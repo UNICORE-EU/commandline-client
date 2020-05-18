@@ -1,0 +1,8 @@
+#
+# authentication methods provided by UCC core
+#
+de.fzj.unicore.ucc.authn.UsernameAuthN
+de.fzj.unicore.ucc.authn.KeystoreAuthN
+de.fzj.unicore.ucc.authn.oidc.TokenBasedAuthN
+de.fzj.unicore.ucc.authn.oidc.OIDCServerAuthN
+de.fzj.unicore.ucc.authn.oidc.OIDCAgentAuthN

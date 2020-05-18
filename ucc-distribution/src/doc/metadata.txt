@@ -1,0 +1,139 @@
+[[ucc_metadata]]
+Metadata management functions
+-----------------------------
+
+UCC offers a simple interface to access the metadata 
+management service in UNICORE.
+
+
+Basics
+~~~~~~
+
+The metadata functions are all accessed via a single UCC command
++metadata+. The actual operation to be performed is given
+with the "-C" (i.e. "command") option.
+
+The storage to be operated upon is given using the "-s" option, 
+alternatively the "-m" option can be used to directly give
+the metadata service URL.
+
+In addition to the URL, the name of the target file on the storage 
+is required.
+
+Metadata is represented in JSON format. The metadata operations
+usually read metadata from a file (or write results to file), which
+is specified using the "-f" option.
+
+In the following examples, +<STORAGE>+ denotes the URL of a storage 
+capable of handling metadata.
+ 
+Available commands
+~~~~~~~~~~~~~~~~~~
+
+==== creating metadata
+
+To create metadata, a file in JSON format is required containing key-value 
+pairs. For example, edit the file "meta.json" to contain:
+
+----
+{
+ foo: bar
+}
+----
+ 
+Say we have a file "test" on our storage, then you can create metadata as
+follows
+
+----
+ucc metadata -C create -f meta.json -s <STORAGE> /test
+----
+
+If you now look at the file with "ls -l -m", 
+
+----
+ucc ls -l -m  <STORAGE>/test
+----
+
+you should get something like this:
+
+----
+-rw-           3344 2011-06-27 22:32 /test                         
+{
+  "foo": "bar",
+  "resourceName": "/test"
+}
+----
+
+
+==== reading metadata
+
+Apart from the "ls -l -m" used above, there is also an explicit
+"read" command, which can write the metadata to a file as well.
+
+
+----
+ucc metadata -C read -s <STORAGE> /test -f out.json
+----
+
+The "-f" option is optional.
+
+
+
+==== updating metadata
+
+Using update, the given metadata is merged with any existing metadata.
+Say we have a file x.json containing:
+
+----
+{
+ x: y
+}
+----
+
+we can append this to the existing metadata 
+
+----
+ucc metadata -C update -s <STORAGE> /test -f x.json
+----
+
+Check that the metadata has indeed been appended.
+
+
+
+
+==== deleting metadata
+
+Explicitely deleting is also possible:
+
+----
+ucc metadata -C delete -s <STORAGE> /test 
+----
+
+Check that the metadata has indeed been deleted.
+
+
+
+==== searching
+
+Searching requires a search string (according to the rules
+of Apache Lucene), and is triggered by the "search" command:
+
+
+----
+ucc metadata -C search -q "foo" -s <STORAGE> /
+----
+
+
+==== triggering metadata extraction
+
+To trigger the extraction of metadata on the server, use the "start-extract"
+command:
+
+----
+ucc metadata -C start-extract -s <STORAGE> /
+----
+
+In this case the "/" denotes the base path from which to start the extraction process.
+
+
+

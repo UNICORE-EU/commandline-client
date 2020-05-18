@@ -1,0 +1,76 @@
+[[ucc_quickstart]]
+Getting started with UCC
+------------------------
+
+Assuming you have successfully installed UCC, this section
+shows how to get going quickly.
+
+Getting help
+~~~~~~~~~~~~
+
+Calling UCC with the "-h" option will show the available options. 
+To get a list of available commands, type
+
+
+----
+$> ucc -h
+----
+
+  To get help on a specific command, type
+  
+----
+$> ucc <command> -h
+----
+
+See also link:options.html[here] for a list of common options.
+
+
+Connecting
+~~~~~~~~~~
+
+First, contact UNICORE and make sure you have access to some target systems.
+  
+----
+$> ucc connect [options]
+----
+  
+
+List available sites
+~~~~~~~~~~~~~~~~~~~~
+
+Then, list the sites available to you using 
+  
+--------------
+$> ucc list-sites [options]
+--------------
+
+Running your first job
+~~~~~~~~~~~~~~~~~~~~~~
+
+The UCC distribution contains samples that you can run. Let's run the "date" 
+sample. The "-v" switch prints more info so you can see what's going on.
+
+--------------
+$> ucc run [options] -v [UCC_HOME]/samples/date.u
+--------------
+
+[NOTE]
+===============================
+Look for UCC samples in the /usr/share/doc/unicore/ucc/samples directory,
+===============================
+
+This will run "date" on a randomly chosen site, and retrieve the output. 
+To run on a particular site, use the "-s" option to specify a particular 
+target system.
+
+Listing your jobs
+~~~~~~~~~~~~~~~~~
+
+The command 
+
+--------------
+$> ucc list-jobs
+--------------
+
+will print a list of jobs (actually their addresses) with their respective status (RUNNING, SUCCESSFUL, etc)
+  

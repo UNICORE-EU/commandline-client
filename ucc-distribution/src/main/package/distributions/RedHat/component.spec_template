@@ -1,0 +1,86 @@
+Buildroot: %{_builddir}/%{name}-root
+Name: unicore-@component-name@@component-suffix@
+Obsoletes: unicore-@component-name@6
+Version: @component-version@
+Release: @component-release@@component-disttag@
+Summary: UNICORE Commandline Client
+License: BSD
+Distribution: RedHat
+Group: Converted/contrib/misc
+URL: http://www.unicore.eu
+Requires: java-1.@java-main-version@.0-openjdk
+AutoReqProv: no
+BuildArch: @component-architecture@
+Packager: Bernd Schuller unicore-support@lists.sourceforge.net
+@preamble@
+
+%description
+UNICORE (Uniform Interface to Computing Resources) offers a
+ready-to-run Grid system including client and server software.
+UNICORE makes distributed computing and data resources available
+in a seamless and secure way in intranets and the internet.
+
+This package contains the UNICORE commandline client UCC.
+
+
+%changelog
+* Thu Jan 16 2014 Bernd Schuller <unicore-support@lists.sourceforge.net> 7.0.1-0
+-fix obsoletes directive
+* Fri Dec 13 2013 Bernd Schuller <unicore-support@lists.sourceforge.net> 5.1.0-1
+-updated Java dependency to Java 7
+* Thu Oct 11 2012 Bernd Schuller <unicore-support@lists.sourceforge.net> 5.1.0-1
+-updated to v1.5.1 of base libs, added samples to rpm
+* Mon Jan 30 2012 Bernd Schuller <unicore-support@lists.sourceforge.net> 5.0.0-1
+-packaging updated, changed version schema, changed name to unicore-ucc6
+* Tue Feb 15 2011 Bernd Schuller <unicore-support@lists.sourceforge.net> 6.4.0-1
+-updates for 6.4.0 release
+* Wed May 5 2010 Bernd Schuller <unicore-support@lists.sourceforge.net> 6.3.1-1
+-include rpm build into automated UCC builds
+* Fri Nov 20 2009 Rebecca Breu <unicore-support@lists.sourceforge.net> 6.2.0-1
+-get site-start for Emacs right
+* Thu Oct 15 2009 Rebecca Breu <unicore-support@lists.sourceforge.net> 6.2.0-1
+-Initial rpm package
+
+@install_command@
+
+%files
+%defattr(644, root, root, 755)
+
+#
+# Config files
+#
+%dir %attr(755 root root) "/etc/unicore/ucc/"
+%config %attr(644 root root) "/etc/unicore/ucc/extensions"
+%config %attr(644 root root) "/etc/unicore/ucc/logging.properties"
+%config %attr(644 root root) "/etc/unicore/ucc/preferences"
+
+#
+# Bash completion
+#
+%attr(644 root root) "/etc/bash_completion.d/unicore-ucc"
+
+#
+# Emacs mode
+#
+%attr(644 root root) "/usr/share/emacs/site-lisp/unicore-ucc/*"
+
+#
+# Documentation and samples
+#
+%docdir %attr(755 root root) "/usr/share/doc/unicore/ucc/"
+%attr(644 root root) "/usr/share/doc/unicore/ucc/*"
+%attr(755 root root) "/usr/share/doc/unicore/ucc/samples"
+%attr(644 root root) "/usr/share/doc/unicore/ucc/samples/*"
+%attr(755 root root) "/usr/share/doc/unicore/ucc/samples/workflows"
+%attr(644 root root) "/usr/share/doc/unicore/ucc/samples/workflows/*"
+
+#
+# jar files
+#
+%dir %attr(755 root root) "/usr/share/unicore/ucc/lib"
+%attr(644 root root) "/usr/share/unicore/ucc/lib/*.jar"
+
+#
+# ucc script
+#
+%attr(755 root root) "/usr/bin/ucc"

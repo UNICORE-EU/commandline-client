@@ -1,0 +1,44 @@
+<s:Workflow xmlns:s="http://www.chemomentum.org/workflow/simple"
+          xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+          xmlns:jsdl-p="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+          xmlns:jsdl-u="http://www.unicore.eu/unicore/jsdl-extensions">
+        
+  <s:Documentation>
+  <!-- template parameter definitions -->
+  <jsdl-u:Argument>
+    <jsdl-u:Name>UC_SIZE</jsdl-u:Name>
+    <jsdl-u:ArgumentMetadata>
+       <jsdl-u:Type>choice</jsdl-u:Type>
+       <jsdl-u:ValidValue>small</jsdl-u:ValidValue>
+       <jsdl-u:ValidValue>medium</jsdl-u:ValidValue>
+       <jsdl-u:ValidValue>large</jsdl-u:ValidValue>
+    </jsdl-u:ArgumentMetadata>
+  </jsdl-u:Argument>
+  <jsdl-u:Argument>
+    <jsdl-u:Name>UC_INPUT</jsdl-u:Name>
+    <jsdl-u:ArgumentMetadata>
+       <jsdl-u:Type>filename</jsdl-u:Type>
+    </jsdl-u:ArgumentMetadata>
+  </jsdl-u:Argument>
+  </s:Documentation> 
+  
+  <s:Activity Id="date" Name="JSDL">
+   <s:JSDL>
+      <jsdl:JobDescription>
+        <jsdl:Application>
+          <jsdl:ApplicationName>ComputeIt</jsdl:ApplicationName>
+          <jsdl-p:POSIXApplication>
+			<jsdl-p:Argument>${UC_SIZE}</jsdl-p:Argument>
+  		  </jsdl-p:POSIXApplication>
+        </jsdl:Application>
+       <jsdl:DataStaging>
+         <jsdl:FileName>stdout</jsdl:FileName>
+         <jsdl:Source>
+           <jsdl:URI>${UC_INPUT}</jsdl:URI>
+         </jsdl:Source>
+         </jsdl:DataStaging>
+      </jsdl:JobDescription>
+    </s:JSDL>
+  </s:Activity>
+
+</s:Workflow>

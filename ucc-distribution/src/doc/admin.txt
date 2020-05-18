@@ -1,0 +1,249 @@
+[[ucc_admin]]
+UCC for site administrators
+---------------------------
+
+UCC can be used for administrative and user support tasks, like
+checking server status, or getting the full details of a user job.
+
+
+
+Security considerations
+~~~~~~~~~~~~~~~~~~~~~~~
+ 
+Usually, each UNICORE user has only access to his or her own resources 
+(such as jobs). For administrative use, you will need to aquire administrator
+privileges. There are two ways to achieve this. 
+
+  - create dedicated user credentials (e.g. a certificate) and map
+them to the role "admin" (in the XUUDB, or whatever attribute source
+you are using). This method is recommended if you want to remotely
+administrate UNICORE/X.
+
+  - use the server keystore (of the UNICORE/X server you want to administrate) 
+as UCC keystore. This will also give you administrator privileges. For this you 
+will need to be logged on to the UNICORE/X server, and UNICORE/X must accept
+certificate authentication.
+
+Admin commands
+~~~~~~~~~~~~~~
+
+UCC has dedicated commands for accessing the "AdminService" of a UNICORE/X container.
+To get started, try
+
+-----------------
+ucc admin-info -l
+-----------------
+
+UCC will try to access the admin service on each availabe UNICORE/X server. For each server,
+a list of statistical and performance data will be listed.
+
+It will also list the available admin commands for each server, with a
+short description of their parameters. For example, here is a sample output:
+
+----------------
+https://localhost:8080/DEMO-SITE/services/AdminService?res=default_admin 
+  Services: 
+    TargetSystemFactoryService[1]
+    ...
+  Monitors: 
+    use.externalConnectionStatus.REST_UnitySAMLAuthenticator: OK
+    use.security.overview: ServerIdentity: CN=Demo UNICORE/X,O=UNICORE,C=EU;Expires: Thu Sep 09 12:01:19 CEST 2032;IssuedBy: CN=Demo CA,O=UNICORE,C=EU
+    ....
+  Metrics: 
+    use.externalConnectionStatus.REST_UnitySAMLAuthenticator: OK
+    use.rest.callFrequency: 0.016677196376660174
+    ...
+  Available commands:
+    ShowJobDetails : parameters: jobID, [xnjsReference]
+    ShowServerUsageOverview : parameters: [clientDN]
+    ToggleResourceAvailability : 'resources' - comma separated list of IDs
+    ToggleJobSubmission : parameters: [message]
+    ToggleBESJobSubmission : 
+----------------
+
+To invoke a command, the "admin-runcommand" is used. It can take
+optional parameters.
+
+
+==== Disabling/enabling job submission
+
+For example, it is possible to disable/enable job
+submission to the server, using the 'ToggleJobSubmission' command,
+which can take an optional message:
+
+-----------------------
+ucc admin-runcommand ToggleJobSubmission message="Maintenance"
+-----------------------
+
+The service will reply:
+
+-----------------------
+SUCCESS, service reply: OK - job submission is disabled
+-----------------------   
+
+If a user now tries to submit, she will receive an error message on submission.
+Running the command again will re-enable the service.
+
+-------------------
+ucc admin-runcommand ToggleJobSubmission message="Maintenance"
+SUCCESS, service reply: OK - job submission is now enabled
+-------------------
+
+==== Getting job details
+To get the full job details (for example in user support), try
+
+--------------
+ucc admin-runcommand ShowJobDetails jobID=<unique_jobid>
+--------------
+
+for example
+
+--------------
+ucc admin-runcommand ShowJobDetails jobID=cdfdafc5-0274-464d-ac4a-463f46c942fa 
+SUCCESS, service reply: Job information for cdfdafc5-0274-464d-ac4a-463f46c942fa
+{Info=Action ID       : cdfdafc5-0274-464d-ac4a-463f46c942fa
+Action type     : JSDL
+Status          : DONE (trans.: none)
+Result          : SUCCESSFUL [Success.]
+Owner           : CN=Demo User,O=UNICORE,C=EU
+Exec. Definition: <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+  <JobDescription>
+    <JobIdentification>
+      <JobName>Date</JobName>
+    </JobIdentification>
+    <Application>
+      <jsdl:POSIXApplication xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+        <jsdl:Executable>/bin/date</jsdl:Executable>
+      </jsdl:POSIXApplication>
+    </Application>
+    <Resources/>
+  </JobDescription>
+</JobDefinition>
+Orig. Definition: <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+  <JobDescription>
+    <JobIdentification>
+      <JobName>Date</JobName>
+    </JobIdentification>
+    <Application>
+      <ApplicationName>Date</ApplicationName>
+      <POSIXApplication xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"/>
+    </Application>
+    <Resources/>
+  </JobDescription>
+</JobDefinition>
+Processing context: de.fzj.unicore.xnjs.ems.ProcessingContext@4308cff0
+Application Info: AppInfo for Date 1.0
+Job log: 
+Thu Sep 08 09:25:03 CEST 2016: Created with ID cdfdafc5-0274-464d-ac4a-463f46c942fa
+Thu Sep 08 09:25:03 CEST 2016: Created with type 'JSDL'
+Thu Sep 08 09:25:03 CEST 2016: Client: Name: CN=Demo User,O=UNICORE,C=EU
+Xlogin: uid: [schuller], gids: [addingOSgroups: true]
+Role: user: role from attribute source
+Security tokens: User name: CN=Demo User,O=UNICORE,C=EU
+Consignor DN: CN=Demo User,O=UNICORE,C=EU
+Delegation to consignor status: true, core delegation status: true
+Message signature status: UNCHECKED
+Client's original IP: 127.0.0.1
+Thu Sep 08 09:25:04 CEST 2016: Using default execution environment.
+Thu Sep 08 09:25:04 CEST 2016: No staging in needed.
+Thu Sep 08 09:25:04 CEST 2016: Status set to READY.
+Thu Sep 08 09:25:04 CEST 2016: Status set to PENDING.
+Thu Sep 08 09:25:04 CEST 2016: Incarnated resources: [CPUsPerNode=1.0, MemoryPerNode=2.68435456E8, ArraySize=1, Nodes=1.0, ArrayLimit=64, CPUTime=3600.0]
+Thu Sep 08 09:25:04 CEST 2016: Command is: 
+#!/bin/sh 
+# ....
+chmod u+x /bin/date 2> /dev/null 
+rm -f /opt/unicore-servers/FILESPACE/cdfdafc5-0274-464d-ac4a-463f46c942fa//UNICORE_SCRIPT_EXIT_CODE
+ /bin/date 
+
+echo $? > /opt/unicore-servers/FILESPACE/cdfdafc5-0274-464d-ac4a-463f46c942fa//UNICORE_SCRIPT_EXIT_CODE
+
+
+Thu Sep 08 09:25:04 CEST 2016: TSI reply: submission OK.
+Thu Sep 08 09:25:04 CEST 2016: Submitted to classic TSI as [schuller NONE] with BSSID=3269519504309
+Thu Sep 08 09:25:13 CEST 2016: Exit code 0
+Thu Sep 08 09:25:13 CEST 2016: Job completed on BSS.
+Thu Sep 08 09:25:14 CEST 2016: Status set to DONE.
+Thu Sep 08 09:25:14 CEST 2016: Result: Success.
+Thu Sep 08 09:25:14 CEST 2016: Total: 10.01 sec., Stage-in: 0.05 sec., Stage-out: 0.00 sec., Datamovement: 0 %}
+
+-------------------
+
+Thus you can get a full view of what the user submitted and what was executed.
+
+Listing jobs, sites, ...
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can also use all normal UCC commands to access the server. Note
+however that due to the authentication and authorisation system in
+UNICORE, this may not always work as expected: the "admin" user might
+not have the required Unix permissions to access files, list
+directories etc.
+
+The UCC commands that list server-side things (list-jobs etc) accept 
+a filtering option, that can be used to limit the results of the operation.
+Filtering works on the XML resource properties of the resource in question.
+
+Filtering is enabled by the "-f" or "--filter" option of the form
+
+-------
+-f XMLNAME OPERATOR VALUE
+-------
+  
+where XMLNAME is the name of an XML Element from the WSRF resource properties
+document.
+
+For example, to list all running jobs:
+
+-----
+ucc list-jobs -f Status equals RUNNING
+-----
+
+To list all jobs submitted on Nov 13, 2007:
+
+-----
+ucc list-jobs -f SubmissionTime contains 2007-11-13
+-----
+
+etc. 
+
+.Filtering options
+[width="100%",cols="<30%m,<70%",frame="topbot",options="header"]
+|=============================
+| Operator (long and short form) | Description
+| equals, eq  | String equality (ignoring case)
+| notequals, neq  | String inequality (ignoring case)
+| contains, c  | Substring match
+| notcontains, nc  | substring non-match
+| greaterthan, gt  | Lexical comparison
+| lessthan, lt  | Lexical comparison
+|=============================
+
+
+Low-level operations
+~~~~~~~~~~~~~~~~~~~~
+
+UCC supports low-level access to REST API endpoints using the "rest"
+command, specifically you can execute HTTP GET, PUT, POST and DELETE
+requests with JSON content.
+
+For example, to delete (destroy) a resource,
+  
+------
+ucc rest delete <Address>
+------
+  
+To get a complete property listing (i.e. print the JSON resource property document)
+  
+-----
+ucc rest get <Address>
+-----
+
+To change properties, use the 'put' command with JSON content.
+   
+-----
+ucc rest put '{"Tags": ["tests", "hpc" ]}'
+-----
+
+These commands can be abbreviated, e.g. + ucc rest d <Address> +
+

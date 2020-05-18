@@ -1,0 +1,25 @@
+The UNICORE Commandline client (UCC) is a full-featured client for the
+UNICORE Grid middleware. 
+
+It requires a Java runtime environment. We recommend using the latest
+OpenJDK or Oracle Java.
+
+For Oracle or IBM Java, you will usually need to install the
+"unlimited strength cryptography" policy files. Otherwise, you
+will encounter "illegal key size" error messages.
+
+UCC offers
+
+ * Job submission and management for both UNICORE native and OGSA-BES
+   interfaces
+
+ * Data movement (upload, download, server-to-server copy, etc) using
+   the UNICORE storage management functions and available data
+   transfer protocols
+
+ * Storage functions (ls, mkdir, ...) including creation of storage
+   instances via storage factories
+
+ * UNICORE workflow system support
+
+and much more.

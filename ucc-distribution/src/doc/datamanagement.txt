@@ -1,0 +1,262 @@
+[[ucc_datamanagement]]
+Data management functions
+-------------------------
+
+UCC offers access to all the data management functions in UNICORE.
+You can upload or download data from a remote server, initiate
+a server-to-server transfer, create directories and so on.
+
+
+Specifying remote locations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Remote locations are via URIs that includes protocol, storage
+server (host/port), site name, and filename, for example
+
+-------
+BFT:https://mygateway:8080/SITE/rest/core/storages/HOME/files/my_file
+-------
+
+which specifies a file named "/my_file" on the storage instance 
+"https://mygateway:8080/SITE/rest/core/storages/HOME",
+using the BFT protocol. 
+
+Paths are always relative to the storage root, not the root of
+the actual file system.
+
+The protocol is optional, and will default to "BFT" if not given.
+
+  
+Data movement
+~~~~~~~~~~~~~
+
+==== cp
+
+The 'cp' command is a generic command for copying source file(s) to a
+target destination, where source and target can be remote locations or
+files on the local machine. Wild card characters '*' and '?'
+are supported. 
+
+Examples for client-server transfers:
+
+-------------
+ucc cp data/*.pdf https://server/rest/core/storages/SHARE/files/pdfs
+ucc cp https://server/rest/core/storages/SHARE/files/pdfs .
+-------------
+
+The "-R" option allows to choose whether subdirectories are to be copied, too.
+
+The "-X" option allows to resume a previous transfer. Missing data will be appended to an
+existing target file (if the chosen protocol supports it).
+
+Examples for server-server transfer:
+
+-------------
+ucc cp https://server/rest/core/storages/SHARE/files/*.pdf  \
+       https://otherserver/rest/core/storages/WORK/data/
+-------------
+
+For server-to-server transfers, the 'cp' command supports several
+additional options.
+
+The "-S" option allows to schedule a transfer for a certain time.
+For example
+
+-------------
+ucc cp -S "23:00" ...
+-------------
+
+The format is simply "HH:mm" (hours and minutes). Alternatively you can give 
+the time in the full ISO 8601 format including year, date, time 
+and time zone:
+
+--------------
+ucc cp -S "2011-12-24T12:30:00+0200" ...
+--------------
+
+Another useful option is "-a" which will execute the server-server transfer 
+asynchronously, i.e. the client will not wait for the transfer to finish.
+
+==== copy-file-status
+
+This will print the status of the given data transfer. As argument, it expects a file name
+containing the transfer reference, or directly the reference.
+ 
+Example (for Unix) which captures the reference into a shell variable:
+  
+-------------
+export ID=$(ucc cp -a ...
+ucc copy-file-status $ID 
+-------------
+
+==== Specifying the file transfer protocol
+
+To use a different protocol from the default BFT, you can use the "-P"
+option to specify your preferred protocol. UCC will try to match them
+with the capabilities of the storage and use the first match. Your
+preferred protocol can also be listed in your preferences file using
+the "protocols" key:
+
+----------
+protocols=UFTP
+----------
+
+[NOTE]
+================
+If necessary, you can specify additional filetransfer options in your preferences file as well. 
+For example, to use the UFTP protocol you may need to specify the client host address 
+and the number of parallel streams explicitely:
+
+-----
+uftp.client.host=your_client_ip_address
+uftp.streams=2
+# encrypt data (at the cost of performance)
+uftp.encryption=true
+# compress data
+uftp.compression=true
+----
+
+Use the special value "all" to enable all available client IP addresses
+for UFTP.
+----
+uftp.client.host=all
+----
+
+You can also override the UFTP server host, which can be useful in case the UFTP server is accessible 
+via multiple network interfaces:
+
+----
+uftp.server.host=myhost.com
+----
+
+UCC will try to use reasonable defaults for any missing parameters.
+
+================
+
+
+
+
+General commands
+~~~~~~~~~~~~~~~~
+
+==== mkdir
+  
+This will create a directory (including required parent directories) remotely.
+  
+Example
+  
+-----
+ucc mkdir https://mygateway:8080/SITE/rest/core/storages/HOME/files/pdfs
+-----
+
+==== rm
+  
+This will remove a file or directory remotely. By default, UCC will ask for a confirmation. 
+Use the "--quiet" or "-q" option to disable this confirmation (e.g. when using 
+this command in scripts).
+  
+Example
+  
+------
+ucc rm https://mygateway:8080/SITE/rest/core/storages/HOME/files/pdfs
+------
+
+==== rename
+  
+This will rename/move a remote file/directory on the same storage.
+  
+Examples
+  
+------
+ucc rename https://mygateway:8080/SITE/rest/core/storages/HOME/files/data/foo1.pdf /files/data/foo2.pdf
+------
+
+will rename the file "foo1.pdf" to "foo2.pdf"
+
+==== stat
+
+This command shows full information on a certain file or directory.
+Add the "-m" flag to also print user-defined metadata.
+
+Example
+
+------------
+ucc stat -m https://mygateway:8080/SITE/rest/core/storages/HOME/files/foo.txt
+------
+
+
+Finding data
+~~~~~~~~~~~~
+
+==== ls
+
+This will list a remote directory. Useful options are: "-l" (detailed output), "-H" (human-friendly)
+and "-R" (recurse). Example:
+
+-----
+ucc ls -l -H https://mygateway:8080/SITE/rest/core/storages/HOME/
+-----
+
+If the storage supports metadata, you can get the metadata of a single file using "ls -l -m":
+
+-----
+ucc ls -l -m https://mygateway:8080/SITE/rest/core/storages/HOME/.bashrc
+-----
+
+
+Using the StorageFactory service
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+UNICORE sites may allow users to dynamically create storage resources,
+which even can be linked to special back-end systems like Apache HDFS, iRODS,
+or cloud storage like Amazon S3.
+
+You can find out if there are sites supporting this "StorageFactory" 
+service either by running the 'system-info -l' command, or better using
+
+----------
+$> ucc create-storage -i
+----------
+
+This will list the available StorageFactory services and also show 
+which types of storage are supported and how much space is left on 
+each of them.
+
+UCC supports creating storages via the 'create-storage' command.
+The simple
+
+----------
+$> ucc create-storage
+----------
+
+will create a new storage resource using the default storage type at 
+some site.
+
+Usually you want to control at least where the storage is created.
+Additionally, the type of storage and some parameters can be passed to 
+UCC. 
+
+As an example, creating a storage of type "S3" would look like this
+
+
+----------
+$> ucc create-storage -t S3 accessKey=... secretKey=...
+----------
+
+
+You can also read parameters from a file. Say you have your S3 keys in a file
+'s3.properties', then you can use the following syntax
+
+----------
+$> ucc create-storage -t S3 @s3.properties
+----------
+
+You can also mix this with the normal 'key=value' syntax, or mix it like this:
+
+----------
+$> ucc create-storage -t S3 accessKey=@s3.accessKey secretKey=@s3.secretKey
+----------
+
+The last version 'key=@file' causes just the value to be read from the 
+named file.
+

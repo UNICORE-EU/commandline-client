@@ -1,0 +1,22 @@
+#
+# sample user preferences for UCC
+#
+
+credential.path=src/test/resources/certs/user-keystore.jks
+credential.keyAlias=demo user
+credential.password=the!user
+
+truststore.type=keystore
+truststore.keystorePath=src/test/resources/certs/user-keystore.jks
+truststore.keystorePassword=the!user
+
+ucc-session-ids=target/ucc-session-ids
+ucc-shell-history=target/ucc-shell-history
+
+registry=http://localhost:65322/services/Registry?res=default_registry
+
+output=target
+
+client.http.connection.timeout=2000
+
+client.http.socket.timeout=20000

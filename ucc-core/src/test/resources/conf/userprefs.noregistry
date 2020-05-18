@@ -1,0 +1,13 @@
+#
+# erroneous user preferences for UCC: registry is missing
+#
+
+credential.path=src/test/resources/certs/user-keystore.jks
+credential.keyAlias=demo user
+credential.password=the!user
+
+truststore.type=keystore
+truststore.keystorePath=src/test/resources/certs/user-keystore.jks
+truststore.keystorePassword=the!user
+
+ucc-session-ids=target/ucc-session-ids

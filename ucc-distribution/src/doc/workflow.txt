@@ -1,0 +1,97 @@
+[[ucc_workflow]]
+Workflows 
+---------
+
+=== Introduction
+
+
+UCC supports the UNICORE workflow system and allows to submit workflows to
+the workflow engine and manage them.
+
+The workflows are executed server-side, and UCC is used only for submitting, 
+managing data and getting results.
+
+[NOTE]
+===========
+Version 8 of the workflow system has changed a lot, and is still evolving
+- as is the UCC support. Stay tuned for updates!
+==========
+
+
+=== Command overview
+
+The following commands are provided. More details and examples follow below.
+  
+  - +workflow-submit+ : submit a workflow file
+  
+  - +workflow-control+ :  abort or resume a running workflow 
+  
+  - +list-workflows+ : list information about workflows
+  
+=== Basic use
+
+To check the availability of workflow services, issue the following command
+
+-------------
+ucc system-info -l
+-------------
+
+This should show at least an accessible workflow service.
+
+The distribution contains some example workflow files in the <<<samples/workflows>>> directory 
+that you can edit and submit.
+  
+-------------
+ucc workflow-submit yourworkflow.json
+-------------
+
+which will submit the workflow and print the address of the workflow to standard output.
+To get the workflow status,
+
+---------------
+ucc list-workflows <workflow_address>
+---------------  
+
+
+To list all your workflows, you can use the <<<list-workflows>>> command without an explicit
+workflow address
+
+---------------
+ucc list-workflows -l
+---------------  
+   
+  
+=== Managing workflow data
+
+
+==== Importing local data for use by a workflow
+
+TBD
+
+If you have local files that need to be imported before starting
+the workflow, you have to specify this using a normal UCC job file that 
+contains only an "Imports" section:
+
+TBD
+
+==== Workflow templates
+
+TBD
+
+If the workflow's +Documentation+ section contains +parameters+ definitions, the corresponding
+replacement will be done by reading parameter values from the .u file. These so-called
+workflow templates can be a very simple and safe way to make adjustments in complex workflows #
+before submission. As an example, consider the following simple example workflow
+
+TBD
+
+----------
+...
+----------
+
+=== Resuming a held workflow
+
+A workflow in status "HELD" can be resumed using the "workflow-control resume" command. If the workflow
+has variables / parameters, updated values can be sent with the resume command.
+
+

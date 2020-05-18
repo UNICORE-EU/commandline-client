@@ -1,0 +1,10 @@
+#
+# UCC extensions file
+#
+#
+# To add new commands to UCC, add lines to this file 
+#   <cmdname>=<Java class name> 
+# where <Java class name> is the name of a Java class extending
+# the de.fzj.unicore.ucc.Command class
+#
+

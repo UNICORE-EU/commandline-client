@@ -1,0 +1,10 @@
+{
+
+  ApplicationName: Date, 
+  ApplicationVersion: "1.0",
+
+  Exports:[
+   { From: "nosuchfile", To: "out", FailOnError: "false", },
+  ],
+  
+} 

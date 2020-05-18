@@ -1,0 +1,7 @@
+{
+
+  Exports:[
+   { From: "http://localhost:65322/rest/core/storages/WORK/files/file1", To: "out", },
+  ],
+  
+} 

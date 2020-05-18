@@ -1,0 +1,42 @@
+<s:Workflow xmlns:s="http://www.chemomentum.org/workflow/simple" 
+            xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl" 
+            xmlns:jsdl1="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <s:Documentation>
+    <s:Comment>
+ For-each loop over a variable, similar to a Java for-loop
+    </s:Comment>
+  </s:Documentation>
+
+
+<s:SubWorkflow Id="for1" xsi:type="s:ForEachType" IteratorName="IT">
+
+  <s:SubWorkflow Id="for1_body">
+    <s:Activity Id="RunScript" Type="JSDL">
+      <s:JSDL>
+        <jsdl:JobDescription>
+          <jsdl:Application>
+             <jsdl1:POSIXApplication>
+              <jsdl1:Executable>/bin/echo</jsdl1:Executable>
+              <jsdl1:Argument>Value is ${FOO}</jsdl1:Argument>
+              <jsdl1:Environment name="FOO">${TEST}</jsdl1:Environment>
+            </jsdl1:POSIXApplication>
+          </jsdl:Application>
+
+        </jsdl:JobDescription>
+      </s:JSDL>
+    </s:Activity>
+  </s:SubWorkflow>
+
+  <s:VariableSet>
+    <s:VariableName>TEST</s:VariableName>
+    <s:Type>INTEGER</s:Type>
+    <s:StartValue>0</s:StartValue>
+    <s:Expression>TEST++;</s:Expression>
+    <s:EndCondition>eval(TEST&lt;5)</s:EndCondition>
+  </s:VariableSet>
+
+ </s:SubWorkflow>
+
+</s:Workflow>

@@ -1,0 +1,11 @@
+{
+
+  ApplicationName: Date, 
+  ApplicationVersion: "1.0",
+    
+  Imports:[
+   { From: "src/test/resources/testfiles/file1", To: "file1", },
+   { From: "src/test/resources/testfiles/file2", To: "file2", },
+  ],
+  
+} 

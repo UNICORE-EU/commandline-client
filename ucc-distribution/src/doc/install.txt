@@ -1,0 +1,135 @@
+[[ucc_install]]
+Installation and configuration
+------------------------------
+
+Prerequisites
+~~~~~~~~~~~~~  
+
+To run UCC, you need a Java runtime version 8 or later (OpenJDK preferred).
+
+Download
+~~~~~~~~
+
+You can get the latest version from the SourceForge 
+https://sourceforge.net/projects/unicore/files/Clients/Commandline%20Client[UNICORE download page].
+
+Installation and configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To install, unpack the distribution in a directory of your choice. It's a good idea
+to add the bin/ directory to your PATH variable,
+
+--------------
+$> export PATH=$PATH:<UCC_HOME>/bin
+--------------
+
+where UCC_HOME is the directory you installed UCC in.
+
+[NOTE]
+==================
+*Windows only* 
+Please do not install UCC into a directory containing spaces such 
+as "Program files".
+
+Also avoid long path names, this can lead to errors due to the Windows
+limit on command line length.
+
+Setting environment variables can be done (as administrator) 
+using the Control panel->System->Extras panel.
+==================
+
+Though you can specify your keystore location and other parameters on the commandline,
+it is easiest to place this information in a file, so that you do not have to key in this
+information repeatedly.
+
+Preferences file
+~~~~~~~~~~~~~~~~
+
+UCC checks by default whether the file <userhome>/.ucc/preferences exists, and reads it.
+
+A minimal example that specifies username, password and your preferred UNICORE registry URL
+would look as follows:
+
+--------------
+registry=<your registry>
+
+authenticationMethod=username
+username=demouser
+password=test123
+
+truststore.type=directory
+truststore.directoryLocations.1=<path to CA file(s)>
+
+client.serverHostnameChecking=NONE
+--------------
+
+Please refer to xref:ucc_options[] for a full description of available options.
+
+[NOTE]
+=================
+If you are worried about security, and do not want specify the password: UCC will ask for it if it
+is not given in the preferences or on the commandline.
+==================
+
+[NOTE]
+==================
+*Windows only* 
+The preferences are usually searched in the "c:\Users\<user_name>\.ucc" 
+folder.
+
+To create the .ucc folder, you might have to use the 
+command prompt "mkdir" command. 
+
+When specifying paths in the preferences file, the backslash '\' 
+character needs to be written using an extra backslash '\\'
+==================
+
+For example, if you are using a local UNICORE installation for 
+testing, you could use
+
+--------------
+registry=https://localhost:8080/DEMO-SITE/rest/core/registries/default_registry
+--------------
+
+[NOTE]
+====================
+If you wish to change the default property file location, you can
+set a Java VM property in the UCC start script, for example by editing the command
+that starts UCC
+
+--------------
+java .... -Ducc.preferences=<preferences location> ....
+--------------
+
+=====================
+
+Logging
+~~~~~~~
+
+UCC writes some messages to the console, more if you choose the
+verbose mode (-v option). If you need real logging (e.g. when using
+the batch mode), you can edit the <UCC_HOME>/conf/logging.properties
+file, which configures the Log4J logging infrastructure used in
+UNICORE.
+  
+Installing UCC extensions
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+UCC can be extended with additional commands. It is enough
+to copy the libraries (.jar files) of the extension into a directory
+that is scanned by UCC: in general these are the UCC +lib+
+and the +$\{HOME\}/.ucc/lib+ directory. 
+
+
+Testing the installation
+~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+To test your UCC installation and to get information about the
+services available in the UNICORE system you're connecting to, do
+
+--------------
+$> ucc system-info -l -v
+--------------
+
+
+
