@@ -183,11 +183,11 @@ token=...
 Certificate-based authentication
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some UNICORE installations may still support (or even require) client
-certficates for authentication.  To configure this, set
+For UNICORE installations that support (or even require) client
+certficates for authentication, set
 
 ----------------------------
-authenicationMethod=X509
+authenticationMethod=X509
 
 credential.path=<your keystore>
 credential.password=XXXXXXX

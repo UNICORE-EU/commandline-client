@@ -2,9 +2,8 @@
 # sample user preferences for UCC
 #
 
-credential.path=src/test/resources/certs/user-keystore.jks
-credential.keyAlias=demo user
-credential.password=the!user
+username=demouser
+password=test123
 
 truststore.type=keystore
 truststore.keystorePath=src/test/resources/certs/user-keystore.jks

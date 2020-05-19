@@ -40,7 +40,7 @@ public class UCCBuilder extends Builder {
 	private final UCCConfigurationProvider configurationProvider;
 	private final IRegistryClient registry;
 	private boolean checkLocalFiles=true;
-
+	
 	/**
 	 * reads a JSON string from the supplied File
 	 * and creates the builder from it
@@ -86,6 +86,11 @@ public class UCCBuilder extends Builder {
 	@Override
 	public JSONObject getJSON() {
 		build();
+		if(imports.size()>0) {
+			try{
+				json.put("haveClientStageIn", true);
+			}catch(JSONException e) {}
+		}
 		return super.getJSON();
 	}
 

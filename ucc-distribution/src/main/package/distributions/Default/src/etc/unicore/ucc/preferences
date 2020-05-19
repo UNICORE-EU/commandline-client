@@ -1,30 +1,19 @@
 #
-# sample user preferences for UCC
+# User preferences for UCC
 #
-# if not specified using the -c option, UCC checks whether a
-# file '$HOME/.ucc/preferences' exists and reads preferences from it
-# 
-
 
 #
-# setting keystore/truststore
-# see 'ucc help-auth' for a full list of properties
+# authentication settings
+# see 'ucc help-auth' for more
 
-# keystore containing a key entry for accessing the Grid
-credential.path=../certs/user-keystore.jks
-credential.password=the!user
-#credential.format=jks
-
-# in case you have more than one key make sure to set the alias
-#credential.keyAlias=demo user
+authenticationMethod=USERNAME
+username=demouser
+password=test123
 
 # configure truststore containing trusted CA certs
 truststore.type=directory
 # if type is 'directory'
 truststore.directoryLocations.1=../certs/trusted-certs/*.pem
-# if it is a keystore file
-truststore.keystorePath=../certs/user-keystore.jks
-truststore.keystorePassword=the!user
 
 # do not check the SSL cert contains correct hostname
 client.serverHostnameChecking=NONE
@@ -39,17 +28,3 @@ registry=https://localhost:8080/DEMO-SITE/services/Registry?res=default_registry
 # default directory for output
 # 
 output=.
-
-#
-# HTTP Proxy settings
-#
-#http.proxyHost=
-#http.proxyPort=
-#http.proxy.user=
-#http.proxy.password=
-#http.nonProxyHosts=<space separated list of hostnames>
-
-#
-# connection timeout in millis (default = 10000)
-#
-#http.connection.timeout=<timeout in millis>

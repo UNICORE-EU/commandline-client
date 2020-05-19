@@ -3,10 +3,15 @@ UCC Changelog
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
 
-Version 2.1.0  (released MMM dd, 2020)
+Version 2.0.1  (released May 19, 2020)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - add workflow submission and management
-
+ - default authentication method is now
+   username/password
+ - remove UNICORE 7 SAML authentication which is no longer used
+   with the REST API. Use username/password instead
+ - fix: submitted job did not wait for client stage-in 
+ 
 Version 2.0.0  (released Mar 17, 2020)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - update to UNICORE 8 base libs

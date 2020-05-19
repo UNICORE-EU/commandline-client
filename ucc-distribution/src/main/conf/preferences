@@ -1,33 +1,19 @@
 #
-# sample user preferences for UCC
+# User preferences for UCC
 #
-# please refer to the manual for more information
-# about the available options
 
 #
-# Credential configuration - it is used to identify you in the Grid,
-# and must be kept secret.
-#
-credential.path=${UCC_CONFIG}/user-keystore.jks
-credential.format=jks
+# authentication settings
+# see 'ucc help-auth' for more
 
-# If you do not want to put your password
-# into a file, remove it and UCC will query for it
-credential.password=the!user
+authenticationMethod=USERNAME
+username=demouser
+password=test123
 
-# In case you have more than one key and use keystore, set the alias
-#credential.keyAlias=demo user
-
-#
-# configure a truststore with trusted CA certificates.
-#
+# configure truststore containing trusted CA certs
 truststore.type=directory
 # if type is 'directory'
-truststore.directoryLocations.1=${UCC_CONFIG}/trusted-certs/*.pem
-# if type is 'keystore'
-truststore.keystorePath=${UCC_CONFIG}/user-keystore.jks
-truststore.keystoreFormat=JKS
-truststore.keystorePassword=the!user
+truststore.directoryLocations.1=../certs/trusted-certs/*.pem
 
 # do not check the SSL cert contains correct hostname
 client.serverHostnameChecking=NONE
@@ -42,18 +28,4 @@ registry=https://localhost:8080/DEMO-SITE/services/Registry?res=default_registry
 # default directory for output
 # 
 output=.
-
-#
-# HTTP Proxy settings
-#
-#http.proxyHost=
-#http.proxyPort=
-#http.proxy.user=
-#http.proxy.password=
-#http.nonProxyHosts=<space separated list of hostnames>
-
-#
-# connection timeout in millis (default = 10000)
-#
-#http.connection.timeout=<timeout in millis>
 

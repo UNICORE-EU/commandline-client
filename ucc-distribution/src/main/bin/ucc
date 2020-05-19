@@ -76,11 +76,6 @@ set_option "Xmx" "128m"
 set_option "Ducc.preferences" "=${HOME}/.ucc/preferences"
 
 #
-# extensions file
-#
-set_option "Ducc.extensions" "=${INST}/conf/extensions"
-
-#
 # log configuration
 #
 set_option "Dlog4j.configuration" "=file://${INST}/conf/logging.properties"
