@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.cli.OptionBuilder;
 
-import de.fzj.unicore.ucc.helpers.ResourceCache;
 import de.fzj.unicore.ucc.util.UCCBuilder;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.runner.RandomSelection;
@@ -300,7 +299,6 @@ public class Batch extends ActionBase {
 		executor.shutdown();
 		message("Site selection summary:");
 		message(printSelectionStatistics(siteSelectionStragegy.getSelectionStatistics()));
-		verbose("Resource cache hits: "+ResourceCache.getInstance().getCacheHits());
 	}
 
 	protected void doBatch() throws IOException, InterruptedException{

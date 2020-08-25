@@ -1,13 +1,11 @@
 package de.fzj.unicore.ucc.helpers;
 
-import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Simple cache support. Multiple caches identified by a cache ID can be used.
@@ -18,49 +16,22 @@ public class ResourceCache {
 
 	private static final ResourceCache cache = new ResourceCache();
 	
-	private final Map<String,Cache>caches;
-	
-	private final CacheManager cacheManager;
-	
-	private final AtomicInteger cacheHits=new AtomicInteger(0);
+	private final Map<String,Cache<Object, Object>>caches;
 	
 	private ResourceCache(){
-		caches=new ConcurrentHashMap<String,Cache>();
-		ByteArrayInputStream bis=new ByteArrayInputStream(ehCacheConfig.getBytes());
-		cacheManager=CacheManager.create(bis);
+		caches = new ConcurrentHashMap<>();
 	}
-	
-	/**
-	 * config for ehcache</br>
-	 * This is an in-memory cache only, 
-	 * using the default LRU policy 
-	 */
-	private String ehCacheConfig="<ehcache name=\"__ucc_resource_cache__\">\n" +
-			   "<defaultCache maxElementsInMemory=\"500\"\n"+
-		        "eternal=\"false\"\n"+
-		        "timeToIdleSeconds=\"3600\"\n"+
-		        "timeToLiveSeconds=\"3600\"\n"+
-		        "overflowToDisk=\"false\"\n"+
-		        "diskPersistent=\"false\"\n"+
-		        "/>\n"+
-		        "</ehcache>";
 
 	public static ResourceCache getInstance(){
 		return cache;
 	}
 	
-	public void put(String cacheID, Object key, Object value){
-		Cache c=doGetCache(cacheID);
-		Element el=new Element(key,value);
-		c.put(el);
+	public void put(String cacheID, Object key, Object value){	
+		doGetCache(cacheID).put(key,value);
 	}
 	
 	public Object get(String cacheID, Object key){
-		Cache c=doGetCache(cacheID);
-		Element el=c.get(key);
-		if(el==null)return null;
-		cacheHits.incrementAndGet();
-		return el.getObjectValue();
+		return doGetCache(cacheID).getIfPresent(key);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -70,16 +41,15 @@ public class ResourceCache {
 		return (T)o;
 	}
 
-	public int getCacheHits(){
-		return cacheHits.intValue();
-	}
-	
-	private synchronized Cache doGetCache(String id){
+	private synchronized Cache<Object,Object> doGetCache(String id){
 		if(id==null)throw new NullPointerException("cache id can't be null");
-		Cache c=caches.get(id);
+		Cache<Object,Object> c=caches.get(id);
 		if(c==null){
-			cacheManager.addCache(id);
-			c=cacheManager.getCache(id);
+			c = CacheBuilder.newBuilder()
+					.maximumSize(250)
+					.expireAfterAccess(3600, TimeUnit.SECONDS)
+					.expireAfterWrite(3600, TimeUnit.SECONDS)
+					.build();
 			caches.put(id, c);
 		}
 		return c;

@@ -1,6 +1,8 @@
 package de.fzj.unicore.ucc.workflow;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.OptionBuilder;
@@ -11,6 +13,7 @@ import org.json.JSONObject;
 import de.fzj.unicore.uas.json.JSONUtil;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
+import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.ucc.actions.info.ListActionBase;
 import eu.unicore.ucc.workflow.WorkflowFactoryLister;
 import eu.unicore.workflow.WorkflowClient;
@@ -130,19 +133,22 @@ public class WorkflowInfo extends ListActionBase<BaseServiceClient> {
 			}
 			return;
 		}
-		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry, configurationProvider, tags);
+		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry, configurationProvider);
 		for(WorkflowFactoryClient wf: workflowFactories){
 			try{
 				verbose("Listing workflows from "+wf.getEndpoint().getUrl());
-				JSONArray list = wf.getProperties().getJSONArray("workflows");
-				for(String url : JSONUtil.toArray(list)) {
+				EnumerationClient jobs = wf.getWorkflowList();
+				jobs.setDefaultTags(tags);
+				Iterator<String>urls = jobs.iterator();
+				while(urls.hasNext()) {
+					String url = urls.next();
 					try {
-					WorkflowClient wfc = new WorkflowClient(new Endpoint(url), 
-							configurationProvider.getClientConfiguration(url),
-							configurationProvider.getRESTAuthN());
-					if(filterMatch(wfc)){
-						listOne(wfc);
-					}
+						WorkflowClient wfc = new WorkflowClient(new Endpoint(url), 
+								configurationProvider.getClientConfiguration(url),
+								configurationProvider.getRESTAuthN());
+						if(filterMatch(wfc)){
+							listOne(wfc);
+						}
 					}catch(Exception e) {
 						error("Error accessing workflow  "+url, e);						
 					}
@@ -185,6 +191,8 @@ public class WorkflowInfo extends ListActionBase<BaseServiceClient> {
 			logger.error("Can't access job list.",e);
 		}
 		listParameters(props, details);
+		List<String> tags =  JSONUtil.toList(props.getJSONArray("tags"));
+		details.append(sep).append("  Tags: ").append(tags);
 		return details.toString();
 	}
 

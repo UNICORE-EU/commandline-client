@@ -26,7 +26,7 @@ public class WorkflowFactoryLister extends Lister<WorkflowFactoryClient>{
 
 	private final UCCConfigurationProvider configurationProvider;
 
-	public WorkflowFactoryLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider, String[] tags){
+	public WorkflowFactoryLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider){
 		this(null, registry, configurationProvider, new AcceptAllFilter());
 	}
 	

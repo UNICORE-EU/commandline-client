@@ -12,11 +12,11 @@
   <parent>
     <groupId>de.fzj.unicore</groupId>
     <artifactId>ucc-parent</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <version>8.0.1</version>
+  <version>8.0.2</version>
 
   <properties>
     <!-- this is the UCC version we are packaging -->
