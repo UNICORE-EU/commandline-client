@@ -1,17 +1,13 @@
 /*
-* kill all successful jobs
+* deletes all successful jobs
 *
-* run with 'ucc run-groovy -f killall.groovy ...'
+* run with 'ucc run-groovy -f killall.groovy'
 * 
 */
 
 import eu.unicore.client.*
 import eu.unicore.client.core.*
 import eu.unicore.client.lookup.CoreEndpointLister
-
-def lister = new CoreEndpointLister(registry,configurationProvider, auth)
-
-//kills a job with the given status ("SUCCESSFUL", "RUNNING", ...)
 
 def kill(job, statuscode){
   if (job.status==statuscode){
@@ -20,9 +16,11 @@ def kill(job, statuscode){
   }
 }
 
-//iterate over sites and kill all jobs that are "SUCCESSFUL"
+// iterate over sites and delete all jobs that are "SUCCESSFUL"
 
-lister.each {
+def endpoints = new CoreEndpointLister(registry, configurationProvider, auth)
+
+endpoints.each {
    it.jobsList.each {
       def jc = new JobClient(new Endpoint(it), configurationProvider.getClientConfiguration(it), auth)
       kill(jc, JobClient.Status.SUCCESSFUL)

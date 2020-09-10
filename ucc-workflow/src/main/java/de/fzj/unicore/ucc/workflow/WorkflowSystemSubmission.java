@@ -14,6 +14,9 @@ public class WorkflowSystemSubmission extends ActionBase {
 
 	public static final String OPT_DRYRUN_LONG="dryRun";
 	public static final String OPT_DRYRUN="d";
+	
+	public static final String OPT_STORAGEURL_LONG="storageURL";
+	public static final String OPT_STORAGEURL="S";
 
 	protected String siteName;
 
@@ -42,6 +45,14 @@ public class WorkflowSystemSubmission extends ActionBase {
 				.create(OPT_FACTORY)
 		);
 
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_STORAGEURL_LONG)
+				.withDescription("Storage URL to upload local files to")
+				.isRequired(false)
+				.hasArg()
+				.withArgName("storage_url")
+				.create(OPT_STORAGEURL)
+		);
+		
 		getOptions().addOption(OptionBuilder.withLongOpt(OPT_DRYRUN_LONG)
 				.withDescription("Dry run, do not submit anything")
 				.isRequired(false)

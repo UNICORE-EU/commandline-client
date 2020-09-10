@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.io.FileUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.fzj.unicore.uas.json.JSONUtil;
@@ -16,6 +15,7 @@ import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.ucc.actions.info.ListActionBase;
 import eu.unicore.ucc.workflow.WorkflowFactoryLister;
+import eu.unicore.util.Log;
 import eu.unicore.workflow.WorkflowClient;
 import eu.unicore.workflow.WorkflowFactoryClient;
 
@@ -63,7 +63,7 @@ public class WorkflowInfo extends ListActionBase<BaseServiceClient> {
 	protected void createOptions() {
 		super.createOptions();
 		getOptions().addOption(OptionBuilder.withLongOpt("nofiles")
-				.withDescription("Do not list global files (in detailed mode)")
+				.withDescription("Do not list workflow files (in detailed mode)")
 				.isRequired(false)
 				.create("N")
 				);
@@ -166,8 +166,9 @@ public class WorkflowInfo extends ListActionBase<BaseServiceClient> {
 	}
 
 	@Override
-	protected String getDetails(BaseServiceClient workflow)throws Exception{
+	protected String getDetails(BaseServiceClient client)throws Exception{
 		if(!detailed)return "";
+		WorkflowClient workflow = (WorkflowClient)client;
 		StringBuilder details=new StringBuilder();
 		JSONObject props = workflow.getProperties();
 		String sep=System.getProperty("line.separator");
@@ -178,30 +179,46 @@ public class WorkflowInfo extends ListActionBase<BaseServiceClient> {
 			details.append(sep).append("  Error(s): tbd");
 		}
 		
+		List<String> tags =  JSONUtil.toList(props.getJSONArray("tags"));
+		details.append(sep).append("  Tags: ").append(tags);
+		
+		listParameters(props, details);
+		
 		if(listFiles){
 			listFiles(workflow, details);
 		}
-		try{
-			JSONArray jobs = props.getJSONArray("jobs");
-			details.append(sep).append("  Number of jobs: ").append(jobs.length());
-			if(listJobs){
-				
+		
+		if(listJobs){
+			try{
+				details.append(sep).append("  Jobs: ");
+				EnumerationClient jobListClient = workflow.getJobList();
+				for(String u: jobListClient) {
+					details.append(sep).append("    ").append(u);
+				}
+			}catch(Exception e){
+				String msg = Log.createFaultMessage("Can't access job list.", e);
+				details.append(sep).append("  ** ERROR: ").append(msg);
 			}
-		}catch(Exception e){
-			logger.error("Can't access job list.",e);
 		}
-		listParameters(props, details);
-		List<String> tags =  JSONUtil.toList(props.getJSONArray("tags"));
-		details.append(sep).append("  Tags: ").append(tags);
 		return details.toString();
 	}
 
 
-	protected void listFiles(BaseServiceClient workflow, StringBuilder details){
+	protected void listFiles(WorkflowClient workflow, StringBuilder details){
 		try{
-			// TODO
+			details.append(sep).append("  Files: ");
+			BaseServiceClient fileListClient = workflow.getFileList();
+			JSONObject props = fileListClient.getProperties();
+			@SuppressWarnings("unchecked")
+			Iterator<String> iter = (Iterator<String>)props.keys();
+			while(iter.hasNext()){
+				String wf = iter.next();
+				String url = props.getString(wf);
+				details.append(sep).append("    ").append(wf).append(" : ").append(url);
+			}
 		}catch(Exception e){
-			logger.error("Can't retrieve output files",e);
+			String msg = Log.createFaultMessage("Can't list workflow files!", e);
+			details.append(sep).append("  ** ERROR: ").append(msg);
 		}
 	}
 
@@ -211,7 +228,8 @@ public class WorkflowInfo extends ListActionBase<BaseServiceClient> {
 				details.append(sep).append("  Parameter: ").append(e.getKey()).append("=").append(e.getValue());
 			}
 		}catch(Exception e){
-			logger.error("Can't process workflow parameters.",e);
+			String msg = Log.createFaultMessage("Can't process workflow parameters!", e);
+			details.append(sep).append("  ** ERROR: ").append(msg);
 		}
 	}
 	

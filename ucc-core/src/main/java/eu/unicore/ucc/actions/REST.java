@@ -40,7 +40,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 
 	@Override
 	public String getDescription(){
-		return "Low-level REST API operations";
+		return "perform a low-level REST API operation";
 	}
 
 	

@@ -85,7 +85,7 @@ public class Shell extends ActionBase {
 		run();
 	}
 
-	private String[]internalCommands = {"set", "unset", "system", "help", "help-auth"};
+	private String[]internalCommands = {"set", "unset", "system", "help", "help-auth", "version"};
 	
 	public void run(){
 		Command.quitAfterPrintingUsage=false;
@@ -130,6 +130,7 @@ public class Shell extends ActionBase {
 				}
 				if("help".equalsIgnoreCase(s)){
 					UCC.printUsage(false);
+					printShellHelp();
 					continue;
 				}
 				if(s.startsWith("help-auth")){
@@ -207,8 +208,12 @@ public class Shell extends ActionBase {
 			handleUnset(args);
 			return true;
 		}
-		if("system".contentEquals(cmd)) {
+		if("system".equalsIgnoreCase(cmd) || "!".equals(cmd) ) {
 			handleSystem(args);
+			return true;
+		}
+		if("version".equalsIgnoreCase(cmd)) {
+			handleVersion();
 			return true;
 		}
 		return false;
@@ -243,7 +248,7 @@ public class Shell extends ActionBase {
 	}
 
 	/**
-	 * handle the "unset" command
+	 * handle the "system" command
 	 * @param args
 	 */
 	protected void handleSystem(String[] args) throws Exception {
@@ -267,6 +272,22 @@ public class Shell extends ActionBase {
 		}
 	}
 
+
+	/**
+	 * handle the "version" command
+	 */
+	protected void handleVersion(){
+		UCC.printVersion();
+	}
+	
+	protected void printShellHelp(){
+		System.err.println("Additional commands in the UCC shell:");
+		System.err.println(" set [name=value]... - show variables / set a variable");
+		System.err.println(" unset <name>...     - unset a variable");
+		System.err.println(" system ...          - run a system command (also: '! ...'");
+		System.err.println(" version             - show version info");
+	}
+	
 	@Override
 	protected boolean requireRegistry() {
 		return false;

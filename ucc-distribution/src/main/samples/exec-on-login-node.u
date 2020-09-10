@@ -1,0 +1,17 @@
+{
+#
+# run job on login node
+#
+
+  "Executable": "/bin/bash",
+
+  "Arguments": ["script.sh"],
+  
+  "Job type": "INTERACTIVE",
+
+  "Imports": [
+    { "From": "inline://foo",
+      "To": "script.sh",
+      "Data": "date; hostname; whoami\n" }
+  ],
+} 

@@ -8,7 +8,7 @@
   <inceptionYear>2007</inceptionYear>
   <url>http://www.unicore.eu</url>
   <version>2.0.2</version>
-  <name>Commandline Client for UNICORE</name>
+  <name>UNICORE Commandline Client (UCC)</name>
 
   <parent>
     <groupId>eu.unicore</groupId>

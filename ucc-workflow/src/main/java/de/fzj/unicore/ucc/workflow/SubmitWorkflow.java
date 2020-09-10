@@ -4,8 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.cli.OptionBuilder;
@@ -13,11 +16,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.fzj.unicore.ucc.IServiceInfoProvider;
+import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.authn.UCCConfigurationProvider;
 import de.fzj.unicore.ucc.util.UCCBuilder;
 import eu.unicore.client.Endpoint;
+import eu.unicore.client.core.StorageClient;
+import eu.unicore.client.core.StorageFactoryClient;
 import eu.unicore.services.rest.client.BaseClient;
 import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.ucc.io.FileUploader;
+import eu.unicore.ucc.lookup.StorageFactoryLister;
 import eu.unicore.util.httpclient.IClientConfiguration;
 import eu.unicore.workflow.WorkflowClient;
 import eu.unicore.workflow.WorkflowClient.Status;
@@ -31,9 +39,6 @@ import eu.unicore.workflow.WorkflowFactoryClient;
 public class SubmitWorkflow extends WorkflowSystemSubmission implements
 		IServiceInfoProvider {
 
-	public static final String OPT_NAME_LONG = "workflowName";
-	public static final String OPT_NAME = "N";
-
 	public static final String OPT_UFILE_LONG = "uccInput";
 	public static final String OPT_UFILE = "u";
 
@@ -42,8 +47,6 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 
 	public static final String OPT_WAIT = "w";
 	public static final String OPT_WAIT_LONG = "wait";
-
-	protected String workflowName;
 
 	protected WorkflowFactoryClient wsc;
 
@@ -57,13 +60,22 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 
 	protected JSONObject templateArguments;
 
-	protected int unmatchedTemplateParameters;
+	protected List<String> unmatchedTemplateParameters = new ArrayList<>();
 
+	protected int localFiles = 0;
+
+	protected Map<String,String> inputs = new HashMap<>();
+	
+	// e.g. "https://host:port/SITE/rest/core/storages/STORAGENAME"
+	protected String storageURL;
+	
+	// base directory in the storage
+	protected String baseDir = "/";
+	
 	@Override
 	public void process() {
 		super.process();
 
-		workflowName = getCommandLine().getOptionValue(OPT_NAME);
 		if (getCommandLine().hasOption(OPT_WAIT)) {
 			wait = true;
 		}
@@ -79,7 +91,10 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 		try {
 			findSite();
 			createBuilder();
-			//createWorkflowDataStorage();
+			createWorkflowDataStorage();
+			if(storageURL!=null) {
+				verbose("Using storage at <"+storageURL);
+			}
 			run();
 		} catch (Exception e) {
 			error("", e);
@@ -91,11 +106,11 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 	protected void createBuilder()throws Exception{
 		String uFile = getOption(OPT_UFILE_LONG, OPT_UFILE);
 		if (uFile != null) {
-			verbose("Reading stage-in definitions from <" + uFile + ">");
+			verbose("Reading stage-in and parameter definitions from <" + uFile + ">");
 			builder = new UCCBuilder(new File(uFile),registry,configurationProvider);
 			//side effect: existence of local files will be checked
-			int n=builder.getImports().size();
-			verbose("Will upload <" + n + "> files");
+			localFiles = builder.getImports().size();
+			verbose("Will upload <" + localFiles + "> files");
 		}
 	}
 	
@@ -135,43 +150,75 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 		}
 	}
 
+	protected void createWorkflowDataStorage() throws Exception {
+		if(localFiles<1) {
+			return;
+		}
+		if(getCommandLine().hasOption(OPT_STORAGEURL)) {
+			storageURL = getOption(OPT_STORAGEURL_LONG, OPT_STORAGEURL);
+			if(!storageURL.endsWith("/"))storageURL = storageURL+"/";
+			return;
+		}
+		StorageFactoryClient sfc = null;
+		if(getCommandLine().hasOption(OPT_FACTORY)) {
+			String url = getCommandLine().getOptionValue(OPT_FACTORY);
+			sfc = new StorageFactoryClient(new Endpoint(url),
+					configurationProvider.getClientConfiguration(url), 
+					configurationProvider.getRESTAuthN());
+		}
+		else {
+			// use first from registry
+			StorageFactoryLister sfl = new StorageFactoryLister(
+					UCC.executor, registry, configurationProvider);
+			sfc = sfl.iterator().next();
+		}
+		if(sfc==null){
+			error("No suitable storage factory available!",null);
+			endProcessing(ERROR);
+		}
+		// create storage now
+		verbose("Creating new storage at <"+sfc.getEndpoint().getUrl());
+		storageURL = sfc.createStorage().getEndpoint().getUrl();
+	}
+	
 	protected void run() throws Exception {
 		loadWorkflowFromFile();
 
-		String uFile = getOption(OPT_UFILE_LONG, OPT_UFILE);
-		if (uFile != null) {
-			verbose("Reading stage-in and parameter definitions from <" + uFile + ">");
-			builder = new UCCBuilder(new File(uFile),registry,configurationProvider);
-			//side effect: existence of local files will be checked
-			int n = builder.getImports().size();
-			verbose("Will upload <" + n + "> files");
+		handleTemplateParameters();
+		if(unmatchedTemplateParameters.size()>0){
+			error("ERROR: No value defined for template parameters: "+unmatchedTemplateParameters, null);
+			endProcessing(1);
+		}
+
+	
+		if(localFiles>0){
+			try {
+				uploadLocalData();
+			} catch (Exception e) {
+				error("Can't upload local files.", e);
+				endProcessing(1);
+			}
 		}
 		
-		handleTemplateParameters();
-		if(unmatchedTemplateParameters>0){
-			error("Warning: for some template parameters, no value could be found!", null);
+		JSONObject wf = new JSONObject(workflowToBeSubmitted);
+		JSONObject inputSpec = wf.optJSONObject("inputs");
+		if(inputSpec==null) {
+			inputSpec = new JSONObject();
+			wf.put("inputs", inputSpec);
+		}
+		for(String i: inputs.keySet()) {
+			inputSpec.put(i, inputs.get(i));
 		}
 
 		if(dryRun){
+			message("Resulting workflow: ");
+			message(wf.toString(2));
 			verbose("Dry run, not submitting.");
 			return;
 		}
 		
-	
-		if(builder!=null){
-//			try {
-//				uploadLocalData(builder, id);
-//			} catch (IOException e) {
-//				error("Can't upload local files.", e);
-//				endProcessing(1);
-//			}
-		}
-		
-		JSONObject wf = new JSONObject(workflowToBeSubmitted);
-		
 		WorkflowClient wmc = wsc.submitWorkflow(wf);
 		
-		//workflowToBeSubmitted = resolveU6URLs(workflowToBeSubmitted);
 		String wfURL = wmc.getEndpoint().getUrl();
 		verbose("Workflow URL: " + wfURL);
 		
@@ -200,19 +247,40 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 
 
 	protected void loadWorkflowFromFile() throws Exception {
-		FileInputStream fis = new FileInputStream(new File(workflowFileName)
-				.getAbsolutePath());
-		try {
+		try (FileInputStream fis = new FileInputStream(
+				new File(workflowFileName).getAbsolutePath()))
+		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			int b = 0;
 			while ((b = fis.read()) != -1) {
 				bos.write(b);
 			}
 			workflowToBeSubmitted = bos.toString();
-		} finally {
-			fis.close();
 		}
 	}
+
+	protected void uploadLocalData() throws Exception {
+		if(!baseDir.endsWith("/"))baseDir = baseDir+"/";
+		StorageClient sc = new StorageClient(new Endpoint(storageURL),
+				configurationProvider.getClientConfiguration(storageURL),
+				configurationProvider.getRESTAuthN());
+		
+		for(FileUploader fu: builder.getImports()) {
+			String wfFile = fu.getTo();
+			if(wfFile.startsWith("wf:")) {
+				verbose("Uploading <"+fu.getFrom()+"> as workflow file <"+wfFile+"> ...");
+				fu.setTo(baseDir+wfFile.substring(3));
+				String url = storageURL+"/files"+fu.getTo();
+				inputs.put(wfFile, url);
+				if(dryRun){
+					verbose("Dry run, not uploading.");
+					continue;
+				}
+				fu.perform(sc, this);
+			}
+		}
+	}
+	
 
 	/**
 	 * check if we have arguments with metadata in the workflow
@@ -221,21 +289,24 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 	 */
 	protected void handleTemplateParameters() throws Exception {
 		JSONObject wf = new JSONObject(workflowToBeSubmitted);
-		templateArguments = wf.optJSONObject("templateParameters");
+		templateArguments = wf.optJSONObject("Template parameters");
 		if(templateArguments==null)return;
 		
-		unmatchedTemplateParameters = templateArguments.length();
 		@SuppressWarnings("unchecked")
 		Iterator<String> keys = templateArguments.keys();
 		while(keys.hasNext()){
 			String name = keys.next();
 			JSONObject arg = templateArguments.getJSONObject(name);
-			String defaultValue = arg.optString("default", null);
-			String val = builder.getProperty(name, defaultValue);
+			String val = arg.optString("default", null);
+			if(builder!=null) {
+				val = builder.getProperty(name, val);
+			}
 			if(val!=null){
-				verbose("Template parameter <"+arg+">: using value: <"+val+">");
+				verbose("Template parameter <"+name+">: using value: <"+val+">");
 				workflowToBeSubmitted = workflowToBeSubmitted.replace("${"+name+"}", val);
-				unmatchedTemplateParameters--;
+			}
+			else {
+				unmatchedTemplateParameters.add(name);
 			}
 		}
 	}

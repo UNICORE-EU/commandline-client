@@ -1,20 +1,21 @@
 {
-  ApplicationName: POVRay,
+  "ApplicationName": "POVRay",
   
-  Environment: ["OUTPUT_FORMAT=PNG",
-	        "SOURCE=input.pov",
-                "TARGET=output.png",
-                "WIDTH=320",
-                "HEIGHT=200",
-  				],
-  Imports: [{
-	  From: scenefile.pov,
-	  To: input.pov
-	}],
+  "Parameters": {
+    "OUTPUT_FORMAT": "PNG",
+    "SOURCE": "input.pov",
+    "TARGET": "output.png",
+    "WIDTH": "320",
+    "HEIGHT": "200",
+  },
+  
+  "Imports": [
+    { "From": "scenefile.pov",
+       To": "input.pov" }
+  ],
 
-  Exports: [{
-	  From: "output.png",
-	  To: "output.png"
-	}],
+  "Exports": [
+    { "From": "output.png", "To": "output.png" }
+  ],
 
 } 

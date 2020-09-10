@@ -38,8 +38,9 @@ public class UCCCompletor implements Completer{
 				Command command=UCC.getCommand(parts[0]);
 				return completeCommand(command, buffer, cursor, completions);
 			}catch(Exception ex){
-				//can happen if the first token is not an existing command
-				return 0;
+				// can happen if the first token is not an existing command
+				// try to complete as a filename
+				return completeFilename(buffer, cursor, completions);
 			}
 		}
 	}
@@ -108,10 +109,38 @@ public class UCCCompletor implements Completer{
 				}
 				return completeFileName(base,parent,pattern,cursor,completions);
 			}
-		}catch(Exception ex){ex.printStackTrace();ex.printStackTrace();/*ignore*/}
+		}catch(Exception ex){/*ignore*/}
 		return -1;
 	}
 
+	@SuppressWarnings("rawtypes")
+	protected int completeFilename(String buffer, int cursor, List completions){
+		try{
+			completions.clear();
+			String[] parts=buffer.split(" +");
+			String lastToken=parts[parts.length-1];
+			boolean empty=buffer.endsWith(" ");
+			String base=empty ? buffer : buffer.substring(0, buffer.lastIndexOf(lastToken));
+			File parent=null;
+			String pattern=null;
+			if(empty){
+				parent=new File(".");
+				pattern="";
+			}
+			else{
+				File f=new File(lastToken);
+				parent=f.getParentFile();
+				pattern=f.getName();
+				if(f.isDirectory() && lastToken.endsWith("/")){
+					parent=f;
+					pattern="";
+				}
+			}
+			return completeFileName(base,parent,pattern,cursor,completions);
+		}catch(Exception ex){/*ignore*/}
+		return -1;
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public int completeFileName(String base, File parent, String filePattern, int cursor, List completions){
 		try{

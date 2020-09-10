@@ -5,16 +5,18 @@ Workflows
 === Introduction
 
 
-UCC supports the UNICORE workflow system and allows to submit workflows to
-the workflow engine and manage them.
+UCC supports the UNICORE Workflow service and allows to submit workflows
+and manage them.
 
-The workflows are executed server-side, and UCC is used only for submitting, 
-managing data and getting results.
+The workflows are executed server-side, and UCC is used only for
+submitting, managing data and getting results. UCC also provides
+helper features for dealing with the workflows' input/output data and
+parametrised workflow templates.
 
 [NOTE]
 ===========
-Version 8 of the workflow system has changed a lot, and is still evolving
-- as is the UCC support. Stay tuned for updates!
+Version 8.x of the Workflow service has changed a lot, and existing
+7.x XML workflows will need to be converted / refactored.
 ==========
 
 
@@ -30,13 +32,14 @@ The following commands are provided. More details and examples follow below.
   
 === Basic use
 
-To check the availability of workflow services, issue the following command
+To check the availability of the Workflow service in the configured
+registry, issue the following command
 
 -------------
 ucc system-info -l
 -------------
 
-This should show at least an accessible workflow service.
+This should show at least an accessible Workflow service.
 
 The distribution contains some example workflow files in the <<<samples/workflows>>> directory 
 that you can edit and submit.
@@ -59,39 +62,95 @@ workflow address
 ---------------
 ucc list-workflows -l
 ---------------  
-   
-  
+
+=== Workflow description format
+
+The JSON format used by that the Workflow service can be found here:
+https://unicore-dev.zam.kfa-juelich.de/documentation/workflow-8.0.0/workflow-manual.html#wf_dialect[JSON workflow description format]
+
 === Managing workflow data
 
 
 ==== Importing local data for use by a workflow
 
-TBD
-
 If you have local files that need to be imported before starting
-the workflow, you have to specify this using a normal UCC job file that 
+the workflow, you can use a normal UCC job file that 
 contains only an "Imports" section:
 
-TBD
+----
+{
+"Imports": 
+ [
+   { "From": "local_file_1", "To": "wf:workflow_file_name_1", },
+   { "From": "local_file_2", "To": "wf:workflow_file_name_2", },
+ ...
+ ],
+}
+----
+
+UCC will upload the local files to a remote storage (which you can specify)
+and automatically register them with the workflow upon submission.
+
+Your workflow JSON can then reference them as "wf:..." in the workflow
+activities.
+
+You can also "manually" register files by adding in "inputs" section to your
+workflow JSON.
+
+----
+{
+ "inputs": {
+   "wf:infile1" : "remote_url_1",
+   "wf:infile2" : "remote_url_2", 
+ },
+
+}
+----
 
 ==== Workflow templates
 
-TBD
-
-If the workflow's +Documentation+ section contains +parameters+ definitions, the corresponding
-replacement will be done by reading parameter values from the .u file. These so-called
-workflow templates can be a very simple and safe way to make adjustments in complex workflows #
-before submission. As an example, consider the following simple example workflow
-
-TBD
+If the workflows contains a +Template parameters+ section, the
+corresponding replacement will be done by reading parameter values
+from the .u file. These so-called workflow templates can be a very
+simple and safe way to make adjustments in complex workflows # before
+submission. As an example, consider the following workflow
 
 ----------
-...
+{
+    "Template parameters": {
+	"SLEEPTIME": {
+	   "type" : "INTEGER",
+	   "default": "10",
+	}
+    },
+   
+    "activities" : [
+	{
+	    "id": "sleep1",
+	    "job": {
+		"Executable": "sleep",
+		"Arguments": ["${SLEEPTIME}"],
+	    },
+	},
+    ],
+}
 ----------
+
+This introduces a parameter with default value "10".
+
+When the workflow is submitted, you can specify a JSON file with the "-u" option,
+which will be checked for a parameter named "SLEEPTIME".
+
+----
+{
+  "SLEEPTIME": "1",
+}
+-----
+
+and if present, the value will be replaced in the workflow.
+
 
 === Resuming a held workflow
 
 A workflow in status "HELD" can be resumed using the "workflow-control resume" command. If the workflow
 has variables / parameters, updated values can be sent with the resume command.
-
-

@@ -187,22 +187,21 @@ Filtering works on the XML resource properties of the resource in question.
 Filtering is enabled by the "-f" or "--filter" option of the form
 
 -------
--f XMLNAME OPERATOR VALUE
+-f NAME OPERATOR VALUE
 -------
   
-where XMLNAME is the name of an XML Element from the WSRF resource properties
-document.
+where NAME is the name of an element from the JSON resource properties.
 
 For example, to list all running jobs:
 
 -----
-ucc list-jobs -f Status equals RUNNING
+ucc list-jobs -f status equals RUNNING
 -----
 
 To list all jobs submitted on Nov 13, 2007:
 
 -----
-ucc list-jobs -f SubmissionTime contains 2007-11-13
+ucc list-jobs -f submissionTime contains 2007-11-13
 -----
 
 etc. 
