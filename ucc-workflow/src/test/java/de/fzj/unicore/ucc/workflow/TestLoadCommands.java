@@ -1,12 +1,12 @@
 package de.fzj.unicore.ucc.workflow;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.helpers.DefaultMessageWriter;
 import eu.unicore.ucc.runner.Broker;
 import eu.unicore.ucc.runner.TargetSystemFinder;
-import junit.framework.Assert;
 
 public class TestLoadCommands {
 
