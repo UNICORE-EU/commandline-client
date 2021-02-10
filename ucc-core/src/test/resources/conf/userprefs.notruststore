@@ -2,9 +2,6 @@ authenticationMethod=USERNAME
 username=demouser
 password=test123
 
-truststore.type=directory
-truststore.directoryLocations.1=src/test/resources/certs/demo-ca-cert.pem
-
 ucc-session-ids=target/ucc-session-ids
 ucc-shell-history=target/ucc-shell-history
 
@@ -16,5 +13,3 @@ client.http.connection.timeout=2000
 
 client.http.socket.timeout=20000
 client.serverHostnameChecking=NONE
-
-preference=vo:/someVo role:someRole   uid:someUid  pgid:someGid useOSgids:false supgids:someSupGid1,someSupGid2

@@ -11,7 +11,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class TestPropertyVariables
 {
@@ -39,11 +39,11 @@ public class TestPropertyVariables
 	public void testGetParameters() throws Exception {
 		String[] args = {"a=b",
 				"@src/test/resources/conf/testweights.properties",
-				"xx=@src/test/resources/log4j.properties"};
+				"xx=@src/test/resources/log4j2.properties"};
 		Map<String,String>params = PropertyVariablesResolver.getParameters(args);
 		Assert.assertEquals("b", params.get("a"));
 		Assert.assertEquals("10",params.get("SITE2"));
 		Assert.assertNotNull(params.get("xx"));
-		Assert.assertTrue(params.get("xx").contains("logger"));
+		Assert.assertTrue(params.get("xx").contains("rootLogger"));
 	}
 }

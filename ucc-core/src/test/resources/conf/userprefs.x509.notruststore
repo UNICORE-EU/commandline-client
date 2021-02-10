@@ -1,9 +1,6 @@
-authenticationMethod=USERNAME
-username=demouser
-password=test123
-
-truststore.type=directory
-truststore.directoryLocations.1=src/test/resources/certs/demo-ca-cert.pem
+authenticationMethod=X509
+credential.path=src/test/resources/certs/user-keystore.jks
+credential.password=the!user
 
 ucc-session-ids=target/ucc-session-ids
 ucc-shell-history=target/ucc-shell-history

@@ -46,7 +46,7 @@ public class TestActionBase {
 	@Test
 	public void testSecurityPreferencesParsing() throws Exception {
 		ActionBase cmd=(ActionBase)UCC.initCommand(new String[]{
-				"connect","-r","http://localhost:65322/services/WRONG_SERVICE", 
+				"connect","-r","https://localhost:65322/services/WRONG_SERVICE", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-" + Constants.OPT_SECURITY_PREFERENCES, "vo:/someVo",
 				"-" + Constants.OPT_SECURITY_PREFERENCES, "role:someRole",
@@ -58,7 +58,7 @@ public class TestActionBase {
 		verifyCommandPref(cmd, "src/test/resources/conf/userprefs.embedded");
 
 		ActionBase cmd2=(ActionBase)UCC.initCommand(new String[]{
-				"connect","-r","http://localhost:65322/services/WRONG_SERVICE", 
+				"connect","-r","https://localhost:65322/services/WRONG_SERVICE", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG, "vo:/someVo",
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG, "role:someRole",
@@ -70,7 +70,7 @@ public class TestActionBase {
 		verifyCommandPref(cmd2, "src/test/resources/conf/userprefs.embedded");
 
 		ActionBase cmd3=(ActionBase)UCC.initCommand(new String[]{
-				"connect","-r","http://localhost:65322/services/WRONG_SERVICE", 
+				"connect","-r","https://localhost:65322/services/WRONG_SERVICE", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG + "=vo:/someVo",
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG + "=role:someRole",
@@ -82,7 +82,7 @@ public class TestActionBase {
 		verifyCommandPref(cmd3, "src/test/resources/conf/userprefs.embedded");
 		
 		ActionBase cmd4=(ActionBase)UCC.initCommand(new String[]{
-				"connect","-r","http://localhost:65322/services/WRONG_SERVICE", 
+				"connect","-r","https://localhost:65322/services/WRONG_SERVICE", 
 				"-c", "src/test/resources/conf/userprefs-withSecPrefs.embedded"
 				}, false);
 		verifyCommandPref(cmd4, "src/test/resources/conf/userprefs-withSecPrefs.embedded");

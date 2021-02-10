@@ -23,7 +23,7 @@ import eu.unicore.ucc.actions.data.LS;
 import eu.unicore.ucc.actions.shell.Shell;
 import eu.unicore.ucc.io.FiletransferParameterProvider;
 import jline.internal.Log;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class TestVarious {
 

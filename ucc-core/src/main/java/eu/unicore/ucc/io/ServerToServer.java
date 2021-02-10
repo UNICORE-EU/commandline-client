@@ -184,7 +184,7 @@ public class ServerToServer implements Constants {
 			transferred = Long.valueOf(props.getString("transferredBytes"));
 			p.updateTotal(transferred);
 			status = props.getString("status");
-		}while(!"FAILED".equals(status) && transferred<remoteSize );
+		}while(!"FAILED".equals(status) && !"DONE".equals(status));
 		p.finish();
 		if("FAILED".equals(status)){
 			String desc = tcc.getProperties().getString("statusMessage");

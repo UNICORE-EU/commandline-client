@@ -5,10 +5,7 @@ import java.util.Properties;
 import org.apache.http.HttpMessage;
 
 import de.fzj.unicore.ucc.authn.PropertiesAwareAuthn;
-import eu.unicore.security.canl.CredentialProperties;
-import eu.unicore.security.canl.TruststoreProperties;
 import eu.unicore.security.wsutil.client.OAuthBearerTokenOutInterceptor;
-import eu.unicore.security.wsutil.client.authn.DelegationSpecification;
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
 import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.util.httpclient.ClientProperties;
@@ -80,13 +77,5 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 		}
 		if(token!=null)httpMessage.setHeader("Authorization", "Bearer "+token);
 	}
-	
-	@Override
-	public DefaultClientConfiguration getClientConfiguration(String targetAddress, String targetDn,
-			DelegationSpecification delegation) throws Exception {
-		ClientProperties sp=new ClientProperties(properties, truststorePasswordCallback, 
-				TruststoreProperties.DEFAULT_PREFIX, 
-				CredentialProperties.DEFAULT_PREFIX, ClientProperties.DEFAULT_PREFIX);
-		return sp;
-	}
+
 }

@@ -3,7 +3,7 @@ package de.fzj.unicore.ucc.helpers;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import jline.internal.Log;
 

@@ -23,7 +23,7 @@ public class TestStorageActions extends EmbeddedTestBase {
 
 		UCC.main(new String[]{"create-storage","-v", "-c", "src/test/resources/conf/userprefs.embedded",
 				"--lifetime", "14",
-				"-f", "http://localhost:65322/rest/core/storagefactories/default_storage_factory"
+				"-f", "https://localhost:65322/rest/core/storagefactories/default_storage_factory"
 		});
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		
@@ -40,7 +40,7 @@ public class TestStorageActions extends EmbeddedTestBase {
 		// wrong factory URL
 		args=new String[]{"create-storage", "-v", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
-				"-f", "http://localhost:65322/services/StorageFactory?res=no_such_factory",
+				"-f", "https://localhost:65322/services/StorageFactory?res=no_such_factory",
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(Constants.ERROR),UCC.exitCode);

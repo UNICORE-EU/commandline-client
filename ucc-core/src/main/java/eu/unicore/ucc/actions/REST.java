@@ -43,6 +43,13 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		return "perform a low-level REST API operation";
 	}
 
+	protected boolean requireRegistry(){
+		return false;
+	}
+	
+	protected boolean skipConnectingToRegistry() {
+		return true;
+	}
 	
 	@Override
 	public void process(){

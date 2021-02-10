@@ -46,7 +46,6 @@ public class Connector implements Runnable {
 
 	@Override
 	public void run() {
-
 		SiteFactoryLister lister=new SiteFactoryLister(UCC.executor,registry,cfgProvider);
 		if(blacklist!=null && blacklist.length>0){
 			msg.verbose("Using blacklist <"+Arrays.asList(blacklist)+">");
@@ -74,6 +73,7 @@ public class Connector implements Runnable {
 		try {
 			SiteClient tss = tsf.getOrCreateSite();
 			msg.verbose("Created TSS at address "+tss.getEndpoint().getUrl());
+			_last_TSS = tss.getEndpoint().getUrl();
 			tssAvailable.incrementAndGet();
 		}catch(Exception e){
 			if(Log.getDetailMessage(e).contains("Access denied")){
@@ -100,5 +100,7 @@ public class Connector implements Runnable {
 	public int getAvailableTSF(){
 		return tsfAvailable.get();
 	}
+
+	public static String _last_TSS = null;
 
 }

@@ -13,7 +13,9 @@ import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.util.EmbeddedTestBase;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.actions.Share;
+import eu.unicore.ucc.actions.job.CreateTSS;
 import eu.unicore.ucc.actions.shell.Shell;
+import eu.unicore.ucc.lookup.Connector;
 
 /**
  * Functional tests for the UCC actions. 
@@ -56,7 +58,7 @@ public class TestGeneralActions extends EmbeddedTestBase {
 		FileUtils.deleteQuietly(sessions);
 
 		connect();
-		String[] args=new String[]{"system-info",  
+		String[] args=new String[]{"system-info","-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 		};
 		UCC.main(args);
@@ -98,9 +100,10 @@ public class TestGeneralActions extends EmbeddedTestBase {
 	@Test
 	public void test_Share()throws Exception{
 		connect();
-		String target = "http://localhost:65322/rest/registries/default_registry";
+		String target = Connector._last_TSS;
+
 		// show ACL
-		String[]args=new String[]{"share",
+		String[]args=new String[]{"share", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				target
 		};

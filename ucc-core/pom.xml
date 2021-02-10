@@ -6,12 +6,12 @@
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
   <url>http://www.unicore.eu</url>
-  <name>UCC core module</name>
+  <name>UCC Core module</name>
   
   <parent>
     <groupId>de.fzj.unicore</groupId>
     <artifactId>ucc-parent</artifactId>
-    <version>2.0.2</version>
+    <version>2.1.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

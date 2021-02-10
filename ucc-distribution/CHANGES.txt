@@ -2,6 +2,13 @@ UCC Changelog
 =============
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
+
+Version 2.1.0  (released MMM DD, 2021)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - update to UNICORE 8.1 base libs
+ - fix: '-K', '--acceptAllIssuers' option did not work as advertised
+ - fix: debian package now depends on "default-jre-headless"
+ 
 Version 2.0.2  (released Sep 10, 2020)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - updated workflow support to match workflow server

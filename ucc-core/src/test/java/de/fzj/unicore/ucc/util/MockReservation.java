@@ -1,5 +1,6 @@
 package de.fzj.unicore.ucc.util;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -9,13 +10,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
-import org.apache.xmlbeans.XmlObject;
-import org.ggf.schemas.jsdl.x2005.x11.jsdl.ResourcesType;
-
 import de.fzj.unicore.xnjs.XNJS;
 import de.fzj.unicore.xnjs.ems.ExecutionException;
 import de.fzj.unicore.xnjs.idb.Incarnation;
-import de.fzj.unicore.xnjs.jsdl.JSDLParser;
 import de.fzj.unicore.xnjs.resources.ResourceRequest;
 import de.fzj.unicore.xnjs.tsi.IReservation;
 import de.fzj.unicore.xnjs.tsi.ReservationStatus;
@@ -43,13 +40,15 @@ public class MockReservation implements IReservation {
 		reservations.remove(resID);
 	}
 
-	public String makeReservation(XmlObject resources, Calendar startTime, Client client)
+	public String makeReservation(Map<String,String> resources, Calendar startTime, Client client)
 	throws ExecutionException {
 		try{
-			ResourcesType rt=ResourcesType.Factory.parse(resources.newInputStream());
 			//merge resource request with IDB defaults...
 			Incarnation gr=configuration.get(Incarnation.class);
-			List<ResourceRequest>resourceRequest = new JSDLParser().parseRequestedResources(rt);
+			List<ResourceRequest>resourceRequest = new ArrayList<>();
+			for(String name: resources.keySet()) {
+				resourceRequest.add(new ResourceRequest(name, resources.get(name)));
+			}
 			List<ResourceRequest>incarnated=gr.incarnateResources(resourceRequest, client);
 			String tsiCmd=TSIUtils.makeMakeReservationCommand(incarnated,startTime,client);
 			lastTSICommand=tsiCmd;

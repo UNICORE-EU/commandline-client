@@ -6,7 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import de.fzj.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.client.Endpoint;

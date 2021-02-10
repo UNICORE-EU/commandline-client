@@ -5,21 +5,16 @@ th * Copyright (c) 2013 ICM Uniwersytet Warszawski All rights reserved.
 package de.fzj.unicore.ucc.authn;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.unigrids.services.atomic.types.SecurityDocument;
-import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import de.fzj.unicore.uas.security.RegistryIdentityResolver;
 import de.fzj.unicore.uas.security.WSRFClientConfigurationProviderImpl;
 import de.fzj.unicore.ucc.Command;
 import de.fzj.unicore.ucc.Constants;
 import de.fzj.unicore.ucc.UCC;
-import de.fzj.unicore.wsrflite.xmlbeans.client.BaseWSRFClient;
 import eu.emi.security.authn.x509.ValidationError;
 import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
@@ -73,23 +68,29 @@ public class UCCConfigurationProviderImpl extends WSRFClientConfigurationProvide
 		if (ap instanceof PropertiesAwareAuthn){
 			
 			if(userProperties.getProperty("truststore.type")==null) {
-//				if(!acceptAllCAs) {
-//					throw new ConfigurationException("You need to configure a truststore or use the -K,--acceptAllIssuers option");
-//				}
-				// set some dummy empty truststore
-				command.verbose("No truststore configured.");
-				userProperties.setProperty("truststore.type", "directory");
-				userProperties.setProperty("truststore.directoryLocations.1", new File("./__dummy_truststore__").getAbsolutePath());
+				if(acceptAllCAs) {
+					userProperties.setProperty("truststore.type", "directory");
+					userProperties.setProperty("truststore.directoryLocations.1", "___dummy___");
+				}
+				else {
+					// fallback to a default truststore
+					String path = new File(System.getProperty("user.home"), 
+							".ucc"+File.separator+"trusted-certs"+File.separator+"*.pem").getPath();
+					command.verbose("Default truststore "+path);
+					userProperties.setProperty("truststore.type", "directory");
+					userProperties.setProperty("truststore.directoryLocations.1", path);
+				}
 			}
 			
 			((PropertiesAwareAuthn)ap).setProperties(userProperties);
 			acceptAll = acceptAllCAs;
-			((PropertiesAwareAuthn) ap).setValidationErrorListener(new ValidationErrorListener() {
+			ValidationErrorListener vel = new ValidationErrorListener() {
 				@Override
 				public boolean onValidationError(final ValidationError error) {
 					return queryValidity(error);
 				}
-			});
+			};
+			((PropertiesAwareAuthn) ap).setValidationErrorListener(vel);
 		}
 		setAuthnProvider(ap);
 		setBasicConfiguration(ap.getBaseClientConfiguration());
@@ -115,13 +116,6 @@ public class UCCConfigurationProviderImpl extends WSRFClientConfigurationProvide
 			try{
 				serviceIdentity = getIdentityResolver().resolveIdentity(serviceUrl);
 			}catch(Exception ex){/*ignored*/}
-			if(serviceIdentity==null){
-				try{
-					IClientConfiguration tmp = super.getClientConfiguration(serviceUrl, 
-							null, DelegationSpecification.DO_NOT);
-					serviceIdentity = checkWSRF(serviceUrl, tmp);
-				}catch(Exception ex){}
-			}
 		}
 		return super.getClientConfiguration(serviceUrl, serviceIdentity, delegate);
 	}
@@ -226,49 +220,5 @@ public class UCCConfigurationProviderImpl extends WSRFClientConfigurationProvide
 			throw new RuntimeException(e);
 		}
 	}
-	
-	/**
-	 * creates a new client based on the old client - same type, same target service - 
-	 * but with fresh authentication
-	 * 
-	 * @param client
-	 * @param delegation
-	 */
-	@SuppressWarnings("unchecked")
-	public <T extends BaseWSRFClient> T refreshClient(T client, DelegationSpecification delegation) {
-		try{
-			Constructor<?> c = client.getClass().getConstructor(String.class, EndpointReferenceType.class, IClientConfiguration.class);
-			String url = client.getUrl();
-			String serviceIdentity = null;
-			IClientConfiguration sec = getClientConfiguration(url, serviceIdentity, delegation);
-			return (T)c.newInstance(client.getUrl(),client.getEPR(),sec);
-		}catch(Exception e){
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public <T extends BaseWSRFClient> T refreshClient(T client) {
-		return refreshClient(client, DelegationSpecification.STANDARD);
-	}
-	
 
-	/**
-	 * attempt to get server DN from WSRF getproperties call
-	 * 
-	 * @return service identity or NULL
-	 */
-	protected String checkWSRF(String serviceURL, IClientConfiguration config) {
-		String identity = null;
-		if(serviceURL.contains("/services/")){
-			try{
-				EndpointReferenceType epr = EndpointReferenceType.Factory.newInstance();
-				epr.addNewAddress().setStringValue(serviceURL);
-				BaseWSRFClient cl = new BaseWSRFClient(epr, config);
-				SecurityDocument sd = cl.getResourceProperty(SecurityDocument.class).get(0);
-				identity = sd.getSecurity().getServerDN();
-				if(identity!=null)command.verbose("Retrieved server DN <"+identity+">");
-			}catch(Exception ex){}
-		}
-		return identity;
-	}
 }

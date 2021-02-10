@@ -2,11 +2,12 @@ package eu.unicore.ucc.lookup;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.JobClient;
+import eu.unicore.util.Log;
 
 /**
  * Convenient access to the jobs on a given target system
@@ -15,7 +16,7 @@ import eu.unicore.client.core.JobClient;
  */
 public class JobLister implements Iterable<JobClient>{
 
-	private static final Logger logger=Logger.getLogger(JobLister.class.getName());
+	private static final Logger logger = Log.getLogger("UCC", JobLister.class);
 	
 	private final CoreClient site;
 	

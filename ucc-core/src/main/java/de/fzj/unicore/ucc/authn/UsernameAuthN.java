@@ -4,15 +4,11 @@ import java.util.Properties;
 
 import org.apache.http.HttpMessage;
 
-import eu.unicore.security.canl.CredentialProperties;
 import eu.unicore.security.canl.PasswordCallback;
-import eu.unicore.security.canl.TruststoreProperties;
-import eu.unicore.security.wsutil.client.authn.DelegationSpecification;
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
 import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.services.rest.client.UsernamePassword;
 import eu.unicore.util.httpclient.ClientProperties;
-import eu.unicore.util.httpclient.DefaultClientConfiguration;
 
 /**
  * Username/Password authentication
@@ -77,13 +73,4 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 		return ret.toString();
 	}
 
-	@Override
-	public DefaultClientConfiguration getClientConfiguration(String targetAddress, String targetDn,
-			DelegationSpecification delegation) throws Exception {
-		ClientProperties sp=new ClientProperties(properties, truststorePasswordCallback, 
-				TruststoreProperties.DEFAULT_PREFIX, 
-				CredentialProperties.DEFAULT_PREFIX, ClientProperties.DEFAULT_PREFIX);
-		return sp;
-	}
-	
 }

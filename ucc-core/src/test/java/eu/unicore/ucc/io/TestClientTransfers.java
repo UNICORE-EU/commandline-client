@@ -24,7 +24,7 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		b.setVerbose(true);
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
 		
-		String url = "http://localhost:65322/rest/core/storages/WORK";
+		String url = "https://localhost:65322/rest/core/storages/WORK";
 		File testData = new File("target/data/test1.dat");
 		FileUtils.writeByteArrayToFile(testData, "test123".getBytes());
 		
@@ -47,7 +47,7 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		b.setVerbose(true);
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
 		
-		String url = "http://localhost:65322/rest/core/storages/WORK";
+		String url = "https://localhost:65322/rest/core/storages/WORK";
 		File testData = new File("target/data/test1.dat");
 		FileUtils.writeByteArrayToFile(testData, "test123".getBytes());
 		

@@ -7,8 +7,7 @@ Summary: UNICORE Commandline Client
 License: BSD
 Distribution: RedHat
 Group: Converted/contrib/misc
-URL: http://www.unicore.eu
-Requires: java-1.@java-main-version@.0-openjdk
+URL: https://www.unicore.eu
 AutoReqProv: no
 BuildArch: @component-architecture@
 Packager: Bernd Schuller unicore-support@lists.sourceforge.net

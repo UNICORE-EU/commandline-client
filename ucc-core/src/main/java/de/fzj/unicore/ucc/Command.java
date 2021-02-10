@@ -13,7 +13,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import de.fzj.unicore.uas.util.MessageWriter;
 import de.fzj.unicore.ucc.helpers.EndProcessingException;
@@ -27,7 +27,7 @@ import eu.unicore.util.Log;
  */
 public abstract class Command implements Constants, MessageWriter {
 
-	protected static final Logger logger=Logger.getLogger("UCC");
+	protected static final Logger logger = Log.getLogger("UCC", Command.class);
 
 	private final UCCOptions options;
 
@@ -386,7 +386,6 @@ public abstract class Command implements Constants, MessageWriter {
 	public void verbose(String message){
 		if(verbose)System.out.println("[ucc "+getName()+"] "+message);
 		logger.debug(message);
-
 	}
 	
 	@Override

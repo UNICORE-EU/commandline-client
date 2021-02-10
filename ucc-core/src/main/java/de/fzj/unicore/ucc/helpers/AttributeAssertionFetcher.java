@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import de.fzj.unicore.ucc.util.VOAttributeFilter;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
@@ -26,6 +26,7 @@ import eu.unicore.samly2.elements.NameID;
 import eu.unicore.samly2.elements.SAMLAttribute;
 import eu.unicore.samly2.exceptions.SAMLValidationException;
 import eu.unicore.security.wsutil.samlclient.SAMLAttributeQueryClient;
+import eu.unicore.util.Log;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**
@@ -33,7 +34,8 @@ import eu.unicore.util.httpclient.IClientConfiguration;
  * @author kstasiak
  */
 public class AttributeAssertionFetcher {
-	private static final Logger logger=Logger.getLogger(AttributeAssertionFetcher.class.getCanonicalName());
+	
+	private static final Logger logger = Log.getLogger("UCC", AttributeAssertionFetcher.class);
 
 	private final IClientConfiguration cfg;
 

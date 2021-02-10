@@ -161,7 +161,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 	}
 
 	protected Calendar getTermTime(){
-		if(initialLifeTime==0)return null;
+		if(initialLifeTime<=0)return null;
 		
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DATE, initialLifeTime);

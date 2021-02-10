@@ -237,9 +237,6 @@ public abstract class ActionBase extends Command {
 		}
 		IClientConfiguration sec = configurationProvider.getClientConfiguration(url);
 		IAuthCallback auth = configurationProvider.getRESTAuthN();
-		if(auth==null) {
-			verbose("The authentication method <"+authNMethod+"> does not directly support REST calls.");
-		}
 		return new RegistryClient(url, sec, auth);
 	}
 
@@ -263,8 +260,11 @@ public abstract class ActionBase extends Command {
 			verbose("Checking registry connection.");
 			String status = registry.getConnectionStatus();
 			verbose("Registry connection status: "+status);
+			if(!status.startsWith("OK") && !skipConnectingToRegistry()) {
+				throw new Exception(status);
+			}
 		}catch(Exception e){
-			error("Cannot contact registry",e);
+			error("Cannot contact registry (set 'contact-registry=false' to ignore this error) ",e);
 			endProcessing(ERROR_CLIENT);
 		}
 	}

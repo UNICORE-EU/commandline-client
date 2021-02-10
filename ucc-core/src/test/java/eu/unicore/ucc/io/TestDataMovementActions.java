@@ -134,7 +134,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 	public void test_GetFile_RawHttpURL()throws IOException{
 		connect();
 		File f=new File("target","test-get-file"+System.currentTimeMillis());
-		String[] args=new String[]{"cp", "http://localhost:65322/services/Registry?wsdl",
+		String[] args=new String[]{"cp", "https://localhost:65322/rest/core",
 				f.getPath(),
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-v"
@@ -204,7 +204,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		assertEquals("1234",content);
 
 		//get-file using raw http
-		args=new String[]{"cp", "http://localhost:65322/services/Registry?wsdl",
+		args=new String[]{"cp", "https://localhost:65322/rest/core",
 				t.getPath(),
 				"-B","1-4",
 				"-c", "src/test/resources/conf/userprefs.embedded",

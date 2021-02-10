@@ -1,12 +1,13 @@
 package de.fzj.unicore.ucc.helpers;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import de.fzj.unicore.uas.util.MessageWriter;
+import eu.unicore.util.Log;
 
 public class DefaultMessageWriter implements MessageWriter {
 
-	private static final Logger logger=Logger.getLogger("UCC");
+	private static final Logger logger = Log.getLogger("UCC", MessageWriter.class);
 	
 	private final boolean verbose;
 	
