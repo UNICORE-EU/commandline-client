@@ -112,6 +112,13 @@
 	<version>${uas.version}</version>
 	<scope>test</scope>
       </dependency>
+      <dependency>
+	<groupId>eu.unicore.workflow</groupId>
+	<artifactId>workflowservice</artifactId>
+	<version>${wf.version}</version>
+	<scope>test</scope>
+      </dependency>
+
     </dependencies>
 
   </dependencyManagement>

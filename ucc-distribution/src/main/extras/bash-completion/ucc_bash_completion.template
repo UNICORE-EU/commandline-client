@@ -19,10 +19,10 @@ _ucc()
   # looking for arguments matching to command
   case "${COMP_WORDS[1]}" in
 %(case_body)s
-    wsrf)
-    #looking for wsrf command
+    rest)
+    #looking for 'rest' command
     if [ $COMP_CWORD -eq 2 ]; then
-      opts="getproperties destroy extend"
+      opts="get put post delete"
     else
       opts="$global_opts "
     fi

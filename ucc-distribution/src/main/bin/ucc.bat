@@ -27,16 +27,16 @@ rem Build the Java classpath
 set CLASSPATH=.
 for %%i in ("%UCC_HOME%\lib\*.jar") do ( call :cpappend %%i )
 
-set VM_ARGS1="-Ducc.extensions=%UCC_HOME%\conf\extensions"
-set VM_ARGS2="-Dlog4j.configuration=file:///%UCC_HOME%\conf\logging.properties"
-set VM_ARGS3="-Ducc.preferences=%USER_UCC_HOME%\preferences"
+set VM_ARGS1="-Ducc.preferences=%USER_UCC_HOME%\preferences"
+
+set VM_ARGS2="-Dlog4j.configurationFile=file:///%UCC_HOME%\conf\logging.properties"
 
 set CMD_LINE_ARGS=%*
 
 rem
 rem Go
 rem
-java %VM_ARGS1% %VM_ARGS2% %VM_ARGS3% de.fzj.unicore.ucc.UCC %CMD_LINE_ARGS%
+java %VM_ARGS1% %VM_ARGS2% de.fzj.unicore.ucc.UCC %CMD_LINE_ARGS%
 goto :eof
 
 

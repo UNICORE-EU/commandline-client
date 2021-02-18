@@ -13,7 +13,6 @@ import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.util.EmbeddedTestBase;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.actions.Share;
-import eu.unicore.ucc.actions.job.CreateTSS;
 import eu.unicore.ucc.actions.shell.Shell;
 import eu.unicore.ucc.lookup.Connector;
 

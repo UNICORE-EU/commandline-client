@@ -49,7 +49,7 @@ case_body = ""
 
 
 for command in commands:
-    if command == "wsrf":
+    if command == "rest":
         continue # This is a special case, it's in the template
 
     opts = find_options(command)

@@ -20,6 +20,14 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+    <dependency>
+      <groupId>eu.unicore</groupId>
+      <artifactId>uas-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>eu.unicore.workflow</groupId>
+      <artifactId>workflowservice</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>de.fzj.unicore</groupId>

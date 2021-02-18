@@ -3,7 +3,7 @@ UCC Changelog
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
 
-Version 2.1.0  (released MMM DD, 2021)
+Version 2.1.0  (released Feb DD, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - update to UNICORE 8.1 base libs
  - fix: '-K', '--acceptAllIssuers' option did not work as advertised

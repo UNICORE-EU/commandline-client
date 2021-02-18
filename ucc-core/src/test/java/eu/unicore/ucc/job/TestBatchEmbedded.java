@@ -37,7 +37,7 @@ public class TestBatchEmbedded extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 	
-	int n=10;
+	int n=4;
 	
 	private void createInFiles()throws IOException{
 		String job="{ApplicationName: Date}";
