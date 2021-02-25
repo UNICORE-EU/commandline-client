@@ -7,7 +7,7 @@
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
   <url>http://www.unicore.eu</url>
-  <version>2.1.0</version>
+  <version>8.1.1</version>
   <name>UNICORE Commandline Client (UCC)</name>
 
   <parent>
