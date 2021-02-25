@@ -165,7 +165,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		boolean delete=tmp.delete();
 		if(!delete)System.out.println("Warning, did not delete file");
 		
-		String id1=Run.getLastJobFile();
+		String id1=Run.getLastJobAddress();
 				
 		int c=0;
 		do{

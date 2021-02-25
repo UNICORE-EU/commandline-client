@@ -96,7 +96,7 @@ public class TestActionBase {
 		Map<String, String[]> pref = cmd.getConfigurationProvider().getSecurityPreferences();
 		assertEquals("/someVo", pref.get("selectedVirtualOrganisation")[0]);
 		assertEquals("someRole", pref.get("role")[0]);
-		assertEquals("someUid", pref.get("xlogin")[0]);
+		assertEquals("someUid", pref.get("uid")[0]);
 		assertEquals("someGid", pref.get("group")[0]);
 		assertEquals("false", pref.get("addDefaultGroups")[0]);
 		assertEquals("someSupGid1", pref.get("supplementaryGroups")[0]);
