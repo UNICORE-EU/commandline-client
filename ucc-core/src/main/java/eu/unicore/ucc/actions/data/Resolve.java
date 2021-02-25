@@ -126,7 +126,7 @@ public class Resolve extends ActionBase {
 		}
 		String result = full? targetDesc.getUnicoreURI() : e.getUrl();
 		message(result);
-		properties.put(PROP_LAST_RESOURCE_URL, result);
+		if(result!=null)properties.put(PROP_LAST_RESOURCE_URL, result);
 	}
 	
 	@Override

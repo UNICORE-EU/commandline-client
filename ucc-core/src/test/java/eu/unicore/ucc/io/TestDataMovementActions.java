@@ -516,18 +516,8 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
-		// with other protocol
-		args=new String[]{"cp", 
-				"-c", "src/test/resources/conf/userprefs.embedded",
-				"BFT:"+storage+"/files/file1",
-				"BFT:"+storage2+"/files/file_1",
-				"-P", "RBYTEIO"
-		};
-		UCC.main(args);
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-
 		// same server
-		args=new String[]{"cp", 
+		args=new String[]{"cp", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"BFT:"+storage+"/files/file1",
 				"BFT:"+storage+"/files/file_1",
