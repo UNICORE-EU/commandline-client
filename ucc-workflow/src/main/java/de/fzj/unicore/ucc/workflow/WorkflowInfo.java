@@ -38,13 +38,13 @@ public class WorkflowInfo extends ListActionBase<BaseServiceClient> {
 
 	@Override
 	public String getArgumentList(){
-		return "[<workflow-file>]";
+		return "[<url> | <url-file>]";
 	}
 
 	@Override
 	public String getSynopsis(){
 		return "Lists info about workflows. " +
-				"The workflow address is read from <workflow-file>, " +
+				"The workflow address is given directly or is read from <workflow-file>, " +
 				"if not given, all workflows are shown.";
 	}
 

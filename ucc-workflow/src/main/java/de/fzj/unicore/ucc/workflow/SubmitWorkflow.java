@@ -3,7 +3,6 @@ package de.fzj.unicore.ucc.workflow;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -221,12 +220,11 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 		
 		String wfURL = wmc.getEndpoint().getUrl();
 		verbose("Workflow URL: " + wfURL);
-		
-		writeIDFile(wfURL);
 
 		// output this to allow nicer shell scripting
 		message(wfURL);
-
+		properties.put(PROP_LAST_RESOURCE_URL, wfURL);
+		
 		if (wait) {
 			verbose("Waiting for workflow to finish...");
 			do {
@@ -332,19 +330,6 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 						"wait for workflow completion").isRequired(false)
 						.create(OPT_WAIT));
 
-	}
-
-	protected void writeIDFile(String url) {
-		try {
-			String id = url.substring(url.lastIndexOf('/')+1);
-			File dump = new File(output, id + ".workflow-address");
-			FileWriter fw = new FileWriter(dump);
-			fw.write(url + "\n");
-			fw.close();
-			verbose("Wrote workflow address to " + dump.getAbsolutePath());
-		} catch (Exception e) {
-			error("Could not write workflow ID file.", e);
-		}
 	}
 
 	@Override

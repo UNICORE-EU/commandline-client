@@ -11,6 +11,7 @@ Version 2.1.0  (released Feb 25, 2021)
  - fix: setting "uid" preference with "-Z" had no effect
  - new feature: "$_" variable in shell mode containing the last URL
    that was accessed / created.
+ - don't write job id/properties files (less clutter)
 
 Version 2.0.2  (released Sep 10, 2020)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
