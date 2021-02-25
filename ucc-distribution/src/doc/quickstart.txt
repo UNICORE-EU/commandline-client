@@ -31,7 +31,7 @@ Connecting
 First, contact UNICORE and make sure you have access to some target systems.
   
 ----
-$> ucc connect [options]
+$> ucc connect
 ----
   
 
@@ -41,7 +41,7 @@ List available sites
 Then, list the sites available to you using 
   
 --------------
-$> ucc list-sites [options]
+$> ucc list-sites
 --------------
 
 Running your first job
@@ -51,7 +51,7 @@ The UCC distribution contains samples that you can run. Let's run the "date"
 sample. The "-v" switch prints more info so you can see what's going on.
 
 --------------
-$> ucc run [options] -v [UCC_HOME]/samples/date.u
+$> ucc run -v [UCC_HOME]/samples/date.u
 --------------
 
 [NOTE]
@@ -69,7 +69,7 @@ Listing your jobs
 The command 
 
 --------------
-$> ucc list-jobs
+$> ucc list-jobs -l
 --------------
 
 will print a list of jobs (actually their addresses) with their respective status (RUNNING, SUCCESSFUL, etc)

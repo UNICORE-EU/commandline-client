@@ -26,12 +26,6 @@ ucc run -H
 
 (most of the options shown are not mandatory, of course)
 
-[NOTE]
-============
-UCC also accepts jobs in the JSDL format that is used internally in UNICORE. 
-To do this, use the "-j" option when submitting the job.
-============
-
 Usually, a UNICORE job file describe a single batch job on the target
 system. However there is a feature called "parameter sweep"
 which leads to the creation of multiple batch jobs from a single
@@ -74,8 +68,10 @@ described in more detail below.
 4+^e| 
 |User precommand               | String          | Pre-processing
 |RunUserPrecommandOnLoginNode  |  "true"/"false"  | Pre-processing is done on login node (default: true)
+|UserPrecommandIgnoreNonZeroExitCode |  "true"/"false"  | Don't fail job if pre-command fails (default: false)
 |User postcommand              | String          | Post-processing
 |RunUserPostcommandOnLoginNode |  "true"/"false"  | Post-processing is done on login node (default: true)
+|UserPostcommandIgnoreNonZeroExitCode |  "true"/"false"  | Don't fail job if post-command fails (default: false)
 4+^e| 
 |Resources             | Map | The job's resource requests
 |Project               | String | Accounting project
@@ -108,15 +104,26 @@ to an executable file.
 Note the comma-separation and the curly braces. To directly call an executable,
   
 --------------------------
-
 {
    "Executable": "/bin/date",  
 }
 --------------------------
 
+Generally, jobs will be submitted to the batch scheduler on the remote
+system.  If you want to run on a login node instead, set the "Job
+type" to "interactive" (instead of the default "normal"):
+  
+--------------------------
+{
+   "Job type": "interactive",  
+}
+--------------------------
+
+
 ===  Arguments and Environment settings
 
-Arguments and environment settings are specified using a list of String values. Here is an example.
+Arguments and environment settings are specified using a list of
+String values. Here is an example.
   
 --------------------------
 {
@@ -148,15 +155,17 @@ or a range:
   },  
 --------------------------
 
-where the From, To and Step parameters are floating point or integer numbers.
+where the From, To and Step parameters are floating point or integer
+numbers.
 
 
 === Application parameters
 
-In UNICORE, parameters for applications are often transferred in the form of environment variables.
-For example, the POVRay application has a large set of parameters to specify image width, 
-height and many more.
-In UCC, you can specify these parameters in a very simple way using the "Parameters" keyword:
+In UNICORE, parameters for applications are often transferred in the
+form of environment variables.  For example, the POVRay application
+has a large set of parameters to specify image width, height and many
+more.  In UCC, you can specify these parameters in a very simple way
+using the "Parameters" keyword:
 
 --------------------------
 
@@ -172,8 +181,9 @@ In UCC, you can specify these parameters in a very simple way using the "Paramet
 }
 --------------------------
 
-Note that an "empty" parameter (which does not have a value) needs to be written with an explicit
-empty string due to the limitations of the JSON syntax.
+Note that an "empty" parameter (which does not have a value) needs to
+be written with an explicit empty string due to the limitations of the
+JSON syntax.
 
 ==== Parameter sweeps
 You can sweep over application parameters by replacing the parameter value
@@ -203,11 +213,8 @@ UNICORE is the job's workspace, which is the default location into
 which files are placed. The same applies to result files: by default,
 files will be downloaded from the job's workspace.
 
-However, other remote storage locations are supported, too.
-
-The remote location can be given as a full UNICORE URI, or using the
-more user friendly (but slower) "unicore://" notation. Read more on remote
-locations in xref:ucc_datamanagement[].
+However, other remote storage locations are supported, too.  Read more
+on remote locations in xref:ucc_datamanagement[].
 
 Local files can be given as an absolute or relative path; in the
 latter case the configured output directory will be used as base
@@ -215,10 +222,10 @@ directory.
 
 ==== Importing files into the job workspace
 
-To import files from your local computer or from remote sites to the 
-job's working directory on the remote UNICORE server, there's the "Imports" 
-keyword. Here is an example Imports section which demonstrates
-some of the possibilities.
+To import files from your local computer or from remote sites to the
+job's working directory on the remote UNICORE server, there's the
+"Imports" keyword. Here is an example Imports section which
+demonstrates some of the possibilities.
 
 
 --------------------------
@@ -239,22 +246,16 @@ some of the possibilities.
  { "From": "/work/data/pdf/*.pdf", "To": "/" },
 
 #
-# import a remote file from a UNICORE storage. The real address
-# will be resolved by UCC
-#
- { "From": "unicore://DEMO-SITE/Home/testfile", "To": "testfile" },
-
-#
 # import a remote file from a UNICORE storage using the UFTP protocol
 #
- { "From": "UFTP:https://gw:8080/DEMO-SITE/services/StorageManagement?res=Home#testfile",
+ { "From": "UFTP:https://gw:8080/DEMO-SITE/rest/core/storages/Home/files/testfile",
    "To": "testfile" },
 
 # create a symlink from a file on the compute machine to the job workspace
  { "From": "link:/work/data/testfile", "To": "linked-file" },
 
 # copy a file on the compute machine to the job workspace
- { "From": "link:/work/data/testfile", "To": "copied-file" },
+ { "From": "file:/work/data/testfile", "To": "copied-file" },
 
 ],
 
@@ -291,8 +292,8 @@ UCC supports simple wild cards ("*" and "?") for importing and exporting files
 
   * +link://+ : symlink file/dir from the remote machine into the job dir
 
-  * +unicore://+ : resolve location pointing to some UNICORE server
-  
+  * Read more on remote locations in xref:ucc_datamanagement[].
+
 ===== Using "inline" data to import a file into the job workspace
 
 For short import files, it can be convenient to place the data directly into the job descrition,
@@ -318,9 +319,10 @@ file. To achieve this, replace the "From" parameter by list of values, for examp
 
    "Imports": [ 
   
-    { "From": [ "unicore://DEMO-SITE/Home/work/data/file1", 
-              "unicore://DEMO-SITE/Home/work/data/file2", 
-              "unicore://DEMO-SITE/Home/work/data/file3", 
+    { "From": [
+              "https://gw:8080/DEMO-SITE/rest/core/storages/Home/files/work/data/file1", 
+              "https://gw:8080/DEMO-SITE/rest/core/storages/Home/files/work/data/file2", 
+              "https://gw:8080/DEMO-SITE/rest/core/storages/Home/files/work/data/file3", 
             ],
       "To": "fileName",  },
 
@@ -337,31 +339,32 @@ storage, use the "Exports" keyword. Here is an example Exports section that spec
 
 --------------------------
 {
-
    "Exports": [ 
-    #this exports all png files to a local directory
+    #t his exports all png files to a local directory
     { "From": "*.png", "To": "/home/me/images/" },
 
-    #this exports a single file to a to local directory
-    #failure of this data transfer will be ignored
+    #t his exports a single file to a to local directory
+    # failure of this data transfer will be ignored
     { "From": "error.log", "To": "/home/me/logs/error.log", "FailOnError": "false", },
     
-    #this exports to a UNICORE storage
-    { "From": "stdout", "To": "unicore://DEMO-SITE/Home/results/myjob/stdout" },
-   
+    # this exports to a UNICORE storage
+    { "From": "stdout", "
+       To": "https://gw:8080/DEMO-SITE/rest/core/storages/Home/files/results/myjob/stdout"
+    },
    ]
-   
 }
 --------------------------
 
-As a special case, UCC also supports downloading files from other UNICORE storages 
-using the Exports keyword:
+As a special case, UCC also supports downloading files from other UNICORE storages
+(after the job has finished), using the Exports keyword:
 
 --------------------------
 {
    "Exports": [ 
-    #this exports a file from a UNICORE storage
-    { "From": "unicore://DEMO-SITE/Work/somefile", "To": "/home/me/somefile" },
+    # this exports a file from a UNICORE storage
+    { "From": "https://gw:8080/DEMO-SITE/rest/core/storages/Work/somefile",
+      "To": "/home/me/somefile"
+    },
    ]   
 }
 --------------------------
@@ -397,7 +400,7 @@ To pass username and password to the server, the syntax is as follows
 
 and similarly for exports.
 
-Servers 7.9.0 and later also support OAuth Bearer token for HTTP data transfers.
+You can use an OAuth Bearer token to authenticate HTTP data transfers.
 
 --------------------------
 {

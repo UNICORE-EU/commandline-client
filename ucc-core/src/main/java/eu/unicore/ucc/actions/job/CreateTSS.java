@@ -141,6 +141,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 			SiteClient tss = tsf.createSite(getCreationParameters(), getTermTime());
 			String addr = tss.getEndpoint().getUrl();
 			message(addr);
+			properties.put(PROP_LAST_RESOURCE_URL, addr);
 			setLastTSSAddress(addr);
 		}catch(Exception ex){
 			error("Could not create site",ex);

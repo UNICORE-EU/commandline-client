@@ -205,6 +205,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		StorageClient sc = sfc.createStorage(storageType, null, getParams(), tt);
 		String addr=sc.getEndpoint().getUrl();
 		message(addr);
+		properties.put(PROP_LAST_RESOURCE_URL, addr);
 		setLastStorageAddress(addr);
 	}
 

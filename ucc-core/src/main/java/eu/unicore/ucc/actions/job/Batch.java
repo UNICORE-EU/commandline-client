@@ -377,6 +377,7 @@ public class Batch extends ActionBase {
 			b.setProperty("IDLocation",running.getRequestDir().getAbsolutePath());
 			Runner r = new Runner(registry, configurationProvider, b, this);
 			r.setAsyncMode(true);
+			r.setQuietMode(false);
 			//TODO r.setCheckResources(!noResourceCheck);
 			r.setNoFetchOutCome(noFetchOutcome);
 			r.setSubmitOnly(submitOnly);

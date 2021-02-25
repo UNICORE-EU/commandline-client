@@ -69,6 +69,7 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 	protected void listFiletransfer(BaseServiceClient ftc){
 		try{
 			message(ftc.getEndpoint().getUrl()+getDetails(ftc));
+			properties.put(PROP_LAST_RESOURCE_URL, ftc.getEndpoint().getUrl());
 		}catch(Exception ex){
 			error("Error listing filetransfer at "+ftc.getEndpoint().getUrl(), ex);
 		}

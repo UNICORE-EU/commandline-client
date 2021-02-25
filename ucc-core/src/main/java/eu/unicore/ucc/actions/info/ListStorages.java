@@ -79,6 +79,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	protected void listSMS(StorageClient sms){
 		try{
 			message(sms.getEndpoint().getUrl()+System.getProperty("line.separator")+getDetails(sms));
+			properties.put(PROP_LAST_RESOURCE_URL, sms.getEndpoint().getUrl());
 		}catch(Exception ex){
 			error("Error listing storage at "+sms.getEndpoint().getUrl(), ex);
 		}

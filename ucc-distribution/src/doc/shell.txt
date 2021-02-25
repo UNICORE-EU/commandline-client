@@ -50,26 +50,45 @@ You can also clear a property (set it to null) by using +unset+
 ucc>unset registry
 --------------------------
 
-Variables referenced via +${var_name}+ will be replaced in
-commands. You can use to make commands shorter and more readable.
-It's also useful to pre-set certain things in your preferences file.
+Variables referenced via +$var_name+ or +${var_name}+ will be replaced
+in commands. You can use this to make commands shorter and more
+readable. It's also possible and useful to pre-set certain things in
+your preferences file.
 
 For example
 
 ------------------
 ucc> set S1=https://myserver/my_site/rest/core/storages/HOME
-ucc> ls -l ${S1}
+ucc> ls -l $S1
 ------------------
+
+A special variable "$_" exists that is set by various commands to
+the "last thing" that was created or accessed.
+
+For example
+
+------------------
+ucc> run -a date.u
+ucc> job-status $_
+------------------
+
 
 Running an external command
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can run an external command via the "system" shell command.
-For example
+You can run an external command via the "system" (or simply "!") shell
+command.  For example
 
 ------------------------
 ucc> system vi job.u
 ------------------------
+
+or simply
+
+------------------------
+ucc> ! cat job.u
+------------------------
+
 
 Exiting the shell
 ~~~~~~~~~~~~~~~~~

@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.apache.commons.cli.OptionBuilder;
 
-import de.fzj.unicore.wsrflite.xmlbeans.client.BaseWSRFClient;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.lookup.Filter;
 import eu.unicore.ucc.actions.ActionBase;
@@ -96,7 +95,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	 * Print details about a list entry.</br> 
 	 * The default implementation returns an empty string
 	 * 
-	 * @param entry - the {@link BaseWSRFClient} for the current list entry
+	 * @param entry - the {@link BaseServiceClient} for the current list entry
 	 */
 	protected String getDetails(T entry)throws Exception{
 		return "";

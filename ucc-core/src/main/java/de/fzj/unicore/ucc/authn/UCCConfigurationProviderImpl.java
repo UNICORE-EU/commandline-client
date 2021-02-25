@@ -165,7 +165,7 @@ public class UCCConfigurationProviderImpl extends WSRFClientConfigurationProvide
 	private void parseSecurityPreference(String pref, Map<String, String[]> securityPreferences) {
 		if (pref.startsWith(PREFERENCE_ARG_UID + ":")) {
 			String val = pref.substring(PREFERENCE_ARG_UID.length() + 1);
-			securityPreferences.put("xlogin", new String[]{val});
+			securityPreferences.put("uid", new String[]{val});
 		} else if (pref.startsWith(PREFERENCE_ARG_PGID + ":")) {
 			String val = pref.substring(PREFERENCE_ARG_PGID.length() + 1);
 			securityPreferences.put("group", new String[]{val});

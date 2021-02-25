@@ -99,74 +99,49 @@ ucc admin-runcommand ShowJobDetails jobID=<unique_jobid>
 for example
 
 --------------
-ucc admin-runcommand ShowJobDetails jobID=cdfdafc5-0274-464d-ac4a-463f46c942fa 
-SUCCESS, service reply: Job information for cdfdafc5-0274-464d-ac4a-463f46c942fa
-{Info=Action ID       : cdfdafc5-0274-464d-ac4a-463f46c942fa
-Action type     : JSDL
+ucc admin-runcommand ShowJobDetails jobID=461f78c7-82a6-4887-9c33-6f538a4b0cb2
+SUCCESS, service reply: Job information for 461f78c7-82a6-4887-9c33-6f538a4b0cb2
+{Info=Action ID       : 461f78c7-82a6-4887-9c33-6f538a4b0cb2
+Action type     : JSON
 Status          : DONE (trans.: none)
 Result          : SUCCESSFUL [Success.]
-Owner           : CN=Demo User,O=UNICORE,C=EU
-Exec. Definition: <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
-  <JobDescription>
-    <JobIdentification>
-      <JobName>Date</JobName>
-    </JobIdentification>
-    <Application>
-      <jsdl:POSIXApplication xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
-        <jsdl:Executable>/bin/date</jsdl:Executable>
-      </jsdl:POSIXApplication>
-    </Application>
-    <Resources/>
-  </JobDescription>
-</JobDefinition>
-Orig. Definition: <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
-  <JobDescription>
-    <JobIdentification>
-      <JobName>Date</JobName>
-    </JobIdentification>
-    <Application>
-      <ApplicationName>Date</ApplicationName>
-      <POSIXApplication xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"/>
-    </Application>
-    <Resources/>
-  </JobDescription>
-</JobDefinition>
-Processing context: de.fzj.unicore.xnjs.ems.ProcessingContext@4308cff0
-Application Info: AppInfo for Date 1.0
+Owner           : CN=Demo User, O=UNICORE, C=EU
+Job Definition: {"Job type":"interactive","DetailedStatusDisplay":"true","KeepFinishedJob":"true","Output":"/tmp","IDLocation":"/tmp","Executable":"date","haveClientStageIn":"false","Tags":["testing"]}
+Processing context: de.fzj.unicore.xnjs.ems.ProcessingContext@17f4b0b6
+Application Info: Application <unnamed>
 Job log: 
-Thu Sep 08 09:25:03 CEST 2016: Created with ID cdfdafc5-0274-464d-ac4a-463f46c942fa
-Thu Sep 08 09:25:03 CEST 2016: Created with type 'JSDL'
-Thu Sep 08 09:25:03 CEST 2016: Client: Name: CN=Demo User,O=UNICORE,C=EU
-Xlogin: uid: [schuller], gids: [addingOSgroups: true]
+Thu Feb 25 16:25:07 CET 2021: Created with ID 461f78c7-82a6-4887-9c33-6f538a4b0cb2
+Thu Feb 25 16:25:07 CET 2021: Created with type 'JSON'
+Thu Feb 25 16:25:07 CET 2021: Client: Name: CN=Demo User,O=UNICORE,C=EU
+Xlogin: uid: [schuller], gids: [schuller:audio, active=schuller, addingOSgroups: true]
 Role: user: role from attribute source
 Security tokens: User name: CN=Demo User,O=UNICORE,C=EU
-Consignor DN: CN=Demo User,O=UNICORE,C=EU
-Delegation to consignor status: true, core delegation status: true
+Delegation to consignor status: true, core delegation status: false
 Message signature status: UNCHECKED
 Client's original IP: 127.0.0.1
-Thu Sep 08 09:25:04 CEST 2016: Using default execution environment.
-Thu Sep 08 09:25:04 CEST 2016: No staging in needed.
-Thu Sep 08 09:25:04 CEST 2016: Status set to READY.
-Thu Sep 08 09:25:04 CEST 2016: Status set to PENDING.
-Thu Sep 08 09:25:04 CEST 2016: Incarnated resources: [CPUsPerNode=1.0, MemoryPerNode=2.68435456E8, ArraySize=1, Nodes=1.0, ArrayLimit=64, CPUTime=3600.0]
-Thu Sep 08 09:25:04 CEST 2016: Command is: 
-#!/bin/sh 
-# ....
-chmod u+x /bin/date 2> /dev/null 
-rm -f /opt/unicore-servers/FILESPACE/cdfdafc5-0274-464d-ac4a-463f46c942fa//UNICORE_SCRIPT_EXIT_CODE
- /bin/date 
-
-echo $? > /opt/unicore-servers/FILESPACE/cdfdafc5-0274-464d-ac4a-463f46c942fa//UNICORE_SCRIPT_EXIT_CODE
-
-
-Thu Sep 08 09:25:04 CEST 2016: TSI reply: submission OK.
-Thu Sep 08 09:25:04 CEST 2016: Submitted to classic TSI as [schuller NONE] with BSSID=3269519504309
-Thu Sep 08 09:25:13 CEST 2016: Exit code 0
-Thu Sep 08 09:25:13 CEST 2016: Job completed on BSS.
-Thu Sep 08 09:25:14 CEST 2016: Status set to DONE.
-Thu Sep 08 09:25:14 CEST 2016: Result: Success.
-Thu Sep 08 09:25:14 CEST 2016: Total: 10.01 sec., Stage-in: 0.05 sec., Stage-out: 0.00 sec., Datamovement: 0 %}
-
+Thu Feb 25 16:25:07 CET 2021: No staging in needed.
+Thu Feb 25 16:25:07 CET 2021: Status set to READY.
+Thu Feb 25 16:25:07 CET 2021: Status set to PENDING.
+Thu Feb 25 16:25:08 CET 2021: Execution on login node
+Thu Feb 25 16:25:08 CET 2021: Command is:
+Thu Feb 25 16:25:08 CET 2021: #!/bin/bash -l 
+export PROJECTS_DIR=/opt/shared-data
+#TSI_EXECUTESCRIPT
+ 
+#RESOURCES 
+#TSI_DISCARD_OUTPUT true
+#TSI_SCRIPT
+#TSI_UMASK 77
+umask 77
+cd /opt/shared-data/UNICORE-Jobs//461f78c7-82a6-4887-9c33-6f538a4b0cb2/
+ { date > /opt/shared-data/UNICORE-Jobs//461f78c7-82a6-4887-9c33-6f538a4b0cb2/stdout 2> /opt/shared-data/UNICORE-Jobs//461f78c7-82a6-4887-9c33-6f538a4b0cb2/stderr; echo $? > /opt/shared-data/UNICORE-Jobs//461f78c7-82a6-4887-9c33-6f538a4b0cb2//UNICORE_SCRIPT_EXIT_CODE ; } & echo $! > /opt/shared-data/UNICORE-Jobs//461f78c7-82a6-4887-9c33-6f538a4b0cb2//UNICORE_SCRIPT_PID 
+Thu Feb 25 16:25:08 CET 2021: TSI reply: submission OK.
+Thu Feb 25 16:25:11 CET 2021: Submitted to classic TSI as [schuller schuller:DEFAULT_GID] with PID=30112 on [localhost]
+Thu Feb 25 16:25:11 CET 2021: Exit code 0
+Thu Feb 25 16:25:11 CET 2021: Job completed on BSS.
+Thu Feb 25 16:25:11 CET 2021: Status set to DONE.
+Thu Feb 25 16:25:11 CET 2021: Result: Success.
+Thu Feb 25 16:25:11 CET 2021: Total: 3 sec., Stage-in: 0 sec., Queued: 0 sec., Main: 0 sec., Stage-out: 0 sec.}
 -------------------
 
 Thus you can get a full view of what the user submitted and what was executed.
@@ -192,7 +167,7 @@ Filtering is enabled by the "-f" or "--filter" option of the form
   
 where NAME is the name of an element from the JSON resource properties.
 
-For example, to list all running jobs:
+For example, to list all jobs :
 
 -----
 ucc list-jobs -f status equals RUNNING

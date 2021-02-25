@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 //import de.fzj.unicore.uas.json.JSONUtil;
 import de.fzj.unicore.uas.util.MessageWriter;
+import de.fzj.unicore.ucc.Constants;
 import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.authn.UCCConfigurationProvider;
 import de.fzj.unicore.ucc.helpers.DefaultMessageWriter;
@@ -73,6 +74,9 @@ public class Runner implements Runnable {
 	protected UCCConfigurationProvider configurationProvider;
 
 	protected Broker broker=null;
+
+	// don't write any files
+	protected boolean quietMode = false;
 
 	protected boolean asyncMode=false;
 
@@ -152,6 +156,10 @@ public class Runner implements Runnable {
 		this.configurationProvider=configurationProvider;
 	}
 
+	public void setQuietMode(boolean quietMode){
+		this.quietMode = quietMode;
+	}
+	
 	public void setBroker(Broker broker){
 		this.broker=broker;
 	}
@@ -293,10 +301,11 @@ public class Runner implements Runnable {
 			throw new RunnerException(ERR_SUBMIT_FAILED,"Could not submit job",e);
 		}
 
-		String epr = jobClient.getEndpoint().getUrl();
-		builder.setProperty("epr", epr);
+		String url = jobClient.getEndpoint().getUrl();
+		builder.setProperty("epr", url);
 		builder.setProperty("type", "job");
-		msg.verbose("Job submitted, job url: "+epr);
+		msg.message(url);
+		properties.put(Constants.PROP_LAST_RESOURCE_URL, url);
 	}
 
 	/**
@@ -591,8 +600,9 @@ public class Runner implements Runnable {
 	}
 
 	protected void writeJobIDFile(){
-		try{
-			if(!mustSave)return;
+		if(quietMode)return;
+		if(!mustSave)return;
+		try	{
 			String dump=builder.getProperty("jobIdFile",null);
 			File dumpFile=null;
 			if(dump==null){
@@ -619,6 +629,7 @@ public class Runner implements Runnable {
 	 * @param errorReason - a short description of the error
 	 */
 	protected void writeFailedJobIDFile(String errorReason){
+		if(quietMode)return;
 		try{
 			File dumpFile=null;
 			dumpFile=new File(output.getAbsolutePath(),"FAILED_"+getJobID()+".job");
@@ -712,6 +723,7 @@ public class Runner implements Runnable {
 	 * @return the absolute path of the properties file
 	 */
 	public String dumpJobProperties(){
+		if(quietMode)return null;
 		String path=null;
 		try{
 			String p = jobClient.getProperties().toString(2);

@@ -61,9 +61,8 @@ public class JobLister implements Iterable<JobClient>{
 				}
 			};
 		}catch(Exception e){
-			logger.error("",e);
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 
 }

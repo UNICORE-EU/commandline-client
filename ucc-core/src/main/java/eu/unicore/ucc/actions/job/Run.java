@@ -78,22 +78,6 @@ public class Run extends ActionBase {
 				.isRequired(false)
 				.create(OPT_NOPREFIX)
 				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_STDOUT_LONG)
-				.withDescription("Name name for storing the standard output")
-				.withArgName("stdout")
-				.hasArg()
-				.isRequired(false)
-				.create(OPT_STDOUT)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_STDERR_LONG)
-				.withDescription("Name name for storing the standard error")
-				.withArgName("stderr")
-				.hasArg()
-				.isRequired(false)
-				.create(OPT_STDERR)
-				);
 	
 		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SAMPLE_LONG)
 				.withDescription("Print an example job and quit")
@@ -245,6 +229,7 @@ public class Run extends ActionBase {
 	protected void run(){
 		runner=new Runner(registry,configurationProvider,builder,this);
 		runner.setAsyncMode(!synchronous);
+		runner.setQuietMode(true);
 		runner.setBriefOutfileNames(brief);
 		runner.setDryRun(dryRun);
 		runner.setProperties(properties);

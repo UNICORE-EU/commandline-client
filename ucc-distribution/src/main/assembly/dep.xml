@@ -10,6 +10,7 @@
       <includes>
         <include>README</include>
         <include>CHANGES.txt</include>
+	<include>LICENSE</include>	
       </includes>
       <excludes>
         <exclude>pom.xml</exclude>
@@ -29,8 +30,8 @@
       <outputDirectory>/samples</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>src/main/extras</directory>
-      <outputDirectory>/extras</outputDirectory>
+      <directory>src/main/extras/bash-completion</directory>
+      <outputDirectory>/extras/bash-completion</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/site</directory>

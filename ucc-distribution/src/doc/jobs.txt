@@ -76,8 +76,6 @@ The following options are available when running jobs (see also the general opti
 | -s,--sitename <SITE>  | Site where the job shall be run
 | -S,--schedule <Time>  | Schedule the submission of the job at the given time
 | -o,--output <Output_dir> | Directory for any output produced (default is the current directory)
-| -O,--stdout <stdout_name> |  specify a name for the exported standard out (by default: 'stdout') 
-| -E,--stderr <stderr_name> | specify a name for the exported standard error (by default: 'stderr') 
 |=======================  
 
   

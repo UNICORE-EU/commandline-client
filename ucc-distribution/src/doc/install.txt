@@ -38,8 +38,8 @@ Setting environment variables can be done (as administrator)
 using the Control panel->System->Extras panel.
 ==================
 
-Though you can specify your keystore location and other parameters on the commandline,
-it is easiest to place this information in a file, so that you do not have to key in this
+Though you can specify many parameters on the commandline, it is
+easiest to use a config file, so that you do not have to key in this
 information repeatedly.
 
 Preferences file
@@ -130,6 +130,3 @@ services available in the UNICORE system you're connecting to, do
 --------------
 $> ucc system-info -l -v
 --------------
-
-
-

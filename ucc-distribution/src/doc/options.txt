@@ -201,9 +201,13 @@ include::ucc-credProperties.txt[]
 Truststore options
 ~~~~~~~~~~~~~~~~~~
 
+In most cases you only need a truststore directory containing trusted
+certificates:
 
-In general you'll want a truststore directory (or file) as well as a
-truststore file (or directory) containing trusted certificates. 
+-------------
+truststore.type=directory
+truststore.directoryLocations.1=/trust/dir/*.pem
+-------------
 
 A full list of options related to truststore management is available
 in the following table. You can also get them via the online help
@@ -225,6 +229,17 @@ truststore.type=directory
 truststore.directoryLocations.1=/trust/dir/*.pem
 -------------
 
+OpenSSL trust store
+
+----------------------
+truststore.type=openssl
+truststore.opensslPath=/etc/grid-security/
+truststore.opensslNsMode=EUGRIDPMA_GLOBUS_REQUIRE
+truststore.updateInterval=1200
+truststore.crlMode=IF_VALID
+-----------------------
+
+
 Java keystore used as a trust store:
 
 -----------------
@@ -233,16 +248,6 @@ truststore.keystorePath=/some/dir/truststore.jks
 truststore.keystoreFormat=JKS
 truststore.keystorePassword=xxxxxx
 -------------------
-
-OpenSSL trust store
-
-----------------------
-truststore.type=openssl
-truststore.opensslPath=/truststores/openssl
-truststore.opensslNsMode=EUGRIDPMA_GLOBUS_REQUIRE
-truststore.updateInterval=1234
-truststore.crlMode=IF_VALID
------------------------
 
 
 Client options

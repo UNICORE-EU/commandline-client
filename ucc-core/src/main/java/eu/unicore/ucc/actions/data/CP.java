@@ -109,6 +109,7 @@ public class CP extends FileOperation {
 		transfer.setPreferredProtocols(preferredProtocols);
 		transfer.setExtraParameterSource(properties);
 		transfer.process();
+		properties.put(PROP_LAST_RESOURCE_URL, transfer.getTransferAddress());
 		lastTransferAddress = transfer.getTransferAddress();
 	}
 	

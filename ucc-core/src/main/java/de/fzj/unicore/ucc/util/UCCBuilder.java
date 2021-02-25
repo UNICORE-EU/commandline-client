@@ -254,21 +254,21 @@ public class UCCBuilder extends Builder {
 		writeLine("  Arguments: [\"-l\", \"-v\", ],",s);
 		writeLine("  Parameters: { VERBOSE: true, INPUTFILE: foo.txt},",s);
 		writeLine("  Environment: [\"VERBOSE=true\", \"TIMING=false\", ],",s);
+		writeLine("  Job type: \"normal | interactive\",",s);
+		writeLine("", s);
 		writeLine("  Imports: [",s);
 		writeLine("    { From: \"localFile | remoteFile\", To: \"jobdirFile\", Mode: \"overwrite | append | nooverwrite\" , FailOnError: \"true | false\" },",s);
 		writeLine("  ],",s);
 		writeLine("  Exports: [",s);
 		writeLine("    { From: \"jobdirFile\", To: \"localFile | remoteFile\", Mode: \"overwrite | append | nooverwrite\" }, ",s);
 		writeLine("  ],",s);
-		writeLine("  Stdout: stdout, Stderr: stderr, Stdin: stdin,",s);
-		writeLine("  Job type: \"interactive\",",s);
 		writeLine("  Name: \"my test job\",",s);
 		writeLine("  User email: foo@bar.org,",s);
 		writeLine("  Notification: \"https://someservice.org\",",s);
-		writeLine("  Project: some_project,",s);
-		writeLine("  Tags: [\"testing\", \"demo job\"] ,",s);
-		writeLine("  Not before: \"2011-11-11T12:00:00+200\",",s);
+		writeLine("  Tags: [\"testing\", \"demo\"] ,",s);
+		writeLine("  Not before: \"2021-11-11T12:00:00+200\",",s);
 		writeLine("  Site: \"DEMO-SITE\",",s);
+		writeLine("  Project: some_project,",s);
 		writeLine("  Resources: {",s);
 		writeLine("    CPUs: 4,",s);
 		writeLine("    Nodes: 2,",s);
@@ -279,8 +279,6 @@ public class UCCBuilder extends Builder {
 		writeLine("  },",s);
 		writeLine("  Preferred protocols: \"UFTP BFT\",",s);
 		writeLine("  Output: \"localdir\",",s);
-		writeLine("  Lifetime: 24h,",s);
-		writeLine("  Update interval: 10,",s);
 		writeLine("}",s);
 		return s.toString();
 	}

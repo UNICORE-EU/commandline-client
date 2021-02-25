@@ -4,13 +4,13 @@ UCC: Introduction
    
 Overview
 
-  UCC is a commandline client for the UNICORE Grid system. It offers a set 
-of basic commands (Run jobs, get output, transfer files, etc). In addition, 
-it can be extended in various ways.
+  UCC is a commandline client for the UNICORE federated system. It
+offers a set of basic commands (Run jobs, get output, transfer files,
+run workflows, etc).
 
   Features:
 
- * Access to all basic UNICORE services
+ * Supports all basic UNICORE services
  
  * Run jobs, manage output, transfer data, etc.
  
@@ -19,8 +19,6 @@ it can be extended in various ways.
  * Support for the UNICORE workflow system
  
  * Scripting support using Groovy
- 
- * UCC is extensible
 
 
 Prerequisites for using UCC
@@ -28,7 +26,7 @@ Prerequisites for using UCC
  * OpenJDK or Oracle Java runtime environment or SDK 
    (Java 8 or later is required)
 
- * Access to a UNICORE Grid
+ * Access to a UNICORE installation
  
 
 Full manual

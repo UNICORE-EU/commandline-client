@@ -306,16 +306,15 @@ public class Shell extends ActionBase {
 			verbose("Cannot setup history");
 			return null;
 		}
-
 	}
-	
+
 	private static Pattern p = Pattern.compile("\"([^\"]*)\"|(\\S+)");
 		
 	public String[] parseCmdlineWithVars(String cmdArgs) throws IOException {
 		String[] args = parseCmdline(cmdArgs);
 		for(int i=0; i<args.length; i++) {
 			String s = args[i];
-			if(s.contains("${")) {
+			if(s.contains("$")) {
 				args[i] = expandVariables(s);
 			}
 		}
@@ -325,9 +324,11 @@ public class Shell extends ActionBase {
 	private String expandVariables(String var){
 		for(String key: properties.stringPropertyNames()) {
 			if(!var.contains(key))continue;
-			String s = "${"+key+"}";
-			if(var.contains(s)){
-				var = var.replace(s,String.valueOf(properties.get(key)));
+			if(var.contains("${"+key+"}")){
+				var = var.replace("${"+key+"}", String.valueOf(properties.get(key)));
+			}
+			else if(var.contains("$"+key)){
+				var = var.replace("$"+key, String.valueOf(properties.get(key)));				
 			}
 		}
 		return var;

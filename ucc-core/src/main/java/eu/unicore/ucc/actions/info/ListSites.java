@@ -49,6 +49,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 				else if(filterMatch(c)){
 					if(!siteNameMatches(siteName, c.getEndpoint().getUrl()))continue;
 					listTSS(c);
+					properties.put(PROP_LAST_RESOURCE_URL, c.getEndpoint().getUrl());
 					lastNumberOfResults++;
 				}
 			}catch(Exception ex){
@@ -136,13 +137,4 @@ public class ListSites extends ListActionBase<SiteClient> {
 				+"Use the -s option to limit the list to a single site.";
 	}
 
-	private static String lastSiteAddress;
-
-	public static String getLastSiteAddress() {
-		return lastSiteAddress;
-	}
-
-	protected static void setLastSiteAddress(String lastAddress) {
-		ListSites.lastSiteAddress = lastAddress;
-	}
 }
