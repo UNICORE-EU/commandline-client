@@ -98,8 +98,10 @@ public class UCCBuilder extends Builder {
 		if(initialised)return;
 		super.build();
 		try{
-			createLocalImports(json.optJSONArray("Imports"));
-			createLocalExports(json.optJSONArray("Exports"));
+			JSONArray nonLocalImports = createLocalImports(json.optJSONArray("Imports"));
+			json.put("Imports", nonLocalImports);
+			JSONArray nonLocalExports = createLocalExports(json.optJSONArray("Exports"));
+			json.put("Exports", nonLocalExports);
 			resolveLocations(json.optJSONArray("Imports"), "From");
 			resolveLocations(json.optJSONArray("Exports"), "To");
 		}catch(Exception ex){
@@ -125,7 +127,8 @@ public class UCCBuilder extends Builder {
 		}
 	}
 	
-	private void createLocalImports(JSONArray j)throws IllegalArgumentException, FileNotFoundException{
+	private JSONArray createLocalImports(JSONArray j)throws IllegalArgumentException, FileNotFoundException{
+		JSONArray otherImports = new JSONArray();
 		if(j!=null){
 			for (int i = 0; i < j.length(); i++) {
 				String source,target;
@@ -134,25 +137,29 @@ public class UCCBuilder extends Builder {
 				try{
 					JSONObject jObj=j.getJSONObject(i);
 					source=JSONUtil.getString(jObj,"From");
-					if(source==null)source=JSONUtil.getString(jObj,"File");//backwards compatibility
 					target=JSONUtil.getString(jObj,"To");
 					String creation=JSONUtil.getString(jObj,"Mode","NORMAL");
 					failOnError=Boolean.parseBoolean(JSONUtil.getString(jObj,"FailOnError","true"));
 					mode=Mode.valueOf(creation);
+					if(source==null || target==null){
+						throw new IllegalArgumentException("File import specification invalid. Syntax: \"From: <source>, To: <uspacefile>, Mode: overwrite|append|nooverwrite\"");
+					}
+					Location l = createLocation(source);
+					if(l.isLocal()){
+						failOnError=failOnError & checkLocalFiles;
+						imports.add(new FileUploader(source,target,mode,failOnError));
+						msg.verbose("Local file import: "+source+" -> "+target);
+					}
+					else {
+						otherImports.put(jObj);
+					}
 				}catch(Exception e){
-					throw new IllegalArgumentException("File import specification invalid. Syntax: \"From: <localfile>, To: <uspacefile>, Mode: overwrite|append|nooverwrite\"");
+					throw new IllegalArgumentException("File import specification invalid. Syntax: \"From: <source>, To: <uspacefile>, Mode: overwrite|append|nooverwrite\"");
 				}
-				if(source==null || target==null){
-					throw new IllegalArgumentException("File import specification invalid. Syntax: \"From: <localfile>, To: <uspacefile>, Mode: overwrite|append|nooverwrite\"");
-				}
-				Location l = createLocation(source);
-				if(l.isLocal()){
-					failOnError=failOnError & checkLocalFiles;
-					imports.add(new FileUploader(source,target,mode,failOnError));
-					msg.verbose("Local file import: "+source+" -> "+target);
-				}
+				
 			}
 		}
+		return otherImports;
 	}
 
 	
@@ -161,7 +168,8 @@ public class UCCBuilder extends Builder {
 		return Resolve.resolve(descriptor, registry, configurationProvider, msg);
 	}
 
-	private void createLocalExports(JSONArray j)throws IllegalArgumentException{
+	private JSONArray createLocalExports(JSONArray j)throws IllegalArgumentException{
+		JSONArray otherExports = new JSONArray();
 		if(j!=null){
 			for (int i = 0; i < j.length(); i++) {
 				String source,target;
@@ -175,19 +183,24 @@ public class UCCBuilder extends Builder {
 					String creation=JSONUtil.getString(jObj,"Mode","NORMAL");
 					mode=Mode.valueOf(creation);
 					failOnError=Boolean.parseBoolean(JSONUtil.getString(jObj,"FailOnError","true"));
+
+					if(source==null || target==null){
+						throw new IllegalArgumentException("Local export specification invalid. Syntax: \"From: <uspacefile | remotefile>, To: <target>, Mode: overwrite|append|nooverwrite\"");
+					}
+					Location l = createLocation(target);
+					if(l.isLocal()){
+						exports.add(new FileDownloader(source,target,mode,failOnError));
+						msg.verbose("File export to client: "+source+" -> "+target);
+					}
+					else {
+						otherExports.put(jObj);
+					}
 				}catch(Exception e){
-					throw new IllegalArgumentException("Local export specification invalid. Syntax: \"From: <uspacefile | u6://address>, To: <localfile>, Mode: overwrite|append|nooverwrite\"");
-				}
-				if(source==null || target==null){
-					throw new IllegalArgumentException("Local export specification invalid. Syntax: \"From: <uspacefile | u6://address>, To: <localfile>, Mode: overwrite|append|nooverwrite\"");
-				}
-				Location l = createLocation(target);
-				if(l.isLocal()){
-					exports.add(new FileDownloader(source,target,mode,failOnError));
-					msg.verbose("File export to client: "+source+" -> "+target);
+					throw new IllegalArgumentException("Local export specification invalid. Syntax: \"From: <uspacefile | remotefile>, To: <target>, Mode: overwrite|append|nooverwrite\"");
 				}
 			}
 		}
+		return otherExports;
 	}
 
 	public List<FileDownloader> getExports() {

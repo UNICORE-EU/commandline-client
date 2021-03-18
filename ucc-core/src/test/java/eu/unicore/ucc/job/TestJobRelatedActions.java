@@ -61,7 +61,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	@Test
 	public void test_Run_JobWithUploads(){
 		connect();
-		run("src/test/resources/jobs/date-with-uploads.u", false);
+		run("src/test/resources/jobs/date-with-uploads.u", true);
 	}
 
 	@Test

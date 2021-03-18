@@ -7,7 +7,9 @@ import org.apache.commons.cli.OptionBuilder;
 
 import de.fzj.unicore.uas.util.UnitParser;
 import de.fzj.unicore.ucc.UCC;
+import de.fzj.unicore.ucc.helpers.EndProcessingException;
 import de.fzj.unicore.ucc.util.UCCBuilder;
+import eu.unicore.client.core.JobClient.Status;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.runner.Runner;
 
@@ -140,7 +142,7 @@ public class Run extends ActionBase {
 	@Override
 	public void process(){
 		super.process();
-
+		boolean success = true;
 		if(getBooleanOption(OPT_SAMPLE_LONG, OPT_SAMPLE)){
 			printSampleJob();
 			endProcessing(0);
@@ -166,14 +168,16 @@ public class Run extends ActionBase {
 		if(getCommandLine().getArgs().length>1){
 			for(int i=1; i<getCommandLine().getArgs().length;i++){
 				initBuilder(getCommandLine().getArgs()[i]);
-				run();
+				success = success && run()==0;
 			}
 		}
 		else{
 			initBuilderFromStdin();
-			run();
+			success = run()==0;
 		}
-
+		if(!success) {
+			throw new EndProcessingException(1, "Job(s) failed.");
+		}
 	}
 
 	/**
@@ -226,7 +230,7 @@ public class Run extends ActionBase {
 		
 	}
 	
-	protected void run(){
+	protected int run(){
 		runner=new Runner(registry,configurationProvider,builder,this);
 		runner.setAsyncMode(!synchronous);
 		runner.setQuietMode(true);
@@ -253,6 +257,12 @@ public class Run extends ActionBase {
 			error("Failed to run job",ex);
 			endProcessing(ERROR);
 		}
+		try {
+			if(synchronous && !Status.SUCCESSFUL.equals(runner.getStatus())) {
+				return ERROR;
+			}
+		}catch(Exception ex) {}
+		return 0;
 	}
 
 	public void printSampleJob(){

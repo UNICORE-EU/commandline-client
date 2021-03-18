@@ -3,6 +3,12 @@ UCC Changelog
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
 
+Version 2.1.1  (released MMM dd, 2021)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - fix: local imports were left in the job description,
+   leading to job runtime erros
+ - fix: UCC returns exit code 1 if job failed
+
 Version 2.1.0  (released Feb 25, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - update to UNICORE 8.1 base libs

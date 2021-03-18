@@ -687,7 +687,7 @@ public class Runner implements Runnable {
 		}
 		StringBuilder sb=new StringBuilder();
 		sb.append(newStatus);
-		if(status.equals(Status.SUCCESSFUL)){
+		if(status.equals(Status.SUCCESSFUL) || status.equals(Status.FAILED)){
 			String exit = jobClient.getProperties().optString("exitCode");
 			if(exit!=null){
 				sb.append(" exit code: ");
@@ -784,6 +784,10 @@ public class Runner implements Runnable {
 
 	public List<String> getPreferredProtocols() {
 		return preferredProtocols;
+	}
+
+	public Status getStatus() {
+		return status;
 	}
 
 	/**

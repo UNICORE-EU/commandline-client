@@ -117,9 +117,13 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 	}
 
 	protected void run(String jobFile, boolean verbose){
+		run(jobFile, verbose, true);
+	}
+		
+	protected void run(String jobFile, boolean verbose, boolean ignoreFailure){
 		String[] args=new String[]{"run",
 				"-c", "src/test/resources/conf/userprefs.embedded",
-				jobFile,
+				jobFile
 		};
 		if(verbose){
 			List<String>a=new ArrayList<String>();
@@ -128,7 +132,7 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 			args=a.toArray(new String[a.size()]);
 		}
 		UCC.main(args);
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		if(!ignoreFailure)assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
 	protected void upload(String file, String target, boolean verbose){
