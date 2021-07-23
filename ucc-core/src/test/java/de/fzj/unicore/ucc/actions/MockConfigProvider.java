@@ -12,12 +12,12 @@ import java.util.Properties;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import de.fzj.unicore.ucc.authn.UCCConfigurationProvider;
-import de.fzj.unicore.wsrflite.xmlbeans.client.IRegistryQuery;
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.security.wsutil.client.authn.DelegationSpecification;
 import eu.unicore.security.wsutil.client.authn.SecuritySessionPersistence;
 import eu.unicore.security.wsutil.client.authn.ServiceIdentityResolver;
 import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.services.ws.client.IRegistryQuery;
 import eu.unicore.util.httpclient.DefaultClientConfiguration;
 import eu.unicore.util.httpclient.IClientConfiguration;
 

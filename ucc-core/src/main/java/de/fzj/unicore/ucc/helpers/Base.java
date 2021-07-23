@@ -5,18 +5,18 @@ import java.util.Properties;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
-import de.fzj.unicore.uas.client.IRegistryQuery;
+import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.util.httpclient.IClientConfiguration;
 import groovy.lang.Script;
 
 /**
  * Base class for groovy scripts
- * 
+ *
  * @author schuller
  */
 public abstract class Base extends Script{
 
-  	IRegistryQuery registry;
+	IRegistryClient registry;
   	IClientConfiguration securityProperties;
   	String registryURL;
   	Properties properties;

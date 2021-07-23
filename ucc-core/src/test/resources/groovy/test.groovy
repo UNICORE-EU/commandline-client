@@ -1,7 +1,3 @@
-import javax.xml.namespace.QName
-import de.fzj.unicore.uas.client.*
-import eu.unicore.security.wsutil.client.authn.*
-
 /*
 * for testing the Groovy script facility
 */

@@ -92,7 +92,8 @@ public class ServerToServer implements Constants {
 		else copyFile();
 	}
 	
-	protected boolean checkRemoteExists(Location remote) throws Exception {
+	protected boolean assertRemoteExists(Location remote) throws Exception {
+		if(hasWildCards(remote.getName()))return true;
 		StorageClient source = new StorageClient(new Endpoint(remote.getSmsEpr()),
 				configurationProvider.getClientConfiguration(remote.getSmsEpr()),
 				configurationProvider.getRESTAuthN());
@@ -100,14 +101,18 @@ public class ServerToServer implements Constants {
 		remoteSize = fle.size;
 		return true;
 	}
-
+	
+	public boolean hasWildCards(String name){
+		return name.contains("*") || name.contains("?");
+	}
+	
 	/**
 	 * perform the remote copy, and cleanup the file transfer resource (if not in async mode)
 	 */
 	protected void copyFile(){
 		try{
 			checkProtocols();
-			checkRemoteExists(sourceDesc);
+			assertRemoteExists(sourceDesc);
 			msg.verbose("Initiating fetch-file on storage = <"+sms.getEndpoint().getUrl()+">," +
 					"receiving file <"+sourceDesc.getUnicoreURI()+">, writing to "+targetDesc.getName());
 			JSONObject params = new JSONObject();

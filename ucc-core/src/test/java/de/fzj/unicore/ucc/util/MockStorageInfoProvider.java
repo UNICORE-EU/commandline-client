@@ -5,7 +5,7 @@ import java.util.Map;
 
 import de.fzj.unicore.uas.impl.sms.DefaultStorageInfoProvider;
 import de.fzj.unicore.uas.impl.sms.StorageDescription;
-import de.fzj.unicore.wsrflite.Kernel;
+import eu.unicore.services.Kernel;
 
 public class MockStorageInfoProvider extends DefaultStorageInfoProvider {
 

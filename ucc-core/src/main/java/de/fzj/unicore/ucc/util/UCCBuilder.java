@@ -275,6 +275,7 @@ public class UCCBuilder extends Builder {
 		writeLine("  Exports: [",s);
 		writeLine("    { From: \"jobdirFile\", To: \"localFile | remoteFile\", Mode: \"overwrite | append | nooverwrite\" }, ",s);
 		writeLine("  ],",s);
+		writeLine("  Umask: \"0022\",",s);
 		writeLine("  Name: \"my test job\",",s);
 		writeLine("  User email: foo@bar.org,",s);
 		writeLine("  Notification: \"https://someservice.org\",",s);
@@ -283,6 +284,7 @@ public class UCCBuilder extends Builder {
 		writeLine("  Site: \"DEMO-SITE\",",s);
 		writeLine("  Project: some_project,",s);
 		writeLine("  Resources: {",s);
+		writeLine("    Queue: batch,",s);
 		writeLine("    CPUs: 4,",s);
 		writeLine("    Nodes: 2,",s);
 		writeLine("    CPUsPerNode: 2,",s);

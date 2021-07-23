@@ -1,7 +1,7 @@
 package de.fzj.unicore.ucc.util;
 
 import de.fzj.unicore.uas.util.MessageWriter;
-import de.fzj.unicore.wsrflite.xmlbeans.client.IRegistryQuery;
+import eu.unicore.services.ws.client.IRegistryQuery;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**

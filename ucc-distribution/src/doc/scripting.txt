@@ -2,10 +2,10 @@
 Scripting
 ---------
 
-UCC can execute Groovy scripts. Groovy (http://groovy.codehaus.org) is a dynamic
+UCC can execute Groovy scripts. Groovy (https://groovy-lang.org) is a dynamic
 scripting language similar to Python or Ruby, but very closely integrated with Java.
 The scripting facility can be used for automation tasks or implementation of 
-custom commands, but it needs a bit of insight into how UNICORE and UCC work.
+custom commands, but it needs a bit of insight into how UCC and UNICORE work.
 
 Script context
 ~~~~~~~~~~~~~~

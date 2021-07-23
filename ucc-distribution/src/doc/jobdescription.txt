@@ -72,6 +72,7 @@ described in more detail below.
 |User postcommand              | String          | Post-processing
 |RunUserPostcommandOnLoginNode |  "true"/"false"  | Post-processing is done on login node (default: true)
 |UserPostcommandIgnoreNonZeroExitCode |  "true"/"false"  | Don't fail job if post-command fails (default: false)
+|Umask               | Octal string    | Umask value  (defaults to "0077")
 4+^e| 
 |Resources             | Map | The job's resource requests
 |Project               | String | Accounting project
@@ -79,8 +80,9 @@ described in more detail below.
 |Imports             | List of imports | Stage-in / data import
 |Exports             | List of exports | Stage-out / data export
 4+^e|
-|Job type           | 'normal', 'interactive' | Whether to run the job via the batch system ('normal', default) or on a login node ('interactive')
+|Job type           | 'normal', 'interactive', 'raw' | Whether to run the job via the batch system ('normal', default) or on a login node ('interactive'), or by using a given file containing batch system directives ('raw')
 |Login node         | String | For 'interactive' jobs, select a login node (by name, as configured server side. Wildcards '*' and '?' can be used)
+|BSS file           | String | For 'raw' jobs, the absolute or relative path to a file containing batch system directives
 |Tags               | List of strings | Job tags
 |Notification       | String          | URL to send job status change notifications to (via HTTP POST)
 |User email         | String          | User email to send notifications to (if the batch system supports it)
@@ -492,6 +494,17 @@ to charge the job to using the "Project" tag:
   "Project" : "my_project",
 ---------------------
 
+==== Umask
+
+By default, UNICORE sets a umask of "0077". If you want to change this, add
+it to the job description, for example
+
+---------------------
+  "Umask" : "0022",
+---------------------
+
+This setting will influence the job directory permissions, as well as all subsequent
+scripts and the batch job submission.
 
 ==== Job tags
 

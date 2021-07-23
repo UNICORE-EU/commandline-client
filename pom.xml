@@ -7,7 +7,7 @@
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
   <url>http://www.unicore.eu</url>
-  <version>2.1.1</version>
+  <version>2.2.0</version>
   <name>UNICORE Commandline Client (UCC)</name>
 
   <parent>
@@ -17,9 +17,9 @@
   </parent>
 
   <properties>
-     <uas.version>2.1.0</uas.version>
-     <wf.version>3.1.0</wf.version>
-     <jnr.version>0.24</jnr.version>
+     <uas.version>2.2.0</uas.version>
+     <wf.version>3.2.0</wf.version>
+     <jnr.version>0.38.8</jnr.version>
      <groovy.version>2.4.16</groovy.version>
      <guava.version>30.0-jre</guava.version>
      <compiler.fork>true</compiler.fork>
@@ -58,11 +58,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>eu.unicore.security</groupId>
-	<artifactId>secutils-cxf</artifactId>
-	<version>3.1.2</version>
-      </dependency>
       <dependency>
 	<groupId>com.google.guava</groupId>
 	<artifactId>guava</artifactId>

@@ -9,10 +9,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import de.fzj.unicore.uas.util.MessageWriter;
-import de.fzj.unicore.wsrflite.xmlbeans.client.Resources;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
+import eu.unicore.services.ws.client.Resources;
 
 /**
  * a more flexible version of a multi-registry client where the
@@ -110,7 +110,7 @@ public class MultiRegistryClient implements IRegistryClient {
 
 	private Boolean compute(Callable<Boolean>task, int timeout){
 		try{
-			Future<Boolean>f=Resources.getExecutorService().submit(task);
+			Future<Boolean>f = Resources.getExecutorService().submit(task);
 			return f.get(timeout, TimeUnit.MILLISECONDS);
 		}catch(Exception ex){
 			return Boolean.FALSE;
