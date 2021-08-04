@@ -22,7 +22,7 @@ client.serverHostnameChecking=NONE
 # The address(es) of the registries to contact
 # (space separated list)
 
-registry=https://localhost:8080/DEMO-SITE/services/Registry?res=default_registry
+registry=https://localhost:8080/DEMO-SITE/rest/registries/default_registry
 
 #
 # default directory for output

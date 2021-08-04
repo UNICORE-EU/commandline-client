@@ -78,7 +78,7 @@ set_option "Ducc.preferences" "=${HOME}/.ucc/preferences"
 #
 # log configuration
 #
-set_option "Dlog4j.configuration" "=file://${INST}/conf/logging.properties"
+set_option "Dlog4j.configurationFile" "=file://${INST}/conf/logging.properties"
 
 # set this one if you have ssl problems and need debug info
 #set_option "Djavax.net.debug" "=ssl,handshake"

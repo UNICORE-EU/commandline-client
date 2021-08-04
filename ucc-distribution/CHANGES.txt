@@ -3,7 +3,7 @@ UCC Changelog
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
 
-Version 2.2.0  (released MMM dd, 2021)
+Version 2.2.0  (released Aug 04, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - update to UNICORE 8.2 base libs
  - fix: local imports were left in the job description,

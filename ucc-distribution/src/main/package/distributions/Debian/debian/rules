@@ -29,7 +29,7 @@ binary-indep: install
 #	dh_installmenu
 #	dh_installdebconf
 #	dh_installlogrotate
-	dh_installemacsen
+#	dh_installemacsen
 #	dh_installpam
 #	dh_installmime
 #	dh_installinit

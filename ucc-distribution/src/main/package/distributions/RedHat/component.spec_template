@@ -22,20 +22,8 @@ This package contains the UNICORE commandline client UCC.
 
 
 %changelog
-* Thu Jan 16 2014 Bernd Schuller <unicore-support@lists.sourceforge.net> 7.0.1-0
--fix obsoletes directive
-* Fri Dec 13 2013 Bernd Schuller <unicore-support@lists.sourceforge.net> 5.1.0-1
--updated Java dependency to Java 7
-* Thu Oct 11 2012 Bernd Schuller <unicore-support@lists.sourceforge.net> 5.1.0-1
--updated to v1.5.1 of base libs, added samples to rpm
-* Mon Jan 30 2012 Bernd Schuller <unicore-support@lists.sourceforge.net> 5.0.0-1
--packaging updated, changed version schema, changed name to unicore-ucc6
-* Tue Feb 15 2011 Bernd Schuller <unicore-support@lists.sourceforge.net> 6.4.0-1
--updates for 6.4.0 release
-* Wed May 5 2010 Bernd Schuller <unicore-support@lists.sourceforge.net> 6.3.1-1
--include rpm build into automated UCC builds
-* Fri Nov 20 2009 Rebecca Breu <unicore-support@lists.sourceforge.net> 6.2.0-1
--get site-start for Emacs right
+* Wed Aug 04 2021 Bernd Schuller <unicore-support@lists.sourceforge.net> 8.2.0-1
+-v8.2.0
 * Thu Oct 15 2009 Rebecca Breu <unicore-support@lists.sourceforge.net> 6.2.0-1
 -Initial rpm package
 
@@ -55,11 +43,6 @@ This package contains the UNICORE commandline client UCC.
 # Bash completion
 #
 %attr(644 root root) "/etc/bash_completion.d/unicore-ucc"
-
-#
-# Emacs mode
-# needs update
-# %attr(644 root root) "/usr/share/emacs/site-lisp/unicore-ucc/*"
 
 #
 # Documentation and samples

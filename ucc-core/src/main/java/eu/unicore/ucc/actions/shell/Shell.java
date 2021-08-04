@@ -112,7 +112,7 @@ public class Shell extends ActionBase {
 				is.addCompleter(new UCCCompletor(cmd));
 			}
 			System.out.println(getHeader());
-			System.out.println("UCC "+UCC.getVersion()+", https://www.unicore.eu");
+			System.out.println("UCC "+UCC.getVersion());
 			System.out.print("Welcome to the UCC shell. Enter 'help' for a list of commands. Enter 'exit' to quit.");
 			while(true){
 				System.out.println();

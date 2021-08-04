@@ -5,8 +5,8 @@ _ucc()
   COMPREPLY=()
   cur=`_get_cword`
   prev="${COMP_WORDS[COMP_CWORD-1]}"
-  commands="abort-job batch bes-job-status bes-list-att bes-list-jobs bes-submit-job bes-terminate-job broker-run cip-query connect connect-to-testgrid copy-file copy-file-status create-storage find get-file get-output get-status issue-delegation list-applications list-jobs list-sites list-storages ls metadata mkdir put-file resolve rm run run-groovy shell system-info workflow-control workflow-info workflow-submit workflow-trace wsrf"
-  global_opts="--registry --with-timing --delegationAssertion --truststore --user --truststorePassword --configuration --help --keystore --long --alias --output --password --verbose --storetype"
+  commands="admin-info admin-runcommand batch cat connect copy-file-status cp create-storage create-tss exec get-output job-abort job-restart job-status list-attributes list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
+  global_opts="--long --url-pattern --raw --configuration --help --output --registry --verbose --with-timing --authenticationMethod --acceptAllIssuers --preference"
 
 
   # parsing for ucc command word (2nd word in commandline.
@@ -18,122 +18,116 @@ _ucc()
 
   # looking for arguments matching to command
   case "${COMP_WORDS[1]}" in
-    abort-job)
-    opts="$global_opts "
+    admin-info)
+    opts="$global_opts --filter --fields --all --tags"
+    ;;
+    admin-runcommand)
+    opts="$global_opts --sitename --url"
     ;;
     batch)
-    opts="$global_opts --threads --input --noFetchOutcome --noResourceCheck --update --jsdl --maxNewJobs --siteWeights --follow --submitOnly --max --keep --sitename"
+    opts="$global_opts --sitename --input --noFetchOutcome --noResourceCheck --update --maxNewJobs --siteWeights --follow --threads --max --keep --submitOnly"
     ;;
-    bes-job-status)
-    opts="$global_opts "
-    ;;
-    bes-list-att)
-    opts="$global_opts --sitename"
-    ;;
-    bes-list-jobs)
-    opts="$global_opts --sitename"
-    ;;
-    bes-submit-job)
-    opts="$global_opts --sitename --jsdl --stdout --brief --stderr"
-    ;;
-    bes-terminate-job)
-    opts="$global_opts "
-    ;;
-    broker-run)
-    opts="$global_opts --sitename --noFilenameFix --asynchronous --lifetime --factoryURL --storageURL"
-    ;;
-    cip-query)
-    opts="$global_opts --sitename --maxrecords --glue --topic"
+    cat)
+    opts="$global_opts --bytes --protocols"
     ;;
     connect)
     opts="$global_opts --lifetime"
     ;;
-    connect-to-testgrid)
-    opts="$global_opts "
-    ;;
-    copy-file)
-    opts="$global_opts --protocols --source --force-remote --target --asynchronous"
-    ;;
     copy-file-status)
     opts="$global_opts "
     ;;
+    cp)
+    opts="$global_opts --bytes --resume --schedule --asynchronous --recursive --protocols"
+    ;;
     create-storage)
+    opts="$global_opts --sitename --info --type --lifetime --factoryURL"
+    ;;
+    create-tss)
     opts="$global_opts --sitename --lifetime --factoryURL"
     ;;
-    find)
-    opts="$global_opts --name --recursive"
-    ;;
-    get-file)
-    opts="$global_opts --source --target --protocols"
+    exec)
+    opts="$global_opts --sitename --broker --dryRun --keep"
     ;;
     get-output)
-    opts="$global_opts --sitename --stdout --jsdl --asynchronous --stderr --example --brief"
+    opts="$global_opts --brief"
     ;;
-    get-status)
+    job-abort)
     opts="$global_opts "
     ;;
-    issue-delegation)
-    opts="$global_opts --sitename --file --target --validity --subject"
+    job-restart)
+    opts="$global_opts "
     ;;
-    list-applications)
-    opts="$global_opts --sitename --filter --all"
+    job-status)
+    opts="$global_opts --all"
+    ;;
+    list-attributes)
+    opts="$global_opts "
     ;;
     list-jobs)
-    opts="$global_opts --sitename --filter --all"
+    opts="$global_opts --sitename --fields --all --tags --filter"
     ;;
     list-sites)
-    opts="$global_opts --filter --all"
+    opts="$global_opts --sitename --fields --all --tags --filter"
     ;;
     list-storages)
-    opts="$global_opts --filter --all"
+    opts="$global_opts --filter --fields --all --tags"
+    ;;
+    list-transfers)
+    opts="$global_opts --filter --fields --all --tags"
+    ;;
+    list-workflows)
+    opts="$global_opts --fields --nofiles --nojobs --filter --all --tags"
     ;;
     ls)
     opts="$global_opts --human --show-metadata --recursive"
     ;;
     metadata)
-    opts="$global_opts --query --file --storage --metadata-service --advanced-query --command"
+    opts="$global_opts --query --wait --file --storage --advanced-query --command"
     ;;
     mkdir)
     opts="$global_opts "
     ;;
-    put-file)
-    opts="$global_opts --protocols --source --target --append"
+    rename)
+    opts="$global_opts "
     ;;
     resolve)
-    opts="$global_opts "
+    opts="$global_opts --list --full"
     ;;
     rm)
     opts="$global_opts --quiet"
     ;;
     run)
-    opts="$global_opts --sitename --stdout --jsdl --asynchronous --stderr --example --brief"
+    opts="$global_opts --sitename --broker --stdout --schedule --asynchronous --stderr --dryRun --example --brief"
     ;;
     run-groovy)
     opts="$global_opts --expression --file"
     ;;
+    share)
+    opts="$global_opts --delete --clean"
+    ;;
     shell)
     opts="$global_opts --file"
+    ;;
+    stat)
+    opts="$global_opts --human --show-metadata"
     ;;
     system-info)
     opts="$global_opts "
     ;;
+    umask)
+    opts="$global_opts --set"
+    ;;
     workflow-control)
     opts="$global_opts "
     ;;
-    workflow-info)
-    opts="$global_opts --filter --nofiles --all"
-    ;;
     workflow-submit)
-    opts="$global_opts --sitename --noFilenameFix --wait --workflowName --lifetime --factoryURL --storageURL --uccInput"
-    ;;
-    workflow-trace)
-    opts="$global_opts "
+    opts="$global_opts --sitename --wait --dryRun --uccInput --factoryURL --storageURL --name"
     ;;
 
-    wsrf)
-    #looking for wsrf command
+    rest)
+    #looking for 'rest' command
     if [ $COMP_CWORD -eq 2 ]; then
-      opts="getproperties destroy extend"
+      opts="get put post delete"
     else
       opts="$global_opts "
     fi

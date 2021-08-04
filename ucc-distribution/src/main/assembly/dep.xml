@@ -44,11 +44,6 @@
       <outputDirectory>lib</outputDirectory>
       <unpack>false</unpack>
       <scope>runtime</scope>
-      <excludes>
-      <!-- exclude things not needed by pure clients 
-       <exclude>org.mortbay.jetty:jetty</exclude>
-      -->
-     </excludes>
     </dependencySet>
   </dependencySets>
 </assembly>
