@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import de.fzj.unicore.ucc.Constants;
 import de.fzj.unicore.ucc.UCC;
-import eu.unicore.bugsreporter.annotation.RegressionTest;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.util.httpclient.ClientProperties;
 import eu.unicore.util.httpclient.IClientConfiguration;
@@ -27,7 +26,6 @@ public class TestActionBase {
 	}
 	
 
-	@RegressionTest(url="https://sourceforge.net/tracker/?func=detail&aid=3371018&group_id=102081&atid=633902")
 	@Test
 	public void testTimeoutParameters()throws Exception{
 		Properties p=new Properties();

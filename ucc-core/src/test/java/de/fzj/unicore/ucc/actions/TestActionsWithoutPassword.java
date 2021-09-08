@@ -7,7 +7,6 @@ import org.junit.Test;
 import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.util.EmbeddedTestBase;
 import de.fzj.unicore.ucc.util.KeystoreAuthNWithPasswd;
-import eu.unicore.bugsreporter.annotation.FunctionalTest;
 import eu.unicore.ucc.actions.job.Run;
 
 /**
@@ -22,7 +21,6 @@ public class TestActionsWithoutPassword extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
-	@FunctionalTest(id="testNoPassword", description="Tests few UCC operations without credential and truststore password in properties file")
 	@Test
 	public void testNoPassword(){
 		KeystoreAuthNWithPasswd.QUESTIONS=0;
@@ -46,7 +44,6 @@ public class TestActionsWithoutPassword extends EmbeddedTestBase {
 		assertEquals(2, KeystoreAuthNWithPasswd.QUESTIONS);
 	}
 
-	@FunctionalTest(id="testNoPassword", description="Tests the UCC shell command without credential and truststore password in properties file")
 	@Test
 	public void testShellNoPassword(){
 		KeystoreAuthNWithPasswd.QUESTIONS=0;

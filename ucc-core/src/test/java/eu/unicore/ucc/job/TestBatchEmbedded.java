@@ -11,12 +11,10 @@ import org.junit.Test;
 
 import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.util.EmbeddedTestBase;
-import eu.unicore.bugsreporter.annotation.FunctionalTest;
 
 public class TestBatchEmbedded extends EmbeddedTestBase {
 
 
-	@FunctionalTest(id="testBatch", description="Tests the 'batch' command")
 	@Test
 	public void testBatch()throws Exception{
 		FileUtils.deleteQuietly(new File("target/test/batchtest"));

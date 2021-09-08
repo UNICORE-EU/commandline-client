@@ -7,13 +7,13 @@
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
   <url>http://www.unicore.eu</url>
-  <version>2.2.0</version>
+  <version>2.2.1</version>
   <name>UNICORE Commandline Client (UCC)</name>
 
   <parent>
     <groupId>eu.unicore</groupId>
     <artifactId>unicore-parent</artifactId>
-    <version>1.23</version>
+    <version>2.0</version>
   </parent>
 
   <properties>

@@ -14,8 +14,6 @@ import org.junit.Test;
 import de.fzj.unicore.uas.util.UnitParser;
 import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.util.EmbeddedTestBase;
-import eu.unicore.bugsreporter.annotation.FunctionalTest;
-import eu.unicore.bugsreporter.annotation.RegressionTest;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.ucc.actions.data.CP;
 import eu.unicore.ucc.actions.data.LS;
@@ -61,7 +59,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	}
 
-	@FunctionalTest(id="testPutGetFileErrorHandling", description="Tests error handling of up/download.")
 	@Test
 	public void test_Error_PutFile_GetFile()throws IOException{
 		connect();
@@ -129,7 +126,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	}
 
-	@FunctionalTest(id="testGetFileRawHttp", description="Tests the get-file from a http source")
 	@Test
 	public void test_GetFile_RawHttpURL()throws IOException{
 		connect();
@@ -143,7 +139,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
-	@FunctionalTest(id="testFileOperationByteRanges", description="Tests the put/get-file ops using a byte range")
 	@Test
 	public void test_FileOps_ByteRange()throws IOException{
 		connect();
@@ -215,7 +210,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 	}
 
 
-	@FunctionalTest(id="testCopyFileStatus", description="Tests the copy-file-status commands")
 	@Test
 	public void test_CopyFile_and_CopyFileStatus()throws IOException{
 		connect();
@@ -281,7 +275,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		checkFilesOK(new File("src/test/resources/jobs/date.u"), f2);
 	}
 
-	@FunctionalTest(id="testListFiletransfers", description="Tests the list-transfers commands")
 	@Test
 	public void test_ListTransfers()throws IOException{
 		connect();
@@ -327,7 +320,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
-	@RegressionTest(url="https://sourceforge.net/tracker/?func=detail&aid=3406663&group_id=102081&atid=633902")
 	@Test
 	public void test_Error_CopyFile()throws IOException{
 		connect();
@@ -343,7 +335,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		assertFalse(Integer.valueOf(0)==UCC.exitCode);
 	}
 
-	@FunctionalTest(id="testGetDirectory", description="Tests get-file of a directory")
 	@Test
 	public void test_ExportDirectory()throws IOException{
 		connect();
@@ -388,7 +379,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 	}
 
 
-	@FunctionalTest(id="testPutDirectory", description="Tests put-file of a directory")
 	@Test
 	public void test_ImportDirectory()throws IOException{
 		connect();
@@ -431,7 +421,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		FileUtils.deleteQuietly(tmp);
 	}
 
-	@FunctionalTest(id="testCatFile", description="Tests the 'cat' command")
 	@Test
 	public void test_CatFile()throws IOException{
 		connect();
@@ -466,7 +455,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
-	@FunctionalTest(id="testCP", description="Tests the CP command")
 	@Test
 	public void test_CP()throws IOException{
 		connect();
