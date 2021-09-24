@@ -1,12 +1,11 @@
 package eu.unicore.ucc.actions.data;
 
-import java.io.IOException;
-
 import org.apache.commons.cli.OptionBuilder;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
 
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.io.Location;
-import jline.console.ConsoleReader;
 
 /**
  * removes a remote file/directory resource
@@ -53,17 +52,16 @@ public class RM extends SMSOperation {
 	}
 	
 	protected boolean confirm(){
-		ConsoleReader r = null;
+		LineReader r = null;
 		try{
-			r = new ConsoleReader();
-			String line=r.readLine("This will delete a remote file/directory, are you sure? [Y]");
+			r = LineReaderBuilder.builder().build();
+			String line = r.readLine("This will delete a remote file/directory, are you sure? [Y]");
 			return line.length()==0  || line.startsWith("y") || line.startsWith("Y");
-		}catch(IOException igored){}
-		finally{
-			if(r!=null) r.shutdown();
+		}finally{
+			try{
+				if(r!=null) r.getTerminal().close();
+			}catch(Exception e) {}
 		}
-		
-		return false;
 	}
 	@Override
 	public String getName() {

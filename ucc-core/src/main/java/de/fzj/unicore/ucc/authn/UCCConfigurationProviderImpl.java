@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+
 import de.fzj.unicore.uas.security.RegistryIdentityResolver;
 import de.fzj.unicore.uas.security.WSRFClientConfigurationProviderImpl;
 import de.fzj.unicore.ucc.Command;
@@ -25,7 +28,6 @@ import eu.unicore.security.wsutil.client.authn.DelegationSpecification;
 import eu.unicore.security.wsutil.client.authn.JsonSecuritySessionPersistence;
 import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.util.httpclient.IClientConfiguration;
-import jline.console.ConsoleReader;
 
 /**
  * UCC specific extension of {@link ClientConfigurationProvider}. Configures the object in UCC way (from preferences)
@@ -208,7 +210,7 @@ public class UCCConfigurationProviderImpl extends WSRFClientConfigurationProvide
 		
 		System.err.println("VALIDATION ERROR : "+err.getMessage());
 		try{
-			ConsoleReader cr = new ConsoleReader();
+			LineReader cr = LineReaderBuilder.builder().build();
 			String line = cr.readLine("Accept issuer <"+issuer+"> [Y/n/a]");
 			boolean accept = line.length()==0  || line.startsWith("y") || line.startsWith("Y");
 			acceptAll =  line.startsWith("a") || line.startsWith("A");

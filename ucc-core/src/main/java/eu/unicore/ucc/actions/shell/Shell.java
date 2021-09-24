@@ -1,7 +1,6 @@
 package eu.unicore.ucc.actions.shell;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +12,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
+import org.jline.reader.History;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.history.DefaultHistory;
 
 import de.fzj.unicore.ucc.Command;
 import de.fzj.unicore.ucc.UCC;
@@ -20,9 +24,6 @@ import de.fzj.unicore.ucc.authn.KeystoreAuthN;
 import de.fzj.unicore.ucc.helpers.EndProcessingException;
 import de.fzj.unicore.ucc.util.PropertyVariablesResolver;
 import eu.unicore.ucc.actions.ActionBase;
-import jline.console.ConsoleReader;
-import jline.console.history.FileHistory;
-import jline.console.history.PersistentHistory;
 
 /**
  * a UCC command that starts an interactive session
@@ -85,45 +86,45 @@ public class Shell extends ActionBase {
 		run();
 	}
 
-	private String[]internalCommands = {"set", "unset", "system", "help", "help-auth", "version"};
+	private String[]internalCommands = {"set", "unset", "system", "!", "help", "help-auth", "version", "exit", "quit"};
 	
 	public void run(){
 		Command.quitAfterPrintingUsage=false;
-		ConsoleReader is=null;
-		PersistentHistory history = null;
+		LineReader is = null;
+		History history = null;
 		try{
 			if(commandFile!=null){
-				is = new ConsoleReader(new FileInputStream(commandFile), System.out);
+				is = LineReaderBuilder.builder().build();
+				is.addCommandsInBuffer(FileUtils.readLines(commandFile, "UTF-8"));
 			}
 			else{
-				is=new ConsoleReader();
-				history = getHistory();
-				if(history!=null){
-					is.setHistoryEnabled(true);
-					is.setHistory(history);
-				}
-				is.setExpandEvents(false);
 				Set<String> cmds = new HashSet<>();
 				cmds.addAll(UCC.cmds.keySet());
 				for(String s: internalCommands) {
 					cmds.add(s);
 				}
-				String[]cmd = cmds.toArray(new String[cmds.size()]);
-				is.addCompleter(new UCCCompletor(cmd));
+				is = LineReaderBuilder.builder()
+						.completer(new UCCCompletor(cmds))
+						.build();
+				history = getHistory(is);
 			}
 			System.out.println(getHeader());
 			System.out.println("UCC "+UCC.getVersion());
 			System.out.print("Welcome to the UCC shell. Enter 'help' for a list of commands. Enter 'exit' to quit.");
 			while(true){
 				System.out.println();
-				String s=commandFile!=null?is.readLine():is.readLine("ucc>");
+				String s = null;
+				try {
+					s=commandFile!=null?is.readLine():is.readLine("ucc>");
+				}catch(Exception uie) {}
+			
 				if(s==null){
 					s="exit";
 				}
 				s=s.trim();
 				if(s.isEmpty())continue;
 
-				if("exit".equalsIgnoreCase(s)){
+				if("exit".equalsIgnoreCase(s) || "quit".equalsIgnoreCase(s)){
 					message("");
 					message("Goodbye.");
 					return;
@@ -187,10 +188,12 @@ public class Shell extends ActionBase {
 		} finally {
 			if (history != null){
 				try{
-					history.flush();
+					history.save();
 				}catch(Exception ex){}
 			}
-			if (is != null) is.shutdown();
+			try{
+				if (is != null) is.getTerminal().close();
+			}catch(Exception ex){}
 		}
 	}
 
@@ -293,14 +296,16 @@ public class Shell extends ActionBase {
 		return false;
 	}
 
-	protected PersistentHistory getHistory() {
+	protected History getHistory(LineReader lineReader) {
 		try{
 			String historyFile = properties.getProperty(HISTORY_FILEKEY);
 			if(historyFile == null){
 				historyFile=System.getProperty("user.home")+File.separator+".ucc"
 						+File.separator+HISTORY_FILEKEY;
 			}
-			return new FileHistory(new File(historyFile));	
+			lineReader.setVariable(LineReader.HISTORY_FILE, historyFile);
+			DefaultHistory history = new DefaultHistory(lineReader);
+			return history;
 		}
 		catch(Exception e){
 			verbose("Cannot setup history");

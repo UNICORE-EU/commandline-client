@@ -3,6 +3,12 @@ UCC Changelog
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
 
+Version 2.2.1  (released mmm dd, 2021)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - fix: clearing the screen during password entry
+   results in characters displayed in clear text (#290)
+ - update to JLine 3.20
+
 Version 2.2.0  (released Aug 04, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - update to UNICORE 8.2 base libs

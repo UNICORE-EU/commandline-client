@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jline.utils.Log;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -22,7 +23,7 @@ import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.ucc.actions.data.LS;
 import eu.unicore.ucc.actions.shell.Shell;
 import eu.unicore.ucc.io.FiletransferParameterProvider;
-import jline.internal.Log;
+
 import org.junit.Assert;
 
 public class TestVarious {

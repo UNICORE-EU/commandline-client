@@ -6,10 +6,12 @@ package de.fzj.unicore.ucc.authn;
 
 import java.io.IOException;
 
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+
 import eu.unicore.security.canl.CachingPasswordCallback;
 import eu.unicore.security.canl.PasswordCallback;
 import eu.unicore.security.wsutil.client.authn.UsernameCallback;
-import jline.console.ConsoleReader;
 
 public class CallbackUtils
 {
@@ -28,7 +30,7 @@ public class CallbackUtils
 					String protectedArtifactDescription)
 			{
 				return getPasswordFromUserCmd(protectedArtifactType,
-								protectedArtifactDescription);
+						protectedArtifactDescription);
 			}
 
 			@Override
@@ -39,13 +41,13 @@ public class CallbackUtils
 			}
 		};
 	}
-	
+
 	public static UsernameCallback getUsernameCallback()
 	{
 		return new UsernameCallback()
 		{
 			private String username = null;
-			
+
 			@Override
 			public String getUsername()
 			{
@@ -72,47 +74,38 @@ public class CallbackUtils
 		}
 		sb.append(" password: ");
 		System.out.println(sb.toString());
-		
-		ConsoleReader cr = null;
+
 		try {
-			cr = new ConsoleReader();
-			cr.setExpandEvents(false);
+			LineReader cr = LineReaderBuilder.builder().build();
 			r = cr.readLine(Character.valueOf('*'));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			return null;
-		} finally{
-			if(cr!=null)cr.shutdown();
 		}
 		r.trim();
 		return r.toCharArray();
 	}
-	
+
 	public static String getUsernameFromUser() throws IOException {
 		String r;
-		ConsoleReader cr = null; 
+		LineReader cr = null; 
 		try {
-			cr = new ConsoleReader();
+			cr = LineReaderBuilder.builder().build();
 			System.out.println("Please enter your username: ");
 			r = cr.readLine();
 			r.trim();
 			return r;
 		}finally {
-			if(cr!=null) cr.shutdown();
+
 		}
 	}
-	
+
 	public static String getUsernameFromUser(String protectedArtifactType) throws IOException {
 		String r;
-		ConsoleReader cr = null; 
-		try {
-			cr = new ConsoleReader();
-			System.out.println("Please enter your "+ protectedArtifactType +" username: ");
-			r = cr.readLine();
-			r.trim();
-			return r;
-		}finally {
-			if(cr!=null) cr.shutdown();
-		}
+		LineReader cr = LineReaderBuilder.builder().build();
+		System.out.println("Please enter your "+ protectedArtifactType +" username: ");
+		r = cr.readLine();
+		r.trim();
+		return r;
 	}
 
 }

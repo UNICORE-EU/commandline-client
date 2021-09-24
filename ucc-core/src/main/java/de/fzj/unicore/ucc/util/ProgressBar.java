@@ -1,11 +1,12 @@
 package de.fzj.unicore.ucc.util;
 
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.InfoCmp.Capability;
+
 import de.fzj.unicore.uas.fts.ProgressListener;
 import de.fzj.unicore.uas.util.MessageWriter;
 import de.fzj.unicore.uas.util.UnitParser;
-import jline.Terminal;
-import jline.TerminalFactory;
-import jline.console.ConsoleReader;
 
 /**
  * console progress bar using jline
@@ -14,9 +15,8 @@ import jline.console.ConsoleReader;
  */
 public class ProgressBar implements ProgressListener<Long> {
 
-	private Terminal terminal=null;	
-	private ConsoleReader reader=null;
-	private MessageWriter msg=null;
+	private Terminal terminal;	
+	private final MessageWriter msg;
 	private long size=-1;
 	private long have=0;
 	private long startedAt=0;
@@ -51,16 +51,9 @@ public class ProgressBar implements ProgressListener<Long> {
 		this.msg=msg;
 		startedAt=System.currentTimeMillis();
 		try {
-			
-			TerminalFactory.configure(TerminalFactory.NONE);
-			
-			terminal = TerminalFactory.get();
-			
-			reader = new ConsoleReader();
-	
+			terminal = TerminalBuilder.terminal();
 		} catch (Exception e) {
 			msg.error("Could not setup jline console output: "+e,null);
-			terminal = null;
 		}
 		setSize(size);
 	}
@@ -111,19 +104,13 @@ public class ProgressBar implements ProgressListener<Long> {
 		}
 		
 		//compute maximum with of identifier printout
-		int w=getTerminalWidth();
-		int max=w-sb.length()-5;
-		if(max>0){
-			sb.insert(0, String.format("%-"+max+"s ", identifier));
-		}
+		int max = getTerminalWidth()-5-sb.length();
+		sb.insert(0, String.format("%-"+max+"s ", identifier));
 		
 		try {
-			reader.getCursorBuffer().clear();
-			reader.getCursorBuffer().write(sb.toString());
-			reader.setCursorPosition(w);
-			reader.redrawLine();
-			reader.flush();
-			
+			terminal.puts(Capability.carriage_return);
+			terminal.writer().write(sb.toString());
+			terminal.flush();
 		}
 		catch (Exception e) {
 			msg.error("Could not output to jline console: "+e,null);
@@ -135,7 +122,7 @@ public class ProgressBar implements ProgressListener<Long> {
 	
 	private int getTerminalWidth(){
 		if(width==0){
-			width=terminal.getWidth();
+			width = Math.max(80, terminal.getWidth());
 		}
 		return width;
 	}
@@ -159,8 +146,9 @@ public class ProgressBar implements ProgressListener<Long> {
 		}
 		output();
 		System.out.println();
-		// TODO: Review me. is the ConsoleReader further required?
-		if(reader != null) reader.shutdown();
+		try{
+			terminal.close();
+		}catch(Exception ex) {}
 	}
 
 
