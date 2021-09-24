@@ -15,7 +15,7 @@ if not exist %USER_UCC_HOME% (
 )
 
 rem Copying configuration files if not exists
-set USER_UCC_FILES=preferences extensions user-keystore.jks 
+set USER_UCC_FILES=preferences
 for %%i in (%USER_UCC_FILES%) do (
 	if not exist %USER_UCC_HOME%\%%i (
 		echo Copying file %%i to %USER_UCC_HOME%

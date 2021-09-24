@@ -13,7 +13,7 @@ password=test123
 # configure truststore containing trusted CA certs
 truststore.type=directory
 # if type is 'directory'
-truststore.directoryLocations.1=../certs/trusted-certs/*.pem
+truststore.directoryLocations.1=${HOME}/.ucc/trusted-certs/*.pem
 
 # do not check the SSL cert contains correct hostname
 client.serverHostnameChecking=NONE
@@ -28,4 +28,3 @@ registry=https://localhost:8080/DEMO-SITE/rest/registries/default_registry
 # default directory for output
 # 
 output=.
-

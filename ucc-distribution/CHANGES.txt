@@ -5,6 +5,7 @@ Issue tracker: https://sourceforge.net/p/unicore/issues
 
 Version 2.2.1  (released mmm dd, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - improvement: 'rest' command accepts a list of URLs
  - fix: clearing the screen during password entry
    results in characters displayed in clear text (#290)
  - update to JLine 3.20

@@ -30,7 +30,7 @@ if [ ! -e ${HOME}/.ucc/ ]; then
     mkdir -p ${HOME}/.ucc/trusted-certs
 fi
 
-CONFIG_FILES="preferences extensions user-keystore.jks"
+CONFIG_FILES="preferences"
 for f in $CONFIG_FILES; do
 	C_F=${HOME}/.ucc/$f
     if [ ! -e "$C_F" -a -e "${INST}/conf/$f" ]; then

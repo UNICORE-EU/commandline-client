@@ -33,18 +33,19 @@ public class UCCCompletor implements Completer {
 		}
 		else {
 			String currentCommand = line.words().get(0);
+			boolean tryFiles = true;
 			try {
 				Command c = UCC.getCommand(currentCommand);
-				commandComplete(c, reader, line, candidates);
+				tryFiles = commandComplete(c, reader, line, candidates);
 			}catch(Exception ex) {}
-			fileNames.complete(reader, line, candidates);
+			if(tryFiles)fileNames.complete(reader, line, candidates);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void commandComplete(Command command, LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
+	protected boolean commandComplete(Command command, LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
 		try{
-			//String[] parts=buffer.split(" +");
+			String cmdName = command.getName();
 			String lastToken = line.word();
 			if(lastToken.startsWith("-")){
 				boolean longOpts = lastToken.startsWith("--");
@@ -63,7 +64,13 @@ public class UCCCompletor implements Completer {
 					}
 				}
 			}
+			else if ("rest".equals(cmdName) &&line.wordIndex()==1) {
+				for(String x: new String[] {"GET","PUT","POST","DELETE"})
+					candidates.add(new Candidate(x));
+				return false;
+			}
 		} catch(Exception e) {}
+		return true;
 	}
 
 }

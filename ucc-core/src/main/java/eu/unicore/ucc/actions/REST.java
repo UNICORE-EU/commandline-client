@@ -30,7 +30,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 
 	@Override
 	public String getArgumentList(){
-		return "GET|PUT|POST|DELETE [JSON-string | @file] URL";
+		return "GET|PUT|POST|DELETE [JSON-string | @file] URL [URLS...]";
 	}
 
 	@Override
@@ -63,42 +63,52 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			if(length<3){
 				throw new IllegalArgumentException("You must provide at least a URL as argument to this command.");
 			}
-			//URL is last argument
-			String url=getCommandLine().getArgs()[length-1];
-			verbose("Connecting to <"+url+">");
-
-			BaseClient bc = makeClient(url);
-			
+			int startIndex = 2;
 			JSONObject content = new JSONObject(); 
 			if(length>3){
 				String ref = getCommandLine().getArgs()[2];
 				if(ref.startsWith("@")){
 					File f = new File(ref.substring(1));
 					content = new JSONObject(FileUtils.readFileToString(f, "UTF-8"));
+					startIndex++;
 				}
-				else {
-					content = new JSONObject(ref);
+				else if(!ref.toLowerCase().startsWith("http")) {
+					try{
+						content = new JSONObject(ref);
+						startIndex++;
+					}catch(JSONException je) {}
 				}
 			}
-			if("get".startsWith(cmd.toLowerCase())){
-				message(bc.getJSON().toString(2));
+			
+			for(int i = startIndex; i<length; i++) {
+				String url=getCommandLine().getArgs()[i];
+				doProcess(cmd, url, content);
 			}
-			else if("delete".startsWith(cmd.toLowerCase())){
-				bc.delete();
-			}
-			else if("post".startsWith(cmd.toLowerCase())){
-				handleResponse(bc.post(content), bc);
-			}
-			else if("put".startsWith(cmd.toLowerCase())){
-				handleResponse(bc.put(content), bc);
-			}
-			else {
-				throw new IllegalArgumentException("Command <"+cmd+"> not (yet) implemented / not understood!");
-			}
-
+			
 		}catch(Exception e){
 			error("Can't perform REST operation", e);
 			endProcessing(ERROR);
+		}
+	}
+	
+	protected void doProcess(String cmd, String url, JSONObject content) throws Exception {
+		verbose("Connecting to <"+url+">");
+		BaseClient bc = makeClient(url);
+	
+		if("get".startsWith(cmd.toLowerCase())){
+			message(bc.getJSON().toString(2));
+		}
+		else if("delete".startsWith(cmd.toLowerCase())){
+			bc.delete();
+		}
+		else if("post".startsWith(cmd.toLowerCase())){
+			handleResponse(bc.post(content), bc);
+		}
+		else if("put".startsWith(cmd.toLowerCase())){
+			handleResponse(bc.put(content), bc);
+		}
+		else {
+			throw new IllegalArgumentException("Command <"+cmd+"> not (yet) implemented / not understood!");
 		}
 	}
 	
