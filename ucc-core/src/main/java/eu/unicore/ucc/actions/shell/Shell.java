@@ -96,6 +96,7 @@ public class Shell extends ActionBase {
 			if(commandFile!=null){
 				is = LineReaderBuilder.builder().build();
 				is.addCommandsInBuffer(FileUtils.readLines(commandFile, "UTF-8"));
+				is.addCommandsInBuffer(Arrays.asList("exit"));
 			}
 			else{
 				Set<String> cmds = new HashSet<>();
@@ -112,12 +113,10 @@ public class Shell extends ActionBase {
 			System.out.println("UCC "+UCC.getVersion());
 			System.out.print("Welcome to the UCC shell. Enter 'help' for a list of commands. Enter 'exit' to quit.");
 			while(true){
-				System.out.println();
 				String s = null;
 				try {
 					s=commandFile!=null?is.readLine():is.readLine("ucc>");
 				}catch(Exception uie) {}
-			
 				if(s==null){
 					s="exit";
 				}
