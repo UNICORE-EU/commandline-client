@@ -1,5 +1,5 @@
 @component-prefix@@component-name@@component-suffix@ (@component-version@-@component-release@@component-disttag@) unstable; urgency=low
 
-  * v8.2.0
+  * v8.2.1
 
- -- Bernd Schuller <b.schuller@fz-juelich.de>  Wed, 4 Aug 2021 12:00:00 +0100
+ -- Bernd Schuller <b.schuller@fz-juelich.de>  Mon, 27 Sep 2021 12:00:00 +0100

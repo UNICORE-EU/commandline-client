@@ -3,7 +3,7 @@ UCC Changelog
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
 
-Version 2.2.1  (released mmm dd, 2021)
+Version 2.2.1  (released Sep 27, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - improvement: 'rest' command accepts a list of URLs
  - fix: clearing the screen during password entry
