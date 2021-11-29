@@ -44,23 +44,20 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 	@Override
 	public String getDescription()
 	{
-		return "Authenticate with an OIDC token to UNICORE RESTful services. "
-				+ "The token is retrieved from the 'oidc-agent' utility.\n"
+		return "Authenticate with an OIDC token. "
+				+ "The token is retrieved from the 'oidc-agent' utility. "
 				+ "See https://github.com/indigo-dc/oidc-agent";
 	}
 	
 	@Override
 	public String getUsage()
 	{
-		StringBuilder ret = new StringBuilder();
-		ret.append("The following properties can be used in the UCC preference file " +
-				"to configure the oidc-agent authentication. Many of these are optional. Refer to the " +
-				"manual and/or the example files.\n");
-		ret.append("\nFor configuring the oidc-agent:\n");
-		ret.append(getMeta(OIDCAgentProperties.class, OIDCAgentProperties.PREFIX));
-		ret.append("\nFor configuring your trusted CAs and certificates, "
-				+ "use the usual 'truststore.*' properties\n");
-		return ret.toString();
+		return "The following properties can be used in the UCC preference file " +
+				"to configure the oidc-agent authentication. " +
+				"Many of these are optional. Refer to the manual and/or the example files.\n" +
+				"\nFor configuring the oidc-agent:\n" +
+				getMeta(OIDCAgentProperties.class, OIDCAgentProperties.PREFIX) +
+				"\nFor configuring your trusted CAs and certificates, use the usual 'truststore.*' properties\n";
 	}
 
 	@Override

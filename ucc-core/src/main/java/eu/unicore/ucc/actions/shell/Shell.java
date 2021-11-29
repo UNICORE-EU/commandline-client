@@ -111,7 +111,7 @@ public class Shell extends ActionBase {
 			}
 			System.out.println(getHeader());
 			System.out.println("UCC "+UCC.getVersion());
-			System.out.print("Welcome to the UCC shell. Enter 'help' for a list of commands. Enter 'exit' to quit.");
+			System.out.println("Welcome to the UCC shell. Enter 'help' for a list of commands. Enter 'exit' to quit.");
 			while(true){
 				String s = null;
 				try {

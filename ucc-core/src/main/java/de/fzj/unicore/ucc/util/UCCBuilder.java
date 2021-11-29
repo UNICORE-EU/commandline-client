@@ -232,18 +232,13 @@ public class UCCBuilder extends Builder {
 	/**
 	 * get the preferred file transfer protocols (if defined)
 	 */
-	public ProtocolType.Enum[] getPreferredProtocols(){
-		return preferredProtocols;
+	public ProtocolType.Enum getPreferredProtocols(){
+		return preferredProtocol;
 	}
 
-	public void setPreferredProtocols(ProtocolType.Enum[]protocols){
-		StringBuilder val=new StringBuilder();
-		for(ProtocolType.Enum p: protocols){
-			if(val.length()>0)val.append(" ");
-			val.append(p);
-		}
-		JSONUtil.putQuietly(json, "Preferred protocols", val.toString());
-		this.preferredProtocols=protocols;
+	public void setPreferredProtocols(ProtocolType.Enum protocol){
+		JSONUtil.putQuietly(json, "Preferred protocol", protocol.toString());
+		this.preferredProtocol = protocol;
 	}
 
 	public Set<Requirement>getRequirements(){

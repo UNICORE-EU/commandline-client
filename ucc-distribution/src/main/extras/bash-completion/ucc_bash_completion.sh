@@ -19,16 +19,16 @@ _ucc()
   # looking for arguments matching to command
   case "${COMP_WORDS[1]}" in
     admin-info)
-    opts="$global_opts --filter --fields --all --tags"
+    opts="$global_opts --tags --fields --all --filter"
     ;;
     admin-runcommand)
     opts="$global_opts --sitename --url"
     ;;
     batch)
-    opts="$global_opts --sitename --input --noFetchOutcome --noResourceCheck --update --maxNewJobs --siteWeights --follow --threads --max --keep --submitOnly"
+    opts="$global_opts --max --maxNewJobs --siteWeights --noResourceCheck --keep --follow --update --input --threads --noFetchOutcome --sitename --submitOnly"
     ;;
     cat)
-    opts="$global_opts --bytes --protocols"
+    opts="$global_opts --bytes --protocol"
     ;;
     connect)
     opts="$global_opts --lifetime"
@@ -37,16 +37,16 @@ _ucc()
     opts="$global_opts "
     ;;
     cp)
-    opts="$global_opts --bytes --resume --schedule --asynchronous --recursive --protocols"
+    opts="$global_opts --recursive --asynchronous --resume --schedule --bytes --protocol"
     ;;
     create-storage)
-    opts="$global_opts --sitename --info --type --lifetime --factoryURL"
+    opts="$global_opts --type --info --lifetime --factoryURL --sitename"
     ;;
     create-tss)
-    opts="$global_opts --sitename --lifetime --factoryURL"
+    opts="$global_opts --factoryURL --sitename --lifetime"
     ;;
     exec)
-    opts="$global_opts --sitename --broker --dryRun --keep"
+    opts="$global_opts --dryRun --sitename --keep --broker"
     ;;
     get-output)
     opts="$global_opts --brief"
@@ -64,25 +64,25 @@ _ucc()
     opts="$global_opts "
     ;;
     list-jobs)
-    opts="$global_opts --sitename --fields --all --tags --filter"
+    opts="$global_opts --tags --filter --sitename --fields --all"
     ;;
     list-sites)
-    opts="$global_opts --sitename --fields --all --tags --filter"
+    opts="$global_opts --tags --filter --sitename --fields --all"
     ;;
     list-storages)
-    opts="$global_opts --filter --fields --all --tags"
+    opts="$global_opts --tags --fields --all --filter"
     ;;
     list-transfers)
-    opts="$global_opts --filter --fields --all --tags"
+    opts="$global_opts --tags --fields --all --filter"
     ;;
     list-workflows)
-    opts="$global_opts --fields --nofiles --nojobs --filter --all --tags"
+    opts="$global_opts --nojobs --tags --nofiles --filter --fields --all"
     ;;
     ls)
-    opts="$global_opts --human --show-metadata --recursive"
+    opts="$global_opts --show-metadata --recursive --human"
     ;;
     metadata)
-    opts="$global_opts --query --wait --file --storage --advanced-query --command"
+    opts="$global_opts --file --storage --wait --advanced-query --query --command"
     ;;
     mkdir)
     opts="$global_opts "
@@ -91,13 +91,13 @@ _ucc()
     opts="$global_opts "
     ;;
     resolve)
-    opts="$global_opts --list --full"
+    opts="$global_opts --full --list"
     ;;
     rm)
     opts="$global_opts --quiet"
     ;;
     run)
-    opts="$global_opts --sitename --broker --stdout --schedule --asynchronous --stderr --dryRun --example --brief"
+    opts="$global_opts --brief --broker --asynchronous --example --schedule --dryRun --sitename"
     ;;
     run-groovy)
     opts="$global_opts --expression --file"
@@ -109,7 +109,7 @@ _ucc()
     opts="$global_opts --file"
     ;;
     stat)
-    opts="$global_opts --human --show-metadata"
+    opts="$global_opts --show-metadata --human"
     ;;
     system-info)
     opts="$global_opts "
@@ -121,7 +121,7 @@ _ucc()
     opts="$global_opts "
     ;;
     workflow-submit)
-    opts="$global_opts --sitename --wait --dryRun --uccInput --factoryURL --storageURL --name"
+    opts="$global_opts --storageURL --wait --uccInput --dryRun --factoryURL --sitename --name"
     ;;
 
     rest)

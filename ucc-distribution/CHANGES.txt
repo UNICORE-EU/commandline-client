@@ -2,6 +2,11 @@ UCC Changelog
 =============
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
+Version 2.3.0 (released MMM dd, 2021)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - update to UNICORE 8.3 base libs
+ - fix: UFTP upload/download used obsolete single-file mode
+ - fix: UFTP parameters not set
 
 Version 2.2.1  (released Sep 27, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

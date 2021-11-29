@@ -2,7 +2,6 @@ package eu.unicore.ucc.runner;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -113,7 +112,7 @@ public class Runner implements Runnable {
 
 	private boolean haveOutDir=false;
 
-	protected final List<String> preferredProtocols=new ArrayList<>();
+	protected String preferredProtocol = "BFT";
 
 	protected SiteSelectionStrategy selectionStrategy;
 	
@@ -556,7 +555,7 @@ public class Runner implements Runnable {
 		}
 		e.setExtraParameterSource(properties);
 		if(e.getChosenProtocol()==null){
-			e.setPreferredProtocols(preferredProtocols);
+			e.setPreferredProtocol(preferredProtocol);
 		}
 		try{
 			//resolve the "from" address
@@ -675,7 +674,7 @@ public class Runner implements Runnable {
 //		for(ProtocolType.Enum p : builder.getPreferredProtocols()){
 //			preferredProtocols.add(p);
 //		}
-		preferredProtocols.add("BFT");
+		preferredProtocol = "BFT";
 	}
 
 	protected void getStatus(boolean printOnlyIfChanged)throws Exception{
@@ -782,8 +781,8 @@ public class Runner implements Runnable {
 		this.properties = properties;
 	}
 
-	public List<String> getPreferredProtocols() {
-		return preferredProtocols;
+	public String getPreferredProtocols() {
+		return preferredProtocol;
 	}
 
 	public Status getStatus() {
@@ -963,8 +962,8 @@ public class Runner implements Runnable {
 					}
 					try{
 						//check if still running
-						Status status=r.jobClient.getStatus();
-						r.msg.verbose("Status for "+r.jobClient.getEndpoint().getUrl()+": "+status);
+						r.getStatus(true);
+						Status status = r.status;
 						if(!Status.SUCCESSFUL.equals(status) &&
 								!Status.FAILED.equals(status)){
 							r.builder.setProperty("Update interval", "0");

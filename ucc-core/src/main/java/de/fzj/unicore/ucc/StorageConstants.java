@@ -11,7 +11,7 @@ public interface StorageConstants {
 	public static final String OPT_APPEND_LONG="append";
 	public static final String OPT_APPEND="a";
 	
-	public static final String OPT_PROTOCOLS_LONG="protocols";
+	public static final String OPT_PROTOCOLS_LONG="protocol";
 	public static final String OPT_PROTOCOLS="P";
 	
 	public static final String OPT_BYTES_LONG="bytes";

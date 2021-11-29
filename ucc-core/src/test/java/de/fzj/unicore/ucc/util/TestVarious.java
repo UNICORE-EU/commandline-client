@@ -15,16 +15,15 @@ import java.util.Map;
 
 import org.jline.utils.Log;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
 
-import de.fzj.unicore.uas.client.UFTPConstants;
 import de.fzj.unicore.ucc.helpers.JLineLogger;
 import eu.unicore.client.core.FileList.FileListEntry;
+import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.ucc.actions.data.LS;
 import eu.unicore.ucc.actions.shell.Shell;
 import eu.unicore.ucc.io.FiletransferParameterProvider;
-
-import org.junit.Assert;
 
 public class TestVarious {
 

@@ -106,7 +106,7 @@ public class CP extends FileOperation {
 		transfer.setScheduled(scheduled);
 		transfer.setSynchronous(synchronous);
 		transfer.setOutput(output);
-		transfer.setPreferredProtocols(preferredProtocols);
+		transfer.setPreferredProtocol(preferredProtocol);
 		transfer.setExtraParameterSource(properties);
 		transfer.process();
 		if(transfer.getTransferAddress()!=null) {
@@ -137,7 +137,7 @@ public class CP extends FileOperation {
 		}
 		fd.setStartByte(startByte);
 		fd.setEndByte(endByte);
-		fd.setPreferredProtocols(preferredProtocols);
+		fd.setPreferredProtocol(preferredProtocol);
 		fd.setRecurse(recurse);
 		fd.setExtraParameterSource(properties);
 		StorageClient sms=new StorageClient(new Endpoint(url),

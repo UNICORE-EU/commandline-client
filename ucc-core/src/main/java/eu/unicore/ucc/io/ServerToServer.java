@@ -2,7 +2,6 @@ package eu.unicore.ucc.io;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,7 @@ public class ServerToServer implements Constants {
 	 */
 	protected File output = new File(".");
 
-	private List<String> preferredProtocols = new ArrayList<>();
+	private String preferredProtocol;
 
 	protected BaseServiceClient tcc;
 
@@ -65,7 +64,7 @@ public class ServerToServer implements Constants {
 		this.sourceDesc = sourceDesc;
 		this.targetDesc = targetDesc;
 		this.configurationProvider = configurationProvider;
-		preferredProtocols.add("BFT");
+		this.preferredProtocol = "BFT";
 	}
 
 	public void setExtraParameterSource(Properties properties){
@@ -227,20 +226,18 @@ public class ServerToServer implements Constants {
 	}
 
 	protected void checkProtocols()throws Exception{
-		if(preferredProtocols.size()>1){
+		if(!"BFT".equals(preferredProtocol)){
 			List<String> supported = JSONUtil.asList(sms.getProperties().getJSONArray("protocols"));
-			for(String p: preferredProtocols){
-				if(supported.contains(p)) {
-					sourceDesc.setProtocol(p.toString());
-					msg.verbose("Using preferred protocol: "+p);
-					return;
-				}
+			if(supported.contains(preferredProtocol)) {
+				sourceDesc.setProtocol(preferredProtocol);
+				msg.verbose("Using preferred protocol: "+preferredProtocol);
+				return;
 			}
 		}
 	}
 
-	public void setPreferredProtocols(List<String> preferredProtocols){
-		this.preferredProtocols = preferredProtocols;
+	public void setPreferredProtocol(String preferredProtocol){
+		this.preferredProtocol = preferredProtocol;
 	}
 
 	public File getOutput() {
@@ -267,8 +264,8 @@ public class ServerToServer implements Constants {
 		this.scheduled = scheduled;
 	}
 
-	public List<String> getPreferredProtocols() {
-		return preferredProtocols;
+	public String getPreferredProtocol() {
+		return preferredProtocol;
 	}
 
 	public long getRemoteSize() {

@@ -67,10 +67,10 @@ public class CatFile extends FileOperation implements StorageConstants {
 		String sourceDescProtocol=sourceDesc.getProtocol();
 		if(!"BFT".equalsIgnoreCase(sourceDescProtocol)){
 			try{
-				preferredProtocols.add(0, sourceDescProtocol);
+				preferredProtocol = sourceDescProtocol;
 			}catch(Exception ignored){}
 		}
-		exp.setPreferredProtocols(preferredProtocols);
+		exp.setPreferredProtocol(preferredProtocol);
 		exp.setExtraParameterSource(properties);
 		exp.setTiming(timing);
 		exp.setForceFileOnly(true);

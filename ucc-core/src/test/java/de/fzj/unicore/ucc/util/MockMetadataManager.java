@@ -14,13 +14,13 @@ import java.util.concurrent.TimeoutException;
 
 import org.bouncycastle.util.encoders.Base64;
 
-import de.fzj.unicore.uas.client.MetadataClient;
 import de.fzj.unicore.uas.metadata.ExtractionStatistics;
 import de.fzj.unicore.uas.metadata.FederatedSearchResultCollection;
 import de.fzj.unicore.uas.metadata.SearchResult;
 import de.fzj.unicore.uas.metadata.StorageMetadataManager;
 import de.fzj.unicore.uas.util.Pair;
 import de.fzj.unicore.xnjs.io.IStorageAdapter;
+import eu.unicore.client.data.Metadata;
 import eu.unicore.security.Client;
 
 public class MockMetadataManager implements StorageMetadataManager{
@@ -61,7 +61,7 @@ public class MockMetadataManager implements StorageMetadataManager{
 				InputStream is=storage.getInputStream(resourceName);
 				try{
 					String md5=computeMD5(is);
-					metadata.put(MetadataClient.CONTENT_MD5,md5);
+					metadata.put(Metadata.CONTENT_MD5,md5);
 				}
 				finally{
 					try{

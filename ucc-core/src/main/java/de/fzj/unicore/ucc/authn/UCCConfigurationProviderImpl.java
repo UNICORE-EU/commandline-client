@@ -13,8 +13,6 @@ import java.util.Properties;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 
-import de.fzj.unicore.uas.security.RegistryIdentityResolver;
-import de.fzj.unicore.uas.security.WSRFClientConfigurationProviderImpl;
 import de.fzj.unicore.ucc.Command;
 import de.fzj.unicore.ucc.Constants;
 import de.fzj.unicore.ucc.UCC;
@@ -24,6 +22,7 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.security.wsutil.client.authn.CachingIdentityResolver;
 import eu.unicore.security.wsutil.client.authn.ClientConfigurationProvider;
+import eu.unicore.security.wsutil.client.authn.ClientConfigurationProviderImpl;
 import eu.unicore.security.wsutil.client.authn.DelegationSpecification;
 import eu.unicore.security.wsutil.client.authn.JsonSecuritySessionPersistence;
 import eu.unicore.services.rest.client.IAuthCallback;
@@ -40,7 +39,7 @@ import eu.unicore.util.httpclient.IClientConfiguration;
  *    
  * @author K. Benedyczak
  */
-public class UCCConfigurationProviderImpl extends WSRFClientConfigurationProviderImpl 
+public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImpl 
 		implements UCCConfigurationProvider
 {
 	public static final String PREFERENCE_ARG_VO = "vo";

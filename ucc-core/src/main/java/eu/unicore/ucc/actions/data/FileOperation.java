@@ -1,16 +1,15 @@
 package eu.unicore.ucc.actions.data;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.cli.OptionBuilder;
+import org.json.JSONObject;
 
-import de.fzj.unicore.uas.client.HttpBasicClient;
 import de.fzj.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
 import de.fzj.unicore.ucc.StorageConstants;
 import de.fzj.unicore.ucc.util.ProgressBar;
+import eu.unicore.client.Endpoint;
+import eu.unicore.client.data.HttpFileTransferClient;
 import eu.unicore.ucc.actions.ActionBase;
 
 /**
@@ -26,19 +25,19 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 	protected Long endByte;
 
 	/**
-	 * List of preferred protocols, which can be set from the commandline, or from the preferences
-	 * file. At least the BFT protocol is guaranteed to be in this list.
+	 * Preferred protocol, which can be set from the commandline, or from the preferences
+	 * file. At least the 'BFT' protocol is guaranteed to work
 	 */
-	protected final List<String> preferredProtocols = new ArrayList<>();
+	protected String preferredProtocol;
 
 	@Override
 	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
 		getOptions().addOption(OptionBuilder.withLongOpt(OPT_PROTOCOLS_LONG)
-				.withDescription("Preferred Protocols")
-				.withArgName("ProtocolList")
-				.hasArgs()
+				.withDescription("Preferred Protocol")
+				.withArgName("Protocol")
+				.hasArg()
 				.isRequired(false)
 				.create(OPT_PROTOCOLS)
 				);
@@ -54,7 +53,7 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 	@Override
 	public void process() {
 		super.process();
-		initPreferredProtocols();
+		initPreferredProtocol();
 		initRange();
 	}
 
@@ -63,43 +62,9 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 	 * SMS) will be used. This can be set using a commandline option or 
 	 * preferences entry
 	 */
-	protected void initPreferredProtocols(){
-		String[] protocols=getCommandLine().getOptionValues(OPT_PROTOCOLS);
-		preferredProtocols.clear();
-		preferredProtocols.addAll(getPreferredProtocols(protocols, properties));
+	protected void initPreferredProtocol(){
+		preferredProtocol = getCommandLine().getOptionValue(OPT_PROTOCOLS);
 	}
-
-	/**
-	 * create a list of preferred protocols from the given space separated string.
-	 * If this is empty, the properties are checked for a "protocols" property
-	 * 
-	 * @param protocols
-	 * @param properties
-	 * @return list of preferred protocols
-	 */
-	public static List<String>getPreferredProtocols(String[] protocols, Properties properties)throws IllegalArgumentException{
-		List<String> result=new ArrayList<>();
-		if(protocols==null || protocols.length==0){
-			if(properties!=null){
-				//get from preferences
-				String protoP=properties.getProperty(OPT_PROTOCOLS_LONG,"BFT");
-				protocols=protoP.split(" +");
-			}
-			if(protocols==null || protocols.length==0){
-				protocols=new String[]{"BFT"};
-			}
-		}
-		for(String p: protocols){
-			if(p!=null){
-				result.add(p);
-			}
-		}
-		if(!result.contains("BFT")){
-			result.add("BFT");
-		}
-		return result;
-	}
-
 
 	protected void initRange(){
 		String bytes=getOption(OPT_BYTES_LONG, OPT_BYTES);
@@ -126,7 +91,10 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 	protected void runRawTransfer(String url, OutputStream out, ProgressBar p)throws Exception {
 		//TODO nicer way to find and configure protocol handlers
 		if(url.startsWith("http")){
-			HttpBasicClient hc=new HttpBasicClient(url, configurationProvider.getAnonymousClientConfiguration());
+			JSONObject props = new JSONObject();
+			props.put("accessURL", url);
+			Endpoint ep = new Endpoint(url);
+			HttpFileTransferClient hc = new HttpFileTransferClient(ep, props, configurationProvider.getAnonymousClientConfiguration(), null);
 			hc.setProgressListener(p);
 			if(startByte!=null){
 				verbose("Byte range: "+startByte+"-"+endByte);

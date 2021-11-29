@@ -6,7 +6,7 @@ package de.fzj.unicore.ucc.authn;
 
 import java.util.Properties;
 
-import de.fzj.unicore.uas.security.WSRFClientConfigurationProvider;
+import eu.unicore.security.wsutil.client.authn.ClientConfigurationProvider;
 import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
@@ -16,7 +16,7 @@ import eu.unicore.util.httpclient.IClientConfiguration;
  * 
  * @author K. Benedyczak
  */
-public interface UCCConfigurationProvider extends WSRFClientConfigurationProvider
+public interface UCCConfigurationProvider extends ClientConfigurationProvider
 {
 	public Properties getUserProperties();
 	

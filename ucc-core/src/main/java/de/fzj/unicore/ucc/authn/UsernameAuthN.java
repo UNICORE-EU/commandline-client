@@ -64,12 +64,12 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 	@Override
 	public String getUsage() {
 		StringBuilder ret = new StringBuilder();
-		ret.append("The following properties can be used in the UCC preference file " +
-				"to configure username/password authentication.\n");
+		ret.append("The following properties can be used in the UCC preference file ");
+		ret.append("to configure username/password authentication.\n");
 		ret.append("username - the username\n");
 		ret.append("password - the password (will be queried if not given)\n");
-		ret.append("\nFor configuring your trusted CAs and certificates, "
-				+ "use the usual 'truststore.*' properties\n");
+		ret.append("\nFor configuring your trusted CAs and certificates, ");
+		ret.append("use the usual 'truststore.*' properties\n");
 		return ret.toString();
 	}
 

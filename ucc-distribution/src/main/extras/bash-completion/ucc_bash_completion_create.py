@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import with_statement
 from subprocess import Popen, PIPE, STDOUT
@@ -11,8 +11,8 @@ UCC_CMD = "ucc"
 
 def find_commands():
     commands = []
-    print "Running UCC to get the list of commands ... "
-    p = Popen([UCC_CMD], stdout=PIPE, stderr=STDOUT)
+    print("Running UCC to get the list of commands ... ")
+    p = Popen([UCC_CMD], stdout=PIPE, stderr=STDOUT, encoding="UTF-8")
     p.wait()
     for line in p.stdout.readlines():
         if not line.startswith(" "):
@@ -25,10 +25,11 @@ def find_commands():
 
 def find_options(command):
     options = []
-    print "Getting options for %s" % command
-    p = Popen([UCC_CMD, command, "-h"], stdout=PIPE, stderr=STDOUT)
+    print("Getting options for %s" % command)
+    p = Popen([UCC_CMD, command, "-h"], stdout=PIPE, stderr=STDOUT, encoding="UTF-8")
     p.wait()
     for line in p.stdout.readlines():
+        line = str(line)
         if not line.startswith(" -"):
             continue
         else:

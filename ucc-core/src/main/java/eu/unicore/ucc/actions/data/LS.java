@@ -118,7 +118,7 @@ public class LS extends SMSOperation {
 
 	protected void listDirectory(String path){
 		try{
-			FileList listing=sms.getFiles(path);
+			FileList listing = sms.ls(path);
 			for(FileListEntry f: listing.list(0, 1000)){
 				listSingleFile(f);
 				if(f.isDirectory && recurse){

@@ -2,13 +2,15 @@ package eu.unicore.ucc.io;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.regex.Pattern;
 
+import de.fzj.unicore.uas.FiletransferParameterProvider;
 import de.fzj.unicore.uas.util.MessageWriter;
 import de.fzj.unicore.uas.util.PropertyHelper;
 import de.fzj.unicore.ucc.util.JSONUtil;
@@ -45,7 +47,7 @@ public abstract class FileTransferBase {
 	 */
 	protected boolean failOnError;
 
-	protected List<String> preferredProtocols=new ArrayList<>();
+	protected String preferredProtocol;
 
 	public abstract void perform(StorageClient sms, MessageWriter msg)throws Exception;
 	
@@ -58,6 +60,12 @@ public abstract class FileTransferBase {
 			String p=String.valueOf(protocol);
 			PropertyHelper ph=new PropertyHelper(extraParameterSource, new String[]{p,p.toLowerCase()});
 			res= ph.getFilteredMap();
+		}
+		ServiceLoader<FiletransferParameterProvider> ppLoader = ServiceLoader.load(FiletransferParameterProvider.class);
+		Iterator<FiletransferParameterProvider> ppIter = ppLoader.iterator();
+		while(ppIter.hasNext()) {
+			FiletransferParameterProvider pp = ppIter.next();
+			pp.provideParameters(res, protocol);
 		}
 		if(res.size()>0){
 			msg.verbose("Have "+res.size()+" extra parameters for protocol "+protocol);
@@ -106,12 +114,12 @@ public abstract class FileTransferBase {
 		this.failOnError = failOnError;
 	}
 
-	public List<String> getPreferredProtocols() {
-		return preferredProtocols;
+	public String getPreferredProtocol() {
+		return preferredProtocol;
 	}
 
-	public void setPreferredProtocols(List<String> preferredProtocols) {
-		this.preferredProtocols = preferredProtocols;
+	public void setPreferredProtocol(String preferredProtocol) {
+		this.preferredProtocol = preferredProtocol;
 	}
 
 	public void setExtraParameterSource(Properties properties){
@@ -205,13 +213,11 @@ public abstract class FileTransferBase {
 		return endByte-startByte;
 	}
 	
-	protected String determineProtocol(List<String>preferred, StorageClient sms) {
-		try{
+	protected String determineProtocol(String preferred, StorageClient sms) {
+		if(preferred!=null)try{
 			List<String> supported = JSONUtil.asList(sms.getProperties().getJSONArray("protocols"));
-			for(String prefer: preferred) {
-				for(String s: supported) {
-					if(prefer.equalsIgnoreCase(s))return s;
-				}
+			for(String s: supported) {
+				if(s.equalsIgnoreCase(preferred))return s;
 			}
 		}catch(Exception ex) {}
 		return "BFT";

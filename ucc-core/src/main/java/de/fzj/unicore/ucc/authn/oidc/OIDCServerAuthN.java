@@ -62,17 +62,14 @@ public class OIDCServerAuthN extends TokenBasedAuthN {
 	@Override
 	public String getUsage()
 	{
-		StringBuilder ret = new StringBuilder();
-		ret.append("The following properties can be used in the UCC preference file " +
-				"to configure the "+getName()+" authentication. "
-						+ "Many of these are optional. Refer to the " +
-				"manual and/or the example files.\n");
-		
-		ret.append("\nFor configuring the access to the OIDC server:\n");
-		ret.append(getMeta(OIDCProperties.class, OIDCProperties.PREFIX));
-		ret.append("\nFor configuring your trusted CAs and certificates, "
-				+ "use the usual 'truststore.*' properties\n");
-		return ret.toString();
+		return "The following properties can be used in the UCC preference file " +
+				"to configure the "+getName()+" authentication. " +
+				"Many of these are optional. Refer to the " +
+				"manual and/or the example files.\n" +
+				"\nFor configuring the access to the OIDC server:\n" +
+				getMeta(OIDCProperties.class, OIDCProperties.PREFIX) +
+				"\nFor configuring your trusted CAs and certificates, " +
+				"use the usual 'truststore.*' properties\n";
 	}
 	
 	@Override

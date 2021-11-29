@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import de.fzj.unicore.uas.client.UFTPConstants;
 import de.fzj.unicore.uas.fts.FiletransferOptions;
 import de.fzj.unicore.uas.fts.FiletransferOptions.IMonitorable;
 import de.fzj.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
@@ -17,6 +16,7 @@ import eu.unicore.client.core.FileList;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
+import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.client.data.UFTPFileTransferClient;
 
 /**
@@ -78,7 +78,7 @@ public class FileDownloader extends FileTransferBase {
 		if(!targetDirectory.isDirectory()){
 			throw new IOException("Target <"+to+"> is not a directory!");
 		}
-		FileList gridFiles = sms.getFiles(directory.path);
+		FileList gridFiles = sms.ls(directory.path);
 		for(FileListEntry file: gridFiles.list(0, 1000)){
 			if(file.isDirectory){
 				if(!recurse) {
@@ -100,7 +100,7 @@ public class FileDownloader extends FileTransferBase {
 	protected void performWildCardExport(StorageClient sms, MessageWriter msg)throws Exception{
 		String dir=getDir(from);
 		if(dir==null)dir="/";
-		FileList files=sms.getFiles(dir);
+		FileList files=sms.ls(dir);
 		File targetDir=targetStream==null?new File(to):null;
 		if(targetStream==null){
 			if(!targetDir.isDirectory())throw new IOException("Target is not a directory.");
@@ -156,7 +156,7 @@ public class FileDownloader extends FileTransferBase {
 				os=new FileOutputStream(localFile.getAbsolutePath(), append);
 			}
 			
-			chosenProtocol = determineProtocol(preferredProtocols, sms);
+			chosenProtocol = determineProtocol(preferredProtocol, sms);
 			Map<String,String>extraParameters=makeExtraParameters(chosenProtocol, msg);
 			ftc = sms.createExport(path, chosenProtocol, extraParameters);
 			configure(ftc, extraParameters);

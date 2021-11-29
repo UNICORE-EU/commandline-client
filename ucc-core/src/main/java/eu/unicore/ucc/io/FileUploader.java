@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import de.fzj.unicore.uas.client.UFTPConstants;
 import de.fzj.unicore.uas.fts.FiletransferOptions;
 import de.fzj.unicore.uas.fts.FiletransferOptions.IMonitorable;
 import de.fzj.unicore.uas.util.MessageWriter;
@@ -14,6 +13,7 @@ import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.util.ProgressBar;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
+import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.client.data.UFTPFileTransferClient;
 
 /**
@@ -54,7 +54,7 @@ public class FileUploader extends FileTransferBase {
 			hasWildCards = hasWildCards(fileSpec);
 		}
 
-		chosenProtocol = determineProtocol(preferredProtocols, sms);
+		chosenProtocol = determineProtocol(preferredProtocol, sms);
 		Map<String,String>extraParameters=makeExtraParameters(chosenProtocol, msg);
 
 		if(!hasWildCards && !isDirectory){
