@@ -156,8 +156,8 @@ public class UCCBuilder extends Builder {
 					else {
 						otherImports.put(jObj);
 					}
-				}catch(Exception e){
-					throw new IllegalArgumentException("File import specification invalid. Syntax: \"From: <source>, To: <uspacefile>, Mode: overwrite|append|nooverwrite\"");
+				}catch(JSONException je) {
+					throw new RuntimeException(je);
 				}
 				
 			}
@@ -171,7 +171,7 @@ public class UCCBuilder extends Builder {
 		return Resolve.resolve(descriptor, registry, configurationProvider, msg);
 	}
 
-	private JSONArray createLocalExports(JSONArray j)throws IllegalArgumentException{
+	private JSONArray createLocalExports(JSONArray j)throws IllegalArgumentException {
 		JSONArray otherExports = new JSONArray();
 		if(j!=null){
 			for (int i = 0; i < j.length(); i++) {
@@ -198,8 +198,8 @@ public class UCCBuilder extends Builder {
 					else {
 						otherExports.put(jObj);
 					}
-				}catch(Exception e){
-					throw new IllegalArgumentException("Local export specification invalid. Syntax: \"From: <uspacefile | remotefile>, To: <target>, Mode: overwrite|append|nooverwrite\"");
+				}catch(JSONException e){
+					throw new RuntimeException(e);
 				}
 			}
 		}

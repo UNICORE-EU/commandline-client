@@ -62,6 +62,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	public void test_Run_JobWithUploads(){
 		connect();
 		run("src/test/resources/jobs/date-with-uploads.u", true);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
 	@Test
