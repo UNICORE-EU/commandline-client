@@ -23,13 +23,13 @@ import eu.unicore.client.data.UFTPFileTransferClient;
  */
 public class FileUploader extends FileTransferBase {
 
-	public FileUploader(String from, String to, Mode mode)throws FileNotFoundException{
-		this(from,to,mode,true);
+	public FileUploader(File baseDirectory, String from, String to, Mode mode)throws FileNotFoundException{
+		this(baseDirectory, from, to, mode, true);
 	}
 
-	public FileUploader(String from, String to, Mode mode, boolean failOnError)throws FileNotFoundException{
+	public FileUploader(File baseDirectory, String from, String to, Mode mode, boolean failOnError)throws FileNotFoundException{
 		this.to=to;
-		this.from=from;
+		this.from = resolveFromBaseDir(from, baseDirectory);
 		this.mode=mode;
 		this.failOnError=failOnError;
 		checkOK();

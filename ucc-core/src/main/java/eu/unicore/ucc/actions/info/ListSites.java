@@ -60,7 +60,8 @@ public class ListSites extends ListActionBase<SiteClient> {
 	}
 
 	protected void listTSS(SiteClient tss)throws Exception{
-		message(tss.getProperties().getString("siteName")+" "+tss.getEndpoint().getUrl()+" "+getDetails(tss));
+		properties.put(PROP_LAST_RESOURCE_URL, tss.getEndpoint().getUrl());
+				message(tss.getProperties().getString("siteName")+" "+tss.getEndpoint().getUrl()+" "+getDetails(tss));
 		printProperties(tss);
 	}
 	

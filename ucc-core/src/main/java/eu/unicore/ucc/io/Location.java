@@ -32,7 +32,7 @@ public class Location implements de.fzj.unicore.uas.json.Location {
 	protected boolean isRaw=false;
 	
 	protected String smsEpr;
-	protected String protocol;
+	protected String protocol = null;
 	protected String name;
 	protected final String defaultProtocol;
 	
@@ -99,7 +99,6 @@ public class Location implements de.fzj.unicore.uas.json.Location {
 				}
 				else{
 					//no protocol, use default
-					protocol=defaultProtocol;
 					smsEpr=s1[0];
 				}
 				return true;
@@ -141,14 +140,17 @@ public class Location implements de.fzj.unicore.uas.json.Location {
 		return name;
 	}
 
+	/**
+	 * @return the protocol as specified in the URL or null if none was set
+	 */
 	public String getProtocol() {
 		return protocol;
 	}
 
 	public void setProtocol(String protocol) {
-		this.protocol=protocol;
+		this.protocol = protocol;
 	}
-
+	
 	public String getSmsEpr() {
 		return smsEpr;
 	}

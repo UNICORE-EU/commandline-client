@@ -121,6 +121,7 @@ public class CP extends FileOperation {
 		FileTransferBase fd = null;
 		Mode mode = resume ? Mode.RESUME : Mode.NORMAL;
 		String url;
+		String selectedProtocol = getEffectiveProtocol(sourceDesc, targetDesc);
 		if(isDownload){
 			if(sourceDesc.isRaw()){
 				rawDownload(sourceDesc.getSmsEpr());
@@ -133,11 +134,11 @@ public class CP extends FileOperation {
 		else{
 			String to = targetDesc.getName();
 			url = targetDesc.getSmsEpr();
-			fd = new FileUploader(source, to, mode);
+			fd = new FileUploader(new File("."), source, to, mode);
 		}
 		fd.setStartByte(startByte);
 		fd.setEndByte(endByte);
-		fd.setPreferredProtocol(preferredProtocol);
+		fd.setPreferredProtocol(selectedProtocol);
 		fd.setRecurse(recurse);
 		fd.setExtraParameterSource(properties);
 		StorageClient sms=new StorageClient(new Endpoint(url),

@@ -64,13 +64,8 @@ public class CatFile extends FileOperation implements StorageConstants {
 				configurationProvider.getRESTAuthN());
 		
 		FileDownloader exp=new FileDownloader(sourceDesc.getName(),"", Mode.NORMAL);
-		String sourceDescProtocol=sourceDesc.getProtocol();
-		if(!"BFT".equalsIgnoreCase(sourceDescProtocol)){
-			try{
-				preferredProtocol = sourceDescProtocol;
-			}catch(Exception ignored){}
-		}
-		exp.setPreferredProtocol(preferredProtocol);
+		String selectedProtocol = getEffectiveProtocol(sourceDesc);
+		exp.setPreferredProtocol(selectedProtocol);
 		exp.setExtraParameterSource(properties);
 		exp.setTiming(timing);
 		exp.setForceFileOnly(true);

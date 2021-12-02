@@ -41,7 +41,6 @@ public abstract class FileTransferBase {
 
 	protected Mode mode;
 
-	
 	/**
 	 * whether the job processing should fail if an error occurs
 	 */
@@ -73,6 +72,13 @@ public abstract class FileTransferBase {
 		return res;
 	}
 	
+	protected String resolveFromBaseDir(String child, File baseDirectory) {
+		File childF = new File(child);
+		if(childF.isAbsolute()) {
+			return child;
+		}
+		return new File(baseDirectory, child).getAbsolutePath();
+	}
 	
 	public String getTo() {
 		return to;

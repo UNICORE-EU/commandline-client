@@ -49,13 +49,12 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 	public static final String PREFERENCE_ARG_SUP_GIDS = "supgids";
 	public static final String PREFERENCE_ARG_ADD_OS_GIDS = "useOSgids";
 	public static final String PREFERENCE_ARG = "[see description]";
-	public static final String PREFERENCE_ARG_HELP = PREFERENCE_ARG_VO + ":<val>|" + 
-			PREFERENCE_ARG_ROLE + ":<val>|" + 
+	public static final String PREFERENCE_ARG_HELP =
 			PREFERENCE_ARG_UID + ":<val>|" +
-			PREFERENCE_ARG_PGID + ":<val>|" +
-			PREFERENCE_ARG_SUP_GIDS + ":<val1,val2,...>|" +
-			PREFERENCE_ARG_ADD_OS_GIDS + ":<true|false>";
-	
+			"group:<val>|" +
+			PREFERENCE_ARG_ROLE + ":<val>|" + 
+			PREFERENCE_ARG_SUP_GIDS + ":<val1,val2,...>|";
+
 	private Properties userProperties;
 	private Command command;
 	
@@ -169,6 +168,9 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 			securityPreferences.put("uid", new String[]{val});
 		} else if (pref.startsWith(PREFERENCE_ARG_PGID + ":")) {
 			String val = pref.substring(PREFERENCE_ARG_PGID.length() + 1);
+			securityPreferences.put("group", new String[]{val});
+		} else if (pref.startsWith("group:")) {
+			String val = pref.substring("group:".length());
 			securityPreferences.put("group", new String[]{val});
 		} else if (pref.startsWith(PREFERENCE_ARG_SUP_GIDS + ":")) {
 			String val = pref.substring(PREFERENCE_ARG_SUP_GIDS.length() + 1);

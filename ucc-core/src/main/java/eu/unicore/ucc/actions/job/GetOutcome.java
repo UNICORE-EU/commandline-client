@@ -17,6 +17,11 @@ public class GetOutcome extends JobOperationBase {
 	 */
 	protected boolean brief;
 
+	/**
+	 * quiet mode (e.g. don't write job id files)
+	 */
+	protected boolean quiet = false;
+
 	@Override
 	@SuppressWarnings("all")
 	protected void createOptions() {
@@ -26,12 +31,20 @@ public class GetOutcome extends JobOperationBase {
 				.isRequired(false)
 				.create(OPT_NOPREFIX)
 				);
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_QUIET_LONG)
+				.withDescription("Quiet mode, don't write job ID file")
+				.isRequired(false)
+				.create(OPT_QUIET)
+				);
 	}
 	
 	@Override
 	protected void processAdditionalOptions(){
 		brief=getBooleanOption(OPT_NOPREFIX_LONG, OPT_NOPREFIX);
 		verbose("Adding job id to output file names = "+!brief);
+		quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
+		verbose("Quiet mode = " + quiet);
+
 	}
 		
 	@Override
@@ -64,7 +77,7 @@ public class GetOutcome extends JobOperationBase {
 			builder.setProperty("KeepFinishedJob","true");
 			Runner runner=new Runner(registry,configurationProvider,builder);
 			runner.setBriefOutfileNames(brief);
-			
+			runner.setQuietMode(quiet);
 			runner.setProperties(properties);
 			runner.run();
 		}

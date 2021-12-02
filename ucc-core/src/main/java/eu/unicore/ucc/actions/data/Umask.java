@@ -45,8 +45,8 @@ public class Umask extends ActionBase {
 
 	@Override
 	public String getSynopsis() {
-		return "Get or set umask of a remote storage (SMS) " +
-				"or a target system service (TSS). Umask is used by the UNICORE" +
+		return "Get or set umask of a remote storage " +
+				"or a remote site (TSS). The umask is used by the UNICORE" +
 				" server side to control permissions of newly created files." +
 				" Without the '" + OPT_SET_LONG + "' parameter the current umask is printed.";
 	}
@@ -70,12 +70,7 @@ public class Umask extends ActionBase {
 	@Override
 	public void process() {
 		super.process();
-		String set = getOption(OPT_SET_LONG, OPT_SET);
-		if (set != null)
-			verbose("Will set a umask to " + set);
-		else
-			verbose("Will get a umask");
-		
+
 		CommandLine cmdLine = getCommandLine(); 
 		if (cmdLine.getArgs().length != 2) {
 			error("Wrong number of arguments", null);
@@ -83,23 +78,21 @@ public class Umask extends ActionBase {
 			endProcessing(ERROR_CLIENT);
 		}
 		String url = cmdLine.getArgs()[1];
-		verbose("Operating on a address: " + url);
 		
+		String set = getOption(OPT_SET_LONG, OPT_SET);
+		
+		verbose("Will "+(set!=null?" set umask to <"+set+">" : "get umask")+" for service: " + url);
 		
 		BaseServiceClient client = createClient(url);
+		properties.put(PROP_LAST_RESOURCE_URL, url);
 		
-		String umaskS;
+		String umaskS = null;
 		
 		try {
 			umaskS = client.getProperties().getString("umask");
 		} catch(Exception ex) {
-			error("Error getting WS-RP document. It seems that the selected service doesn't " +
+			error("Error getting umask property. It seems that the selected service doesn't " +
 					"support umask setting", ex);
-			endProcessing(ERROR);
-			return; //dummy
-		}
-		if (umaskS == null) {
-			error("The selected service doesn't support umask setting", null);
 			endProcessing(ERROR);
 		}
 		

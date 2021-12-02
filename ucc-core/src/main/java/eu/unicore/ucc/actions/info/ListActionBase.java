@@ -103,8 +103,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 
 	
 	/**
-	 * print details about a list entry, the 
-	 * default implementation prints the properties document
+	 * print the properties of a list entry
 	 * 
 	 * @param entry - the BaseServiceClient for the current list entry
 	 */

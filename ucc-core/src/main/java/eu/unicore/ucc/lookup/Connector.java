@@ -63,7 +63,7 @@ public class Connector implements Runnable {
 					handleTSF(tsf);
 					tsfAvailable.incrementAndGet();
 				}catch(Exception ex){
-					msg.error("Error on TSF "+tsf.getEndpoint().getUrl(),ex);
+					msg.error("Error creating site at "+tsf.getEndpoint().getUrl(),ex);
 				}
 			}
 		}
@@ -72,7 +72,7 @@ public class Connector implements Runnable {
 	protected void handleTSF(SiteFactoryClient tsf) throws Exception {
 		try {
 			SiteClient tss = tsf.getOrCreateSite();
-			msg.verbose("Created TSS at address "+tss.getEndpoint().getUrl());
+			msg.verbose("TSS at address "+tss.getEndpoint().getUrl());
 			_last_TSS = tss.getEndpoint().getUrl();
 			tssAvailable.incrementAndGet();
 		}catch(Exception e){
@@ -86,7 +86,7 @@ public class Connector implements Runnable {
 	}
 
 	/**
-	 * set the blacklist i.e. pattern of 
+	 * set the blacklist i.e. patterns of site URLs to ignore
 	 * @param blackList
 	 */
 	public void setBlacklist(String[] blacklist){

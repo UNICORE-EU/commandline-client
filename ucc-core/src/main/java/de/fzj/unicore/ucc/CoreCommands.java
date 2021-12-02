@@ -18,7 +18,6 @@ import eu.unicore.ucc.actions.data.RM;
 import eu.unicore.ucc.actions.data.Rename;
 import eu.unicore.ucc.actions.data.Resolve;
 import eu.unicore.ucc.actions.data.Umask;
-import eu.unicore.ucc.actions.info.ListAttributes;
 import eu.unicore.ucc.actions.info.ListJobs;
 import eu.unicore.ucc.actions.info.ListSites;
 import eu.unicore.ucc.actions.info.ListStorages;
@@ -80,10 +79,7 @@ public class CoreCommands implements ProvidedCommands {
 				new Shell(),
 				new Share(),
 				new REST(),
-				
-				//security and VO
-				new ListAttributes(),
-				
+
 				//admin
 				new RunCommand(),
 				new AdminServiceInfo(),

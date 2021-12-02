@@ -50,6 +50,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	
 	protected StorageClient makeClient(String url) throws Exception {
 		Endpoint epr = new Endpoint(url);
+		properties.put(PROP_LAST_RESOURCE_URL, url);
 		return new StorageClient(epr, 
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());

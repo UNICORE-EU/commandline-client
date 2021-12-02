@@ -47,8 +47,10 @@ option. When "-b" is given on the command line, no subdirectory will be created.
 
 ==== Specifying the site
 
-In the example above, a random site will be chosen to execute the job. To control it, you can use the "-s" option.
-This will accept the name of a target system. The target systems available to you can be listed by
+In the example above, a random site will be chosen to execute the
+job. To control it, you can use the "-s" option.  This will accept the
+name of a target system. The target systems available to you can be
+listed by
 
 ----------
 ucc list-sites
@@ -57,8 +59,9 @@ ucc list-sites
 
 ==== Accessing a job's working directory
 
-Using the UCC's data management functions, the job working directory can be accessed at any time
-after job submission. Please see section xref:ucc_datamanagement[] for details.
+Using the UCC's data management functions, the job working directory
+can be accessed at any time after job submission. Please see section
+xref:ucc_datamanagement[] for details.
 
 Options overview
 ~~~~~~~~~~~~~~~~
@@ -92,17 +95,15 @@ selected using the "-B" or "--broker" option.
 
  * LOCAL (default): brokering is done by UCC itself
 
-To see if other brokers exist, execute "ucc run -h", the available options will be listed
-in the help for the "-B" option.
+To see if other brokers exist, execute "ucc run -h", the available
+options will be listed in the help for the "-B" option.
 
 Processing jobs asynchronously  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In case of long-running jobs, you will want to run the job asynchronously, i.e. just submit the job,
-stage in any files and start it, in order to get the results later. UCC supports this, of course.
-The basic idea is that when submitting a job in asynchronous mode, 
-a job descriptor file is written that contains the job's address, and 
-any information about export files.
+In case of long-running jobs, you will want to run the job
+asynchronously, i.e. just submit the job, stage in any files and start
+it, in order to get the results later.
 
 ==== Asynchronous submission
 
@@ -113,38 +114,42 @@ ucc run -a <job file>
 --------------
 
 This will submit the job, stage-in any local files, start the job and exit.
-A job descriptor file (ending in ".job") will be written to your configured output
-directory.
+A job file will be written that contains information about the job endpoint
+and any exports that should be performed once the job has finished.
+You can use this file later with the 'get-output' and 'job-status' commands.
 
 ==== Get the status of particular jobs
 
 The command 
 --------------
-ucc job-status <job_desc> <job_desc_2> ...
+ucc job-status <job_file_or_url> <job_file_or_url_2> ...
 --------------
 
 will retrieve the status of the given jobs. If not given on the command line, a 
-job ID will be read from the console.
-  
+job URL will be read from the console.
+
+The arguments can be either a job URL, or the name of a job file (as
+written by the 'run -a' command.
+
 
 ==== Download results
     
-To get stdout, stderr and other files you have marked for export in your link:jobs.html[job description],
-do 
+To get stdout and stderr as well as other files marked for export, do
 
 --------------
-ucc get-output -o <outdir> <job_desc>
+ucc get-output -o <outdir> <job_file_or_url> <job_file_or_url_2> ...
 --------------
-  
-Here, the option "-o" specifies the directory where to put the output, by default the current
-directory is used. As before, the job address can also be read from the console.
-  
+
+Here, the option "-o" specifies the directory where to put the output,
+by default the current directory is used. As before, a job address
+can also be read from the console.
+
+
 ==== Referencing a job by its URL (endpoint address)
 
-In case you want to check on a job not submitted through UCC, or in case you do not
-have the job descriptor file any more, you can also refer to a job given its URL.
-The "list-jobs" command will produce a list of all job URLs that you can 
-access.
+In case you want to check on a job not submitted through UCC, you can
+refer to a job by its URL.  The "list-jobs" command will produce a
+list of all job URLs that you can access.
 
 Note that in this case UCC will only retrieve stdout and stderr files. To download
 other result files, you'll have to use the data movement functions described 

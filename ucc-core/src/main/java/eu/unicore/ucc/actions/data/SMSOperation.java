@@ -7,7 +7,6 @@
  */
 package eu.unicore.ucc.actions.data;
 
-import de.fzj.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.actions.ActionBase;
@@ -57,7 +56,7 @@ public abstract class SMSOperation extends ActionBase {
 			error("Can't contact the storage service of " + targetDesc, ex);
 			endProcessing(ERROR);
 			//dummy
-			throw new EndProcessingException(ERROR);
+			return null;
 		}
 	}
 

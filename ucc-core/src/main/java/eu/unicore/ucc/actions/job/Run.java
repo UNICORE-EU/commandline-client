@@ -56,6 +56,13 @@ public class Run extends ActionBase {
 	 */
 	protected boolean dryRun=false;
 	
+	/**
+	 * quiet mode (e.g. don't write job id files)
+	 */
+	protected boolean quiet = false;
+
+	protected String[] tags;
+
 	@Override
 	@SuppressWarnings("all")
 	protected void createOptions() {
@@ -101,10 +108,17 @@ public class Run extends ActionBase {
 				.create(OPT_BROKER)
 				);
 		
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_DRYRUN_LONG)
-				.withDescription("Dry run, do not submit the job")
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_TAGS_LONG)
+				.withDescription("Tag the job with the given tag(s)")
 				.isRequired(false)
-				.create(OPT_DRYRUN)
+				.hasArg()
+				.create(OPT_TAGS)
+				);
+
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_QUIET_LONG)
+				.withDescription("Quiet mode, don't write job ID file")
+				.isRequired(false)
+				.create(OPT_QUIET)
 				);
 	}
 
@@ -126,7 +140,7 @@ public class Run extends ActionBase {
 				"Run 'ucc run -"+OPT_SAMPLE+"' to see an example job."+
 				"A job can be executed in two modes. In the default synchronous mode, " +
 				"UCC will wait for the job to finish. In asynchonous mode, initiated by the '"+OPT_MODE+"' option, " +
-				"a descriptor file will be written that can be used later with other UCC commands.";
+				"the job will be submitted and started. Check status / retrieve output later with other UCC commands.";
 	}
 
 	@Override
@@ -165,6 +179,14 @@ public class Run extends ActionBase {
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
 		verbose("Dry run = "+dryRun);
 
+		quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
+		verbose("Quiet mode = " + quiet);
+
+		String tagsArg = getCommandLine().getOptionValue(OPT_TAGS);
+		if(tagsArg!=null) {
+			tags = tagsArg.split(",");
+			verbose("Job tags = " + tagsArg);
+		}
 		if(getCommandLine().getArgs().length>1){
 			for(int i=1; i<getCommandLine().getArgs().length;i++){
 				initBuilder(getCommandLine().getArgs()[i]);
@@ -180,17 +202,14 @@ public class Run extends ActionBase {
 		}
 	}
 
-	/**
-	 * 
-	 * @param jobFile - job file name
-	 */
-	protected void initBuilder(String jobFile){
+	protected void initBuilder(String jobFileName){
 		try{
-			builder = new UCCBuilder(new File(jobFile), registry, configurationProvider);
+			File jobFile = new File(jobFileName);
+			builder = new UCCBuilder(jobFile, registry, configurationProvider);
 			builder.setMessageWriter(this);
-			verbose("Read job from <"+jobFile+">");
+			verbose("Read job from <"+jobFileName+">");
 		}catch(Exception e){
-			error("Can't parse job file <"+jobFile+">",e);
+			error("Can't parse job file <"+jobFileName+">",e);
 			endProcessing(ERROR_CLIENT);
 		}
 		configureBuilder();
@@ -227,13 +246,15 @@ public class Run extends ActionBase {
 			// commandline option overrides
 			siteName = siteFromJob;
 		}
-		
+		if(tags!=null&&tags.length>0) {
+			builder.addTags(tags);
+		}
 	}
 	
 	protected int run(){
 		runner=new Runner(registry,configurationProvider,builder,this);
 		runner.setAsyncMode(!synchronous);
-		runner.setQuietMode(true);
+		runner.setQuietMode(quiet);
 		runner.setBriefOutfileNames(brief);
 		runner.setDryRun(dryRun);
 		runner.setProperties(properties);

@@ -204,27 +204,22 @@ public class Shell extends ActionBase {
 		String cmd = args[0];
 		if("set".equalsIgnoreCase(cmd)){
 			handleSet(args);
-			return true;
 		}
-		if("unset".equalsIgnoreCase(cmd)){
+		else if("unset".equalsIgnoreCase(cmd)){
 			handleUnset(args);
-			return true;
 		}
-		if("system".equalsIgnoreCase(cmd) || "!".equals(cmd) ) {
+		else if("system".equalsIgnoreCase(cmd) || "!".equals(cmd) ) {
 			handleSystem(args);
-			return true;
 		}
-		if("version".equalsIgnoreCase(cmd)) {
+		else if("version".equalsIgnoreCase(cmd)) {
 			handleVersion();
-			return true;
 		}
-		return false;
+		else {
+			return false;
+		}
+		return true;
 	}
 
-	/**
-	 * handle the "set" command
-	 * @param args
-	 */
 	protected void handleSet(String[] args) throws IOException {
 		if(args.length==1){
 			//print properties
@@ -249,10 +244,6 @@ public class Shell extends ActionBase {
 		}
 	}
 
-	/**
-	 * handle the "system" command
-	 * @param args
-	 */
 	protected void handleSystem(String[] args) throws Exception {
 		if(args.length<2)return;
 		
@@ -264,24 +255,16 @@ public class Shell extends ActionBase {
 		p.waitFor();
 	}
 
-	/**
-	 * handle the "unset" command
-	 * @param args
-	 */
 	protected void handleUnset(String[] args){
 		for(int i=1; i<args.length;i++){
 			properties.remove(args[i]);
 		}
 	}
 
-
-	/**
-	 * handle the "version" command
-	 */
 	protected void handleVersion(){
 		UCC.printVersion();
 	}
-	
+
 	protected void printShellHelp(){
 		System.err.println("Additional commands in the UCC shell:");
 		System.err.println(" set [name=value]... - show variables / set a variable");

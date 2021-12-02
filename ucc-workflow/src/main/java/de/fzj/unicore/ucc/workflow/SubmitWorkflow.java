@@ -11,9 +11,11 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.cli.OptionBuilder;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.fzj.unicore.uas.json.JSONUtil;
 import de.fzj.unicore.ucc.IServiceInfoProvider;
 import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.authn.UCCConfigurationProvider;
@@ -23,6 +25,7 @@ import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.core.StorageFactoryClient;
 import eu.unicore.services.rest.client.BaseClient;
 import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.io.FileUploader;
 import eu.unicore.ucc.lookup.StorageFactoryLister;
 import eu.unicore.util.httpclient.IClientConfiguration;
@@ -35,18 +38,26 @@ import eu.unicore.workflow.WorkflowFactoryClient;
  * 
  * @author schuller
  */
-public class SubmitWorkflow extends WorkflowSystemSubmission implements
+public class SubmitWorkflow extends ActionBase implements
 		IServiceInfoProvider {
 
 	public static final String OPT_UFILE_LONG = "uccInput";
 	public static final String OPT_UFILE = "u";
 
-	public static final String OPT_LIFETIME = "t";
-	public static final String OPT_LIFETIME_LONG = "lifetime";
-
 	public static final String OPT_WAIT = "w";
 	public static final String OPT_WAIT_LONG = "wait";
+	
+	public static final String OPT_DRYRUN_LONG="dryRun";
+	public static final String OPT_DRYRUN="d";
+	
+	public static final String OPT_STORAGEURL_LONG="storageURL";
+	public static final String OPT_STORAGEURL="S";
 
+	protected String siteName;
+
+	protected UCCBuilder builder;
+
+	protected boolean dryRun = false;
 	protected WorkflowFactoryClient wsc;
 
 	protected String workflowToBeSubmitted;
@@ -70,11 +81,63 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 	
 	// base directory in the storage
 	protected String baseDir = "/";
-	
-	@Override
-	public void process() {
-		super.process();
 
+	protected String[] tags;
+
+	@Override
+	@SuppressWarnings("all")
+	protected void createOptions() {
+		super.createOptions();
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
+				.withDescription("Site name for submission")
+				.withArgName("Vsite")
+				.hasArg()
+				.isRequired(false)
+				.create(OPT_SITENAME)
+		);
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_FACTORY_LONG)
+				.withDescription("URL or site name of storage factory to use")
+				.isRequired(false)
+				.hasArg()
+				.withArgName("StorageFactory")
+				.create(OPT_FACTORY)
+		);
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_STORAGEURL_LONG)
+				.withDescription("Storage URL to upload local files to")
+				.isRequired(false)
+				.hasArg()
+				.withArgName("storage_url")
+				.create(OPT_STORAGEURL)
+		);
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_DRYRUN_LONG)
+				.withDescription("Dry run, do not submit anything")
+				.isRequired(false)
+				.create(OPT_DRYRUN)
+				);
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_TAGS_LONG)
+				.withDescription("Tag the job with the given tag(s)")
+				.isRequired(false)
+				.hasArg()
+				.create(OPT_TAGS)
+				);
+		getOptions().addOption(
+				OptionBuilder.withLongOpt(OPT_UFILE_LONG).withDescription(
+						"UCC .u file with stage-in definitions").isRequired(
+						false).hasArg().create(OPT_UFILE));
+		getOptions().addOption(
+				OptionBuilder.withLongOpt(OPT_WAIT_LONG).withDescription(
+						"wait for workflow completion").isRequired(false)
+						.create(OPT_WAIT));
+	}
+
+	@Override
+	public void process(){
+		super.process();
+		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
+
+		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
+		verbose("Dry run = "+dryRun);
+	
 		if (getCommandLine().hasOption(OPT_WAIT)) {
 			wait = true;
 		}
@@ -85,6 +148,12 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 			endProcessing(1);
 		} else {
 			workflowFileName = getCommandLine().getArgs()[1];
+		}	
+
+		String tagsArg = getCommandLine().getOptionValue(OPT_TAGS);
+		if(tagsArg!=null) {
+			tags = tagsArg.split(",");
+			verbose("Workflow tags = " + tagsArg);
 		}
 
 		try {
@@ -184,20 +253,8 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 		loadWorkflowFromFile();
 
 		handleTemplateParameters();
-		if(unmatchedTemplateParameters.size()>0){
-			error("ERROR: No value defined for template parameters: "+unmatchedTemplateParameters, null);
-			endProcessing(1);
-		}
-
-	
-		if(localFiles>0){
-			try {
-				uploadLocalData();
-			} catch (Exception e) {
-				error("Can't upload local files.", e);
-				endProcessing(1);
-			}
-		}
+		
+		uploadLocalData();
 		
 		JSONObject wf = new JSONObject(workflowToBeSubmitted);
 		JSONObject inputSpec = wf.optJSONObject("inputs");
@@ -209,6 +266,8 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 			inputSpec.put(i, inputs.get(i));
 		}
 
+		appendTags(wf);
+		
 		if(dryRun){
 			message("Resulting workflow: ");
 			message(wf.toString(2));
@@ -217,32 +276,32 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 		}
 		
 		WorkflowClient wmc = wsc.submitWorkflow(wf);
-		
 		String wfURL = wmc.getEndpoint().getUrl();
 		verbose("Workflow URL: " + wfURL);
-
-		// output this to allow nicer shell scripting
 		message(wfURL);
 		properties.put(PROP_LAST_RESOURCE_URL, wfURL);
 		
 		if (wait) {
-			verbose("Waiting for workflow to finish...");
-			do {
-				Thread.sleep(2000);
-				Status newStatus = wmc.getStatus();
-				if (newStatus == null) {
-					error("Can't get workflow status.", null);
-					break;
-				}
-				if (!newStatus.equals(status)) {
-					status = newStatus;
-					verbose(status.toString());
-				}
-			} while (Status.RUNNING.equals(status));
+			waitForFinish(wmc);
 		}
 
 	}
 
+	protected void waitForFinish(WorkflowClient wmc) throws Exception {
+		verbose("Waiting for workflow to finish...");
+		do {
+			Thread.sleep(2000);
+			Status newStatus = wmc.getStatus();
+			if (newStatus == null) {
+				error("Can't get workflow status.", null);
+				break;
+			}
+			if (!newStatus.equals(status)) {
+				status = newStatus;
+				verbose(status.toString());
+			}
+		} while (Status.RUNNING.equals(status));
+	}
 
 	protected void loadWorkflowFromFile() throws Exception {
 		try (FileInputStream fis = new FileInputStream(
@@ -257,25 +316,31 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 		}
 	}
 
-	protected void uploadLocalData() throws Exception {
-		if(!baseDir.endsWith("/"))baseDir = baseDir+"/";
-		StorageClient sc = new StorageClient(new Endpoint(storageURL),
-				configurationProvider.getClientConfiguration(storageURL),
-				configurationProvider.getRESTAuthN());
-		
-		for(FileUploader fu: builder.getImports()) {
-			String wfFile = fu.getTo();
-			if(wfFile.startsWith("wf:")) {
-				verbose("Uploading <"+fu.getFrom()+"> as workflow file <"+wfFile+"> ...");
-				fu.setTo(baseDir+wfFile.substring(3));
-				String url = storageURL+"/files"+fu.getTo();
-				inputs.put(wfFile, url);
-				if(dryRun){
-					verbose("Dry run, not uploading.");
-					continue;
+	protected void uploadLocalData() {
+		if(localFiles==0)return;
+		try {
+			if(!baseDir.endsWith("/"))baseDir = baseDir+"/";
+			StorageClient sc = new StorageClient(new Endpoint(storageURL),
+					configurationProvider.getClientConfiguration(storageURL),
+					configurationProvider.getRESTAuthN());
+
+			for(FileUploader fu: builder.getImports()) {
+				String wfFile = fu.getTo();
+				if(wfFile.startsWith("wf:")) {
+					verbose("Uploading <"+fu.getFrom()+"> as workflow file <"+wfFile+"> ...");
+					fu.setTo(baseDir+wfFile.substring(3));
+					String url = storageURL+"/files"+fu.getTo();
+					inputs.put(wfFile, url);
+					if(dryRun){
+						verbose("Dry run, not uploading.");
+						continue;
+					}
+					fu.perform(sc, this);
 				}
-				fu.perform(sc, this);
 			}
+		}catch(Exception e) {
+			error("Can't upload local files.", e);
+			endProcessing(1);
 		}
 	}
 	
@@ -307,29 +372,30 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 				unmatchedTemplateParameters.add(name);
 			}
 		}
+		if(unmatchedTemplateParameters.size()>0){
+			error("ERROR: No value defined for template parameters: "+unmatchedTemplateParameters, null);
+			endProcessing(1);
+		}
 	}
 
-	
-	@Override
-	@SuppressWarnings("all")
-	protected void createOptions() {
-		super.createOptions();
-
-		getOptions().addOption(
-				OptionBuilder.withLongOpt(OPT_NAME_LONG).withDescription(
-						"Workflow Name").withArgName("Name").hasArg()
-						.isRequired(false).create(OPT_NAME));
-
-		getOptions().addOption(
-				OptionBuilder.withLongOpt(OPT_UFILE_LONG).withDescription(
-						"UCC .u file with stage-in definitions").isRequired(
-						false).hasArg().create(OPT_UFILE));
-
-		getOptions().addOption(
-				OptionBuilder.withLongOpt(OPT_WAIT_LONG).withDescription(
-						"wait for workflow completion").isRequired(false)
-						.create(OPT_WAIT));
-
+	protected void appendTags(JSONObject wf) {
+		if(tags!=null&&tags.length>0) {
+			JSONArray existingTags = wf.optJSONArray("Tags");
+			if(existingTags==null)existingTags = wf.optJSONArray("tags");
+			if(existingTags==null) {
+				existingTags = new JSONArray();
+				JSONUtil.putQuietly(wf, "tags", existingTags);
+			}
+			try {
+				List<String> existing = JSONUtil.toList(existingTags);
+				for(String t: tags) {
+					if(!existing.contains(t)) {
+						existing.add(t);
+						existingTags.put(t);
+					}
+				}
+			}catch(JSONException je) {}
+		}
 	}
 
 	@Override
@@ -344,10 +410,8 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 
 	@Override
 	public String getSynopsis() {
-		return "Runs a workflow. "
-				+ "The workflow definition is read from <workflow-file>."
-				+ "A descriptor file will be written that can be used "
-				+ "later with other ucc commands.";
+		return "Submits a workflow to the UNICORE Workflow engine. "
+				+ "The workflow definition is read from <workflow-file>.";
 	}
 
 	@Override
@@ -367,7 +431,6 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 
 	@Override
 	public String getType() {
-		// TODO Auto-generated method stub
 		return "WorkflowServices";
 	}
 
@@ -383,7 +446,7 @@ public class SubmitWorkflow extends WorkflowSystemSubmission implements
 			serverDetails(sb, props.getJSONObject("server"));
 			clientDetails(sb, props.getJSONObject("client"));
 		}catch(Exception ex) {
-			error("Error accessing REST service at <"+url+">", ex);
+			error("Error accessing service at <"+url+">", ex);
 		}
 		return sb.toString();
 	}

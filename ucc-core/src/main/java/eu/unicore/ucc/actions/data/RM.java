@@ -21,17 +21,17 @@ public class RM extends SMSOperation {
 	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt("quiet")
-				.withDescription("quiet mode")
+		getOptions().addOption(OptionBuilder.withLongOpt(OPT_QUIET_LONG)
+				.withDescription("Quiet mode, don't ask for confirmation")
 				.isRequired(false)
-				.create("q")
+				.create(OPT_QUIET)
 				);
 	}
 	
 	@Override
 	public void process(){
 		super.process();
-		boolean quiet = getBooleanOption("quiet", "q");
+		boolean quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
 		String target = getCommandLine().getArgs()[1];
 		StorageClient sms = getStorageClient(target);
 		try{

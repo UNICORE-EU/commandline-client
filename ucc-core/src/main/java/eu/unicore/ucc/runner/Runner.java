@@ -431,11 +431,7 @@ public class Runner implements Runnable {
 
 
 	protected void doGetStdOut()throws Exception{
-		String stdout="stdout";
-		try{
-			// stdout=jobClient.getProperties().getString("stdout");
-		}
-		catch(Exception e){}
+		String stdout = builder.getProperty("Stdout", "stdout");
 		FileDownloader e=new FileDownloader(stdout, stdout, Mode.NORMAL, false);
 		if(outputToConsole){
 			System.out.println("*** Command output: ");
@@ -451,11 +447,7 @@ public class Runner implements Runnable {
 	}
 
 	protected void doGetStdErr()throws Exception{
-		String stderr="stderr";
-		try{
-			// stderr=jobClient.getProperties().getString("stderr");
-		}
-		catch(Exception e){}
+		String stderr = builder.getProperty("Stderr", "stderr");
 		FileDownloader e=new FileDownloader(stderr, stderr, Mode.NORMAL, false);
 		if(outputToConsole){
 			System.out.println("*** Error output: ");

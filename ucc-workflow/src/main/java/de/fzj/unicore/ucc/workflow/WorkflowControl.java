@@ -23,7 +23,7 @@ public class WorkflowControl extends ActionBase {
 	
 	private String cmd;
 	
-	final Map<String,String>parameters=new HashMap<String,String>();
+	final Map<String,String>parameters=new HashMap<>();
 	
 	@Override
 	public String getName() {
@@ -85,6 +85,7 @@ public class WorkflowControl extends ActionBase {
 		workflow=new WorkflowClient(new Endpoint(workflowURL),
 				configurationProvider.getClientConfiguration(workflowURL), 
 				configurationProvider.getRESTAuthN());
+		properties.put(PROP_LAST_RESOURCE_URL, workflowURL);
 	}
 	
 	protected void run() throws Exception{

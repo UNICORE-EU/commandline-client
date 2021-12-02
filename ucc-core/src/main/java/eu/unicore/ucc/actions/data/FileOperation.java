@@ -11,6 +11,7 @@ import de.fzj.unicore.ucc.util.ProgressBar;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.data.HttpFileTransferClient;
 import eu.unicore.ucc.actions.ActionBase;
+import eu.unicore.ucc.io.Location;
 
 /**
  * common stuff for file operations
@@ -108,5 +109,14 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 		}
 		else throw new Exception("No protocol handler for "+url);
 	}
-
+	
+	protected String getEffectiveProtocol(Location ... locations) {
+		String selectedProtocol = preferredProtocol;
+		for(Location l: locations) {
+			if(!l.isLocal() && l.getProtocol()!=null) {
+				selectedProtocol = l.getProtocol();
+			}
+		}
+		return selectedProtocol;
+	}
 }

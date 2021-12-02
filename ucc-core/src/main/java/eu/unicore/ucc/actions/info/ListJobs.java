@@ -68,6 +68,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 	}
 
 	protected void listJob(JobClient job){
+		properties.put(PROP_LAST_RESOURCE_URL, job.getEndpoint().getUrl());
 		message(job.getEndpoint().getUrl()+getDetails(job));
 		printProperties(job);
 	}

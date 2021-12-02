@@ -5,8 +5,20 @@ Issue tracker: https://sourceforge.net/p/unicore/issues
 Version 2.3.0 (released MMM dd, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - update to UNICORE 8.3 base libs
+ - improvement: "run": paths for local files to upload are resolved
+   relative to .u job file
+ - improvement: "run": in async mode, write job ID file, but
+   add "--quiet" option to allow switching this off
+ - improvement: "run" and "workflow-submit" can now add tags
+   on submission with "--tags tag1,tag2,..." option
  - fix: UFTP upload/download used obsolete single-file mode
  - fix: UFTP parameters not set
+ - only allow a single preferred protocol (option -P, --protocol)
+ - fix: setting user preference for group (-Z group:foo) did not
+   have any effect
+ - fix: "cp": use the transfer protocol specified in the remote URL
+ - remove obsolete 'list-attributes' command
+ - update bash completion
 
 Version 2.2.1  (released Sep 27, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

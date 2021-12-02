@@ -52,21 +52,21 @@ public class FileDownloader extends FileTransferBase {
 	@Override
 	public void perform(StorageClient sms, MessageWriter msg)throws Exception{
 		boolean isWildcard = hasWildCards(from);
-		FileListEntry gridSource = null;
+		FileListEntry remoteSource = null;
 		if(isWildcard){
 			performWildCardExport(sms,msg);
 		}
 		else {
 			//check if source is a directory
-			gridSource = sms.stat(from);
-			if(gridSource.isDirectory){
+			remoteSource = sms.stat(from);
+			if(remoteSource.isDirectory){
 				if(forceFileOnly){
 					throw new IOException("Source is a directory");
 				}
-				performDirectoryExport(gridSource, new File(to), sms, msg);
+				performDirectoryExport(remoteSource, new File(to), sms, msg);
 			}
 			else{
-				download(gridSource,new File(to),sms,msg);
+				download(remoteSource,new File(to),sms,msg);
 			}
 		}	
 	}
@@ -78,8 +78,8 @@ public class FileDownloader extends FileTransferBase {
 		if(!targetDirectory.isDirectory()){
 			throw new IOException("Target <"+to+"> is not a directory!");
 		}
-		FileList gridFiles = sms.ls(directory.path);
-		for(FileListEntry file: gridFiles.list(0, 1000)){
+		FileList remoteFiles = sms.ls(directory.path);
+		for(FileListEntry file: remoteFiles.list(0, 1000)){
 			if(file.isDirectory){
 				if(!recurse) {
 					msg.verbose("Skipping directory "+file.path);
@@ -121,7 +121,7 @@ public class FileDownloader extends FileTransferBase {
 	/**
 	 * download a single regular file
 	 * 
-	 * @param source - grid file descriptor
+	 * @param source - remote file descriptor
 	 * @param localFile - local file or directory to write to
 	 * @param msg
 	 * @param sms

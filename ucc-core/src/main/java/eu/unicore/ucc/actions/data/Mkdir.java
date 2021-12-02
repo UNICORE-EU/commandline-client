@@ -5,9 +5,6 @@ import eu.unicore.ucc.io.Location;
 
 /**
  * creates a directory on a remote SMS location 
- * which can be given in the "abstract" form 
- * "u6://..." or "unicore6://"<br/>
- * or as standard unicore URL
  * 
  * @see Location
  *
@@ -48,7 +45,7 @@ public class Mkdir extends SMSOperation {
 	
 	@Override
 	public String getArgumentList(){
-		return "<Storage-URL>#/dir or <u6://...>/dir";
+		return "<Storage-URL>/files/dir or <unicore://site/storage_name/dir";
 	}
 	@Override
 	public String getCommandGroup(){

@@ -5,7 +5,7 @@ _ucc()
   COMPREPLY=()
   cur=`_get_cword`
   prev="${COMP_WORDS[COMP_CWORD-1]}"
-  commands="admin-info admin-runcommand batch cat connect copy-file-status cp create-storage create-tss exec get-output job-abort job-restart job-status list-attributes list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
+  commands="admin-info admin-runcommand batch cat connect copy-file-status cp create-storage create-tss exec get-output job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
   global_opts="--long --url-pattern --raw --configuration --help --output --registry --verbose --with-timing --authenticationMethod --acceptAllIssuers --preference"
 
 
@@ -19,13 +19,13 @@ _ucc()
   # looking for arguments matching to command
   case "${COMP_WORDS[1]}" in
     admin-info)
-    opts="$global_opts --tags --fields --all --filter"
+    opts="$global_opts --fields --all --filter --tags"
     ;;
     admin-runcommand)
     opts="$global_opts --sitename --url"
     ;;
     batch)
-    opts="$global_opts --max --maxNewJobs --siteWeights --noResourceCheck --keep --follow --update --input --threads --noFetchOutcome --sitename --submitOnly"
+    opts="$global_opts --noResourceCheck --threads --keep --siteWeights --sitename --noFetchOutcome --follow --max --submitOnly --update --input --maxNewJobs"
     ;;
     cat)
     opts="$global_opts --bytes --protocol"
@@ -37,19 +37,19 @@ _ucc()
     opts="$global_opts "
     ;;
     cp)
-    opts="$global_opts --recursive --asynchronous --resume --schedule --bytes --protocol"
+    opts="$global_opts --bytes --recursive --resume --asynchronous --schedule --protocol"
     ;;
     create-storage)
-    opts="$global_opts --type --info --lifetime --factoryURL --sitename"
+    opts="$global_opts --sitename --type --info --factoryURL --lifetime"
     ;;
     create-tss)
-    opts="$global_opts --factoryURL --sitename --lifetime"
+    opts="$global_opts --sitename --factoryURL --lifetime"
     ;;
     exec)
-    opts="$global_opts --dryRun --sitename --keep --broker"
+    opts="$global_opts --dryRun --broker --sitename --keep"
     ;;
     get-output)
-    opts="$global_opts --brief"
+    opts="$global_opts --brief --quiet"
     ;;
     job-abort)
     opts="$global_opts "
@@ -60,29 +60,26 @@ _ucc()
     job-status)
     opts="$global_opts --all"
     ;;
-    list-attributes)
-    opts="$global_opts "
-    ;;
     list-jobs)
-    opts="$global_opts --tags --filter --sitename --fields --all"
+    opts="$global_opts --fields --tags --filter --all --sitename"
     ;;
     list-sites)
-    opts="$global_opts --tags --filter --sitename --fields --all"
+    opts="$global_opts --fields --tags --filter --all --sitename"
     ;;
     list-storages)
-    opts="$global_opts --tags --fields --all --filter"
+    opts="$global_opts --fields --all --filter --tags"
     ;;
     list-transfers)
-    opts="$global_opts --tags --fields --all --filter"
+    opts="$global_opts --fields --all --filter --tags"
     ;;
     list-workflows)
-    opts="$global_opts --nojobs --tags --nofiles --filter --fields --all"
+    opts="$global_opts --fields --tags --filter --nofiles --all --nojobs"
     ;;
     ls)
-    opts="$global_opts --show-metadata --recursive --human"
+    opts="$global_opts --recursive --show-metadata --human"
     ;;
     metadata)
-    opts="$global_opts --file --storage --wait --advanced-query --query --command"
+    opts="$global_opts --wait --advanced-query --query --file --command --storage"
     ;;
     mkdir)
     opts="$global_opts "
@@ -97,13 +94,13 @@ _ucc()
     opts="$global_opts --quiet"
     ;;
     run)
-    opts="$global_opts --brief --broker --asynchronous --example --schedule --dryRun --sitename"
+    opts="$global_opts --tags --quiet --broker --brief --sitename --asynchronous --schedule --example"
     ;;
     run-groovy)
     opts="$global_opts --expression --file"
     ;;
     share)
-    opts="$global_opts --delete --clean"
+    opts="$global_opts --clean --delete"
     ;;
     shell)
     opts="$global_opts --file"
@@ -121,7 +118,7 @@ _ucc()
     opts="$global_opts "
     ;;
     workflow-submit)
-    opts="$global_opts --storageURL --wait --uccInput --dryRun --factoryURL --sitename --name"
+    opts="$global_opts --wait --tags --dryRun --sitename --storageURL --uccInput --factoryURL"
     ;;
 
     rest)

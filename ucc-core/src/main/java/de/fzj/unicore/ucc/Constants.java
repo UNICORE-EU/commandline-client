@@ -120,9 +120,6 @@ public interface Constants {
 	public static final String OPT_SUBMIT_ONLY_LONG="submitOnly";
 	public static final String OPT_SUBMIT_ONLY="S";
 
-	public static final String OPT_NAME_LONG="name";
-	public static final String OPT_NAME="N";
-	
 	public static final String OPT_FORCE_REMOTE_MODE_LONG="force-remote";
 	public static final String OPT_FORCE_REMOTE_MODE="f";
 	
@@ -137,6 +134,9 @@ public interface Constants {
 	
 	public static final String OPT_DRYRUN_LONG="dryRun";
 	public static final String OPT_DRYRUN="d";
+	
+	public static final String OPT_QUIET_LONG="quiet";
+	public static final String OPT_QUIET="q";
 	
 	public static final String OPT_ASSERTIONPRETTYPRINT_LONG="prettifyAssertion";
 	public static final String OPT_ASSERTIONPRETTYPRINT="P";

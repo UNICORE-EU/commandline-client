@@ -33,6 +33,7 @@ import eu.unicore.ucc.io.Location;
  */
 public class UCCBuilder extends Builder {
 
+	private File baseDirectory;
 	private final List<FileUploader> imports;
 	private final List<FileDownloader> exports;
 	
@@ -50,6 +51,7 @@ public class UCCBuilder extends Builder {
 	 */
 	public UCCBuilder(File jsonFile, IRegistryClient registry, UCCConfigurationProvider configurationProvider)throws Exception{
 		this(FileUtils.readFileToString(jsonFile, "UTF-8"), registry, configurationProvider);
+		this.baseDirectory = jsonFile.getParentFile()!=null?jsonFile.getParentFile():new File(".");
 	}
 
 	/**
@@ -60,6 +62,7 @@ public class UCCBuilder extends Builder {
 	 */
 	public UCCBuilder(String jsonString, IRegistryClient registry, UCCConfigurationProvider configurationProvider) {
 		super(jsonString);
+		this.baseDirectory = new File(".");
 		exports = new ArrayList<>();
 		imports = new ArrayList<>();
 		this.configurationProvider = configurationProvider;
@@ -147,7 +150,7 @@ public class UCCBuilder extends Builder {
 					Location l = createLocation(source);
 					if(l.isLocal()){
 						failOnError=failOnError & checkLocalFiles;
-						imports.add(new FileUploader(source,target,mode,failOnError));
+						imports.add(new FileUploader(baseDirectory, source,target,mode,failOnError));
 						msg.verbose("Local file import: "+source+" -> "+target);
 					}
 					else {
@@ -189,7 +192,7 @@ public class UCCBuilder extends Builder {
 					}
 					Location l = createLocation(target);
 					if(l.isLocal()){
-						exports.add(new FileDownloader(source,target,mode,failOnError));
+						exports.add(new FileDownloader(source, target, mode, failOnError));
 						msg.verbose("File export to client: "+source+" -> "+target);
 					}
 					else {
@@ -201,6 +204,10 @@ public class UCCBuilder extends Builder {
 			}
 		}
 		return otherExports;
+	}
+
+	public File getBaseDirectory() {
+		return baseDirectory;
 	}
 
 	public List<FileDownloader> getExports() {
@@ -252,6 +259,24 @@ public class UCCBuilder extends Builder {
 			return (int)UnitParser.getTimeParser(0).getDoubleValue(lifetime);
 		}
 		else return -1;
+	}
+	
+	public void addTags(String[]tags) {
+		JSONArray existingTags = json.optJSONArray("Tags");
+		if(existingTags==null)existingTags = json.optJSONArray("tags");
+		if(existingTags==null) {
+			existingTags = new JSONArray();
+			JSONUtil.putQuietly(json, "Tags", existingTags);
+		}
+		try {
+			List<String> existing = JSONUtil.toList(existingTags);
+			for(String t: tags) {
+				if(!existing.contains(t)) {
+					existing.add(t);
+					existingTags.put(t);
+				}
+			}
+		}catch(JSONException je) {}
 	}
 
 	public static String getJobSample(){

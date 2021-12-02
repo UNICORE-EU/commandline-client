@@ -23,7 +23,7 @@ import eu.unicore.workflow.WorkflowFactoryClient;
  * creates a workflow listing
  * @author schuller
  */
-public class WorkflowInfo extends ListActionBase<BaseServiceClient> {
+public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 
 	private boolean listFiles;
 
@@ -166,9 +166,8 @@ public class WorkflowInfo extends ListActionBase<BaseServiceClient> {
 	}
 
 	@Override
-	protected String getDetails(BaseServiceClient client)throws Exception{
+	protected String getDetails(WorkflowClient workflow)throws Exception{
 		if(!detailed)return "";
-		WorkflowClient workflow = (WorkflowClient)client;
 		StringBuilder details=new StringBuilder();
 		JSONObject props = workflow.getProperties();
 		String sep=System.getProperty("line.separator");
