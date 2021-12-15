@@ -22,8 +22,8 @@ This package contains the UNICORE commandline client UCC.
 
 
 %changelog
-* Mon Nov 29 2021 Bernd Schuller <unicore-support@lists.sourceforge.net> 8.3.0.1
--v8.3.0
+* @release-timestamp@ Bernd Schuller <unicore-support@lists.sourceforge.net>
+-v@component-version@
 * Thu Oct 15 2009 Rebecca Breu <unicore-support@lists.sourceforge.net> 6.2.0-1
 -Initial rpm package
 

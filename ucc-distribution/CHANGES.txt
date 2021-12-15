@@ -2,7 +2,7 @@ UCC Changelog
 =============
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
-Version 2.3.0 (released MMM dd, 2021)
+Version 2.3.0 (released Dec 15, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - update to UNICORE 8.3 base libs
  - improvement: "run": paths for local files to upload are resolved

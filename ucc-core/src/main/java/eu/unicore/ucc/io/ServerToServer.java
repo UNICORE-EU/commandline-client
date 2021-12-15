@@ -1,7 +1,5 @@
 package eu.unicore.ucc.io;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +34,6 @@ public class ServerToServer implements Constants {
 	private final Location sourceDesc;
 	private final Location targetDesc;
 	private final UCCConfigurationProvider configurationProvider;
-
-	/**
-	 * output directory for async transfer descriptor
-	 */
-	protected File output = new File(".");
 
 	private String preferredProtocol;
 
@@ -127,7 +120,6 @@ public class ServerToServer implements Constants {
 			transferAddress = tcc.getEndpoint().getUrl();
 			msg.verbose("Have filetransfer instance: "+transferAddress);
 			if(!synchronous){
-				writeIDFile();
 				return;
 			}
 			waitForCompletion();
@@ -209,22 +201,6 @@ public class ServerToServer implements Constants {
 		}
 	}
 
-
-	protected void writeIDFile(){
-		try{
-			String url = tcc.getEndpoint().getUrl();
-			File dump=new File(output, JSONUtil.extractResourceID(url)+".transfer");
-			FileWriter fw=new FileWriter(dump);
-			fw.append(url).append("\n");
-			fw.close();
-			msg.verbose("Wrote transfer descriptor to "+dump.getAbsolutePath());
-			msg.message(dump.getAbsolutePath());
-		}
-		catch(Exception e){
-			msg.error("Could not write job ID file.",e);
-		}
-	}
-
 	protected void checkProtocols()throws Exception{
 		if(!"BFT".equals(preferredProtocol)){
 			List<String> supported = JSONUtil.asList(sms.getProperties().getJSONArray("protocols"));
@@ -238,14 +214,6 @@ public class ServerToServer implements Constants {
 
 	public void setPreferredProtocol(String preferredProtocol){
 		this.preferredProtocol = preferredProtocol;
-	}
-
-	public File getOutput() {
-		return output;
-	}
-
-	public void setOutput(File output) {
-		this.output = output;
 	}
 
 	public boolean isSynchronous() {
