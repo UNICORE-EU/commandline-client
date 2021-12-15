@@ -105,7 +105,6 @@ public class CP extends FileOperation {
 		transfer.setMessageWriter(this);
 		transfer.setScheduled(scheduled);
 		transfer.setSynchronous(synchronous);
-		transfer.setOutput(output);
 		transfer.setPreferredProtocol(preferredProtocol);
 		transfer.setExtraParameterSource(properties);
 		transfer.process();
