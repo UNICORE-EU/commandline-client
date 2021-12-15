@@ -63,7 +63,7 @@ described in more detail below.
 |Executable            | String          | Command line
 |Arguments             | List of strings | Command line arguments 
 |Environment           | Map of strings  | Environment values 
-|Parameters            | Map | Application parameters | Optional
+|Parameters            | Map | Application parameters
 |IgnoreNonZeroExitCode | "true"/"false"  | Don't fail the job if app exits with non-zero exit code (default: false)
 4+^e| 
 |User precommand               | String          | Pre-processing
