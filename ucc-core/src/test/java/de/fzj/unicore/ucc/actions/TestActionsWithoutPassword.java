@@ -41,7 +41,7 @@ public class TestActionsWithoutPassword extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		
-		assertEquals(2, KeystoreAuthNWithPasswd.QUESTIONS);
+		assertEquals(1, KeystoreAuthNWithPasswd.QUESTIONS);
 	}
 
 	@Test
