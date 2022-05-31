@@ -5,13 +5,13 @@
   <packaging>jar</packaging>
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
-  <url>http://www.unicore.eu</url>
+  <url>https://www.unicore.eu</url>
   <name>UCC Core module</name>
   
   <parent>
     <groupId>de.fzj.unicore</groupId>
     <artifactId>ucc-parent</artifactId>
-    <version>2.3.0</version>
+    <version>2.4.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -30,8 +30,8 @@
       <artifactId>jnr-unixsocket</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>

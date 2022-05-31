@@ -33,10 +33,6 @@
       <directory>src/main/extras/bash-completion</directory>
       <outputDirectory>/extras/bash-completion</outputDirectory>
     </fileSet>
-    <fileSet>
-      <directory>target/site</directory>
-      <outputDirectory>/doc</outputDirectory>
-    </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>

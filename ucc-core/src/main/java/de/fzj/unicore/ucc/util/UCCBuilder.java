@@ -10,7 +10,6 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.unigrids.services.atomic.types.ProtocolType;
 
 import de.fzj.unicore.uas.json.Builder;
 import de.fzj.unicore.uas.json.JSONUtil;
@@ -239,11 +238,11 @@ public class UCCBuilder extends Builder {
 	/**
 	 * get the preferred file transfer protocols (if defined)
 	 */
-	public ProtocolType.Enum getPreferredProtocols(){
+	public String getPreferredProtocol(){
 		return preferredProtocol;
 	}
 
-	public void setPreferredProtocols(ProtocolType.Enum protocol){
+	public void setPreferredProtocol(String protocol){
 		JSONUtil.putQuietly(json, "Preferred protocol", protocol.toString());
 		this.preferredProtocol = protocol;
 	}

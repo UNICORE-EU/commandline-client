@@ -9,6 +9,7 @@ import java.io.InputStream;
 import org.apache.commons.cli.OptionBuilder;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
+import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
 /**
@@ -44,22 +45,19 @@ public class Groovy extends ActionBase{
 	@Override
 	public void process() {
 		super.process();
-		
 		CompilerConfiguration conf=new CompilerConfiguration();
-		
-		//set the groovy base class
 		conf.setScriptBaseClass("de.fzj.unicore.ucc.helpers.Base");
-		
-		GroovyShell shell=new GroovyShell(conf);
 		//inject context for the script
-		shell.setProperty("registry", registry);
-		shell.setProperty("configurationProvider", configurationProvider);
-		shell.setProperty("auth", configurationProvider.getRESTAuthN());
-		shell.setProperty("registryURL", registryURL);
-		shell.setProperty("properties", properties);
-		shell.setProperty("options",getOptions());
-		shell.setProperty("commandLine", getCommandLine());
-		shell.setProperty("messageWriter", this);
+		GroovyShell shell=new GroovyShell(conf);
+		Binding binding = shell.getContext();
+		binding.setVariable("registry", registry);
+		binding.setVariable("configurationProvider", configurationProvider);
+		binding.setVariable("auth", configurationProvider.getRESTAuthN());
+		binding.setVariable("registryURL", registryURL);
+		binding.setVariable("properties", properties);
+		binding.setVariable("options", getOptions());
+		binding.setVariable("commandLine", getCommandLine());
+		binding.setVariable("messageWriter", this);
 		if(getCommandLine().hasOption(OPT_GROOVYEXPRESSION)){
 			expression=getCommandLine().getOptionValue(OPT_GROOVYEXPRESSION);
 		}else if (getCommandLine().hasOption(OPT_GROOVYSCRIPT)){
@@ -73,7 +71,6 @@ public class Groovy extends ActionBase{
 		else{
 			getFallbackGroovyExpression();
 		}
-		//run the script
 		shell.evaluate(expression);
 	}
 	

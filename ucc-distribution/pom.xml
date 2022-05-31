@@ -5,38 +5,25 @@
   <packaging>pom</packaging>
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
-  <url>http://www.unicore.eu</url>
+  <url>https://www.unicore.eu</url>
 
   <name>UCC Distribution and docs</name>
 
   <parent>
     <groupId>de.fzj.unicore</groupId>
     <artifactId>ucc-parent</artifactId>
-    <version>2.3.0</version>
+    <version>2.4.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <version>8.3.0</version>
+  <version>9.0.0</version>
 
   <properties>
     <!-- this is the UCC version we are packaging -->
     <ucc.version>${project.parent.version}</ucc.version>
     <package.version>${project.version}</package.version>
     <package.release>1</package.release>
-
-    <!-- configuration of the "docman" tool -->
-    <docman.enabled/>
-    <doc.src>src/doc/manual.txt</doc.src>
-    <doc.target>ucc-manual</doc.target>
-    <doc.includeBundle>file:src/doc/ucc-documentation.properties</doc.includeBundle>
   </properties>
-
-  <distributionManagement>
-    <site>
-      <id>unicore.eu</id>
-      <url>dav:https://unicore-dev.zam.kfa-juelich.de/documentation/ucc-${package.version}</url>
-    </site>
-  </distributionManagement>
 
   <dependencies>
     <dependency>
@@ -83,11 +70,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>2.2</version>
       </plugin>
     </plugins>
   </build>

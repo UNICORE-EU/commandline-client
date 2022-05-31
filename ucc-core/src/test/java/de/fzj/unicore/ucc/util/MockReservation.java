@@ -17,7 +17,7 @@ import de.fzj.unicore.xnjs.resources.ResourceRequest;
 import de.fzj.unicore.xnjs.tsi.IReservation;
 import de.fzj.unicore.xnjs.tsi.ReservationStatus;
 import de.fzj.unicore.xnjs.tsi.ReservationStatus.Status;
-import de.fzj.unicore.xnjs.tsi.remote.TSIUtils;
+import de.fzj.unicore.xnjs.tsi.remote.TSIMessages;
 import eu.unicore.security.Client;
 
 public class MockReservation implements IReservation {
@@ -50,7 +50,7 @@ public class MockReservation implements IReservation {
 				resourceRequest.add(new ResourceRequest(name, resources.get(name)));
 			}
 			List<ResourceRequest>incarnated=gr.incarnateResources(resourceRequest, client);
-			String tsiCmd=TSIUtils.makeMakeReservationCommand(incarnated,startTime,client);
+			String tsiCmd = new TSIMessages(configuration).makeMakeReservationCommand(incarnated,startTime,client);
 			lastTSICommand=tsiCmd;
 			String resID=UUID.randomUUID().toString();
 			ReservationStatus rs=new ReservationStatus();

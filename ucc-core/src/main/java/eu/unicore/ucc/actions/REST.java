@@ -92,7 +92,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	}
 	
 	protected void doProcess(String cmd, String url, JSONObject content) throws Exception {
-		verbose("Connecting to <"+url+">");
+		verbose("Accessing endpoint <"+url+">");
 		BaseClient bc = makeClient(url);
 	
 		if("get".startsWith(cmd.toLowerCase())){

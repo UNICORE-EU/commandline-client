@@ -6,22 +6,22 @@
   <packaging>pom</packaging>
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
-  <url>http://www.unicore.eu</url>
-  <version>2.3.0</version>
+  <url>https://www.unicore.eu</url>
+  <version>2.4.0</version>
   <name>UNICORE Commandline Client (UCC)</name>
 
   <parent>
     <groupId>eu.unicore</groupId>
     <artifactId>unicore-parent</artifactId>
-    <version>2.0</version>
+    <version>2.1</version>
   </parent>
 
   <properties>
-     <uas.version>2.3.0</uas.version>
-     <wf.version>3.3.0</wf.version>
+     <uas.version>2.4.0</uas.version>
+     <wf.version>3.4.0</wf.version>
      <jnr.version>0.38.8</jnr.version>
-     <groovy.version>2.4.16</groovy.version>
-     <guava.version>30.0-jre</guava.version>
+     <groovy.version>4.0.0-rc-2</groovy.version>
+     <guava.version>31.0.1-jre</guava.version>
      <compiler.fork>true</compiler.fork>
   </properties>
   
@@ -74,8 +74,8 @@
 	<version>${uas.version}</version>
       </dependency>
       <dependency>
-	<groupId>org.codehaus.groovy</groupId>
-	<artifactId>groovy-all</artifactId>
+	<groupId>org.apache.groovy</groupId>
+	<artifactId>groovy</artifactId>
 	<version>${groovy.version}</version>
       </dependency>
       <dependency>

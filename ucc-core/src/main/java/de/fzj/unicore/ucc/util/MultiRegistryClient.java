@@ -12,7 +12,7 @@ import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
-import eu.unicore.services.ws.client.Resources;
+import eu.unicore.services.rest.client.Resources;
 
 /**
  * a more flexible version of a multi-registry client where the

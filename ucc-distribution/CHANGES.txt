@@ -2,6 +2,10 @@ UCC Changelog
 =============
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
+Version 2.4.0 (released mmm dd, 2022)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - update to UNICORE 9.0 base libs
+
 Version 2.3.0 (released Dec 15, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - update to UNICORE 8.3 base libs
