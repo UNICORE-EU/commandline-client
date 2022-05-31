@@ -1,5 +1,5 @@
 authenticationMethod=X509
-credential.path=src/test/resources/certs/user-keystore.jks
+credential.path=src/test/resources/certs/user-keystore.p12
 credential.password=the!user
 
 ucc-session-ids=target/ucc-session-ids

@@ -1,92 +1,37 @@
-<?xml version="1.0" encoding="UTF-8"?>
+{
 
-<!--
- a sample idb file 
- -->
+"Partitions" : {
 
-<idb:IDB xmlns:idb="http://www.fz-juelich.de/unicore/xnjs/idb">
+  "batch" : {
+    "IsDefaultPartition": "true",
+    "Description" : "Default batch queue",
+    "CPUArchitecture" : "x86_64",
+    "Resources" : {
+      "Runtime"       : "1-24h:1h",
+      "Nodes"         : "1-1:1",
+      "CPUsPerNode"   : "1-1:1",
+      "TotalCPUs"     : "1-1",
+      "MemoryPerNode" : "8G-8G"
+    }
+  }
+ 
+ },
+
+"Applications": [
+
+  {
+    "Name" : "Date",
+    "Version" : "1.0",
+    "Executable" : "/bin/date"
+  },
   
-  <!-- Applications -->
-  
-  <idb:IDBApplication>
-    <idb:ApplicationName>Date</idb:ApplicationName>
-    <idb:ApplicationVersion>1.0</idb:ApplicationVersion>
-    <jsdl:POSIXApplication xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
-      <jsdl:Executable>/bin/date</jsdl:Executable>
-    </jsdl:POSIXApplication>
-  </idb:IDBApplication>
+  {
+    "Name" : "Cat",
+    "Version" : "1.0",
+    "Executable" : "/bin/cat",
+    "Arguments": [ "infile" ]
+  },
 
-  <idb:IDBApplication>
-    <idb:ApplicationName>Cat</idb:ApplicationName>
-    <idb:ApplicationVersion>1.0</idb:ApplicationVersion>
-    <jsdl:POSIXApplication xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
-      <jsdl:Executable>/bin/cat</jsdl:Executable>
-      <jsdl:Argument>infile</jsdl:Argument>
-    </jsdl:POSIXApplication>
-  </idb:IDBApplication>
+]
 
-    
-  <!-- Resources -->
-  
-  <idb:TargetSystemProperties>
-    <jsdl:Resources xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl">
-      <jsdl:CPUArchitecture>
-        <jsdl:CPUArchitectureName>x86</jsdl:CPUArchitectureName>
-      </jsdl:CPUArchitecture>
-
-      <!-- cpu time (per cpu) in seconds -->
-      <jsdl:IndividualCPUTime>
-        <jsdl:Exact>3600</jsdl:Exact>
-        <jsdl:Range>
-         <jsdl:LowerBound>1</jsdl:LowerBound>
-         <jsdl:UpperBound>86400</jsdl:UpperBound>
-        </jsdl:Range>
-      </jsdl:IndividualCPUTime>
-
-      <!-- CPUs per node -->
-      <jsdl:IndividualCPUCount>
-        <jsdl:Exact>1.0</jsdl:Exact>
-        <jsdl:Range>
-         <jsdl:LowerBound>1.0</jsdl:LowerBound>
-         <jsdl:UpperBound>1.0</jsdl:UpperBound>
-        </jsdl:Range>
-      </jsdl:IndividualCPUCount>
-
-      <!-- total CPUs -->
-      <jsdl:TotalCPUCount>
-    	<jsdl:Range>
-         <jsdl:LowerBound>1.0</jsdl:LowerBound>
-         <jsdl:UpperBound>1.0</jsdl:UpperBound>
-        </jsdl:Range>
-      </jsdl:TotalCPUCount>
-
-      <!-- Memory per node (bytes) -->
-      <jsdl:IndividualPhysicalMemory>
-        <jsdl:Exact>268435456</jsdl:Exact>
-        <jsdl:Range>
-         <jsdl:LowerBound>1024576</jsdl:LowerBound>
-         <jsdl:UpperBound>1073741824</jsdl:UpperBound>
-        </jsdl:Range>
-      </jsdl:IndividualPhysicalMemory>
-
-      <!-- Nodes -->
-      <jsdl:TotalResourceCount>
-        <jsdl:Exact>1.0</jsdl:Exact>
-        <jsdl:Range>
-         <jsdl:LowerBound>1.0</jsdl:LowerBound>
-         <jsdl:UpperBound>1.0</jsdl:UpperBound>
-        </jsdl:Range>
-      </jsdl:TotalResourceCount>
-      
-     <jsdl:OperatingSystem>
-       <jsdl:OperatingSystemType>
-         <jsdl:OperatingSystemName>LINUX</jsdl:OperatingSystemName>
-       </jsdl:OperatingSystemType>
-       <jsdl:OperatingSystemVersion>2.6</jsdl:OperatingSystemVersion>
-       <jsdl:Description>Probably some Linux distribution</jsdl:Description>
-      </jsdl:OperatingSystem>
-      
-    </jsdl:Resources>
-  </idb:TargetSystemProperties>
-
-</idb:IDB>
+}

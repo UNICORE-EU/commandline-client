@@ -2,12 +2,10 @@
 # erroneous user preferences for UCC: registry is missing
 #
 
-credential.path=src/test/resources/certs/user-keystore.jks
-credential.keyAlias=demo user
+credential.path=src/test/resources/certs/user-keystore.p12
 credential.password=the!user
 
-truststore.type=keystore
-truststore.keystorePath=src/test/resources/certs/user-keystore.jks
-truststore.keystorePassword=the!user
+truststore.type=directory
+truststore.directoryLocations.1=src/test/resources/certs/demo-ca-cert.pem
 
 ucc-session-ids=target/ucc-session-ids

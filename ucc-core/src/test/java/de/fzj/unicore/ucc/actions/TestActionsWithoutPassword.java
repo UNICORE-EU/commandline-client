@@ -53,7 +53,7 @@ public class TestActionsWithoutPassword extends EmbeddedTestBase {
 				"-f", "src/test/resources/shell_input",
 		};
 		UCC.main(args);
-		assertEquals(2, KeystoreAuthNWithPasswd.QUESTIONS);
+		assertEquals(1, KeystoreAuthNWithPasswd.QUESTIONS);
 		
 	}
 }
