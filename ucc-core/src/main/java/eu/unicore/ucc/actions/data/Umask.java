@@ -8,7 +8,7 @@
 package eu.unicore.ucc.actions.data;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
 import de.fzj.unicore.ucc.helpers.EndProcessingException;
@@ -27,15 +27,14 @@ public class Umask extends ActionBase {
 	public static final String OPT_SET = "s";
 	
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SET_LONG)
-				.withDescription("Set a umask to the provided value.")
-				.isRequired(false)
+		getOptions().addOption(Option.builder(OPT_SET)
+				.longOpt(OPT_SET_LONG)
+				.desc("Set a umask to the provided value.")
+				.required(false)
 				.hasArg()
-				.create(OPT_SET)
-				);
+				.build());
 	}
 
 	@Override

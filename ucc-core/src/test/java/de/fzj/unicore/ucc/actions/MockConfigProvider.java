@@ -11,7 +11,6 @@ import java.util.Properties;
 
 import de.fzj.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
-import eu.unicore.security.wsutil.client.authn.DelegationSpecification;
 import eu.unicore.security.wsutil.client.authn.SecuritySessionPersistence;
 import eu.unicore.security.wsutil.client.authn.ServiceIdentityResolver;
 import eu.unicore.services.rest.client.IAuthCallback;
@@ -33,14 +32,6 @@ public class MockConfigProvider implements UCCConfigurationProvider
 
 	@Override
 	public IClientConfiguration getClientConfiguration(String serviceUrl)
-			throws Exception
-	{
-		return configuration;
-	}
-	
-	@Override
-	public IClientConfiguration getClientConfiguration(String serviceUrl, String serviceIdentity, 
-			DelegationSpecification delegate)
 			throws Exception
 	{
 		return configuration;

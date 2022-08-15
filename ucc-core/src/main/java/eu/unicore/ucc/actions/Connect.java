@@ -1,6 +1,6 @@
 package eu.unicore.ucc.actions;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import eu.unicore.ucc.lookup.Connector;
 
@@ -18,16 +18,15 @@ public class Connect extends ActionBase {
 	private static String lastRegistryURL;
 	
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_LIFETIME_LONG)
-				.withDescription("Initial lifetime (in days) for created target systems.")
-				.withArgName("Lifetime")
+		getOptions().addOption(Option.builder(OPT_LIFETIME)
+				.longOpt(OPT_LIFETIME_LONG)
+				.desc("Initial lifetime (in days) for created target systems.")
+				.argName("Lifetime")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_LIFETIME)
-		);
+				.required(false)
+				.build());
 	}
 
 	@Override

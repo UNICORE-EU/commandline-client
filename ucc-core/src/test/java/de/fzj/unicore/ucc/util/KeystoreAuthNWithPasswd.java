@@ -2,8 +2,6 @@ package de.fzj.unicore.ucc.util;
 
 import java.util.Properties;
 
-import javax.security.auth.x500.X500Principal;
-
 import de.fzj.unicore.ucc.authn.PropertiesAwareAuthn;
 import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.unicore.security.canl.CachingPasswordCallback;
@@ -11,7 +9,6 @@ import eu.unicore.security.canl.CredentialProperties;
 import eu.unicore.security.canl.PasswordCallback;
 import eu.unicore.security.canl.TruststoreProperties;
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
-import eu.unicore.security.wsutil.client.authn.DelegationSpecification;
 import eu.unicore.util.httpclient.ClientProperties;
 import eu.unicore.util.httpclient.DefaultClientConfiguration;
 
@@ -34,18 +31,11 @@ public class KeystoreAuthNWithPasswd implements AuthenticationProvider, Properti
 	}
 
 	@Override
-	public DefaultClientConfiguration getClientConfiguration(String targetAddress,
-			String targetDn, DelegationSpecification delegate) throws Exception
+	public DefaultClientConfiguration getClientConfiguration(String targetAddress) throws Exception
 	{
-		ClientProperties sp=new ClientProperties(properties, getPasswordCallback(), 
+		return new ClientProperties(properties, getPasswordCallback(), 
 				TruststoreProperties.DEFAULT_PREFIX, 
 				CredentialProperties.DEFAULT_PREFIX, ClientProperties.DEFAULT_PREFIX);
-		if (delegate.isDelegate())
-		{
-			sp.getETDSettings().setReceiver(new X500Principal(targetDn));
-			sp.getETDSettings().setExtendTrustDelegation(true);
-		}
-		return sp;
 	}
 
 	@Override

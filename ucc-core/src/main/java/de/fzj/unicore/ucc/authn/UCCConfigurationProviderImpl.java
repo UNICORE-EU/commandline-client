@@ -23,10 +23,8 @@ import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.security.wsutil.client.authn.CachingIdentityResolver;
 import eu.unicore.security.wsutil.client.authn.ClientConfigurationProvider;
 import eu.unicore.security.wsutil.client.authn.ClientConfigurationProviderImpl;
-import eu.unicore.security.wsutil.client.authn.DelegationSpecification;
 import eu.unicore.security.wsutil.client.authn.JsonSecuritySessionPersistence;
 import eu.unicore.services.rest.client.IAuthCallback;
-import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**
  * UCC specific extension of {@link ClientConfigurationProvider}. Configures the object in UCC way (from preferences)
@@ -102,24 +100,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		setSecurityPreferences(setupExtraAttributes());
 		setIdentityResolver(new CachingIdentityResolver());
 	}
-	
-	@Override
-	public IClientConfiguration getClientConfiguration(String serviceUrl) throws Exception {
-		return getClientConfiguration(serviceUrl,null,DelegationSpecification.DO_NOT);
-	}
-	
-	@Override
-	public IClientConfiguration getClientConfiguration(String serviceUrl, String serviceIdentity, 
-			DelegationSpecification delegate) throws Exception
-	{
-		if(DelegationSpecification.STANDARD.equals(delegate) && serviceIdentity==null){
-			try{
-				serviceIdentity = getIdentityResolver().resolveIdentity(serviceUrl);
-			}catch(Exception ex){/*ignored*/}
-		}
-		return super.getClientConfiguration(serviceUrl, serviceIdentity, delegate);
-	}
-	
+
 	protected String getSessionStorageFile() {
 		if (userProperties != null) {
 			 return userProperties.getProperty("ucc-session-ids");
@@ -144,11 +125,10 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 	/**
 	 * Prepares a map with security preferences, to be quickly applied when actual configuration is 
 	 * assembled on demand. 
-	 * The base implementation adds the {@link Constants#OPT_SECURITY_PREFERENCES} and the 
-	 * requested user ID, if given by the {@link Constants#OPT_USERID} option.
+	 * The base implementation adds the preferences given via {@link Constants#OPT_SECURITY_PREFERENCES}
 	 */
 	private Map<String, String[]> setupExtraAttributes(){
-		Map<String, String[]> securityPreferences = new HashMap<String, String[]>();
+		Map<String, String[]> securityPreferences = new HashMap<>();
 		String[] vals = command.getCommandLine().getOptionValues(Constants.OPT_SECURITY_PREFERENCES);
 		if (vals == null) {
 			String fromFile = userProperties.getProperty(Constants.OPT_SECURITY_PREFERENCES_LONG);

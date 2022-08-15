@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
@@ -59,19 +59,18 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt("nofiles")
-				.withDescription("Do not list workflow files (in detailed mode)")
-				.isRequired(false)
-				.create("N")
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt("nojobs")
-				.withDescription("Do not list jobs (in detailed mode)")
-				.isRequired(false)
-				.create("j")
-				);
+		getOptions().addOption(Option.builder("N")
+				.longOpt("nofiles")
+				.desc("Do not list workflow files (in detailed mode)")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder("j")
+				.longOpt("nojobs")
+				.desc("Do not list jobs (in detailed mode)")
+				.required(false)
+				.build());
 	}
 
 	@Override
@@ -208,8 +207,7 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 			details.append(sep).append("  Files: ");
 			BaseServiceClient fileListClient = workflow.getFileList();
 			JSONObject props = fileListClient.getProperties();
-			@SuppressWarnings("unchecked")
-			Iterator<String> iter = (Iterator<String>)props.keys();
+			Iterator<String> iter = props.keys();
 			while(iter.hasNext()){
 				String wf = iter.next();
 				String url = props.getString(wf);

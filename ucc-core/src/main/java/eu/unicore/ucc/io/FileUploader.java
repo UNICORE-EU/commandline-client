@@ -214,14 +214,19 @@ public class FileUploader extends FileTransferBase {
 	 * @throws Exception
 	 */
 	private void copyProperties(File sourceFile, StorageClient sms, String target, MessageWriter msg)throws Exception{
-		boolean x=sourceFile.canExecute();
 		try{
-			if(x){
-				// TODO
-				//sms.changePermissions(target, true, true, x);
+			StringBuilder perms = new StringBuilder("r--r--");
+			if(sourceFile.canExecute()){
+				perms.setCharAt(2,'x');
+				perms.setCharAt(5,'x');
 			}
+			if(sourceFile.canWrite()){
+				perms.setCharAt(1,'w');
+				perms.setCharAt(4,'w');
+			}
+			sms.chmod(target, perms.toString());
 		}catch(Exception ex){
-			msg.error("Can't set exectuable flag on remote file.",ex);
+			msg.error("Can't set permissions on remote file.",ex);
 		}
 	}
 

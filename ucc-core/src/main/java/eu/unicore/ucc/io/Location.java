@@ -85,7 +85,7 @@ public class Location implements de.fzj.unicore.uas.json.Location {
 
 		//check if it is an SMS UNICORE URI
 		if(isUNICORE_URL(desc)){
-			if(!desc.contains("/files")) {
+			if(!desc.contains("/files/")) {
 				// user only gave a storage endpoint
 				desc = desc+"/files/";
 			}
@@ -151,10 +151,17 @@ public class Location implements de.fzj.unicore.uas.json.Location {
 		this.protocol = protocol;
 	}
 	
+	/**
+	 * get the storage endpoint, e.g. https://SITE/rest/core/storages/HOME
+	 */
 	public String getSmsEpr() {
 		return smsEpr;
 	}
 
+	/**
+	 * get the full URL with protocol and file path
+	 * @return
+	 */
 	public String getUnicoreURI() {
 		return getUnicoreURI(protocol);
 	}

@@ -11,7 +11,7 @@ import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**
- * UCC specific extension of {@link WSRFClientConfigurationProvider}
+ * UCC specific extension of {@link ClientConfigurationProvider}
  * allowing for property-file based configuration
  * 
  * @author K. Benedyczak

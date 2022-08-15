@@ -43,12 +43,19 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 		uas.startSynchronous();
 		UCC.unitTesting=true;
 		Command.quitAfterPrintingUsage=false;
+		File testsRoot = new File("target", "ucc-test");
+		FileUtils.deleteQuietly(testsRoot);
+		testsRoot.mkdirs();
+		new File(testsRoot, "STORAGES").mkdir();
+		new File(testsRoot, "WORK").mkdir();
 	}
 
 	@Before
 	public synchronized void doPreClean()throws Exception{
 		expected.clear();
 		gotExpectedOutput = false;
+		File sessions=new File("target","ucc-session-ids");
+		FileUtils.deleteQuietly(sessions);
 	}
 
 	@BeforeClass

@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
 import groovy.lang.Binding;
@@ -21,24 +21,23 @@ public class Groovy extends ActionBase{
 	protected String expression;
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_GROOVYSCRIPT_LONG)
-				.withDescription("File containing the Groovy script")
-				.withArgName("Script")
+		getOptions().addOption(Option.builder(OPT_GROOVYSCRIPT)
+				.longOpt(OPT_GROOVYSCRIPT_LONG)
+				.desc("File containing the Groovy script")
+				.argName("Script")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_GROOVYSCRIPT)
-				);
+				.required(false)
+				.build());
 		
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_GROOVYEXPRESSION_LONG)
-				.withDescription("the Groovy expression")
-				.withArgName("Expression")
+		getOptions().addOption(Option.builder(OPT_GROOVYEXPRESSION)
+				.longOpt(OPT_GROOVYEXPRESSION_LONG)
+				.desc("the Groovy expression")
+				.argName("Expression")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_GROOVYEXPRESSION)
-				);
+				.required(false)
+				.build());
 		
 	}
 

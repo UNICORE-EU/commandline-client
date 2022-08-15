@@ -126,7 +126,7 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 				jobFile
 		};
 		if(verbose){
-			List<String>a=new ArrayList<String>();
+			List<String>a=new ArrayList<>();
 			a.addAll(Arrays.asList(args));
 			a.add("-v");
 			args=a.toArray(new String[a.size()]);

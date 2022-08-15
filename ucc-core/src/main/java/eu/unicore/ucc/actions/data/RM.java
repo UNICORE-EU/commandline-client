@@ -1,6 +1,6 @@
 package eu.unicore.ucc.actions.data;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 
@@ -18,14 +18,14 @@ public class RM extends SMSOperation {
 
 	protected Location targetDesc;
 
-	@SuppressWarnings("all")
+	@Override
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_QUIET_LONG)
-				.withDescription("Quiet mode, don't ask for confirmation")
-				.isRequired(false)
-				.create(OPT_QUIET)
-				);
+		getOptions().addOption(Option.builder(OPT_QUIET)
+				.longOpt(OPT_QUIET_LONG)
+				.desc("Quiet mode, don't ask for confirmation")
+				.required(false)
+				.build());
 	}
 	
 	@Override

@@ -38,10 +38,10 @@ public class UCC{
 
 	public static boolean mute = false;
 
-	public static final Map<String, Class<? extends Command>> cmds = new HashMap<String, Class<? extends Command>>();
+	public static final Map<String, Class<? extends Command>> cmds = new HashMap<>();
 
 	public static final Map<String, AuthenticationProvider> authNMethods = 
-			new HashMap<String, AuthenticationProvider>();
+			new HashMap<>();
 
 	public static Integer exitCode=null;
 
@@ -52,7 +52,7 @@ public class UCC{
 	private static MessageWriter msg = new DefaultMessageWriter();
 
 	public static String getVersion(){
-		String v=UCC.class.getPackage().getImplementationVersion();
+		String v = UCC.class.getPackage().getSpecificationVersion();
 		if(v==null)v="(DEVELOPMENT version)";
 		return v+", https://www.unicore.eu";
 	}

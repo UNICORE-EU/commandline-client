@@ -3,7 +3,7 @@ package eu.unicore.ucc.actions.info;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
 import de.fzj.unicore.ucc.UCC;
@@ -22,13 +22,13 @@ public class ListSites extends ListActionBase<SiteClient> {
 	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
-				.withDescription("Site Name")
-				.withArgName("Vsite")
+		getOptions().addOption(Option.builder(OPT_SITENAME)
+				.longOpt(OPT_SITENAME_LONG)
+				.desc("Site Name")
+				.required(false)
+				.argName("Site")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_SITENAME)
-				);
+				.build());
 	}
 	
 	@Override
@@ -106,11 +106,12 @@ public class ListSites extends ListActionBase<SiteClient> {
 	protected void listResources(JSONObject resources, StringBuilder details){
 		String sep=System.getProperty("line.separator");
 		try{
-			@SuppressWarnings("unchecked")
 			Iterator<String> resIterator = resources.keys();
 			while(resIterator.hasNext()) {
 				String name = resIterator.next();
-				details.append(sep).append("     "+name).append(": ").append(resources.getString(name));
+				details.append(sep).append("     ").
+				    append(name).append(": ").
+				    append(resources.getString(name));
 			}
 		}
 		catch(Exception ex){}
@@ -132,7 +133,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 	
 	@Override
 	public String getSynopsis() {
-		return "List the Grid sites available to you, together " +
+		return "List the UNICORE sites available to you, together " +
 				"with some information about the site's capabilities. "
 				+"Use the -l or -a options to control the amount of information. "
 				+"Use the -s option to limit the list to a single site.";

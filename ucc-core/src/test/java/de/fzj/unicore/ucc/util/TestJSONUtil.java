@@ -2,7 +2,6 @@ package de.fzj.unicore.ucc.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +9,6 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
-
-import org.junit.Assert;
 
 public class TestJSONUtil {
 
@@ -41,32 +38,7 @@ public class TestJSONUtil {
 		assertNotNull(o);
 		assertEquals("url/#xx", o.getString("From"));
 	}
-	
-	
-	@Test
-	public void testErrorReporting(){
-		String json="{ foo : bar \n \n ";
-		try{
-			new JSONObject(json);
-			Assert.fail("Expected parse exception");
-		}catch(JSONException ex){
-			String msg=JSONUtil.makeParseErrorMessage(json, ex);
-			assertTrue("got: "+msg, msg.contains("line 3"));
-		}
-	}
-	
-	@Test
-	public void testErrorReporting2(){
-		String json="#foocomment\n{ foo : bar \n \n }";
-		try{
-			new JSONObject(json);
-			Assert.fail("Expected parse exception");
-		}catch(JSONException ex){
-			String msg=JSONUtil.makeParseErrorMessage(json, ex);
-			assertTrue(msg,msg.contains("must begin with"));
-		}
-	}
-	
+
 	@Test
 	public void testToMap()throws Exception{
 		String json="{ foo : bar, x : y } ";

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,45 +58,41 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	public static final String OPT_INFO="i";
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_LIFETIME_LONG)
-				.withDescription("Initial lifetime (in days) for created storages.")
-				.withArgName("Lifetime")
+		getOptions().addOption(Option.builder(OPT_LIFETIME)
+				.longOpt(OPT_LIFETIME_LONG)
+				.desc("Initial lifetime (in days) for created storages.")
+				.argName("Lifetime")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_LIFETIME)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
-				.withDescription("Name of the site")
-				.withArgName("Site")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_SITENAME)
+				.longOpt(OPT_SITENAME_LONG)
+				.desc("Name of the site")
+				.argName("Site")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_SITENAME)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_FACTORY_LONG)
-				.withDescription("Factory URL")
-				.withArgName("Factory")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_FACTORY)
+				.longOpt(OPT_FACTORY_LONG)
+				.desc("Factory URL")
+				.argName("Factory")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_FACTORY)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_TYPE_LONG)
-				.withDescription("Storage type")
-				.withArgName("Type")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_TYPE)
+				.longOpt(OPT_TYPE_LONG)
+				.desc("Storage type")
+				.argName("Type")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_TYPE)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_INFO_LONG)
-				.withDescription("Only show info, do not create anything")
-				.isRequired(false)
-				.create(OPT_INFO)
-				);
-
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_INFO)
+				.longOpt(OPT_INFO_LONG)
+				.desc("Only show info, do not create anything")
+				.required(false)
+				.build());
 	}
 
 	@Override
@@ -257,7 +253,6 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		StringBuilder sb=new StringBuilder();
 		boolean first=true;
 		String newline = System.getProperty("line.separator");
-		@SuppressWarnings("unchecked")
 		Iterator<String>types = pr.keys();
 		while(types.hasNext()){
 			if(!first)sb.append(newline).append("  ");
@@ -333,7 +328,6 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 			try{
 				if(!byType)return true;
 				JSONObject desc = smf.getProperties().getJSONObject("storageDescriptions");
-				@SuppressWarnings("unchecked")
 				Iterator<String>types = desc.keys();
 				while(types.hasNext()){
 					if(storageType.equals(types.next()))return true;

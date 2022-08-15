@@ -1,6 +1,6 @@
 package eu.unicore.ucc.actions.info;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.JobClient;
@@ -21,16 +21,15 @@ public class ListJobs extends ListActionBase<JobClient> {
 	}
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
-				.withDescription("Site Name")
-				.withArgName("Vsite")
+		getOptions().addOption(Option.builder(OPT_SITENAME)
+				.longOpt(OPT_SITENAME_LONG)
+				.desc("Site Name")
+				.required(false)
+				.argName("Site")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_SITENAME)
-				);
+				.build());
 	}
 
 	@Override

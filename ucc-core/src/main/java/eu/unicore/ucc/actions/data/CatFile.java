@@ -21,13 +21,6 @@ public class CatFile extends FileOperation implements StorageConstants {
 	protected StorageClient sms;
 
 	@Override
-	@SuppressWarnings("all")
-	protected void createOptions() {
-		super.createOptions();
-
-	}
-
-	@Override
 	public void process() {
 		super.process();
 

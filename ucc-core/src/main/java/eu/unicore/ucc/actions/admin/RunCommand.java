@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.admin.AdminServiceClient;
@@ -22,26 +22,25 @@ public class RunCommand extends ActionBase {
 	private String url;
 
 	private String cmd;
-	private final Map<String,String>params=new HashMap<String,String>();
+	private final Map<String,String>params=new HashMap<>();
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
-				.withDescription("Site Name")
-				.withArgName("Vsite")
+		getOptions().addOption(Option.builder(OPT_SITENAME)
+				.longOpt(OPT_SITENAME_LONG)
+				.desc("Site Name")
+				.argName("Vsite")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_SITENAME)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_URL_LONG)
-				.withDescription("Admin service URL")
-				.withArgName("URL")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_URL)
+				.longOpt(OPT_URL_LONG)
+				.desc("Admin service URL")
+				.argName("URL")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_URL)
-				);
+				.required(false)
+				.build());
 	}
 
 	@Override

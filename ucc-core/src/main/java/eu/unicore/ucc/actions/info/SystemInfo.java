@@ -2,7 +2,7 @@ package eu.unicore.ucc.actions.info;
 
 import java.util.List;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import de.fzj.unicore.ucc.Command;
 import de.fzj.unicore.ucc.IServiceInfoProvider;
@@ -22,27 +22,26 @@ public class SystemInfo extends ActionBase {
 	
 	private String pattern;
 	
-	@SuppressWarnings("all")
+	@Override
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt("long")
-				.withDescription("Detailed output.")
-				.isRequired(false)
-				.create("l")
-				);
-		
-		getOptions().addOption(OptionBuilder.withLongOpt("raw")
-				.withDescription("Show raw registry content.")
-				.isRequired(false)
-				.create("R")
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt("url-pattern")
-				.withDescription("Only show details for endpoint URLs matching "
+		getOptions().addOption(Option.builder("l")
+				.longOpt("long")
+				.desc("Detailed output")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder("R")
+				.longOpt("raw")
+				.desc("Show raw registry content")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder("P")
+				.longOpt("url-pattern")
+				.desc("Only show details for endpoint URLs matching "
 						+ "the given regexp (e.g. \".*/storage.*\"")
+				.required(false)
 				.hasArg()
-				.isRequired(false)
-				.create("P")
-				);
+				.build());	
 	}
 	
 	@Override

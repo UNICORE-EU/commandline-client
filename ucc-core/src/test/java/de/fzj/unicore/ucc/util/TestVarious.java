@@ -13,6 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.jline.utils.Log;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -133,6 +138,21 @@ public class TestVarious {
 	public void testJLineLogging() throws Exception {
 		JLineLogger.init();
 		Log.info("test123");
+	}
+
+	@Test
+	public void testArgParsing() throws Exception {
+		Options options = new Options();
+		options.addOption(Option.builder("B")
+				.longOpt("bytes")
+				.desc("Byte range")
+				.argName("ByteRange")
+				.hasArg()
+				.required(false)
+				.build());
+		CommandLineParser p = new DefaultParser();
+		CommandLine cl = p.parse(options, new String [] {"-B", "0-9"});
+		assertEquals("0-9", cl.getOptionValue("B"));
 	}
 	
 }

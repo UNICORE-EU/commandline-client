@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import de.fzj.unicore.ucc.util.ProgressBar;
 import eu.unicore.client.Endpoint;
@@ -27,38 +27,37 @@ import eu.unicore.ucc.io.ServerToServer;
 public class CP extends FileOperation {
 
 	protected String target;
-	protected final List<String>sources = new ArrayList<String>();
+	protected final List<String>sources = new ArrayList<>();
 	
 	protected boolean append;
 	protected boolean recurse;
 	protected boolean resume;
 	
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
 		
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_MODE_LONG)
-				.withDescription("(server-server only) Asynchronous mode, writes the transfer ID to a file.")
-				.isRequired(false)
-				.create(OPT_MODE)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SCHEDULED_LONG)
-				.withDescription("(server-server only) Schedule the transfer for a specific time (in HH:mm or ISO8601 format)")
-				.isRequired(false)
+		getOptions().addOption(Option.builder(OPT_MODE)
+				.longOpt(OPT_MODE_LONG)
+				.desc("(server-server only) Asynchronous mode, writes the transfer ID to a file.")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_SCHEDULED)
+				.longOpt(OPT_SCHEDULED_LONG)
+				.desc("(server-server only) Schedule the transfer for a specific time (in HH:mm or ISO8601 format)")
+				.required(false)
 				.hasArg()
-				.create(OPT_SCHEDULED)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_RESUME_LONG)
-				.withDescription("(client-server only) Resume previous transfer, appending only missing data.")
-				.isRequired(false)
-				.create(OPT_RESUME)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_RECURSIVE_LONG)
-				.withDescription("Recurse into subdirectories")
-				.isRequired(false)
-				.create(OPT_RECURSIVE)
-				);
+				.build());
+		getOptions().addOption(Option.builder(OPT_RESUME)
+				.longOpt(OPT_RESUME_LONG)
+				.desc("(client-server only) Resume previous transfer, appending only missing data.")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_RECURSIVE)
+				.longOpt(OPT_RECURSIVE_LONG)
+				.desc("Recurse into subdirectories")
+				.required(false)
+				.build());
 	}
 
 	@Override

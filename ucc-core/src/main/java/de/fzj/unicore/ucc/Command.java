@@ -7,10 +7,9 @@ import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Logger;
@@ -63,7 +62,7 @@ public abstract class Command implements Constants, MessageWriter {
 			printUsage();
 			endProcessing(0);
 		}
-		CommandLineParser parser = new GnuParser();
+		CommandLineParser parser = new DefaultParser();
 		line = parser.parse( getOptions(), args );
 		UCC.setMessageWriter(this);
 
@@ -144,32 +143,33 @@ public abstract class Command implements Constants, MessageWriter {
 	/**
 	 * add options understood by the command
 	 */
-	@SuppressWarnings("all")
 	protected void createOptions(){
 		getOptions().addOption(new Option(OPT_HELP,OPT_HELP_LONG,false,"Print this help message")
 		,UCCOptions.GRP_GENERAL);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_VERBOSE_LONG)
-				.withDescription("Verbose mode")
-				.withArgName("Verbose")
-				.isRequired(false)
-				.create(OPT_VERBOSE)
-				,UCCOptions.GRP_GENERAL);
-		
+		getOptions().addOption(Option.builder(OPT_VERBOSE)
+				.longOpt(OPT_VERBOSE_LONG)
+				.desc("Verbose mode")
+				.argName("Verbose")
+				.required(false)
+				.build(),
+				UCCOptions.GRP_GENERAL);
 		if(isTimeable()){
-			getOptions().addOption(OptionBuilder.withLongOpt(OPT_TIMING_LONG)
-					.withDescription("Timing mode")
-					.isRequired(false)
-					.create(OPT_TIMING)
+			getOptions().addOption(Option.builder(OPT_TIMING)
+					.longOpt(OPT_TIMING_LONG)
+					.desc("Timing mode")
+					.required(false)
+					.build()
 					,UCCOptions.GRP_GENERAL);
 		}
 		
 		if(producesOutput()){
-			getOptions().addOption(OptionBuilder.withLongOpt(OPT_OUTPUT_LONG)
-					.withDescription("Directory for any output produced")
-					.withArgName("Output")
+			getOptions().addOption(Option.builder(OPT_OUTPUT)
+					.longOpt(OPT_OUTPUT_LONG)
+					.desc("Directory for any output produced")
+					.argName("Output")
 					.hasArg()
-					.isRequired(false)
-					.create(OPT_OUTPUT)
+					.required(false)
+					.build()
 					,UCCOptions.GRP_GENERAL);
 		}
 	}

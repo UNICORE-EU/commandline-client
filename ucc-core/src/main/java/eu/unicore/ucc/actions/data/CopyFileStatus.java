@@ -19,12 +19,6 @@ public class CopyFileStatus extends ActionBase {
 	protected UnitParser up = UnitParser.getCapacitiesParser(3);
 
 	@Override
-	@SuppressWarnings("all")
-	protected void createOptions() {
-		super.createOptions();
-	}
-
-	@Override
 	public void process() {
 		super.process();
 		List<String> urls = new ArrayList<>();

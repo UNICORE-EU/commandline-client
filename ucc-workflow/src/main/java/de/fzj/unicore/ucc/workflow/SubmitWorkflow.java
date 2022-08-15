@@ -4,13 +4,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,49 +86,53 @@ public class SubmitWorkflow extends ActionBase implements
 	protected String[] tags;
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
-				.withDescription("Site name for submission")
-				.withArgName("Vsite")
+		getOptions().addOption(Option.builder(OPT_SITENAME)
+				.longOpt(OPT_SITENAME_LONG)
+				.desc("Site Name")
+				.required(false)
+				.argName("Site")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_SITENAME)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_FACTORY_LONG)
-				.withDescription("URL or site name of storage factory to use")
-				.isRequired(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_FACTORY)
+				.longOpt(OPT_FACTORY_LONG)
+				.desc("URL or site name of storage factory to use")
+				.argName("StorageFactory")
 				.hasArg()
-				.withArgName("StorageFactory")
-				.create(OPT_FACTORY)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_STORAGEURL_LONG)
-				.withDescription("Storage URL to upload local files to")
-				.isRequired(false)
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_STORAGEURL)
+				.longOpt(OPT_STORAGEURL_LONG)
+				.desc("Storage URL to upload local files to")
+				.argName("StorageURL")
 				.hasArg()
-				.withArgName("storage_url")
-				.create(OPT_STORAGEURL)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_DRYRUN_LONG)
-				.withDescription("Dry run, do not submit anything")
-				.isRequired(false)
-				.create(OPT_DRYRUN)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_TAGS_LONG)
-				.withDescription("Tag the job with the given tag(s)")
-				.isRequired(false)
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_DRYRUN)
+				.longOpt(OPT_DRYRUN_LONG)
+				.desc("Dry run, do not submit anything")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_TAGS)
+				.longOpt(OPT_TAGS_LONG)
+				.desc("Tag the job with the given tag(s) (comma-separated)")
+				.required(false)
+				.hasArgs()
+				.valueSeparator(',')
+				.build());
+		getOptions().addOption(Option.builder(OPT_UFILE)
+				.longOpt(OPT_UFILE_LONG)
+				.desc("UCC .u file with stage-in definitions")
+				.argName("UCCInputFile")
 				.hasArg()
-				.create(OPT_TAGS)
-				);
-		getOptions().addOption(
-				OptionBuilder.withLongOpt(OPT_UFILE_LONG).withDescription(
-						"UCC .u file with stage-in definitions").isRequired(
-						false).hasArg().create(OPT_UFILE));
-		getOptions().addOption(
-				OptionBuilder.withLongOpt(OPT_WAIT_LONG).withDescription(
-						"wait for workflow completion").isRequired(false)
-						.create(OPT_WAIT));
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_WAIT)
+				.longOpt(OPT_WAIT_LONG)
+				.desc("Wait for workflow completion")
+				.required(false)
+				.build());
 	}
 
 	@Override
@@ -150,10 +155,9 @@ public class SubmitWorkflow extends ActionBase implements
 			workflowFileName = getCommandLine().getArgs()[1];
 		}	
 
-		String tagsArg = getCommandLine().getOptionValue(OPT_TAGS);
-		if(tagsArg!=null) {
-			tags = tagsArg.split(",");
-			verbose("Workflow tags = " + tagsArg);
+		tags = getCommandLine().getOptionValues(OPT_TAGS);
+		if(tags!=null) {
+			verbose("Workflow tags = " + Arrays.deepToString(tags));
 		}
 
 		try {
@@ -355,7 +359,6 @@ public class SubmitWorkflow extends ActionBase implements
 		templateArguments = wf.optJSONObject("Template parameters");
 		if(templateArguments==null)return;
 		
-		@SuppressWarnings("unchecked")
 		Iterator<String> keys = templateArguments.keys();
 		while(keys.hasNext()){
 			String name = keys.next();

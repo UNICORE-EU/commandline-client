@@ -2,7 +2,7 @@ package eu.unicore.ucc.actions.info;
 
 import java.util.Arrays;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.lookup.Filter;
@@ -33,38 +33,38 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	public static int lastNumberOfResults;
 	
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_FILTER_LONG)
-				.withDescription("Filter the list")
-				.isRequired(false)
+
+		getOptions().addOption(Option.builder(OPT_FILTER)
+				.longOpt(OPT_FILTER_LONG)
+				.desc("Filter the list")
+				.required(false)
 				.hasArgs()
-				.create(OPT_FILTER)
-			);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_DETAILED_LONG)
-				.withDescription("Detailed output")
-				.isRequired(false)
-				.create(OPT_DETAILED)
-			);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_ALL_LONG)
-				.withDescription("Print all properties")
-				.isRequired(false)
-				.create(OPT_ALL)
-			);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_FIELDS_LONG)
-				.withDescription("Print only the named fields")
-				.isRequired(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_DETAILED)
+				.longOpt(OPT_DETAILED_LONG)
+				.desc("Detailed output")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_ALL)
+				.longOpt(OPT_ALL_LONG)
+				.desc("Print all properties")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_FIELDS)
+				.longOpt(OPT_FIELDS_LONG)
+				.desc("Print only the named fields")
+				.required(false)
 				.hasArgs()
-				.create(OPT_FIELDS)
-			);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_TAGS_LONG)
-				.withDescription("Only list items with the given tags")
-				.isRequired(false)
+				.build());	
+		getOptions().addOption(Option.builder(OPT_TAGS)
+				.longOpt(OPT_TAGS_LONG)
+				.desc("Only list items with the given tags")
+				.required(false)
 				.hasArgs()
-				.create(OPT_TAGS)
-			);		
+				.valueSeparator(',')
+				.build());
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		}
 		if(getCommandLine().hasOption(OPT_TAGS)){
 			tags = getCommandLine().getOptionValues(OPT_TAGS);
-			verbose("Tags = "+Arrays.asList(tags));
+			verbose("Tags = " + Arrays.deepToString(tags));
 		}
 		if(getCommandLine().hasOption(OPT_FIELDS)){
 			fields = getCommandLine().getOptionValues(OPT_FIELDS);

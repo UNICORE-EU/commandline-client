@@ -26,7 +26,7 @@ public abstract class JobOperationBase extends ActionBase {
 	 * @return pair containing {@link JobClient} and {@link UCCBuilder}
 	 */
 	protected Pair<JobClient,UCCBuilder> createJobClient(String jobDescriptor){
-		Pair<JobClient,UCCBuilder>res=new Pair<JobClient, UCCBuilder>();
+		Pair<JobClient,UCCBuilder>res = new Pair<>();
 		JobClient job=null;
 		UCCBuilder builder=createBuilder(jobDescriptor);
 		res.setM2(builder);
@@ -80,7 +80,7 @@ public abstract class JobOperationBase extends ActionBase {
 		super.process();
 		processAdditionalOptions();
 		
-		List<String> args=new ArrayList<String>();
+		List<String> args = new ArrayList<>();
 
 		if(getCommandLine().getArgs().length==1){
 			try{
@@ -97,7 +97,7 @@ public abstract class JobOperationBase extends ActionBase {
 			}
 		}
 
-		List<Pair<JobClient,UCCBuilder>>jobClients = new ArrayList<Pair<JobClient,UCCBuilder>>();
+		List<Pair<JobClient,UCCBuilder>>jobClients = new ArrayList<>();
 		for(String arg: args){
 			jobClients.add(createJobClient(arg));
 		}

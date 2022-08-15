@@ -15,12 +15,6 @@ public class Rename extends SMSOperation {
 	protected String source;
 
 	@Override
-	@SuppressWarnings("all")
-	protected void createOptions() {
-		super.createOptions();
-	}
-
-	@Override
 	public void process() {
 		super.process();
 		String[]args = getCommandLine().getArgs();

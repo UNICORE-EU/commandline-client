@@ -1,12 +1,15 @@
 package eu.unicore.ucc.actions.job;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
 import de.fzj.unicore.ucc.IServiceInfoProvider;
@@ -45,32 +48,29 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 	private String siteName;
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_LIFETIME_LONG)
-				.withDescription("Initial lifetime (in days) for created target systems.")
-				.withArgName("Lifetime")
+		getOptions().addOption(Option.builder(OPT_LIFETIME)
+				.longOpt(OPT_LIFETIME_LONG)
+				.desc("Initial lifetime (in days) for created storages.")
+				.argName("Lifetime")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_LIFETIME)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
-				.withDescription("Name of the site")
-				.withArgName("Site")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_SITENAME)
+				.longOpt(OPT_SITENAME_LONG)
+				.desc("Name of the site")
+				.argName("Site")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_SITENAME)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_FACTORY_LONG)
-				.withDescription("Factory URL")
-				.withArgName("Factory")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_FACTORY)
+				.longOpt(OPT_FACTORY_LONG)
+				.desc("Factory URL")
+				.argName("Factory")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_FACTORY)
-				);
+				.required(false)
+				.build());
 	}
 
 	@Override
@@ -195,7 +195,6 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	protected String getDescription(SiteFactoryClient sfc) throws Exception {
 		JSONObject pr=sfc.getProperties();
 		StringBuilder sb=new StringBuilder();
@@ -207,9 +206,10 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 			String partition = qIter.next();
 			sb.append("   * ").append(partition).append(": ");
 			JSONObject part = resources.getJSONObject(partition);
-			Iterator<String>rIter = part.sortedKeys();
-			while(rIter.hasNext()) {
-				String r = rIter.next();
+			List<String>keys = new ArrayList<>();
+			keys.addAll(part.keySet());
+			Collections.sort(keys);
+			for(String r: keys) {
 				String rVal = part.getString(r);
 				sb.append("[").append(r);
 				sb.append(": ").append(rVal);

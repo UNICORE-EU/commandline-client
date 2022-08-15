@@ -2,8 +2,9 @@ package eu.unicore.ucc.actions.job;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Arrays;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import de.fzj.unicore.uas.util.UnitParser;
 import de.fzj.unicore.ucc.UCC;
@@ -64,62 +65,54 @@ public class Run extends ActionBase {
 	protected String[] tags;
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_MODE_LONG)
-				.withDescription("Run asynchronous, writing a job ID file for use with other ucc commands")
-				.isRequired(false)
-				.create(OPT_MODE)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
-				.withDescription("Site Name")
-				.withArgName("Vsite")
+		getOptions().addOption(Option.builder(OPT_MODE)
+				.longOpt(OPT_MODE_LONG)
+				.desc("Run asynchronous, writing a job ID file for use with other ucc commands")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_SITENAME)
+				.longOpt(OPT_SITENAME_LONG)
+				.desc("Site Name")
+				.required(false)
+				.argName("Site")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_SITENAME)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_NOPREFIX_LONG)
-				.withDescription("Short output file names")
-				.isRequired(false)
-				.create(OPT_NOPREFIX)
-				);
-	
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SAMPLE_LONG)
-				.withDescription("Print an example job and quit")
-				.isRequired(false)
-				.create(OPT_SAMPLE)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SCHEDULED_LONG)
-				.withDescription("Schedule the job for a specific time (in ISO8601 format)")
-				.isRequired(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_NOPREFIX)
+				.longOpt(OPT_NOPREFIX_LONG)
+				.desc("Short output file names")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_SAMPLE)
+				.longOpt(OPT_SAMPLE_LONG)
+				.desc("Print an example job and quit")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_SCHEDULED)
+				.longOpt(OPT_SCHEDULED_LONG)
+				.desc("Schedule the job for a specific time (in ISO8601 format)")
+				.required(false)
 				.hasArg()
-				.create(OPT_SCHEDULED)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_BROKER_LONG)
-				.withDescription("Use the specific named broker implementation (available: "+UCC.getBrokerList()+")")
-				.isRequired(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_BROKER)
+				.longOpt(OPT_BROKER_LONG)
+				.desc("Use the specific named broker implementation (available: "+UCC.getBrokerList()+")")
+				.required(false)
 				.hasArg()
-				.create(OPT_BROKER)
-				);
-		
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_TAGS_LONG)
-				.withDescription("Tag the job with the given tag(s)")
-				.isRequired(false)
-				.hasArg()
-				.create(OPT_TAGS)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_QUIET_LONG)
-				.withDescription("Quiet mode, don't write job ID file")
-				.isRequired(false)
-				.create(OPT_QUIET)
-				);
+				.build());
+		getOptions().addOption(Option.builder(OPT_TAGS)
+				.longOpt(OPT_TAGS_LONG)
+				.desc("Tag the job with the given tag(s) (comma-separated)")
+				.required(false)
+				.hasArgs()
+				.valueSeparator(',')
+				.build());
+		getOptions().addOption(Option.builder(OPT_QUIET)
+				.longOpt(OPT_QUIET_LONG)
+				.desc("Quiet mode, don't write job ID file")
+				.required(false)
+				.build());
 	}
 
 
@@ -182,10 +175,9 @@ public class Run extends ActionBase {
 		quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
 		verbose("Quiet mode = " + quiet);
 
-		String tagsArg = getCommandLine().getOptionValue(OPT_TAGS);
-		if(tagsArg!=null) {
-			tags = tagsArg.split(",");
-			verbose("Job tags = " + tagsArg);
+		tags = getCommandLine().getOptionValues(OPT_TAGS);
+		if(tags!=null) {
+			verbose("Job tags = " + Arrays.deepToString(tags));
 		}
 		if(getCommandLine().getArgs().length>1){
 			for(int i=1; i<getCommandLine().getArgs().length;i++){

@@ -42,7 +42,6 @@ public class UCCCompletor implements Completer {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	protected boolean commandComplete(Command command, LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
 		try{
 			String cmdName = command.getName();

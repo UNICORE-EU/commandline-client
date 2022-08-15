@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
@@ -52,41 +52,46 @@ public class Metadata extends ActionBase {
 	}
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
 
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_COMMAND_LONG).
-				withDescription("Metadata command: write, read, update, delete, start-extract, search").
-				isRequired(true).
-				hasArg().
-				create(OPT_COMMAND));
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_STORAGE_LONG).
-				withDescription("Storage address").
-				isRequired(false).
-				withArgName("Storage").
-				hasArg().
-				create(OPT_STORAGE));
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_FILE_LONG).
-				withDescription("File containing metadata").
-				isRequired(false).
-				withArgName("Filename").
-				hasArg().
-				create(OPT_FILE));
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_QUERY_LONG).
-				withDescription("Query string for search").
-				isRequired(false).
-				withArgName("Query").
-				hasArg().
-				create(OPT_QUERY));
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_WAIT_LONG).
-				withDescription("Wait for long-running tasks to finish").
-				isRequired(false).
-				create(OPT_WAIT));
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_QUERYADV_LONG)
-				.withDescription("Advanced query")
-				.isRequired(false)
-				.create(OPT_QUERYADV));
+		getOptions().addOption(Option.builder(OPT_COMMAND)
+				.longOpt(OPT_COMMAND_LONG)
+				.desc("Metadata command: write, read, update, delete, start-extract, search")
+				.required(true)
+				.hasArg()
+				.build());
+		getOptions().addOption(Option.builder(OPT_STORAGE)
+				.longOpt(OPT_STORAGE_LONG)
+				.desc("Storage address")
+				.required(false)
+				.hasArg()
+				.argName("Storage")
+				.build());
+		getOptions().addOption(Option.builder(OPT_FILE)
+				.longOpt(OPT_FILE_LONG)
+				.desc("File containing metadata")
+				.required(false)
+				.hasArg()
+				.argName("Filename")
+				.build());
+		getOptions().addOption(Option.builder(OPT_QUERY)
+				.longOpt(OPT_QUERY_LONG)
+				.desc("Query string for search")
+				.required(false)
+				.hasArg()
+				.argName("Query")
+				.build());
+		getOptions().addOption(Option.builder(OPT_WAIT)
+				.longOpt(OPT_WAIT_LONG)
+				.desc("Wait for long-running tasks to finish")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_QUERYADV)
+				.longOpt(OPT_QUERYADV_LONG)
+				.desc("Advanced query")
+				.required(false)
+				.build());
 	}
 
 	@Override

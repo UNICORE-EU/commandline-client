@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.jline.reader.History;
@@ -40,11 +40,6 @@ public class Shell extends ActionBase {
 	private File commandFile=null;
 
 	@Override
-	public String getCommandGroup() {
-		return super.getCommandGroup();
-	}
-
-	@Override
 	public String getDescription() {
 		return "start an interactive UCC session";
 	}
@@ -64,16 +59,15 @@ public class Shell extends ActionBase {
 	 *  creates options for the shell command
 	 */
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_FILE_LONG)
-				.withDescription("Read input from this file instead stdin")
-				.withArgName("Commandsfile")
+		getOptions().addOption(Option.builder(OPT_FILE)
+				.longOpt(OPT_FILE_LONG)
+				.desc("Read input from this file instead stdin")
+				.required(false)
+				.argName("CommandsFile")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_FILE)
-				);
+				.build());
 	}
 
 	@Override
@@ -322,7 +316,7 @@ public class Shell extends ActionBase {
 	}
 	
 	public static String[] parseCmdline(String cmdArgs) throws IOException {
-		List<String>result = new ArrayList<String>();
+		List<String>result = new ArrayList<>();
 		Matcher m = p.matcher(cmdArgs);
 		while (m.find()) {
 			String val;

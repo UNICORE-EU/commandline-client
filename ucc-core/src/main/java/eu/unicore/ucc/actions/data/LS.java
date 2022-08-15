@@ -2,7 +2,7 @@ package eu.unicore.ucc.actions.data;
 
 import java.util.Calendar;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
 import de.fzj.unicore.uas.util.UnitParser;
@@ -34,33 +34,29 @@ public class LS extends SMSOperation {
 	}
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
 
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_DETAILED_LONG)
-				.withDescription("detailed listing")
-				.isRequired(false)
-				.create(OPT_DETAILED)
-		);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_RECURSIVE_LONG)
-				.withDescription("recurse into subdirectories")
-				.isRequired(false)
-				.create(OPT_RECURSIVE)
-		);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_HUMAN_LONG)
-				.withDescription("human-friendly format")
-				.isRequired(false)
-				.create(OPT_HUMAN)
-		);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SHOW_META_LONG)
-				.withDescription("Show metadata")
-				.isRequired(false)
-				.create(OPT_SHOW_META)
-		);
+		getOptions().addOption(Option.builder(OPT_DETAILED)
+				.longOpt(OPT_DETAILED_LONG)
+				.desc("detailed listing")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_RECURSIVE)
+				.longOpt(OPT_RECURSIVE_LONG)
+				.desc("recurse into subdirectories")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_HUMAN)
+				.longOpt(OPT_HUMAN_LONG)
+				.desc("human-friendly format")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_SHOW_META)
+				.longOpt(OPT_SHOW_META_LONG)
+				.desc("Show metadata")
+				.required(false)
+				.build());
 	}
 
 	@Override

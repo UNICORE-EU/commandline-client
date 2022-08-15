@@ -20,12 +20,6 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	protected UnitParser unitParser=UnitParser.getCapacitiesParser(1);
 
 	@Override
-	@SuppressWarnings("all")
-	protected void createOptions() {
-		super.createOptions();
-	}
-
-	@Override
 	public void process() {
 		super.process();
 		// do we have a list of storages

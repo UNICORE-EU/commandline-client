@@ -2,10 +2,11 @@ package eu.unicore.ucc.actions.data;
 
 import java.io.OutputStream;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
 import de.fzj.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
+import de.fzj.unicore.uas.util.UnitParser;
 import de.fzj.unicore.ucc.StorageConstants;
 import de.fzj.unicore.ucc.util.ProgressBar;
 import eu.unicore.client.Endpoint;
@@ -27,28 +28,27 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 
 	/**
 	 * Preferred protocol, which can be set from the commandline, or from the preferences
-	 * file. At least the 'BFT' protocol is guaranteed to work
+	 * file. At least the 'BFT' protocol is always available.
 	 */
 	protected String preferredProtocol;
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_PROTOCOLS_LONG)
-				.withDescription("Preferred Protocol")
-				.withArgName("Protocol")
+		getOptions().addOption(Option.builder(OPT_PROTOCOLS)
+				.longOpt(OPT_PROTOCOLS_LONG)
+				.desc("Preferred Protocol")
+				.argName("Protocol")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_PROTOCOLS)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_BYTES_LONG)
-				.withDescription("Byte range")
-				.withArgName("ByteRange")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_BYTES)
+				.longOpt(OPT_BYTES_LONG)
+				.desc("Byte range")
+				.argName("ByteRange")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_BYTES)
-				);
+				.required(false)
+				.build());
 	}
 
 	@Override
@@ -72,17 +72,24 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 		if(bytes==null)return;
 		String[]tokens=bytes.split("-");
 		try{
-			String start=tokens[0];
-			String end=tokens[1];
-			if(start.length()>0){
-				startByte=Long.parseLong(start);
-				endByte=Long.MAX_VALUE;
-			}
-			if(end.length()>0){
-				endByte=Long.parseLong(end);
-				if(startByte==null){
-					startByte=Long.valueOf(0l);
+			if(tokens.length>1) {
+				String start=tokens[0];
+				String end=tokens[1];
+				if(start.length()>0){
+					startByte = (long)(UnitParser.getCapacitiesParser(0).getDoubleValue(start));
+					endByte=Long.MAX_VALUE;
 				}
+				if(end.length()>0){
+					endByte = (long)(UnitParser.getCapacitiesParser(0).getDoubleValue(end));
+					if(startByte==null){
+						startByte=Long.valueOf(0l);
+					}
+				}
+			}
+			else {
+				String end=tokens[0];
+				endByte = (long)(UnitParser.getCapacitiesParser(0).getDoubleValue(end));
+				startByte = Long.valueOf(0l);
 			}
 		}catch(Exception e){
 			throw new IllegalArgumentException("Could not parse byte range "+bytes);

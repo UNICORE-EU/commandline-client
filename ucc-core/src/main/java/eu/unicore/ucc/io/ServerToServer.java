@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.http.HttpResponse;
 import org.json.JSONObject;
 
 import de.fzj.unicore.uas.util.MessageWriter;
@@ -17,10 +16,9 @@ import de.fzj.unicore.ucc.helpers.EndProcessingException;
 import de.fzj.unicore.ucc.util.JSONUtil;
 import de.fzj.unicore.ucc.util.ProgressBar;
 import eu.unicore.client.Endpoint;
-import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
-import eu.unicore.services.rest.client.BaseClient;
+import eu.unicore.client.data.TransferControllerClient;
 
 /**
  * Copy a file from a remote sms to another remote SMS <br/>
@@ -37,7 +35,7 @@ public class ServerToServer implements Constants {
 
 	private String preferredProtocol;
 
-	protected BaseServiceClient tcc;
+	protected TransferControllerClient tcc;
 
 	protected StorageClient sms;
 
@@ -105,18 +103,9 @@ public class ServerToServer implements Constants {
 		try{
 			checkProtocols();
 			assertRemoteExists(sourceDesc);
-			msg.verbose("Initiating fetch-file on storage = <"+sms.getEndpoint().getUrl()+">," +
-					"receiving file <"+sourceDesc.getUnicoreURI()+">, writing to "+targetDesc.getName());
-			JSONObject params = new JSONObject();
-			params.put("file", targetDesc.getName());
-			params.put("source", sourceDesc.getUnicoreURI());
-			params.put("extraParameters", getExtraParams());
-			// TODO method on StorageClient and transfer controller client are missing
-			BaseClient bc = new BaseClient(sms.getEndpoint().getUrl()+"/transfers", sms.getSecurityConfiguration(), sms.getAuth());
-			HttpResponse res = bc.post(params);
-			bc.checkError(res);
-			String loc = res.getFirstHeader("Location").getValue();
-			tcc = new BaseServiceClient(new Endpoint(loc), sms.getSecurityConfiguration(), sms.getAuth());
+			msg.verbose("Initiating fetch-file on storage <"+sms.getEndpoint().getUrl()+">," +
+					"receiving file <"+sourceDesc.getUnicoreURI()+">, writing to '"+targetDesc.getName()+"'");
+			tcc = sms.fetchFile(sourceDesc.getUnicoreURI(), targetDesc.getName(), sourceDesc.getProtocol());
 			transferAddress = tcc.getEndpoint().getUrl();
 			msg.verbose("Have filetransfer instance: "+transferAddress);
 			if(!synchronous){
@@ -145,7 +134,7 @@ public class ServerToServer implements Constants {
 		String protocol = sourceDesc.getProtocol();
 		
 		if(extraParameterSource!=null){
-			Map<String, String> res = new HashMap<String, String>();
+			Map<String, String> res = new HashMap<>();
 			String p = String.valueOf(protocol);
 			PropertyHelper ph = new PropertyHelper(extraParameterSource, new String[]{p,p.toLowerCase()});
 			res = ph.getFilteredMap();
@@ -177,7 +166,7 @@ public class ServerToServer implements Constants {
 		do{
 			JSONObject props = tcc.getProperties();
 			Thread.sleep(1000);
-			transferred = Long.valueOf(props.getString("transferredBytes"));
+			transferred = props.getLong("transferredBytes");
 			p.updateTotal(transferred);
 			status = props.getString("status");
 		}while(!"FAILED".equals(status) && !"DONE".equals(status));

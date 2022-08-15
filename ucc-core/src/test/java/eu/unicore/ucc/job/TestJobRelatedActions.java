@@ -170,7 +170,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 				
 		int c=0;
 		do{
-
 			args=new String[]{"job-status",
 					"-c", "src/test/resources/conf/userprefs.embedded",
 					id1
@@ -227,7 +226,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
-
 		args=new String[]{"job-restart", 
 				"-v", "-c", "src/test/resources/conf/userprefs.embedded",
 				Run.getLastJobAddress(),
@@ -236,6 +234,24 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
+	@Test
+	public void test_Run_Tags(){
+		connect();
+
+		String[] args=new String[]{"run", "-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"src/test/resources/jobs/date.u",
+				"-T", "foo,bar,test123"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+
+		args=new String[]{"list-jobs", "-v", "--tags", "test123",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
 	
 	@Test
 	public void test_Exec(){

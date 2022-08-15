@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import de.fzj.unicore.ucc.util.UCCBuilder;
 import eu.unicore.ucc.actions.ActionBase;
@@ -93,85 +93,83 @@ public class Batch extends ActionBase {
 	private volatile boolean isShutdown=false;
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_FOLLOW_LONG)
-				.withDescription("Follow mode")
-				.isRequired(false)
-				.create(OPT_FOLLOW)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_INPUTDIR_LONG)
-				.withDescription("Input directory")
-				.withArgName("Inputdir")
+		getOptions().addOption(Option.builder(OPT_FOLLOW_LONG)
+				.longOpt(OPT_FOLLOW)
+				.desc("Follow mode: wait for new job files")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_INPUTDIR)
+				.longOpt(OPT_INPUTDIR_LONG)
+				.desc("Input directory")
+				.required(false)
+				.argName("InputDir")
 				.hasArg()
-				.isRequired(true)
-				.create(OPT_INPUTDIR)
-		);
+				.build());
+		getOptions().addOption(Option.builder(OPT_KEEP)
+				.longOpt(OPT_KEEP_LONG)
+				.desc("Don't remove finished jobs")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_UPDATEINTERVAL)
+				.longOpt(OPT_UPDATEINTERVAL_LONG)
+				.desc("Minimum update interval (millis)")
+				.required(false)
+				.argName("UpdateInterval")
+				.hasArg()
+				.build());
+		getOptions().addOption(Option.builder(OPT_MAXRUNNING)
+				.longOpt(OPT_MAXRUNNING_LONG)
+				.desc("Maximum number of jobs running at a time")
+				.required(false)
+				.argName("MaxRunningJobs")
+				.hasArg()
+				.build());
+		getOptions().addOption(Option.builder(OPT_MAXREQUESTS)
+				.longOpt(OPT_MAXREQUESTS_LONG)
+				.desc("Maximum number of jobs submitted at a time")
+				.required(false)
+				.argName("MaxNewJobs")
+				.hasArg()
+				.build());
+		getOptions().addOption(Option.builder(OPT_NUMTHREADS)
+				.longOpt(OPT_NUMTHREADS_LONG)
+				.desc("Number of concurrent client threads")
+				.required(false)
+				.argName("NumberOfThreads")
+				.hasArg()
+				.build());
+		getOptions().addOption(Option.builder(OPT_NOCHECKRESOURCES)
+				.longOpt(OPT_NOCHECKRESOURCES_LONG)
+				.desc("Do not check if required resources are available")
+				.required(false)
+				.build());
 
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_KEEP_LONG)
-				.withDescription("don't remove finished jobs")
-				.isRequired(false)
-				.create(OPT_KEEP)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_UPDATEINTERVAL_LONG)
-				.withDescription("minimum update interval (millis)")
-				.isRequired(false)
+		getOptions().addOption(Option.builder("X")
+				.longOpt("noFetchOutcome")
+				.desc("Do not download stdout/stderr")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_SITENAME)
+				.longOpt(OPT_SITENAME_LONG)
+				.desc("Site Name")
+				.required(false)
+				.argName("Site")
 				.hasArg()
-				.withArgName("UpdateInterval")
-				.create(OPT_UPDATEINTERVAL)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_MAXRUNNING_LONG)
-				.withDescription("maximum number of jobs at a time")
-				.isRequired(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_WEIGHTS)
+				.longOpt(OPT_WEIGHTS_LONG)
+				.desc("File containing site weights")
+				.required(false)
+				.argName("fileName")
 				.hasArg()
-				.withArgName("MaxRunningJobs")
-				.create(OPT_MAXRUNNING)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_MAXREQUESTS_LONG)
-				.withDescription("maximum number of jobs submitted at a time")
-				.isRequired(false)
-				.hasArg()
-				.withArgName("MaxNewJobs")
-				.create(OPT_MAXREQUESTS)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_NUMTHREADS_LONG)
-				.withDescription("number of concurrent client threads")
-				.isRequired(false)
-				.hasArg()
-				.withArgName("NumberOfThreads")
-				.create(OPT_NUMTHREADS)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_NOCHECKRESOURCES_LONG)
-				.withDescription("do not check if required resources are available")
-				.isRequired(false)
-				.create(OPT_NOCHECKRESOURCES)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt("noFetchOutcome")
-				.withDescription("Do NOT get stdout/stderr")
-				.isRequired(false)
-				.create("X")
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
-				.withDescription("Site Name")
-				.withArgName("Vsite")
-				.hasArg()
-				.isRequired(false)
-				.create(OPT_SITENAME)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_WEIGHTS_LONG)
-				.withDescription("file containing site weights")
-				.withArgName("fileName")
-				.hasArg()
-				.isRequired(false)
-				.create(OPT_WEIGHTS)
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SUBMIT_ONLY_LONG)
-				.withDescription("only submit jobs, do not wait for completion")
-				.isRequired(false)
-				.create(OPT_SUBMIT_ONLY)
-		);
-
+				.build());
+		getOptions().addOption(Option.builder(OPT_SUBMIT_ONLY)
+				.longOpt(OPT_SUBMIT_ONLY_LONG)
+				.desc("Only submit jobs, do not wait for completion")
+				.required(false)
+				.build());
 	}
 
 
@@ -182,7 +180,7 @@ public class Batch extends ActionBase {
 
 	@Override
 	public String getDescription() {
-		return "run ucc on a set of files";
+		return "run UCC on a set of files";
 	}
 
 	@Override
@@ -198,13 +196,6 @@ public class Batch extends ActionBase {
 	@Override
 	public String getCommandGroup(){
 		return "Job execution";
-	}
-
-	@Override
-	protected void initRegistryClient(){
-		super.initRegistryClient();
-		//verbose("Creating caching registry.");
-		//registry = new CachingRegistryClient(registry);
 	}
 
 	@Override

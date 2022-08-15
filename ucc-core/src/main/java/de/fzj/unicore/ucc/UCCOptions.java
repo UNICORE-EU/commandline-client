@@ -64,7 +64,7 @@ public class UCCOptions extends Options {
 		Options result = super.addOption(option);
 		List<Option>grp=optionGroups.get(optionGroup);
 		if(grp==null){
-			grp=new ArrayList<Option>();
+			grp = new ArrayList<>();
 			optionGroups.put(optionGroup, grp);
 		}
 		grp.add(option);

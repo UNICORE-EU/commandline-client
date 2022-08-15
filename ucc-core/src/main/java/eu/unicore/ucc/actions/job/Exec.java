@@ -1,6 +1,6 @@
 package eu.unicore.ucc.actions.job;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.util.UCCBuilder;
@@ -37,35 +37,30 @@ public class Exec extends ActionBase {
 	protected boolean keep=false;
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SITENAME_LONG)
-				.withDescription("Site Name")
-				.withArgName("Vsite")
+		getOptions().addOption(Option.builder(OPT_SITENAME)
+				.longOpt(OPT_SITENAME_LONG)
+				.desc("Name of the site")
+				.argName("Site")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_SITENAME)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_BROKER_LONG)
-				.withDescription("Use the specific named broker implementation (available: "+UCC.getBrokerList()+")")
-				.isRequired(false)
-				.hasArg()
-				.create(OPT_BROKER)
-				);
-
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_DRYRUN_LONG)
-				.withDescription("Dry run, do not submit the job")
-				.isRequired(false)
-				.create(OPT_DRYRUN)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_KEEP_LONG)
-				.withDescription("Do not delete the remote job after it is finished")
-				.isRequired(false)
-				.create(OPT_KEEP)
-				);
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_BROKER)
+				.longOpt(OPT_BROKER_LONG)
+				.desc("Use the specific named broker implementation (available: "+UCC.getBrokerList()+")")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_DRYRUN)
+				.longOpt(OPT_DRYRUN_LONG)
+				.desc("Dry run, do not submit the job")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_KEEP)
+				.longOpt(OPT_KEEP_LONG)
+				.desc("Don't remove finished job")
+				.required(false)
+				.build());
 	}
 
 
@@ -82,8 +77,7 @@ public class Exec extends ActionBase {
 	@Override
 	public String getSynopsis(){
 		return "Runs a command through UNICORE. " +
-				"The command will not be run through a remote queue, but on the cluster login node " +
-				"(if the server allows this)." +
+				"The command will not be run through a remote queue, but on the cluster login node. " +
 				"The command and its arguments are taken from the UCC command line." +
 				"UCC will wait for the job to finish and print standard output and error to the console.";
 	}

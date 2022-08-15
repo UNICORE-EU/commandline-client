@@ -3,7 +3,7 @@ package eu.unicore.ucc.actions;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import de.fzj.unicore.ucc.Command;
 import de.fzj.unicore.ucc.UCCOptions;
@@ -44,7 +44,6 @@ public abstract class ActionBase extends Command {
 	 * creates basic options for setting keystore, etc
 	 */
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
 		createGeneralOptions();
@@ -54,32 +53,34 @@ public abstract class ActionBase extends Command {
 	/*
 	 * security related (keystore, truststore, ...)
 	 */
-	@SuppressWarnings({ "static-access"})
 	private void createSecurityOptions(){
 
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_AUTHN_METHOD_LONG)
-				.withDescription("The method used for authentication")
-				.withArgName("AuthenticationMethod")
+		getOptions().addOption(Option.builder(OPT_AUTHN_METHOD)
+				.longOpt(OPT_AUTHN_METHOD_LONG)
+				.desc("The method used for authentication")
+				.argName("AuthenticationMethod")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_AUTHN_METHOD)
+				.required(false)
+				.build()
 				,UCCOptions.GRP_SECURITY);
 
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_AUTHN_ACCEPT_ALL_LONG)
-				.withDescription("Accept issuers not in the trust store")
-				.isRequired(false)
-				.create(OPT_AUTHN_ACCEPT_ALL)
+		getOptions().addOption(Option.builder(OPT_AUTHN_ACCEPT_ALL)
+				.longOpt(OPT_AUTHN_ACCEPT_ALL_LONG)
+				.desc("Accept issuers not in the trust store")
+				.required(false)
+				.build()
 				,UCCOptions.GRP_SECURITY);
 		
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_SECURITY_PREFERENCES_LONG)
-				.withDescription("User preference regarding choice of UNIX login and " +
+		getOptions().addOption(Option.builder(OPT_SECURITY_PREFERENCES)
+				.longOpt(OPT_SECURITY_PREFERENCES_LONG)
+				.desc("User preference regarding choice of UNIX login and " +
 						"groups, role etc which should be used for operation execution. " +
 						"The selected values must be allowed for the user. " +
 						"Full syntax: "  + UCCConfigurationProviderImpl.PREFERENCE_ARG_HELP)
-						.withArgName(UCCConfigurationProviderImpl.PREFERENCE_ARG)
+						.argName(UCCConfigurationProviderImpl.PREFERENCE_ARG)
 						.hasArgs()
-						.isRequired(false)
-						.create(OPT_SECURITY_PREFERENCES)
+						.required(false)
+						.build()
 						,UCCOptions.GRP_SECURITY);
 	}
 
@@ -87,22 +88,23 @@ public abstract class ActionBase extends Command {
 	/* 
 	 * general (preferences, registries, ...)
 	 */
-	@SuppressWarnings("static-access")
 	private void createGeneralOptions(){
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_PROPERTIES_LONG)
-				.withDescription("Properties file containing your preferences. By default, a file '<userhome>/.ucc/preferences' is checked.")
-				.withArgName("Properties")
+		getOptions().addOption(Option.builder(OPT_PROPERTIES)
+				.longOpt(OPT_PROPERTIES_LONG)
+				.desc("Properties file containing your preferences. By default, a file '<userhome>/.ucc/preferences' is checked.")
+				.argName("Properties")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_PROPERTIES)
+				.required(false)
+				.build()
 				,UCCOptions.GRP_GENERAL);
 
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_REGISTRY_LONG)
-				.withDescription("Comma-separated list of UNICORE registry URLs")
-				.withArgName("Registry")
+		getOptions().addOption(Option.builder(OPT_REGISTRY)
+				.longOpt(OPT_REGISTRY_LONG)
+				.desc("Comma-separated list of UNICORE registry URLs")
+				.argName("Registry")
 				.hasArg()
-				.isRequired(false)
-				.create(OPT_REGISTRY)
+				.required(false)
+				.build()
 				,UCCOptions.GRP_GENERAL);
 	}
 

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,20 +27,19 @@ public class Share extends ActionBase {
 	public static final String OPT_DELETE = "d";
 	
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
 		
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_CLEAN_LONG)
-				.withDescription("Prior to applying all other ACEs (if any are present) the ACL of the resource is cleared.")
-				.isRequired(false)
-				.create(OPT_CLEAN)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_DELETE_LONG)
-				.withDescription("Specified ACEs are deleted from the resource's ACL (if this option is not specified then ACEs are added).")
-				.isRequired(false)
-				.create(OPT_DELETE)
-				);
+		getOptions().addOption(Option.builder(OPT_CLEAN)
+				.longOpt(OPT_CLEAN_LONG)
+				.desc("Prior to applying all other ACEs (if any are present) the ACL of the resource is cleared.")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_DELETE)
+				.longOpt(OPT_DELETE_LONG)
+				.desc("Specified ACEs are deleted from the resource's ACL (if this option is not specified then ACEs are added).")
+				.required(false)
+				.build());
 	}
 
 	@Override

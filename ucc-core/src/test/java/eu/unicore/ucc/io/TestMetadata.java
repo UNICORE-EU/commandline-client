@@ -45,7 +45,7 @@ public class TestMetadata extends EmbeddedTestBase {
 		File metaFile=new File("target", "testmetadata.json");
 		FileUtils.writeStringToFile(metaFile, "{foo: bar}", "UTF-8");
 
-		args=new String[]{"metadata",
+		args=new String[]{"metadata", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-s", storage,
 				"-C", "write",

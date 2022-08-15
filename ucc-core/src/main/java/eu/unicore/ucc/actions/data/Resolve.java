@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import de.fzj.unicore.uas.util.MessageWriter;
 import de.fzj.unicore.ucc.authn.UCCConfigurationProvider;
@@ -28,9 +28,9 @@ public class Resolve extends ActionBase {
 	protected Location targetDesc;
 
 	protected boolean full;
-	
+
 	private final static List<IResolve>resolvers = new ArrayList<>();
-	
+
 	static {
 		MessageWriter msg = new DefaultMessageWriter();
 		try{
@@ -51,23 +51,23 @@ public class Resolve extends ActionBase {
 	public synchronized static void addResolver(IResolve resolver){
 		if(!resolvers.contains(resolver))resolvers.add(resolver);
 	}
-	
+
 	private final static ResourceCache cache = ResourceCache.getInstance();
-	
+
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt("full")
-				.withDescription("Print full file URI")
-				.isRequired(false)
-				.create("f")
-		);
-		getOptions().addOption(OptionBuilder.withLongOpt("list")
-				.withDescription("List all available resolvers / URL schemes")
-				.isRequired(false)
-				.create("l")
-		);
+		getOptions().addOption(Option.builder("f")
+				.longOpt("full")
+				.desc("Print full file URI")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder("l")
+				.longOpt("list")
+				.desc("List all available resolvers / URL schemes")
+				.required(false)
+				.build());
+
 	}
 	/**
 	 * resolve the given URI using the registered resolvers
@@ -87,14 +87,13 @@ public class Resolve extends ActionBase {
 		for(IResolve r: resolvers){
 			Location loc=r.resolve(uri,registry,security,messageWriter);
 			if(loc!=null) {
-				// cache it
 				cache.put("_locations_", uri, loc.getUnicoreURI());
 				return loc;
 			}
 		}
 		return new Location(uri);
 	}
-	
+
 	@Override
 	public void process(){
 		super.process();
@@ -105,7 +104,7 @@ public class Resolve extends ActionBase {
 			doResolve();
 		}
 	}
-	
+
 	protected void doList() {
 		message("Configured resolvers");
 		for(IResolve r: resolvers) {
@@ -128,7 +127,7 @@ public class Resolve extends ActionBase {
 		message(result);
 		if(result!=null)properties.put(PROP_LAST_RESOURCE_URL, result);
 	}
-	
+
 	@Override
 	public String getName() {
 		return "resolve";
@@ -139,12 +138,12 @@ public class Resolve extends ActionBase {
 		return "Resolves a remote location and prints the storage URL. "
 				+ "Use the '-f' option to print the full UNICORE file URI ";
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "resolve remote location";
 	}
-	
+
 	@Override
 	public String getArgumentList(){
 		return "[URI]";

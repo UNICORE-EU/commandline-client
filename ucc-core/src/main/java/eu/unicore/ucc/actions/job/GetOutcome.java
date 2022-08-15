@@ -2,7 +2,7 @@ package eu.unicore.ucc.actions.job;
 
 import java.util.List;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import de.fzj.unicore.uas.util.Pair;
 import de.fzj.unicore.ucc.util.UCCBuilder;
@@ -23,19 +23,18 @@ public class GetOutcome extends JobOperationBase {
 	protected boolean quiet = false;
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_NOPREFIX_LONG)
-				.withDescription("Short output file names")
-				.isRequired(false)
-				.create(OPT_NOPREFIX)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_QUIET_LONG)
-				.withDescription("Quiet mode, don't write job ID file")
-				.isRequired(false)
-				.create(OPT_QUIET)
-				);
+		getOptions().addOption(Option.builder(OPT_NOPREFIX)
+				.longOpt(OPT_NOPREFIX_LONG)
+				.desc("Short output file names")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_QUIET)
+				.longOpt(OPT_QUIET_LONG)
+				.desc("Quiet mode, don't ask for confirmation")
+				.required(false)
+				.build());
 	}
 	
 	@Override

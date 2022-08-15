@@ -2,7 +2,7 @@ package eu.unicore.ucc.actions.job;
 
 import java.util.List;
 
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 
 import de.fzj.unicore.uas.util.Pair;
 import de.fzj.unicore.ucc.util.UCCBuilder;
@@ -32,19 +32,18 @@ public class GetStatus extends JobOperationBase {
 	}
 
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_DETAILED_LONG)
-				.withDescription("More detailed job status")
-				.isRequired(false)
-				.create(OPT_DETAILED)
-				);
-		getOptions().addOption(OptionBuilder.withLongOpt(OPT_ALL_LONG)
-				.withDescription("Full job status including log")
-				.isRequired(false)
-				.create(OPT_ALL)
-				);
+		getOptions().addOption(Option.builder(OPT_DETAILED)
+				.longOpt(OPT_DETAILED_LONG)
+				.desc("More detailed job status")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_ALL)
+				.longOpt(OPT_ALL_LONG)
+				.desc("Full job status including log")
+				.required(false)
+				.build());
 	}
 	
 	@Override
