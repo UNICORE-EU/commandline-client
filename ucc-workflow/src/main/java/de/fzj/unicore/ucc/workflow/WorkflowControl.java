@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.fzj.unicore.ucc.UCC;
 import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.workflow.WorkflowClient;
@@ -113,12 +112,12 @@ public class WorkflowControl extends ActionBase {
 	
 	protected void doAbort()throws Exception{
 		verbose("Aborting workflow "+workflowURL);
-		if(!UCC.unitTesting)workflow.abort();
+		workflow.abort();
 	}
 	
 	protected void doResume()throws Exception{
 		verbose("Resuming workflow "+workflowURL);
-		if(!UCC.unitTesting)workflow.resume(parameters);
+		workflow.resume(parameters);
 	}
 	
 	@Override

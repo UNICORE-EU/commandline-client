@@ -282,6 +282,7 @@ public class SubmitWorkflow extends ActionBase implements
 		WorkflowClient wmc = wsc.submitWorkflow(wf);
 		String wfURL = wmc.getEndpoint().getUrl();
 		verbose("Workflow URL: " + wfURL);
+		lastAddress=wfURL;
 		message(wfURL);
 		properties.put(PROP_LAST_RESOURCE_URL, wfURL);
 		
@@ -473,4 +474,6 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 		sb.append(" ").append(dn).append(cr);
 	}
+	
+	public static String lastAddress;
 }
