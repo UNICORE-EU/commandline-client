@@ -1,6 +1,6 @@
 package de.fzj.unicore.ucc.helpers;
 
-import eu.unicore.util.Log;
+import org.apache.logging.log4j.jul.LogManager;
 
 /**
  * diverts logging from the JLine library to a Log4j logger,
@@ -10,8 +10,10 @@ import eu.unicore.util.Log;
  */
 public class JLineLogger {
 
-	public static void init(){
-		Log.getLoggerName("foo", JLineLogger.class);
+	public static void init() {
+		try{
+			System.setProperty("java.util.logging.manager", LogManager.class.getName());
+		}catch(Exception e) {}
 	}
 		
 }

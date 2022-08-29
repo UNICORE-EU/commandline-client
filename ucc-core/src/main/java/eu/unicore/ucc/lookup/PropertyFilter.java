@@ -87,7 +87,7 @@ public class PropertyFilter implements Filter {
 				String propName=args[0];
 				String mod=args[1];
 				String val=args[2];
-				msg.verbose("Filtering on property "+propName);
+				msg.verbose("Filtering on property '"+propName+"'");
 				if(acceptModifier(mod)){
 					return new PropertyFilter(propName,mod,val,msg);
 				}

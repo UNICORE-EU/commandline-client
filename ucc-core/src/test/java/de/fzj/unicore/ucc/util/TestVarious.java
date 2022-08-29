@@ -18,7 +18,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.jline.utils.Log;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -137,7 +136,7 @@ public class TestVarious {
 	@Test
 	public void testJLineLogging() throws Exception {
 		JLineLogger.init();
-		Log.info("test123");
+		org.jline.utils.Log.info("test123");
 	}
 
 	@Test

@@ -7,9 +7,7 @@ import org.junit.Test;
 
 import de.fzj.unicore.ucc.UCC;
 import eu.unicore.client.Endpoint;
-import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.workflow.WorkflowClient;
-import eu.unicore.workflow.WorkflowFactoryClient;
 
 public class TestWorkflowControl extends EmbeddedTestBase {
 
