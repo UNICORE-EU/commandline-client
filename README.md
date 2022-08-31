@@ -7,7 +7,7 @@ a full featured client for UNICORE.
 ## Download
 
 The UCC can be downloaded from SourceForge
-https://sourceforge.net/projects/unicore/files/Clients/s/Commandline%20Client/
+https://sourceforge.net/projects/unicore/files/Clients/Commandline%20Client/
 
 ## Documentation
 
