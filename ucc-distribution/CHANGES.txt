@@ -10,11 +10,12 @@ Version 9.0.0 (released mmm dd, 2022)
    This release requires Java 11 or later!
  
  - update to UNICORE 9.0 base libs
+ - new feature: "run" command supports submitting into an
+   allocation via "--allocation" parameter
  - fix: uploading local files sets their remote
    write/execute permission
  - version number reported via "--version" and in this change log
    now equal the package version
-
 
 Version 2.3.0 (released Dec 15, 2021)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

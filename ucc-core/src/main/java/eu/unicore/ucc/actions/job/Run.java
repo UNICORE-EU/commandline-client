@@ -10,6 +10,8 @@ import de.fzj.unicore.uas.util.UnitParser;
 import de.fzj.unicore.ucc.UCC;
 import de.fzj.unicore.ucc.helpers.EndProcessingException;
 import de.fzj.unicore.ucc.util.UCCBuilder;
+import eu.unicore.client.Endpoint;
+import eu.unicore.client.core.AllocationClient;
 import eu.unicore.client.core.JobClient.Status;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.runner.Runner;
@@ -31,6 +33,11 @@ public class Run extends ActionBase {
 	protected String siteName=null;
 
 	/**
+	 * Allocation job URL
+	 */
+	protected String allocation=null;
+
+	/**
 	 * synchronous mode
 	 */
 	protected boolean synchronous;
@@ -39,11 +46,6 @@ public class Run extends ActionBase {
 	 * do not add job id prefixes to output file names 
 	 */
 	protected boolean brief;
-
-	/**
-	 * whether the JSDL doc should be validated
-	 */
-	protected boolean validateJSDL=true;
 
 	/**
 	 * whether job submission to the batch system (server-side) should be
@@ -77,6 +79,13 @@ public class Run extends ActionBase {
 				.desc("Site Name")
 				.required(false)
 				.argName("Site")
+				.hasArg()
+				.build());
+		getOptions().addOption(Option.builder(OPT_ALLOCATION)
+				.longOpt(OPT_ALLOCATION_LONG)
+				.desc("Allocation URL")
+				.required(false)
+				.argName("Allocation")
 				.hasArg()
 				.build());
 		getOptions().addOption(Option.builder(OPT_NOPREFIX)
@@ -156,6 +165,12 @@ public class Run extends ActionBase {
 		}
 
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
+
+		allocation = getCommandLine().getOptionValue(OPT_ALLOCATION);
+		
+		if(allocation!=null && siteName!=null) {
+			throw new IllegalArgumentException("Cannot have both 'allocation' and 'sitename' arguments.");
+		}
 
 		synchronous=!getBooleanOption(OPT_MODE_LONG, OPT_MODE);
 		verbose("Synchronous processing = "+synchronous);
@@ -255,6 +270,16 @@ public class Run extends ActionBase {
 			brokerName = "LOCAL";
 		}
 		runner.setBroker(UCC.getBroker(brokerName, this));
+		if(allocation!=null) {
+			try {
+				AllocationClient ac = new AllocationClient(new Endpoint(allocation),
+						configurationProvider.getClientConfiguration(allocation),
+						configurationProvider.getRESTAuthN());
+				runner.setSubmissionService(ac);
+			}catch(Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		}
 		try{
 			runner.run();
 			if(!dryRun){

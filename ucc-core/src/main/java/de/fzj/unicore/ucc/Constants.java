@@ -75,6 +75,9 @@ public interface Constants {
 	public static final String OPT_MODE_LONG="asynchronous";
 	public static final String OPT_MODE="a";
 	
+	public static final String OPT_ALLOCATION_LONG="allocation";
+	public static final String OPT_ALLOCATION="A";
+	
 	public static final String OPT_GROOVYSCRIPT_LONG="file";
 	public static final String OPT_GROOVYSCRIPT="f";
 	

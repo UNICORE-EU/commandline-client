@@ -22,6 +22,7 @@ import de.fzj.unicore.ucc.helpers.DefaultMessageWriter;
 import de.fzj.unicore.ucc.util.JSONUtil;
 import de.fzj.unicore.ucc.util.UCCBuilder;
 import eu.unicore.client.Endpoint;
+import eu.unicore.client.core.IJobSubmission;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.client.core.JobClient.Status;
 import eu.unicore.client.core.SiteClient;
@@ -60,7 +61,7 @@ public class Runner implements Runnable {
 
 	private UCCBuilder builder;
 
-	protected SiteClient tss;
+	protected IJobSubmission tss;
 
 	protected JobClient jobClient;
 
@@ -191,6 +192,10 @@ public class Runner implements Runnable {
 		this.selectionStrategy = strategy;
 	}
 
+	public void setSubmissionService(IJobSubmission tss) {
+		this.tss = tss;
+	}
+	
 	/**
 	 * processes the job. Errors during processing are handled differently depending
 	 * on the async mode flag.<br/>
@@ -328,6 +333,10 @@ public class Runner implements Runnable {
 	 * @throws RunnerException if no matching TSS can be found
 	 */
 	protected void findTSS()throws RunnerException {
+		if(tss!=null) {
+			msg.verbose("Submission endpoint: "+tss.getEndpoint().getUrl());
+			return;
+		}
 		if(broker==null){
 			broker = UCC.getBroker("LOCAL", msg);
 		}
@@ -350,6 +359,10 @@ public class Runner implements Runnable {
 	 * list suitable TSS for job submission.
 	 */
 	protected void listCandidateSites()throws RunnerException {
+		if(tss!=null) {
+			msg.message("Submission endpoint: "+tss.getEndpoint().getUrl());
+			return;
+		}
 		if(broker==null){
 			broker = UCC.getBroker("LOCAL", msg);
 		}

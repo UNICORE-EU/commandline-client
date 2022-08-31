@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import with_statement
 from subprocess import Popen, PIPE, STDOUT
 
 TEMPLATE = "ucc_bash_completion.template"
@@ -45,9 +44,8 @@ with open(TEMPLATE) as f:
     output = f.read()
     
 commands = sorted(find_commands())
-global_opts = find_options("system-info")
+global_opts = find_options("rest")
 case_body = ""
-
 
 for command in commands:
     if command == "rest":
