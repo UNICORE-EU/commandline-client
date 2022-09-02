@@ -1,7 +1,0 @@
-{
-  Resources:{
-    CPUs: 32,
-    Runtime: 12h,
-  },
-
-}

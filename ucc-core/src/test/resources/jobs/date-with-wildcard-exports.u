@@ -1,9 +1,0 @@
-{
-
-  ApplicationName: Date, 
-  
-  Exports:[
-   { From: "std*", To: "./" , },
-  ],
-  
-} 

@@ -1,6 +1,0 @@
-#
-# authentication methods provided by UCC core
-#
-
-de.fzj.unicore.ucc.authn.KeystoreAuthN
-de.fzj.unicore.ucc.util.KeystoreAuthNWithPasswd
