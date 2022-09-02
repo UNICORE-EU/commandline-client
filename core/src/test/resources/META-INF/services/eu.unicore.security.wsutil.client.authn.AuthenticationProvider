@@ -1,0 +1,6 @@
+#
+# authentication methods provided by UCC core
+#
+
+eu.unicore.ucc.authn.KeystoreAuthN
+eu.unicore.ucc.util.KeystoreAuthNWithPasswd

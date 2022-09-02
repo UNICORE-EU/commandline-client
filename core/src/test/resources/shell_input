@@ -1,0 +1,11 @@
+connect
+list-sites
+
+help
+help-auth
+
+set
+set foo=bar
+set foo2=bar=x
+set ham=spam
+unset ham

@@ -1,0 +1,109 @@
+#!/bin/bash
+#
+# Startup script for the UNICORE Commandline client
+#
+
+#
+# Installation directory
+#
+dir=`dirname $0`
+if [ "${dir#/}" = "${dir}" ]
+then
+  if [ "$dir" != "." ]
+  then
+    dir="$(pwd)/$dir"
+  else
+    dir="$(pwd)"
+  fi
+fi
+
+
+INST="${dir%/bin}"
+
+#Alternatively specify the absolute path of the installation dir here
+#INST=
+
+
+if [ ! -e ${HOME}/.ucc/ ]; then
+    echo Creating UCC user\'s preferences directory ${HOME}/.ucc
+    mkdir -m 700 ${HOME}/.ucc/
+    mkdir -p ${HOME}/.ucc/trusted-certs
+fi
+
+CONFIG_FILES="preferences"
+for f in $CONFIG_FILES; do
+	C_F=${HOME}/.ucc/$f
+    if [ ! -e "$C_F" -a -e "${INST}/conf/$f" ]; then
+		cp "${INST}/conf/$f" "$C_F"
+       	chmod 600 "$C_F"
+    fi
+done
+
+
+#
+# Java command 
+#
+JAVA=${JAVA:-java}
+
+#
+# Options to the Java VM
+#
+
+#
+# helper function to set an option if it is not already set
+#
+# arg1: option name (without leading "-", e.g "Ducc.extensions")
+# arg2: option value (e.g. =conf/extensions)
+#
+Options=( )
+set_option(){
+	if [[ "$UCC_OPTS" != *$1* ]]
+	then
+		N=${#Options[*]}
+		Options[$N]="-$1$2"
+	fi
+}
+
+
+#
+# Memory for the VM
+#
+set_option "Xmx" "128m"
+
+#
+# default location of user preferences file
+#
+set_option "Ducc.preferences" "=${HOME}/.ucc/preferences"
+
+#
+# log configuration
+#
+set_option "Dlog4j.configurationFile" "=file://${INST}/conf/logging.properties"
+
+# set this one if you have ssl problems and need debug info
+#set_option "Djavax.net.debug" "=ssl,handshake"
+
+#
+# put all jars in lib/ on the classpath
+#
+CP=.$(find "$INST/lib" -name "*.jar" -exec printf ":{}" \; )
+
+
+if [ -d ${HOME}/.ucc/lib ]
+then
+#
+# put all jars in ${HOME}/.ucc/lib/ on the classpath
+#
+CP=$CP:$(find "${HOME}/.ucc/lib" -name "*.jar" -exec printf ":{}" \; )
+fi
+	
+export CLASSPATH=$CP
+
+#
+# go
+#
+$JAVA "${Options[@]}" ${DEFS} ${UCC_OPTS} eu.unicore.ucc.UCC ${1+"$@"}
+
+
+
+

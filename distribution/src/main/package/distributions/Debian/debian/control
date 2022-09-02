@@ -1,0 +1,15 @@
+Source: @component-prefix@@component-name@@component-suffix@
+Section: contrib/misc
+Priority: extra
+Maintainer: Bernd Schuller <unicore-support@lists.sourceforge.net> 
+Homepage: http://www.unicore.eu
+@build_depends@
+
+Package: @component-prefix@@component-name@@component-suffix@
+Architecture: @component-architecture@
+Depends: default-jre-headless
+Description: UNICORE (UNiform Interface to COmputing REsources) is
+ a software suite for building federated systems, providing secure and
+ seamless access to high-performance compute and data resources
+ .
+ This package contains the UNICORE Commandline Client (UCC).

@@ -1,0 +1,18 @@
+{
+
+    "Template parameters": {
+	"SLEEPTIME": { "type" : "INTEGER", 
+		       "default": "10", },
+    },
+   
+    "activities" : [
+	{
+	    "id": "sleep1",
+	    "job": {
+		"Executable": "sleep",
+		"Arguments": ["${SLEEPTIME}"],
+	    },
+	},
+    ],
+    
+}

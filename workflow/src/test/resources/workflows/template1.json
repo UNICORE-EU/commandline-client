@@ -1,0 +1,16 @@
+{
+  "Template parameters":
+  {
+     "UC_SIZE": {},
+     "UC_INPUT": {}
+  },   
+  
+  "activities": {
+  	"j1": {
+  	  "job": {
+      "Executable": "echo",
+      "Arguments": ["${UC_SIZE}", "${UC_INPUT}"]
+      }
+    }
+  }
+ }

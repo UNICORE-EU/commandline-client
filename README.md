@@ -1,13 +1,15 @@
 # UNICORE Commandline Client (UCC)
 
-This repository contains the source code
-for the UNICORE Commandline Client (UCC),
-a full featured client for UNICORE. 
+This repository contains the source code for the
+UNICORE Commandline Client (UCC), a full featured
+client for UNICORE, written in Java.
 
 ## Download
 
 The UCC can be downloaded from SourceForge
 https://sourceforge.net/projects/unicore/files/Clients/Commandline%20Client/
+
+Additionally, you will need a Java runtime (version 11 or later).
 
 ## Documentation
 

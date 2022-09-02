@@ -1,0 +1,44 @@
+{
+
+    "variables": [
+	{
+	    "id": "decl1",
+	    "name": "VAR",
+	    "type": "STRING",
+	    "initial_value": "some initial value",
+	},
+    ],
+    
+    "activities" : [
+
+	{
+	    "id": "echo1",
+	    "type": "JOB",
+	    "job": {
+		"Executable": "echo",
+		"Arguments": ["${VAR}"],
+	    },
+	},
+	
+	{
+	    "id": "hold1",
+	    "type": "HOLD",
+	},
+	
+	{
+	    "id": "echo2",
+	    "type": "JOB",
+	    "job": {
+		"Executable": "echo",
+		"Arguments": ["${VAR}"],
+	    },
+	},
+    ],
+    
+    "transitions": [
+	{ "from": "echo1", "to": "hold1" },
+	{ "from": "hold1", "to": "echo2" },
+	
+    ],
+
+}

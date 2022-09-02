@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.fzj.unicore</groupId>
+  <groupId>eu.unicore.ucc</groupId>
   <artifactId>ucc-parent</artifactId>
   <packaging>pom</packaging>
   <description>UNICORE Commandline Client</description>
@@ -67,9 +67,9 @@
   </issueManagement>
 
   <modules>
-    <module>ucc-core</module>
-    <module>ucc-workflow</module>
-    <module>ucc-distribution</module>
+    <module>core</module>
+    <module>workflow</module>
+    <module>distribution</module>
   </modules>
 
   <dependencyManagement>
