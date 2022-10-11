@@ -78,6 +78,12 @@
 	<groupId>eu.unicore.security</groupId>
 	<artifactId>secutils-cxf</artifactId>
 	<version>${secutils.version}</version>
+	<exclusions>
+	  <exclusion>
+	    <groupId>com.fasterxml.woodstox</groupId>
+	    <artifactId>woodstox-core</artifactId>
+	  </exclusion>
+	</exclusions>
       </dependency>
       <dependency>
 	<groupId>com.google.guava</groupId>
@@ -93,6 +99,20 @@
 	<groupId>eu.unicore</groupId>
 	<artifactId>uas-client</artifactId>
 	<version>${uas.version}</version>
+	<exclusions>
+	  <exclusion>
+	    <groupId>com.sun.xml.ws</groupId>
+	    <artifactId>jaxws-ri</artifactId>
+	  </exclusion>
+	  <exclusion>
+	    <groupId>org.apache.wss4j</groupId>
+	    <artifactId>wss4j-ws-security-dom</artifactId>
+	  </exclusion>
+	  <exclusion>
+	    <groupId>com.fasterxml.woodstox</groupId>
+	    <artifactId>woodstox-core</artifactId>
+	  </exclusion>
+	</exclusions>
       </dependency>
       <dependency>
 	<groupId>org.apache.groovy</groupId>
@@ -127,6 +147,12 @@
 	<artifactId>uas-core</artifactId>
 	<version>${uas.version}</version>
 	<scope>test</scope>
+	<exclusions>
+	  <exclusion>
+	    <groupId>com.fasterxml.woodstox</groupId>
+	    <artifactId>woodstox-core</artifactId>
+	  </exclusion>
+	</exclusions>
       </dependency>
       <dependency>
 	<groupId>eu.unicore.workflow</groupId>

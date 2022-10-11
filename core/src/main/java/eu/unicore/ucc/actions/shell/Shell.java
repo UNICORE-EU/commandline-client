@@ -80,8 +80,10 @@ public class Shell extends ActionBase {
 		run();
 	}
 
-	private String[]internalCommands = {"set", "unset", "system", "!", "help", "help-auth", "version", "exit", "quit"};
-	
+	private String[]internalCommands = { "set", "unset", "system", "!",
+			"help", "help-auth", "version",
+			"exit", "quit" };
+
 	public void run(){
 		Command.quitAfterPrintingUsage=false;
 		LineReader is = null;
@@ -280,8 +282,7 @@ public class Shell extends ActionBase {
 						+File.separator+HISTORY_FILEKEY;
 			}
 			lineReader.setVariable(LineReader.HISTORY_FILE, historyFile);
-			DefaultHistory history = new DefaultHistory(lineReader);
-			return history;
+			return new DefaultHistory(lineReader);
 		}
 		catch(Exception e){
 			verbose("Cannot setup history");

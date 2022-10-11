@@ -102,6 +102,9 @@ public class OIDCServerAuthN extends TokenBasedAuthN {
 		}
 		
 		String username = oidcProperties.getValue(OIDCProperties.USERNAME);
+		if(username==null){
+			username = new String(CallbackUtils.getUsernameFromUser("OIDC server"));
+		}
 		String password = oidcProperties.getValue(OIDCProperties.PASSWORD);
 		if(password==null){
 			password = new String(CallbackUtils.getPasswordFromUserCmd("OIDC server", null));

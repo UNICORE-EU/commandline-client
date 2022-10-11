@@ -66,7 +66,6 @@ public class CallbackUtils
 	}
 
 	public static char[] getPasswordFromUserCmd(String protectedArtifactType, String protectedArtifactDescription) {
-		String r;
 		StringBuilder sb = new StringBuilder();
 		sb.append("Please enter your ").append(protectedArtifactType);
 		if(protectedArtifactDescription!=null){
@@ -74,38 +73,28 @@ public class CallbackUtils
 		}
 		sb.append(" password: ");
 		System.out.println(sb.toString());
-
-		try {
-			LineReader cr = LineReaderBuilder.builder().build();
-			r = cr.readLine(Character.valueOf('*'));
-		} catch (Exception e) {
-			return null;
-		}
-		r.trim();
-		return r.toCharArray();
+		return readLine(true).toCharArray();
 	}
 
 	public static String getUsernameFromUser() throws IOException {
-		String r;
-		LineReader cr = null; 
-		try {
-			cr = LineReaderBuilder.builder().build();
-			System.out.println("Please enter your username: ");
-			r = cr.readLine();
-			r.trim();
-			return r;
-		}finally {
-
-		}
+		System.out.println("Please enter your username: ");
+		return readLine(false);
 	}
 
 	public static String getUsernameFromUser(String protectedArtifactType) throws IOException {
-		String r;
-		LineReader cr = LineReaderBuilder.builder().build();
 		System.out.println("Please enter your "+ protectedArtifactType +" username: ");
-		r = cr.readLine();
-		r.trim();
-		return r;
+		return readLine(false);
 	}
 
+	private static String readLine(boolean hidden) {
+		LineReader cr = LineReaderBuilder.builder().build();
+		try{
+			return cr.readLine(hidden? '*' : null).trim();
+		}finally {
+			try{
+				cr.getTerminal().close();
+			}catch(Exception ex) {}
+		}
+	}
+	
 }

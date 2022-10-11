@@ -31,6 +31,9 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 	public void addAuthenticationHeaders(HttpMessage httpMessage) throws Exception {
 		synchronized (this) {
 			if(username==null)username = properties.getProperty("username");
+			if(username==null) {
+				username = CallbackUtils.getUsernameFromUser("REST API");
+			}
 			if(password==null)password = properties.getProperty("password");
 			if(password==null) {
 				char[]pw = callback.getPassword("REST API", "configured server-side");
