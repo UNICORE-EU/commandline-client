@@ -22,7 +22,7 @@ _ucc()
     rest)
     #looking for 'rest' command
     if [ $COMP_CWORD -eq 2 ]; then
-      opts="get put post delete"
+      opts="get put post delete $global_opts"
     else
       opts="$global_opts "
     fi

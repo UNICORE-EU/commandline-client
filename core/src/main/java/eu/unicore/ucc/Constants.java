@@ -96,7 +96,7 @@ public interface Constants {
 	public static final String OPT_MAXRUNNING_LONG="max";
 	public static final String OPT_MAXRUNNING="m";
 	
-	public static final String OPT_MAXREQUESTS_LONG="maxNewJobs";
+	public static final String OPT_MAXREQUESTS_LONG="max-new-jobs";
 	public static final String OPT_MAXREQUESTS="M";
 	
 	public static final String OPT_UPDATEINTERVAL_LONG="update";
@@ -105,8 +105,11 @@ public interface Constants {
 	public static final String OPT_NUMTHREADS_LONG="threads";
 	public static final String OPT_NUMTHREADS="t";
 	
-	public static final String OPT_NOCHECKRESOURCES_LONG="noResourceCheck";
+	public static final String OPT_NOCHECKRESOURCES_LONG="no-resource-check";
 	public static final String OPT_NOCHECKRESOURCES="R";
+	
+	public static final String OPT_NOFETCHOUTCOME_LONG="no-fetch-outcome";
+	public static final String OPT_NOFETCHOUTCOME="X";
 	
 	public static final String OPT_LIFETIME_LONG="lifetime";
 	public static final String OPT_LIFETIME="l";
@@ -117,16 +120,16 @@ public interface Constants {
 	public static final String OPT_HUMAN_LONG="human";
 	public static final String OPT_HUMAN="H";
 
-	public static final String OPT_WEIGHTS_LONG="siteWeights";
+	public static final String OPT_WEIGHTS_LONG="site-weights";
 	public static final String OPT_WEIGHTS="W";
 
-	public static final String OPT_SUBMIT_ONLY_LONG="submitOnly";
+	public static final String OPT_SUBMIT_ONLY_LONG="submit-only";
 	public static final String OPT_SUBMIT_ONLY="S";
 
 	public static final String OPT_FORCE_REMOTE_MODE_LONG="force-remote";
 	public static final String OPT_FORCE_REMOTE_MODE="f";
 	
-	public static final String OPT_FACTORY_LONG="factoryURL";
+	public static final String OPT_FACTORY_LONG="factory-url";
 	public static final String OPT_FACTORY="f";
 
 	public static final String OPT_SCHEDULED_LONG="schedule";
@@ -135,23 +138,20 @@ public interface Constants {
 	public static final String OPT_BROKER_LONG="broker";
 	public static final String OPT_BROKER="B";
 	
-	public static final String OPT_DRYRUN_LONG="dryRun";
+	public static final String OPT_DRYRUN_LONG="dry-run";
 	public static final String OPT_DRYRUN="d";
 	
 	public static final String OPT_QUIET_LONG="quiet";
 	public static final String OPT_QUIET="q";
 	
-	public static final String OPT_ASSERTIONPRETTYPRINT_LONG="prettifyAssertion";
-	public static final String OPT_ASSERTIONPRETTYPRINT="P";
-	
 	public static final String OPT_SECURITY_PREFERENCES="Z";
 	public static final String OPT_SECURITY_PREFERENCES_LONG="preference";
 	
 	public static final String OPT_AUTHN_METHOD="k";
-	public static final String OPT_AUTHN_METHOD_LONG="authenticationMethod";
+	public static final String OPT_AUTHN_METHOD_LONG="authentication-method";
 	
 	public static final String OPT_AUTHN_ACCEPT_ALL="K";
-	public static final String OPT_AUTHN_ACCEPT_ALL_LONG="acceptAllIssuers";
+	public static final String OPT_AUTHN_ACCEPT_ALL_LONG="accept-all-issuers";
 	
 	// key for the session ID file
 	public static final String SESSION_ID_FILEKEY = "ucc-session-ids";

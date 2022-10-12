@@ -18,25 +18,29 @@ public class SystemInfo extends ActionBase {
 
 	private boolean details=false;
 	
-	private boolean raw=false;
-	
 	private String pattern;
+	
+	private static final String OPT_PATTERN_LONG = "url-pattern";
+	private static final String OPT_PATTERN = "P";
+	
+	private static final String OPT_RAW_LONG = "raw";
+	private static final String OPT_RAW = "R";
 	
 	@Override
 	protected void createOptions() {
 		super.createOptions();
-		getOptions().addOption(Option.builder("l")
-				.longOpt("long")
+		getOptions().addOption(Option.builder(OPT_DETAILED)
+				.longOpt(OPT_DETAILED_LONG)
 				.desc("Detailed output")
 				.required(false)
 				.build());
-		getOptions().addOption(Option.builder("R")
-				.longOpt("raw")
+		getOptions().addOption(Option.builder(OPT_RAW)
+				.longOpt(OPT_RAW_LONG)
 				.desc("Show raw registry content")
 				.required(false)
 				.build());
-		getOptions().addOption(Option.builder("P")
-				.longOpt("url-pattern")
+		getOptions().addOption(Option.builder(OPT_PATTERN)
+				.longOpt(OPT_PATTERN_LONG)
 				.desc("Only show details for endpoint URLs matching "
 						+ "the given regexp (e.g. \".*/storage.*\"")
 				.required(false)
@@ -70,10 +74,9 @@ public class SystemInfo extends ActionBase {
 	@Override
 	public void process() {
 		super.process();
-		details=getBooleanOption("long", "l");
-		raw=getBooleanOption("raw", "R");
-		pattern = getOption("pattern", "P", null);
-		if(raw){
+		details=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
+		pattern = getOption(OPT_PATTERN_LONG, OPT_PATTERN, null);
+		if(getBooleanOption(OPT_RAW_LONG, OPT_RAW)){
 			printRawContent();
 		}
 		else{

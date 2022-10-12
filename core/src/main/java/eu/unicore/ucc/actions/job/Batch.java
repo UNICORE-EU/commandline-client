@@ -146,8 +146,8 @@ public class Batch extends ActionBase {
 				.required(false)
 				.build());
 
-		getOptions().addOption(Option.builder("X")
-				.longOpt("noFetchOutcome")
+		getOptions().addOption(Option.builder(OPT_NOFETCHOUTCOME)
+				.longOpt(OPT_NOFETCHOUTCOME_LONG)
 				.desc("Do not download stdout/stderr")
 				.required(false)
 				.build());
@@ -242,7 +242,7 @@ public class Batch extends ActionBase {
 		noResourceCheck=getBooleanOption(OPT_NOCHECKRESOURCES_LONG, OPT_NOCHECKRESOURCES);
 		verbose("Checking available resources = "+!noResourceCheck);
 
-		noFetchOutcome=getBooleanOption("noFetchOutcome", "X");
+		noFetchOutcome=getBooleanOption(OPT_NOFETCHOUTCOME_LONG, OPT_NOFETCHOUTCOME);
 		verbose("Getting standard output and standard error = "+!noFetchOutcome);
 
 		submitOnly=getBooleanOption(OPT_SUBMIT_ONLY_LONG, OPT_SUBMIT_ONLY);

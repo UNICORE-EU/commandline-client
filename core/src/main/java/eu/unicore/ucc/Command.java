@@ -302,6 +302,18 @@ public abstract class Command implements Constants, MessageWriter {
 		}
 		
 		PropertyVariablesResolver.substituteVariables(properties, propertiesFile);
+		checkDeprecation();
+	}
+	
+	protected void checkDeprecation() {
+		if(properties==null)throw new IllegalStateException();
+		String authMethod = properties.getProperty("authenticationMethod");
+		if(authMethod!=null && properties.getProperty(OPT_AUTHN_METHOD_LONG)==null) {
+			verbose("WARN: deprecated config file property 'authenticationMethod', "
+					+ "updating to '"+OPT_AUTHN_METHOD_LONG+"'");
+			properties.setProperty(OPT_AUTHN_METHOD_LONG, authMethod);
+			properties.remove("authenticationMethod");
+		}
 	}
 
 	public void setProperties(Properties properties){

@@ -1,17 +1,15 @@
 package eu.unicore.ucc.workflow;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.commons.cli.Option;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,6 +18,7 @@ import de.fzj.unicore.uas.json.JSONUtil;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.core.StorageFactoryClient;
+import eu.unicore.client.lookup.SiteNameFilter;
 import eu.unicore.services.rest.client.BaseClient;
 import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.ucc.IServiceInfoProvider;
@@ -42,36 +41,30 @@ import eu.unicore.workflow.WorkflowFactoryClient;
 public class SubmitWorkflow extends ActionBase implements
 		IServiceInfoProvider {
 
-	public static final String OPT_UFILE_LONG = "uccInput";
+	public static final String OPT_UFILE_LONG = "ucc-input";
 	public static final String OPT_UFILE = "u";
 
 	public static final String OPT_WAIT = "w";
 	public static final String OPT_WAIT_LONG = "wait";
 	
-	public static final String OPT_DRYRUN_LONG="dryRun";
-	public static final String OPT_DRYRUN="d";
-	
-	public static final String OPT_STORAGEURL_LONG="storageURL";
+	public static final String OPT_STORAGEURL_LONG="storage-url";
 	public static final String OPT_STORAGEURL="S";
 
-	protected String siteName;
+	protected String submissionSite;
 
 	protected UCCBuilder builder;
 
 	protected boolean dryRun = false;
+
 	protected WorkflowFactoryClient wsc;
 
-	protected String workflowToBeSubmitted;
+	protected JSONObject workflow;
 
 	protected WorkflowClient.Status status;
 
 	protected String workflowFileName;
 
 	protected boolean wait = false;
-
-	protected JSONObject templateArguments;
-
-	protected List<String> unmatchedTemplateParameters = new ArrayList<>();
 
 	protected int localFiles = 0;
 
@@ -90,7 +83,7 @@ public class SubmitWorkflow extends ActionBase implements
 		super.createOptions();
 		getOptions().addOption(Option.builder(OPT_SITENAME)
 				.longOpt(OPT_SITENAME_LONG)
-				.desc("Site Name")
+				.desc("Site name")
 				.required(false)
 				.argName("Site")
 				.hasArg()
@@ -116,7 +109,7 @@ public class SubmitWorkflow extends ActionBase implements
 				.build());
 		getOptions().addOption(Option.builder(OPT_TAGS)
 				.longOpt(OPT_TAGS_LONG)
-				.desc("Tag the job with the given tag(s) (comma-separated)")
+				.desc("Tag the workflow with the given tag(s) (comma-separated)")
 				.required(false)
 				.hasArgs()
 				.valueSeparator(',')
@@ -138,7 +131,7 @@ public class SubmitWorkflow extends ActionBase implements
 	@Override
 	public void process(){
 		super.process();
-		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
+		submissionSite=getCommandLine().getOptionValue(OPT_SITENAME);
 
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
 		verbose("Dry run = "+dryRun);
@@ -186,40 +179,15 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 	}
 	
-	protected void findSite() {
-		try {
-			List<Endpoint> available = registry.listEntries("WorkflowServices");
-			for (Endpoint epr : available) {
-				if (siteName != null) {
-					String addr = epr.getUrl();
-					if (addr.contains(siteName)) {
-						wsc = new WorkflowFactoryClient(epr,
-								configurationProvider.getClientConfiguration(addr),
-								configurationProvider.getRESTAuthN());
-						verbose("Using service <" + addr
-								+ "> at requested site <" + siteName + ">");
-						return;
-					}
-				}
-			}
-			int i = 0;
-			if (available.size() == 0) {
-				message("No workflow service available!");
-				endProcessing(1);
-			} else {
-				// select one
-				i = new Random().nextInt(available.size());
-				Endpoint epr = available.get(i);
-				wsc =  new WorkflowFactoryClient(epr,
-						configurationProvider.getClientConfiguration(epr.getUrl()),
-						configurationProvider.getRESTAuthN());
-			}
-			verbose("Selected workflow service at "
-					+ wsc.getEndpoint().getUrl());
-		} catch (Exception e) {
-			error("Can't find a workflow service.", e);
-			endProcessing(1);
+	protected void findSite() throws Exception {
+		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry,
+				configurationProvider, true);
+		if(submissionSite!=null) {
+			workflowFactories.setAddressFilter(new SiteNameFilter(submissionSite));
 		}
+		wsc = workflowFactories.iterator().next();
+		verbose("Selected workflow service at "
+				+ wsc.getEndpoint().getUrl());
 	}
 
 	protected void createWorkflowDataStorage() throws Exception {
@@ -254,34 +222,28 @@ public class SubmitWorkflow extends ActionBase implements
 	}
 	
 	protected void run() throws Exception {
-		loadWorkflowFromFile();
-
-		handleTemplateParameters();
-		
+		loadWorkflow();
 		uploadLocalData();
-		
-		JSONObject wf = new JSONObject(workflowToBeSubmitted);
-		JSONObject inputSpec = wf.optJSONObject("inputs");
+		JSONObject inputSpec = workflow.optJSONObject("inputs");
 		if(inputSpec==null) {
 			inputSpec = new JSONObject();
-			wf.put("inputs", inputSpec);
+			workflow.put("inputs", inputSpec);
 		}
 		for(String i: inputs.keySet()) {
 			inputSpec.put(i, inputs.get(i));
 		}
 
-		appendTags(wf);
+		appendTags(workflow);
 		
 		if(dryRun){
 			message("Resulting workflow: ");
-			message(wf.toString(2));
+			message(workflow.toString(2));
 			verbose("Dry run, not submitting.");
 			return;
 		}
 		
-		WorkflowClient wmc = wsc.submitWorkflow(wf);
+		WorkflowClient wmc = wsc.submitWorkflow(workflow);
 		String wfURL = wmc.getEndpoint().getUrl();
-		verbose("Workflow URL: " + wfURL);
 		lastAddress=wfURL;
 		message(wfURL);
 		properties.put(PROP_LAST_RESOURCE_URL, wfURL);
@@ -289,7 +251,6 @@ public class SubmitWorkflow extends ActionBase implements
 		if (wait) {
 			waitForFinish(wmc);
 		}
-
 	}
 
 	protected void waitForFinish(WorkflowClient wmc) throws Exception {
@@ -306,19 +267,6 @@ public class SubmitWorkflow extends ActionBase implements
 				verbose(status.toString());
 			}
 		} while (Status.RUNNING.equals(status));
-	}
-
-	protected void loadWorkflowFromFile() throws Exception {
-		try (FileInputStream fis = new FileInputStream(
-				new File(workflowFileName).getAbsolutePath()))
-		{
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			int b = 0;
-			while ((b = fis.read()) != -1) {
-				bos.write(b);
-			}
-			workflowToBeSubmitted = bos.toString();
-		}
 	}
 
 	protected void uploadLocalData() {
@@ -351,15 +299,18 @@ public class SubmitWorkflow extends ActionBase implements
 	
 
 	/**
-	 * check if we have arguments with metadata in the workflow
-	 * and if yes replace any parameters using the spec in 
+	 * Loads workflow from file. 
+	 * Checks if there are arguments with metadata in the workflow
+	 * and if yes replaces any parameters using the spec in 
 	 * the .u file / builder 
 	 */
-	protected void handleTemplateParameters() throws Exception {
-		JSONObject wf = new JSONObject(workflowToBeSubmitted);
-		templateArguments = wf.optJSONObject("Template parameters");
+	protected void loadWorkflow() throws Exception {
+		String wf = FileUtils.readFileToString(new File(workflowFileName), "UTF-8");
+		workflow = new JSONObject(wf);
+		JSONObject templateArguments = workflow.optJSONObject("Template parameters");
 		if(templateArguments==null)return;
-		
+
+		List<String> unmatchedTemplateParameters = new ArrayList<>();
 		Iterator<String> keys = templateArguments.keys();
 		while(keys.hasNext()){
 			String name = keys.next();
@@ -370,7 +321,7 @@ public class SubmitWorkflow extends ActionBase implements
 			}
 			if(val!=null){
 				verbose("Template parameter <"+name+">: using value: <"+val+">");
-				workflowToBeSubmitted = workflowToBeSubmitted.replace("${"+name+"}", val);
+				wf = wf.replace("${"+name+"}", val);
 			}
 			else {
 				unmatchedTemplateParameters.add(name);
@@ -380,6 +331,7 @@ public class SubmitWorkflow extends ActionBase implements
 			error("ERROR: No value defined for template parameters: "+unmatchedTemplateParameters, null);
 			endProcessing(1);
 		}
+		workflow = new JSONObject(wf);
 	}
 
 	protected void appendTags(JSONObject wf) {
@@ -414,7 +366,7 @@ public class SubmitWorkflow extends ActionBase implements
 
 	@Override
 	public String getSynopsis() {
-		return "Submits a workflow to the UNICORE Workflow engine. "
+		return "Submits a workflow to a UNICORE Workflow engine. "
 				+ "The workflow definition is read from <workflow-file>.";
 	}
 

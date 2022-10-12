@@ -61,13 +61,18 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 	protected void createOptions() {
 		super.createOptions();
 		getOptions().addOption(Option.builder("N")
-				.longOpt("nofiles")
+				.longOpt("no-files")
 				.desc("Do not list workflow files (in detailed mode)")
 				.required(false)
 				.build());
 		getOptions().addOption(Option.builder("j")
-				.longOpt("nojobs")
+				.longOpt("no-jobs")
 				.desc("Do not list jobs (in detailed mode)")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder("n")
+				.longOpt("no-internal")
+				.desc("Skip UNICORE/X-internal workflow engine(s)")
 				.required(false)
 				.build());
 	}
@@ -131,7 +136,8 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 			}
 			return;
 		}
-		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry, configurationProvider);
+		boolean includeInternal = !getBooleanOption("no-internal", "n");
+		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry, configurationProvider, includeInternal);
 		for(WorkflowFactoryClient wf: workflowFactories){
 			try{
 				verbose("Listing workflows from "+wf.getEndpoint().getUrl());

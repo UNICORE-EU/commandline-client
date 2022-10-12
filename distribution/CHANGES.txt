@@ -2,16 +2,25 @@ UCC Changelog
 =============
 Issue tracker: https://sourceforge.net/p/unicore/issues
 
-Version 9.0.0 (released mmm dd, 2022)
+Version 9.0.0 (released Oct 13, 2022)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *** JAVA VERSION NOTE:
 
    This release requires Java 11 or later!
+
+*** Incompatible changes:
+
+   The long forms of the commandline options have been
+   harmonized to all lowercase with "-" as separator, e.g.
+   "--dryRun" is now "--dry-run"
  
  - update to UNICORE 9.0 base libs
  - new feature: "run" command supports submitting into an
    allocation via "--allocation" parameter
+ - new feature: support UNICORE/X-internal workflow engine(s)
+   when submitting and listing workflows
+ - harmonize commandline options
  - fix: uploading local files sets their remote
    write/execute permission
  - version number reported via "--version" and in this change log

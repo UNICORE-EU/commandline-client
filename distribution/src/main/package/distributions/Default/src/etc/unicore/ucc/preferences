@@ -6,7 +6,7 @@
 # authentication settings
 # see 'ucc help-auth' for more
 
-authenticationMethod=USERNAME
+authentication-method=USERNAME
 username=demouser
 password=test123
 
