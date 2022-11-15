@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.message.StatusLine;
 import org.json.JSONObject;
 
 import eu.unicore.security.wsutil.client.OAuthBearerTokenOutInterceptor;
@@ -120,24 +122,21 @@ public class OIDCServerAuthN extends TokenBasedAuthN {
 			params.add(new BasicNameValuePair("client_id", clientID));
 			params.add(new BasicNameValuePair("client_secret", clientSecret));
 		}
-		
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
 		post.setEntity(entity);
 		HttpClient client = HttpUtils.createClient(url, dcc);
-		HttpResponse response = client.execute(post);
-		
-		String body = "";
-		try{
-			body = EntityUtils.toString(response.getEntity());
-		}catch(Exception ex){};
-		
-		if(response.getStatusLine().getStatusCode()!=200){
-			throw new Exception("Error <"+response.getStatusLine().getStatusCode()+"> from OIDC server: "+body);
+		try(ClassicHttpResponse response = client.executeOpen(null, post, HttpClientContext.create())){
+			String body = "";
+			try{
+				body = EntityUtils.toString(response.getEntity());
+			}catch(Exception ex){};
+
+			if(response.getCode()!=200){
+				throw new Exception("Error <"+new StatusLine(response)+"> from OIDC server: "+body);
+			}
+			JSONObject reply = new JSONObject(body);
+			token = reply.optString("access_token", null);
 		}
-		
-		JSONObject reply = new JSONObject(body);
-		token = reply.optString("access_token", null);
-		
 	}
 	
 }

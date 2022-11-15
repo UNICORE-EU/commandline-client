@@ -28,7 +28,6 @@ def find_options(command):
     p = Popen([UCC_CMD, command, "-h"], stdout=PIPE, stderr=STDOUT, encoding="UTF-8")
     p.wait()
     for line in p.stdout.readlines():
-        line = str(line)
         if not line.startswith(" -"):
             continue
         else:
@@ -44,7 +43,7 @@ with open(TEMPLATE) as f:
     output = f.read()
     
 commands = sorted(find_commands())
-global_opts = find_options("rest")
+global_opts = sorted(find_options("rest"))
 case_body = ""
 
 for command in commands:
@@ -52,7 +51,7 @@ for command in commands:
         continue # This is a special case, it's in the template
 
     opts = find_options(command)
-    opts = set(opts) - set(global_opts)
+    opts = sorted(set(opts) - set(global_opts))
     s = '    %s)\n    opts="$global_opts %s"\n    ;;\n' % (command,
                                                            " ".join(opts))
     case_body += s

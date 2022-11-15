@@ -6,7 +6,7 @@ _ucc()
   cur=`_get_cword`
   prev="${COMP_WORDS[COMP_CWORD-1]}"
   commands="admin-info admin-runcommand batch cat connect copy-file-status cp create-storage create-tss exec get-output job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
-  global_opts="--configuration --help --output --registry --verbose --with-timing --authentication-method --accept-all-issuers --preference"
+  global_opts="--accept-all-issuers --authentication-method --configuration --help --output --preference --registry --verbose --with-timing"
 
 
   # parsing for ucc command word (2nd word in commandline.
@@ -19,13 +19,13 @@ _ucc()
   # looking for arguments matching to command
   case "${COMP_WORDS[1]}" in
     admin-info)
-    opts="$global_opts --fields --long --all --tags --filter"
+    opts="$global_opts --all --fields --filter --long --tags"
     ;;
     admin-runcommand)
     opts="$global_opts --sitename --url"
     ;;
     batch)
-    opts="$global_opts --input --max --f --site-weights --threads --max-new-jobs --update --submit-only --no-fetch-outcome --keep --sitename --no-resource-check"
+    opts="$global_opts --f --input --keep --max --max-new-jobs --no-fetch-outcome --no-resource-check --site-weights --sitename --submit-only --threads --update"
     ;;
     cat)
     opts="$global_opts --bytes --protocol"
@@ -37,19 +37,19 @@ _ucc()
     opts="$global_opts "
     ;;
     cp)
-    opts="$global_opts --bytes --protocol --recursive --resume --asynchronous --schedule"
+    opts="$global_opts --asynchronous --bytes --protocol --recursive --resume --schedule"
     ;;
     create-storage)
-    opts="$global_opts --type --info --lifetime --sitename --factory-url"
+    opts="$global_opts --factory-url --info --lifetime --sitename --type"
     ;;
     create-tss)
-    opts="$global_opts --sitename --factory-url --lifetime"
+    opts="$global_opts --factory-url --lifetime --sitename"
     ;;
     exec)
-    opts="$global_opts --keep --sitename --dry-run --broker"
+    opts="$global_opts --broker --dry-run --keep --sitename"
     ;;
     get-output)
-    opts="$global_opts --quiet --brief"
+    opts="$global_opts --brief --quiet"
     ;;
     job-abort)
     opts="$global_opts "
@@ -58,28 +58,28 @@ _ucc()
     opts="$global_opts "
     ;;
     job-status)
-    opts="$global_opts --long --all"
+    opts="$global_opts --all --long"
     ;;
     list-jobs)
-    opts="$global_opts --fields --long --all --tags --sitename --filter"
+    opts="$global_opts --all --fields --filter --long --sitename --tags"
     ;;
     list-sites)
-    opts="$global_opts --fields --long --all --tags --sitename --filter"
+    opts="$global_opts --all --fields --filter --long --sitename --tags"
     ;;
     list-storages)
-    opts="$global_opts --fields --long --all --tags --filter"
+    opts="$global_opts --all --fields --filter --long --tags"
     ;;
     list-transfers)
-    opts="$global_opts --fields --long --all --tags --filter"
+    opts="$global_opts --all --fields --filter --long --tags"
     ;;
     list-workflows)
-    opts="$global_opts --no-files --fields --no-jobs --long --all --tags --no-internal --filter"
+    opts="$global_opts --all --fields --filter --long --no-files --no-internal --no-jobs --tags"
     ;;
     ls)
-    opts="$global_opts --human --recursive --long --show-metadata"
+    opts="$global_opts --human --long --recursive --show-metadata"
     ;;
     metadata)
-    opts="$global_opts --command --advanced-query --wait --storage --file --query"
+    opts="$global_opts --advanced-query --command --file --query --storage --wait"
     ;;
     mkdir)
     opts="$global_opts "
@@ -88,19 +88,19 @@ _ucc()
     opts="$global_opts "
     ;;
     resolve)
-    opts="$global_opts --list --full"
+    opts="$global_opts --full --list"
     ;;
     rm)
     opts="$global_opts --quiet"
     ;;
     run)
-    opts="$global_opts --example --broker --quiet --brief --asynchronous --tags --sitename --schedule --allocation"
+    opts="$global_opts --allocation --asynchronous --brief --broker --example --quiet --schedule --sitename --tags"
     ;;
     run-groovy)
-    opts="$global_opts --file --expression"
+    opts="$global_opts --expression --file"
     ;;
     share)
-    opts="$global_opts --delete --clean"
+    opts="$global_opts --clean --delete"
     ;;
     shell)
     opts="$global_opts --file"
@@ -109,7 +109,7 @@ _ucc()
     opts="$global_opts --human --show-metadata"
     ;;
     system-info)
-    opts="$global_opts --url-pattern --long --raw"
+    opts="$global_opts --long --raw --url-pattern"
     ;;
     umask)
     opts="$global_opts --set"
@@ -118,7 +118,7 @@ _ucc()
     opts="$global_opts "
     ;;
     workflow-submit)
-    opts="$global_opts --ucc-input --storage-url --wait --tags --sitename --factory-url --dry-run"
+    opts="$global_opts --dry-run --factory-url --sitename --storage-url --tags --ucc-input --wait"
     ;;
 
     rest)

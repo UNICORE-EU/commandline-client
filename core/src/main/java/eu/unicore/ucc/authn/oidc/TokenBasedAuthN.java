@@ -2,7 +2,7 @@ package eu.unicore.ucc.authn.oidc;
 
 import java.util.Properties;
 
-import org.apache.http.HttpMessage;
+import org.apache.hc.core5.http.HttpMessage;
 
 import eu.unicore.security.wsutil.client.OAuthBearerTokenOutInterceptor;
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;

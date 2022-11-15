@@ -17,7 +17,6 @@ import eu.emi.security.authn.x509.ValidationError;
 import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
-import eu.unicore.security.wsutil.client.authn.CachingIdentityResolver;
 import eu.unicore.security.wsutil.client.authn.ClientConfigurationProvider;
 import eu.unicore.security.wsutil.client.authn.ClientConfigurationProviderImpl;
 import eu.unicore.security.wsutil.client.authn.JsonSecuritySessionPersistence;
@@ -98,7 +97,6 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 				getBasicClientConfiguration().useSecuritySessions(), getSessionStorageFile()));
 		getSessionsPersistence().readSessionIDs(getBasicClientConfiguration().getSessionIDProvider());
 		setSecurityPreferences(setupExtraAttributes());
-		setIdentityResolver(new CachingIdentityResolver());
 	}
 
 	protected String getSessionStorageFile() {

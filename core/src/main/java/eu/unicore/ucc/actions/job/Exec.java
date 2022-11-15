@@ -125,7 +125,9 @@ public class Exec extends ActionBase {
 			job.executable(args[1]);
 			
 			job.run_on_login_node();
-			
+			if(!Boolean.getBoolean(properties.getProperty("UCC_JOBDESCRIPTION_V8", "false"))){
+				job.getJSON().put("Job type", "INTERACTIVE");
+			}
 			// add args
 			if(args.length > 1 ){
 				for(int i=2; i<args.length;i++){

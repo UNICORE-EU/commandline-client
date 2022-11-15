@@ -28,11 +28,11 @@
     <!-- goes into .jar manifests -->
     <specification.version>9.0.1</specification.version>
 
-     <uas.version>2.4.0</uas.version>
-     <wf.version>3.4.0</wf.version>
-     <secutils.version>3.3.1</secutils.version>
+     <uas.version>2.5.0</uas.version>
+     <wf.version>3.5.0</wf.version>
+     <secutils.version>3.4.0</secutils.version>
      <jnr.version>0.38.17</jnr.version>
-     <groovy.version>4.0.4</groovy.version>
+     <groovy.version>4.0.6</groovy.version>
      <guava.version>31.1-jre</guava.version>
      <jline.version>3.21.0</jline.version>
      <commons-cli.version>1.5.0</commons-cli.version>

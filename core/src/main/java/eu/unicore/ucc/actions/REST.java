@@ -2,10 +2,12 @@ package eu.unicore.ucc.actions;
 
 
 import java.io.File;
+import java.util.Formatter;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.message.StatusLine;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -112,15 +114,15 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		}
 	}
 	
-	protected void handleResponse(HttpResponse res, BaseClient bc) throws Exception {
+	protected void handleResponse(ClassicHttpResponse res, BaseClient bc) throws Exception {
 		bc.checkError(res);
 		try {
-			message(res.getStatusLine().toString());
+			message(new StatusLine(res).toString());
 			Header l = res.getFirstHeader("Location");
 			if(l!=null) {
 				message(l.getValue());
 			}
-			for(Header h: res.getAllHeaders()) {
+			for(Header h: res.getHeaders()) {
 				verbose(h.getName()+": "+h.getValue());
 			}
 			message(bc.asJSON(res).toString(2));
@@ -128,9 +130,9 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	}
 	
 	protected BaseClient makeClient(String url) throws Exception {
-		IClientConfiguration securityProperties = configurationProvider.getClientConfiguration(url);
-		IAuthCallback auth = configurationProvider.getRESTAuthN();
-		return new BaseClient(url, securityProperties, auth);
+		return new BaseClient(url,
+				configurationProvider.getClientConfiguration(url),
+				configurationProvider.getRESTAuthN());
 	}
 	
 	@Override
@@ -164,22 +166,23 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		String cr = System.getProperty("line.separator");
 		String role = client.getJSONObject("role").getString("selected");
 		String uid = client.getJSONObject("xlogin").optString("UID","n/a");
-		sb.append("  * authenticated as: '").append(client.getString("dn")).append("' role='").append(role).append("'");
-		sb.append(" uid='").append(uid).append("'");
-		sb.append(cr);
+		try(Formatter f = new Formatter(sb)){
+			f.format("  * authenticated as: '%s' role='%s' uid='%s'%s",
+					client.getString("dn"), role, uid, cr);
+		}
 	}
 	
 	private void serverDetails(StringBuilder sb, JSONObject server) throws JSONException {
 		String cr = System.getProperty("line.separator");
-		sb.append("* server v").append(server.optString("version", "n/a"));
-		
 		String dn = null;
 		try{
 			dn = server.getJSONObject("credential").getString("dn");
 		}catch(JSONException ex) {
 			dn = server.getString("dn");
 		}
-		sb.append(" ").append(dn).append(cr);
+		try(Formatter f = new Formatter(sb)){
+			f.format("* server v%s %s %s", server.optString("version", "n/a"), dn, cr);
+		}
 	}
 
 }

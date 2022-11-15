@@ -11,7 +11,6 @@ import java.util.Properties;
 
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.security.wsutil.client.authn.SecuritySessionPersistence;
-import eu.unicore.security.wsutil.client.authn.ServiceIdentityResolver;
 import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.httpclient.DefaultClientConfiguration;
@@ -80,13 +79,6 @@ public class MockConfigProvider implements UCCConfigurationProvider
 
 	@Override
 	public Properties getUserProperties()
-	{
-		return null;
-	}
-
-
-	@Override
-	public ServiceIdentityResolver getIdentityResolver()
 	{
 		return null;
 	}
