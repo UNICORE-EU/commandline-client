@@ -31,7 +31,7 @@ To skip unit testing
 The following commands create distribution packages:
 
     mvn install -DskipTests
-    cd ucc-distribution
+    cd distribution
     # tgz
     mvn package -DskipTests -Ppackman -Dpackage.type=bin.tar.gz
     # deb

@@ -5,7 +5,7 @@ _ucc()
   COMPREPLY=()
   cur=`_get_cword`
   prev="${COMP_WORDS[COMP_CWORD-1]}"
-  commands="admin-info admin-runcommand batch cat connect copy-file-status cp create-storage create-tss exec get-output job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
+  commands="admin-info admin-runcommand batch cat connect copy-file-status cp create-storage create-tss exec get-output job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir open-tunnel rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
   global_opts="--accept-all-issuers --authentication-method --configuration --help --output --preference --registry --verbose --with-timing"
 
 
@@ -83,6 +83,9 @@ _ucc()
     ;;
     mkdir)
     opts="$global_opts "
+    ;;
+    open-tunnel)
+    opts="$global_opts --keep --local-address"
     ;;
     rename)
     opts="$global_opts "

@@ -2,6 +2,7 @@ package eu.unicore.ucc;
 
 import eu.unicore.ucc.actions.Connect;
 import eu.unicore.ucc.actions.Groovy;
+import eu.unicore.ucc.actions.OpenTunnel;
 import eu.unicore.ucc.actions.REST;
 import eu.unicore.ucc.actions.Share;
 import eu.unicore.ucc.actions.admin.AdminServiceInfo;
@@ -79,6 +80,7 @@ public class CoreCommands implements ProvidedCommands {
 				new Shell(),
 				new Share(),
 				new REST(),
+				new OpenTunnel(),
 
 				//admin
 				new RunCommand(),

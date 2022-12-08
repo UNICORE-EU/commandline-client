@@ -3,7 +3,8 @@
 from subprocess import Popen, PIPE, STDOUT
 
 TEMPLATE = "ucc_bash_completion.template"
-OUTPUT = "ucc_bash_completion.sh"
+OUTPUTS = [ "ucc_bash_completion.sh",
+            "../../package/distributions/Default/src/etc/bash_completion.d/unicore-ucc" ]
 UCC_CMD = "ucc"
 
 ######################################################################
@@ -62,5 +63,7 @@ output = output % {"commands": " ".join(commands),
                    "case_body": case_body}
 
 
-with open(OUTPUT, "w") as f:
-    f.write(output)
+for OUTPUT in OUTPUTS: 
+    with open(OUTPUT, "w") as f:
+        print("Writing to %s" % OUTPUT)
+        f.write(output)
