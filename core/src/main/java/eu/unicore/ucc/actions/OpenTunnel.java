@@ -6,7 +6,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
 import org.apache.commons.cli.Option;
-import org.apache.commons.io.IOUtils;
 
 import eu.unicore.services.rest.client.BaseClient;
 import eu.unicore.services.rest.client.ForwardingHelper;
@@ -105,20 +104,19 @@ public class OpenTunnel extends ActionBase {
 			sc = ServerSocketChannel.open();
 			sc.bind(new InetSocketAddress(localInterface, localPort), 1);
 			do {
+				verbose("Waiting for client to connect.");
 				client = sc.accept();
-				verbose("Client application connected.");
-				verbose("Connecting to service endpoint <"+endpoint+"> ...");
+				verbose("Client application connected, connecting to backend <"+endpoint+"> ...");
 				BaseClient bc = makeClient(endpoint);
 				ForwardingHelper fh = new ForwardingHelper(bc);
 				SocketChannel serviceProxy = fh.connect(endpoint);
-				verbose("Service proxy connected.");
-				verbose("Start data forwarding...");
+				verbose("Connected, starting data forwarding.");
 				fh.startForwarding(client, serviceProxy);
-				verbose("Client/service disconnected.");
+				verbose("Disconnected.");
 			}while(keepListening);
 		}
 		finally {
-			IOUtils.closeQuietly(sc.socket());
+			sc.close();
 		}
 	}
 
