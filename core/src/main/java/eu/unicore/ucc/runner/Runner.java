@@ -604,8 +604,7 @@ public class Runner implements Runnable {
 	}
 
 	protected void writeJobIDFile(){
-		if(quietMode)return;
-		if(!mustSave)return;
+		if(quietMode || !mustSave)return;
 		try	{
 			String dump=builder.getProperty("jobIdFile",null);
 			File dumpFile=null;
@@ -618,9 +617,9 @@ public class Runner implements Runnable {
 			else{
 				dumpFile=new File(dump);
 			}
-			FileWriter fw=new FileWriter(dumpFile);
-			builder.writeTo(fw);
-			fw.close();
+			try(FileWriter fw=new FileWriter(dumpFile)){
+				builder.writeTo(fw);
+			}
 			msg.message(dumpFile.getAbsolutePath());
 		}
 		catch(Exception e){
@@ -635,15 +634,14 @@ public class Runner implements Runnable {
 	protected void writeFailedJobIDFile(String errorReason){
 		if(quietMode)return;
 		try{
-			File dumpFile=null;
-			dumpFile=new File(output.getAbsolutePath(),"FAILED_"+getJobID()+".job");
-			FileWriter fw=new FileWriter(dumpFile);
-			if(errorReason!=null){
-				builder.setProperty("ucc-errorReason", errorReason);
+			File dumpFile = new File(output.getAbsolutePath(),"FAILED_"+getJobID()+".job");
+			try(FileWriter fw = new FileWriter(dumpFile)) {
+				if(errorReason!=null){
+					builder.setProperty("ucc-errorReason", errorReason);
+				}
+				builder.writeTo(fw);
+				msg.message(dumpFile.getAbsolutePath());
 			}
-			builder.writeTo(fw);
-			fw.close();
-			msg.message(dumpFile.getAbsolutePath());
 		}
 		catch(Exception e){
 			msg.error("Could not write failed job to file.",e);
@@ -733,9 +731,9 @@ public class Runner implements Runnable {
 			String p = jobClient.getProperties().toString(2);
 			String id = JSONUtil.extractResourceID(jobClient.getEndpoint().getUrl());
 			File dump = new File(output, id+".properties");
-			FileWriter fw = new FileWriter(dump);
-			fw.append(p);
-			fw.close();
+			try(FileWriter fw = new FileWriter(dump)){
+				fw.append(p);
+			}
 			path = dump.getAbsolutePath();
 			msg.message(path);
 		}catch(Exception e){

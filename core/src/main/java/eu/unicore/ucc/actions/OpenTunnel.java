@@ -36,7 +36,7 @@ public class OpenTunnel extends ActionBase {
 		super.createOptions();
 		getOptions().addOption(Option.builder(OPT_LOCAL_ADDRESS)
 				.longOpt(OPT_LOCAL_ADDRESS_LONG)
-				.desc("Local address to listen on")
+				.desc("Local address <[interface:]port> to listen on (port=0 to let system choose)")
 				.hasArg()
 				.required(true)
 				.build());
@@ -103,6 +103,10 @@ public class OpenTunnel extends ActionBase {
 		try{
 			sc = ServerSocketChannel.open();
 			sc.bind(new InetSocketAddress(localInterface, localPort), 1);
+			if(localPort==0) {
+				localPort = ((InetSocketAddress)sc.getLocalAddress()).getPort();
+				message("Listening on <"+localInterface+":"+localPort+">");
+			}
 			do {
 				verbose("Waiting for client to connect.");
 				client = sc.accept();

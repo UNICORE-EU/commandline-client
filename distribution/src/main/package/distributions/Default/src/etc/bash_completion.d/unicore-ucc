@@ -97,7 +97,7 @@ _ucc()
     opts="$global_opts --quiet"
     ;;
     run)
-    opts="$global_opts --allocation --asynchronous --brief --broker --example --quiet --schedule --sitename --tags"
+    opts="$global_opts --allocation --asynchronous --brief --broker --dry-run --example --quiet --schedule --sitename --tags"
     ;;
     run-groovy)
     opts="$global_opts --expression --file"

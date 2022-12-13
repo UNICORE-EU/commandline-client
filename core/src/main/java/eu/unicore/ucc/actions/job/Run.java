@@ -122,8 +122,12 @@ public class Run extends ActionBase {
 				.desc("Quiet mode, don't write job ID file")
 				.required(false)
 				.build());
+		getOptions().addOption(Option.builder(OPT_DRYRUN)
+				.longOpt(OPT_DRYRUN_LONG)
+				.desc("Dry run, don't submit anything")
+				.required(false)
+				.build());
 	}
-
 
 	@Override
 	public String getName() {
