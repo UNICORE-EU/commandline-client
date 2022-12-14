@@ -4,6 +4,7 @@ package eu.unicore.ucc.actions;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.cli.Option;
 
@@ -42,7 +43,7 @@ public class OpenTunnel extends ActionBase {
 				.build());
 		getOptions().addOption(Option.builder(OPT_KEEP)
 				.longOpt(OPT_KEEP_LONG)
-				.desc("Keep the local port open after client application disconnects")
+				.desc("Keep the local listening port open (default: true). If 'false', only one client is accepted.")
 				.required(false)
 				.build());
 	}
@@ -76,6 +77,9 @@ public class OpenTunnel extends ActionBase {
 		return true;
 	}
 
+	AtomicInteger numClients = new AtomicInteger(0);
+	int maxConnections = 0;
+		
 	@Override
 	public void process(){
 		super.process();
@@ -88,7 +92,10 @@ public class OpenTunnel extends ActionBase {
 			localPort = Integer.valueOf(localAddress[localAddress.length-1]);
 			localInterface = localAddress.length>1? localAddress[0] : "localhost";
 			endpoint = getCommandLine().getArgs()[1];	
-			keepListening = getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
+			keepListening = getCommandLine().hasOption(OPT_KEEP) ?
+				getBooleanOption(OPT_KEEP_LONG, OPT_KEEP) : true;
+			if(!keepListening)maxConnections=1;
+
 			doProcess();
 		}catch(Exception e){
 			error("Can't open tunnel", e);
@@ -97,30 +104,32 @@ public class OpenTunnel extends ActionBase {
 	}
 
 	protected void doProcess() throws Exception {
+		BaseClient bc = makeClient(endpoint);
+		ForwardingHelper fh = new ForwardingHelper(bc);
 		verbose("Opening listening socket on <"+localInterface+":"+localPort+">");
-		SocketChannel client = null;
-		ServerSocketChannel sc = null;
-		try{
-			sc = ServerSocketChannel.open();
+		try(ServerSocketChannel sc = ServerSocketChannel.open()){
+			sc.configureBlocking(false);
 			sc.bind(new InetSocketAddress(localInterface, localPort), 1);
+			fh.accept(sc, (client)->{
+				if(maxConnections>0 && numClients.get()>maxConnections) {
+					throw new RuntimeException("Max number <"+maxConnections+"> of connections reached.");
+				}
+				numClients.incrementAndGet();
+				try {
+					verbose("Client application " + client.getRemoteAddress() +
+							" connected, connecting to backend <"+endpoint+"> ...");
+					SocketChannel serviceProxy = fh.connect(endpoint);
+					verbose("Connected, starting data forwarding.");
+					fh.startForwarding(client, serviceProxy);
+				}catch(Exception ex) {
+					throw new RuntimeException(ex);
+				}
+			});
 			if(localPort==0) {
 				localPort = ((InetSocketAddress)sc.getLocalAddress()).getPort();
 				message("Listening on <"+localInterface+":"+localPort+">");
 			}
-			do {
-				verbose("Waiting for client to connect.");
-				client = sc.accept();
-				verbose("Client application connected, connecting to backend <"+endpoint+"> ...");
-				BaseClient bc = makeClient(endpoint);
-				ForwardingHelper fh = new ForwardingHelper(bc);
-				SocketChannel serviceProxy = fh.connect(endpoint);
-				verbose("Connected, starting data forwarding.");
-				fh.startForwarding(client, serviceProxy);
-				verbose("Disconnected.");
-			}while(keepListening);
-		}
-		finally {
-			sc.close();
+			fh.run();
 		}
 	}
 
