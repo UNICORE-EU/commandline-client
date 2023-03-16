@@ -17,7 +17,7 @@ public interface Constants {
 	public static final int ERROR_CONNECTION=4;
 	
 	//validation error
-	public static final int ERROR_JSDL_INVALID=5;
+	public static final int ERROR_JOB_INVALID=5;
 	
 	//requested resource not found
 	public static final int NO_SUCH_RESOURCE=404;
@@ -47,6 +47,9 @@ public interface Constants {
 
 	public static final String OPT_SITENAME_LONG="sitename";
 	public static final String OPT_SITENAME="s";
+
+	public static final String OPT_LOGIN_NODE_LONG="login-node";
+	public static final String OPT_LOGIN_NODE="L";
 
 	public static final String OPT_NOPREFIX_LONG="brief";
 	public static final String OPT_NOPREFIX="b";

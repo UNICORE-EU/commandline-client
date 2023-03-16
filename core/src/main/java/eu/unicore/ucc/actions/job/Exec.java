@@ -25,6 +25,11 @@ public class Exec extends ActionBase {
 	protected String siteName=null;
 
 	/**
+	 * request a particular login node
+	 */
+	protected String loginNode=null;
+
+	/**
 	 * whether to actually submit the job - if <code>false</code>, brokering etc will
 	 * be performed but no job will be submitted 
 	 */
@@ -43,6 +48,13 @@ public class Exec extends ActionBase {
 				.longOpt(OPT_SITENAME_LONG)
 				.desc("Name of the site")
 				.argName("Site")
+				.hasArg()
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_LOGIN_NODE)
+				.longOpt(OPT_LOGIN_NODE_LONG)
+				.desc("Login node to use")
+				.argName("LoginNode")
 				.hasArg()
 				.required(false)
 				.build());
@@ -96,6 +108,7 @@ public class Exec extends ActionBase {
 	public void process(){
 		super.process();
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
+		loginNode=getCommandLine().getOptionValue(OPT_LOGIN_NODE);
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
 		verbose("Dry run = "+dryRun);
 		keep=getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
@@ -124,7 +137,7 @@ public class Exec extends ActionBase {
 			// first arg is command
 			job.executable(args[1]);
 			
-			job.run_on_login_node();
+			job.run_on_login_node(loginNode);
 			if(!Boolean.getBoolean(properties.getProperty("UCC_JOBDESCRIPTION_V8", "false"))){
 				job.getJSON().put("Job type", "INTERACTIVE");
 			}
