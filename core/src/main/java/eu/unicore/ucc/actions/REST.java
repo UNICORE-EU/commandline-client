@@ -2,12 +2,18 @@ package eu.unicore.ucc.actions;
 
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Formatter;
 
+import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.StatusLine;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,6 +30,33 @@ import eu.unicore.util.httpclient.IClientConfiguration;
  * @author schuller
  */
 public class REST extends ActionBase implements IServiceInfoProvider {
+
+	public static final String OPT_ACCEPT_LONG = "accept";
+	public static final String OPT_ACCEPT = "A";
+	public static final String OPT_CONTENT_LONG = "content-type";
+	public static final String OPT_CONTENT = "C";
+
+
+	private String accept;
+	private String contentType;
+
+	@Override
+	protected void createOptions() {
+		super.createOptions();
+
+		getOptions().addOption(Option.builder(OPT_ACCEPT)
+				.longOpt(OPT_ACCEPT_LONG)
+				.desc("Value for the 'Accept' HTTP header (default: 'application/json')")
+				.required(false)
+				.hasArg()
+				.build());
+		getOptions().addOption(Option.builder(OPT_CONTENT)
+				.longOpt(OPT_CONTENT_LONG)
+				.desc("Value for the 'Content-Type' HTTP header (default: 'application/json')")
+				.required(false)
+				.hasArg()
+				.build());
+	}
 
 	@Override
 	public String getName(){
@@ -65,6 +98,8 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			if(length<3){
 				throw new IllegalArgumentException("You must provide at least a URL as argument to this command.");
 			}
+			accept = getCommandLine().getOptionValue(OPT_ACCEPT);
+			contentType = getCommandLine().getOptionValue(OPT_CONTENT);
 			int startIndex = 2;
 			JSONObject content = new JSONObject(); 
 			if(length>3){
@@ -81,7 +116,6 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 					}catch(JSONException je) {}
 				}
 			}
-			
 			for(int i = startIndex; i<length; i++) {
 				String url=getCommandLine().getArgs()[i];
 				doProcess(cmd, url, content);
@@ -98,7 +132,16 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		BaseClient bc = makeClient(url);
 	
 		if("get".startsWith(cmd.toLowerCase())){
-			message(bc.getJSON().toString(2));
+			String res = "";
+			if(accept==null || "application/json".equalsIgnoreCase(accept)) {
+				res = bc.getJSON().toString(2);
+			}
+			else {
+				try(ClassicHttpResponse response = bc.get(ContentType.create(accept))){
+					res = EntityUtils.toString(response.getEntity());
+				}
+			}
+			message(res);
 		}
 		else if("delete".startsWith(cmd.toLowerCase())){
 			bc.delete();
@@ -107,7 +150,9 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			handleResponse(bc.post(content), bc);
 		}
 		else if("put".startsWith(cmd.toLowerCase())){
-			handleResponse(bc.put(content), bc);
+			ContentType ct = contentType!=null? ContentType.create(contentType): ContentType.APPLICATION_JSON;
+			InputStream in = IOUtils.toInputStream(content.toString(), "UTF-8");
+			handleResponse(bc.put(in, ct), bc);
 		}
 		else {
 			throw new IllegalArgumentException("Command <"+cmd+"> not (yet) implemented / not understood!");
