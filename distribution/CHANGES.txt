@@ -6,6 +6,11 @@ Issue tracker: https://sourceforge.net/p/unicore/issues
 
    This release requires Java 11 or later!
 
+Version 9.2.0 (released Mar xx, 2023)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - REST: allow to set Content-Type and Accept headers
+   for GET and PUT operations
+
 Version 9.1.0 (released Dec 13, 2022)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - update to UNICORE 9.1 base libs

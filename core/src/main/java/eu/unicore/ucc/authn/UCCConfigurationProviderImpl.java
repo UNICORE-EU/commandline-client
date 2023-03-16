@@ -45,7 +45,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 	public static final String PREFERENCE_ARG_PGID = "pgid";
 	public static final String PREFERENCE_ARG_SUP_GIDS = "supgids";
 	public static final String PREFERENCE_ARG_ADD_OS_GIDS = "useOSgids";
-	public static final String PREFERENCE_ARG = "[see description]";
+	public static final String PREFERENCE_ARG = "Arg";
 	public static final String PREFERENCE_ARG_HELP =
 			PREFERENCE_ARG_UID + ":<val>|" +
 			"group:<val>|" +

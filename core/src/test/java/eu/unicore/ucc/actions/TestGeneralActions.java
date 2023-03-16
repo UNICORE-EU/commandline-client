@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.junit.Test;
 
+import eu.unicore.services.rest.security.jwt.JWTUtils;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.shell.Shell;
 import eu.unicore.ucc.lookup.Connector;
@@ -143,6 +145,27 @@ public class TestGeneralActions extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		assertEquals(0,Share.lastNumberOfPermits);
+	}
+	
+	@Test
+	public void testIssueToken() throws Exception {
+		int lifetime = 60;
+		String[]args=new String[]{"issue-token",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-v",
+				"--lifetime", String.valueOf(lifetime),
+				"--limited",
+				"--renewable",
+				"--inspect",
+				"https://localhost:65322/rest/core/token",
+		};
+		UCC.main(args);
+		String token = IssueToken.lastToken;
+		JSONObject o = JWTUtils.getPayload(token);
+		System.out.println(o.toString(2));
+		assertEquals("Wrong lifetime", lifetime, o.getInt("exp")-o.getInt("iat"));
+		assertEquals("Should be limited", o.optString("aud"), o.optString("iss"));
+		assertEquals("Should be renewable", "true", o.optString("renewable"));
 	}
 
 }

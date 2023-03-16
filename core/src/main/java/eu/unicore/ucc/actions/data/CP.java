@@ -84,7 +84,7 @@ public class CP extends FileOperation {
 		try{
 			for(String source: sources){
 				Location sourceDesc = createLocation(source);
-				boolean isServerToServer = sourceDesc.isUnicoreURL() && targetDesc.isUnicoreURL();
+				boolean isServerToServer = !sourceDesc.isLocal() && !targetDesc.isLocal();
 				if(isServerToServer){
 					handleServerServer(sourceDesc, targetDesc, scheduled, synchronous);
 				}
