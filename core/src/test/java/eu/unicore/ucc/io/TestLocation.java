@@ -16,6 +16,7 @@ public class TestLocation {
 		String url = "https://localhost:8080/DEMO/rest/core/storages/WORK/files/foo.dat";
 		Location l = new Location(url);
 		assertTrue(l.isUnicoreURL());
+		assertFalse(l.isRaw());
 	}
 	
 	@Test

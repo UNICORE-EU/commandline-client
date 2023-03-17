@@ -3,8 +3,6 @@ package eu.unicore.ucc.io;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.fzj.unicore.uas.util.MessageWriter;
-
 /**
  * A local or remote file location. Can be specified in in the following ways
  * <ul>
@@ -40,11 +38,7 @@ public class Location implements de.fzj.unicore.uas.json.Location {
 	 * Constructs a new Location
 	 * 
 	 * @param desc - the string describing the location
-	 * @param registry - the {@link RegistryClient} pointing to the registry
-	 * @param sec - security settings
-	 * @param msg -  a {@link MessageWriter} instance
-	 * @param doResolve - if <code>false</code>, no resolution of unicore:// URLs will be performed
-	 * @param defaultProtocol -  the default protocol
+	 * @param defaultProtocol -  the default (UNICORE) protocol
 	 */
 	public Location(String desc, String defaultProtocol){
 		this.originalDescriptor = desc;
@@ -167,7 +161,7 @@ public class Location implements de.fzj.unicore.uas.json.Location {
 	}
 	
 	/**
-	 * get this location as a UNICORE RESTful URI using the given protocol, i.e.
+	 * get this location as a resolved URI using the given protocol, i.e.
 	 * <code>protocol://SMS-URL/files/path</code> <br/>
 	 * for example
 	 * <code>BFT://https://localhost:8080/DEMO-SITE/rest/core/storages/WORK/files/test</code> <br/>
@@ -188,4 +182,14 @@ public class Location implements de.fzj.unicore.uas.json.Location {
 	public String getEndpointURL() {
 		return originalDescriptor;
 	}
+	
+	public String getResolvedURL() {
+		if(isRaw) {
+			return originalDescriptor;
+		}
+		else {
+			return getUnicoreURI();
+		}
+	}
+	
 }

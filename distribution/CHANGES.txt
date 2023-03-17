@@ -8,6 +8,8 @@ Issue tracker: https://sourceforge.net/p/unicore/issues
 
 Version 9.2.0 (released Mar xx, 2023)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - new feature: 'issue-token' command for the new endpoint
+   '/rest/core/token' allowing to issue a JWT token
  - REST: allow to set Content-Type and Accept headers
    for GET and PUT operations
 

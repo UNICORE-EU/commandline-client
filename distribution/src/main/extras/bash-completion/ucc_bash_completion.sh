@@ -5,8 +5,8 @@ _ucc()
   COMPREPLY=()
   cur=`_get_cword`
   prev="${COMP_WORDS[COMP_CWORD-1]}"
-  commands="admin-info admin-runcommand batch cat connect copy-file-status cp create-storage create-tss exec get-output job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir open-tunnel rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
-  global_opts="--accept-all-issuers --authentication-method --configuration --help --output --preference --registry --verbose --with-timing"
+  commands="admin-info admin-runcommand batch cat connect copy-file-status cp create-storage create-tss exec get-output issue-token job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir open-tunnel rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
+  global_opts="--accept --accept-all-issuers --authentication-method --configuration --content-type --help --output --preference --registry --verbose --with-timing"
 
 
   # parsing for ucc command word (2nd word in commandline.
@@ -46,10 +46,13 @@ _ucc()
     opts="$global_opts --factory-url --lifetime --sitename"
     ;;
     exec)
-    opts="$global_opts --broker --dry-run --keep --sitename"
+    opts="$global_opts --broker --dry-run --keep --login-node --sitename"
     ;;
     get-output)
     opts="$global_opts --brief --quiet"
+    ;;
+    issue-token)
+    opts="$global_opts --inspect --lifetime --limited --renewable --sitename"
     ;;
     job-abort)
     opts="$global_opts "

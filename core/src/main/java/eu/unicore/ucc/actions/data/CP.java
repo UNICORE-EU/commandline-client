@@ -70,17 +70,13 @@ public class CP extends FileOperation {
 			sources.add(args[i]);
 		}
 		Location targetDesc = createLocation(target);
-		
 		recurse = getBooleanOption(OPT_RECURSIVE_LONG, OPT_RECURSIVE);
 		if(recurse)verbose("Recurse into subdirectories="+recurse);
-		
 		resume = getBooleanOption(OPT_RESUME_LONG, OPT_RESUME);
 		if(resume)verbose("Resume previous transfer(s)="+resume);
-		
 		String scheduled = getOption(OPT_SCHEDULED_LONG, OPT_SCHEDULED);
-		
 		boolean synchronous = !getBooleanOption(OPT_MODE_LONG, OPT_MODE);
-		
+
 		try{
 			for(String source: sources){
 				Location sourceDesc = createLocation(source);
@@ -89,6 +85,9 @@ public class CP extends FileOperation {
 					handleServerServer(sourceDesc, targetDesc, scheduled, synchronous);
 				}
 				else{
+					if(sourceDesc.isLocal() && targetDesc.isLocal()) {
+						throw new IllegalArgumentException("One of source or target must be remote!");
+					}
 					handleClientServer(source, sourceDesc, targetDesc);
 				}
 			}
@@ -100,6 +99,9 @@ public class CP extends FileOperation {
 
 	protected void handleServerServer(Location sourceDesc, Location targetDesc, String scheduled, boolean synchronous) 
 	throws Exception {
+		if(sourceDesc.isRaw() && targetDesc.isRaw()) {
+			throw new IllegalArgumentException("One of source or target must be a UNICORE storage!");
+		}
 		ServerToServer transfer = new ServerToServer(sourceDesc, targetDesc, configurationProvider);
 		transfer.setMessageWriter(this);
 		transfer.setScheduled(scheduled);

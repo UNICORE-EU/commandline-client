@@ -99,7 +99,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 				throw new IllegalArgumentException("You must provide at least a URL as argument to this command.");
 			}
 			accept = getCommandLine().getOptionValue(OPT_ACCEPT);
-			contentType = getCommandLine().getOptionValue(OPT_CONTENT);
+			contentType = getCommandLine().getOptionValue(OPT_CONTENT, "application/json");
 			int startIndex = 2;
 			JSONObject content = new JSONObject(); 
 			if(length>3){
@@ -150,7 +150,8 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			handleResponse(bc.post(content), bc);
 		}
 		else if("put".startsWith(cmd.toLowerCase())){
-			ContentType ct = contentType!=null? ContentType.create(contentType): ContentType.APPLICATION_JSON;
+			ContentType ct = ContentType.create(contentType);
+			verbose("PUT w/ content-type: "+ct.getMimeType());
 			InputStream in = IOUtils.toInputStream(content.toString(), "UTF-8");
 			handleResponse(bc.put(in, ct), bc);
 		}

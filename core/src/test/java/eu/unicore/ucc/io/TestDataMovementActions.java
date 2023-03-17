@@ -426,7 +426,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		connect();
 		String storage = createUspace();
 		String[] args=new String[]{"cat",
-				"BFT:"+storage+"/files/stdout",
+				"BFT:"+storage+"/files/stdout", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 		};
 		UCC.main(args);
@@ -514,6 +514,21 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
 	}
+	
+	@Test
+	public void test_CP_FromHttpURL()throws IOException{
+		connect();
+		String storage=createStorage();
+
+		String[] args=new String[]{"cp", "https://localhost:65322/rest/core",
+				"BFT:"+storage+"/files/file1",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-v"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		
+	}
 
 	protected String createStorage(){
 		run("src/test/resources/jobs/empty.u", false);
@@ -524,5 +539,4 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		run("src/test/resources/jobs/date.u", false);
 		return Run.getLastJobDirectory();
 	}
-	
 }

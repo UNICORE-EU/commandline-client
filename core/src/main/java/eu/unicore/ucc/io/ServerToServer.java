@@ -21,10 +21,12 @@ import eu.unicore.ucc.util.JSONUtil;
 import eu.unicore.ucc.util.ProgressBar;
 
 /**
- * Copy a file from a remote sms to another remote SMS <br/>
+ * Copy a file from a remote location to another remote location. 
+ * At least one remote must be UNICORE.
  *
- * (if source and target are the same SMS, the simple StorageManagement copy operation is used)
- * 
+ * (if source and target are both UNICORE and the same SMS, the simple 
+ * StorageManagement copy operation is used)
+ *
  * @author schuller
  */
 public class ServerToServer implements Constants {
@@ -37,9 +39,12 @@ public class ServerToServer implements Constants {
 
 	protected TransferControllerClient tcc;
 
-	protected StorageClient sms;
-
 	private boolean synchronous = true;
+
+	// both sides UNICORE?
+	private boolean bothSidesUNICORE = true;
+	// one side is UNICORE AND is the receiver
+	private boolean UNICOREReceives = true;
 
 	protected long remoteSize=-1;
 
@@ -63,26 +68,27 @@ public class ServerToServer implements Constants {
 	}
 	
 	public void process() throws Exception {
-
 		if(scheduled!=null){
 			scheduled=UnitParser.convertDateToISO8601(scheduled);
 			msg.verbose("Will schedule transfer for "+scheduled);
 			synchronous = false;
 		}
 		msg.verbose("Synchronous transfer = "+synchronous);
-		
-		Endpoint target = new Endpoint(targetDesc.getSmsEpr());
 
-		sms = new StorageClient(target,
+		bothSidesUNICORE = !sourceDesc.isRaw && !targetDesc.isRaw();
+		if(bothSidesUNICORE  && sourceDesc.getSmsEpr().equalsIgnoreCase(targetDesc.getSmsEpr())) {
+			Endpoint target = new Endpoint(targetDesc.getSmsEpr());
+			StorageClient sms = new StorageClient(target,
 				configurationProvider.getClientConfiguration(target.getUrl()),
 				configurationProvider.getRESTAuthN());
-		if(sourceDesc.getSmsEpr().equalsIgnoreCase(targetDesc.getSmsEpr())){
-			smsCopyFile();
+			smsCopyFile(sms);
 		}
-		else copyFile();
+		else {
+			copyFile();
+		}
 	}
 	
-	protected boolean assertRemoteExists(Location remote) throws Exception {
+	protected boolean assertSourceExists(Location remote) throws Exception {
 		if(hasWildCards(remote.getName()))return true;
 		StorageClient source = new StorageClient(new Endpoint(remote.getSmsEpr()),
 				configurationProvider.getClientConfiguration(remote.getSmsEpr()),
@@ -101,11 +107,29 @@ public class ServerToServer implements Constants {
 	 */
 	protected void copyFile(){
 		try{
-			checkProtocols();
-			assertRemoteExists(sourceDesc);
-			msg.verbose("Initiating fetch-file on storage <"+sms.getEndpoint().getUrl()+">," +
-					"receiving file <"+sourceDesc.getUnicoreURI()+">, writing to '"+targetDesc.getName()+"'");
-			tcc = sms.fetchFile(sourceDesc.getUnicoreURI(), targetDesc.getName(), sourceDesc.getProtocol());
+			if(!sourceDesc.isRaw())assertSourceExists(sourceDesc);
+			UNICOREReceives = sourceDesc.isRaw();
+			
+			if(bothSidesUNICORE || UNICOREReceives) {
+				Endpoint target = new Endpoint(targetDesc.getSmsEpr());
+				StorageClient sms = new StorageClient(target,
+						configurationProvider.getClientConfiguration(target.getUrl()),
+						configurationProvider.getRESTAuthN());
+				String protocol = bothSidesUNICORE? checkProtocols(sms):null;
+				msg.verbose("Initiating fetch-file on storage <"+sms.getEndpoint().getUrl()+">," +
+						"receiving file <"+sourceDesc.getUnicoreURI()+">, writing to '"+targetDesc.getName()+"'");
+				tcc = sms.fetchFile(sourceDesc.getResolvedURL(), targetDesc.getName(), protocol);
+			}
+			else {
+				// source sends
+				Endpoint source = new Endpoint(sourceDesc.getSmsEpr());
+				StorageClient sms = new StorageClient(source,
+						configurationProvider.getClientConfiguration(source.getUrl()),
+						configurationProvider.getRESTAuthN());
+				msg.verbose("Initiating send-file on storage <"+sms.getEndpoint().getUrl()+">," +
+						"sending file <"+sourceDesc.getName()+">, writing to '"+targetDesc.getResolvedURL()+"'");
+				tcc = sms.sendFile(sourceDesc.getName(), targetDesc.getResolvedURL(), null);
+			}
 			transferAddress = tcc.getEndpoint().getUrl();
 			msg.verbose("Have filetransfer instance: "+transferAddress);
 			if(!synchronous){
@@ -177,7 +201,7 @@ public class ServerToServer implements Constants {
 		}
 	}
 
-	protected void smsCopyFile(){
+	protected void smsCopyFile(StorageClient sms){
 		try{
 			msg.verbose("Copy on remote storage: "+sourceDesc.getName()+"->"+targetDesc.getName());
 			JSONObject params = new JSONObject();
@@ -190,15 +214,15 @@ public class ServerToServer implements Constants {
 		}
 	}
 
-	protected void checkProtocols()throws Exception{
+	protected String checkProtocols(StorageClient sms)throws Exception{
 		if(!"BFT".equals(preferredProtocol)){
 			List<String> supported = JSONUtil.asList(sms.getProperties().getJSONArray("protocols"));
 			if(supported.contains(preferredProtocol)) {
-				sourceDesc.setProtocol(preferredProtocol);
 				msg.verbose("Using preferred protocol: "+preferredProtocol);
-				return;
+				return preferredProtocol;
 			}
 		}
+		return null;
 	}
 
 	public void setPreferredProtocol(String preferredProtocol){
