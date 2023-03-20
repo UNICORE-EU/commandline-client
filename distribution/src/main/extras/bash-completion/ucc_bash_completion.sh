@@ -46,7 +46,7 @@ _ucc()
     opts="$global_opts --factory-url --lifetime --sitename"
     ;;
     exec)
-    opts="$global_opts --broker --dry-run --keep --login-node --sitename"
+    opts="$global_opts --asynchronous --broker --dry-run --keep --login-node --sitename --tags"
     ;;
     get-output)
     opts="$global_opts --brief --quiet"

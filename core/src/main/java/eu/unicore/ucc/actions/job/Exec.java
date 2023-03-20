@@ -1,5 +1,7 @@
 package eu.unicore.ucc.actions.job;
 
+import java.util.Arrays;
+
 import org.apache.commons.cli.Option;
 
 import eu.unicore.client.Job;
@@ -41,6 +43,13 @@ public class Exec extends ActionBase {
 	 */
 	protected boolean keep=false;
 
+	protected String[] tags;
+
+	/**
+	 * asynchronous mode
+	 */
+	protected boolean asynchronous;
+
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -72,6 +81,18 @@ public class Exec extends ActionBase {
 				.longOpt(OPT_KEEP_LONG)
 				.desc("Don't remove finished job")
 				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_MODE)
+				.longOpt(OPT_MODE_LONG)
+				.desc("Run asynchronous, don't wait for finish, don't get results.")
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_TAGS)
+				.longOpt(OPT_TAGS_LONG)
+				.desc("Tag the job with the given tag(s) (comma-separated)")
+				.required(false)
+				.hasArgs()
+				.valueSeparator(',')
 				.build());
 	}
 
@@ -113,6 +134,12 @@ public class Exec extends ActionBase {
 		verbose("Dry run = "+dryRun);
 		keep=getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
 		verbose("Delete job when done = "+!keep);
+		asynchronous=getBooleanOption(OPT_MODE_LONG, OPT_MODE);
+		verbose("Asynchronous processing = "+asynchronous);
+		tags = getCommandLine().getOptionValues(OPT_TAGS);
+		if(tags!=null) {
+			verbose("Job tags = " + Arrays.deepToString(tags));
+		}
 		initBuilder(getCommandLine().getArgs());
 		run();
 	}
@@ -126,7 +153,9 @@ public class Exec extends ActionBase {
 			builder.setProperty("IDLocation",output.getAbsolutePath());
 			builder.setProperty("KeepFinishedJob", String.valueOf(keep));
 			builder.setProperty("DetailedStatusDisplay", "true");
-
+			if(tags!=null&&tags.length>0) {
+				builder.addTags(tags);
+			}
 			if(siteName!=null){
 				builder.setProperty("Site", siteName);
 			}
@@ -156,7 +185,7 @@ public class Exec extends ActionBase {
 
 	protected void run(){
 		runner=new Runner(registry,configurationProvider,builder,this);
-		runner.setAsyncMode(false);
+		runner.setAsyncMode(asynchronous);
 		runner.setBriefOutfileNames(true);
 		runner.setOutputToConsole(true);
 		runner.setDryRun(dryRun);
