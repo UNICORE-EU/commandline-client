@@ -5,8 +5,10 @@ import java.util.Properties;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
+import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.registry.IRegistryClient;
-import eu.unicore.util.httpclient.IClientConfiguration;
+import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import groovy.lang.Script;
 
 /**
@@ -17,11 +19,12 @@ import groovy.lang.Script;
 public abstract class Base extends Script{
 
 	IRegistryClient registry;
-  	IClientConfiguration securityProperties;
+	UCCConfigurationProvider configurationProvider;
+	IAuthCallback auth;
   	String registryURL;
   	Properties properties;
-
 	Options options;
 	CommandLine commandLine;
+	MessageWriter messageWriter;
 
 }

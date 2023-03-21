@@ -53,7 +53,7 @@
           <descriptors>
             <descriptor>src/main/assembly/dep.xml</descriptor>
           </descriptors>
-          <finalName>unicore-ucc-${version}</finalName>
+          <finalName>unicore-ucc-${project.version}</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <archiverConfig>
              <fileMode>0644</fileMode>
