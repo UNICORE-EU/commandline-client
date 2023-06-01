@@ -6,6 +6,13 @@ Issue tracker: https://sourceforge.net/p/unicore/issues
 
    This release requires Java 11 or later!
 
+Version 9.2.2 (released Jun 1, 2023)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - update to UNICORE 9.2.2 base libs
+ - fix: system-info now correctly displays non-string-valued
+   resources
+ - fix: properly show errors when submitting faulty workflow
+
 Version 9.2.0 (released Mar 21, 2023)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - new feature: 'issue-token' command for the new endpoint

@@ -1,5 +1,6 @@
 package eu.unicore.ucc.lookup;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -8,15 +9,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.Logger;
 
+import de.fzj.unicore.uas.util.Pair;
 import eu.unicore.client.Endpoint;
+import eu.unicore.client.core.EnumerationClient;
+import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.StorageFactoryClient;
 import eu.unicore.client.lookup.AddressFilter;
 import eu.unicore.client.lookup.Lister;
 import eu.unicore.client.lookup.Producer;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
+import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.Log;
+import eu.unicore.util.httpclient.IClientConfiguration;
 
 public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 
@@ -68,39 +74,65 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 	}
 
 	protected void setupProducers()throws Exception {
-		addProducer(new Producer<StorageFactoryClient>() {
-			
-			private BlockingQueue<StorageFactoryClient> target;
-			private AtomicInteger runCounter;
-			
-			@Override
-			public void run() {
-				try {
-					List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("StorageFactory"));
-					for(Endpoint site: sites){
-						if(addressFilter.accept(site)){
-							StorageFactoryClient c = new StorageFactoryClient(site, 
-									configurationProvider.getClientConfiguration(site.getUrl()),
-									configurationProvider.getRESTAuthN());
-							if(addressFilter.accept(c)) {
-								target.add(c);
-							}
-						}
+		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
+		for(final Endpoint site: sites){
+			addProducer(new StorageFactoryProducer(site,
+					configurationProvider.getClientConfiguration(site.getUrl()),
+					configurationProvider.getRESTAuthN(), addressFilter));
+		}
+	}
+
+	public static class StorageFactoryProducer implements Producer<StorageFactoryClient>{
+
+		private final Endpoint ep;
+		private final IClientConfiguration securityProperties;
+		private final IAuthCallback auth;
+		private final List<Pair<Endpoint,String>>errors = new ArrayList<>();
+		private final AddressFilter addressFilter;
+
+		private BlockingQueue<StorageFactoryClient> target;
+		private AtomicInteger runCounter;
+
+		public StorageFactoryProducer(Endpoint ep, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter) {
+			this.ep = ep;
+			this.securityProperties = securityProperties;
+			this.auth = auth;
+			this.addressFilter = addressFilter;
+		}
+
+		@Override
+		public void run() {
+			try{
+				log.debug("Processing site at {}", ep.getUrl());
+				handleEndpoint();
+			}
+			catch(Exception ex){
+				errors.add(new Pair<>(ep,Log.createFaultMessage("", ex)));
+			}
+			finally{
+				runCounter.decrementAndGet();
+			}
+		}
+		
+		private void handleEndpoint() throws Exception {
+			SiteClient c = new SiteClient(ep, securityProperties, auth);
+			Endpoint factoriesEp = ep.cloneTo(c.getLinkUrl("storagefactories"));
+			EnumerationClient factoriesList = new EnumerationClient(factoriesEp, securityProperties, auth);
+			for(String factoryURL: factoriesList) {
+				if(addressFilter.accept(factoryURL)) {
+					StorageFactoryClient f = new StorageFactoryClient(c.getEndpoint().cloneTo(factoryURL),
+							securityProperties, auth);
+					if(addressFilter.accept(f)) {
+						target.offer(f);
 					}
-				}catch(Exception ex) {}
-				finally {
-					runCounter.decrementAndGet();
 				}
 			}
-			
-			@Override
-			public void init(BlockingQueue<StorageFactoryClient> target, AtomicInteger runCount) {
-				this.target = target;
-				this.runCounter = runCount;
-			}
-			
-		});
-		
+		}
+
+		@Override
+		public void init(BlockingQueue<StorageFactoryClient> target, AtomicInteger runCount) {
+			this.target = target;
+			this.runCounter = runCount;
+		}
 	}
-	
 }

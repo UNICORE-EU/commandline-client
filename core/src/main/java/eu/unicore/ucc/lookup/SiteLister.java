@@ -86,17 +86,13 @@ public class SiteLister extends Lister<SiteClient>{
 	public static class SiteProducer implements Producer<SiteClient>{
 
 		private final Endpoint epr;
-
-		protected final IClientConfiguration securityProperties;
-		protected final IAuthCallback auth;
-		
-		protected final List<Pair<Endpoint,String>>errors = new ArrayList<>();
+		private final IClientConfiguration securityProperties;
+		private final IAuthCallback auth;
+		private final List<Pair<Endpoint,String>>errors = new ArrayList<>();
+		private final AddressFilter addressFilter;
 
 		private AtomicInteger runCount;
-
-		protected BlockingQueue<SiteClient> target;
-
-		protected AddressFilter addressFilter;
+		private BlockingQueue<SiteClient> target;
 		
 		public SiteProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter) {
 			this.epr = epr;
@@ -108,9 +104,7 @@ public class SiteLister extends Lister<SiteClient>{
 		@Override
 		public void run() {
 			try{
-				if(log.isDebugEnabled()){
-					log.debug("Processing site at "+epr.getUrl());
-				}
+				log.debug("Processing site at {}", epr.getUrl());
 				handleEndpoint(epr);
 			}
 			catch(Exception ex){

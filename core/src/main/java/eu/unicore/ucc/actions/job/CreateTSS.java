@@ -210,7 +210,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 			keys.addAll(part.keySet());
 			Collections.sort(keys);
 			for(String r: keys) {
-				String rVal = part.getString(r);
+				String rVal = String.valueOf(part.get(r));
 				sb.append("[").append(r);
 				sb.append(": ").append(rVal);
 				sb.append("] ");
