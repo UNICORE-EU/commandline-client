@@ -288,7 +288,7 @@ public class SubmitWorkflow extends ActionBase implements
 						verbose("Dry run, not uploading.");
 						continue;
 					}
-					fu.perform(sc, this);
+					fu.perform(sc);
 				}
 			}
 		}catch(Exception e) {

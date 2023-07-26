@@ -4,23 +4,28 @@ import java.util.Properties;
 
 import org.apache.hc.core5.http.HttpMessage;
 
-import eu.unicore.security.wsutil.client.OAuthBearerTokenOutInterceptor;
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
 import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.PropertiesAwareAuthn;
+import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.util.httpclient.ClientProperties;
-import eu.unicore.util.httpclient.DefaultClientConfiguration;
 
 /**
- * Base class for authenticating using a Bearer token
-
+ * Base class for authenticating using a Bearer token.
+ *
+ * (it also handles the case where the token is explicitely
+ * given in the properties)
+ *
  * @author schuller
  */
 public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider 
                              implements PropertiesAwareAuthn, IAuthCallback {
 	
 	protected String token = null;
-	
+	protected String refreshToken = null;
+	protected ConsoleLogger msg = UCC.getConsoleLogger();
+
 	@Override
 	public String getName() {
 		return "bearer-token";
@@ -39,7 +44,6 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 		ret.append("The following properties can be used in the UCC preference file " +
 				"to configure the "+getName()+" authentication.\n");
 		ret.append("token - the bearer token\n");
-		
 		ret.append("\nFor configuring your trusted CAs and certificates, "
 				+ "use the usual 'truststore.*' properties\n");
 		return ret.toString();
@@ -52,28 +56,21 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 		properties.setProperty("client."+ClientProperties.PROP_MESSAGE_SIGNING_ENABLED, "false");
 	}
 
-	@Override
-	public DefaultClientConfiguration getAnonymousClientConfiguration() {
-		DefaultClientConfiguration dcc = super.getAnonymousClientConfiguration();
-		try{
-			retrieveToken(dcc);
-		}catch(Exception ex){
-			throw new RuntimeException(ex);
-		}
-		if(token!=null){
-			dcc.getExtraSecurityTokens().put(OAuthBearerTokenOutInterceptor.TOKEN_KEY, token);
-		}
-		return dcc;
-	}
-
-	protected void retrieveToken(DefaultClientConfiguration dcc) throws Exception {
+	protected void retrieveToken() throws Exception {
 		token = properties.getProperty("token");
 	}
 
+	protected void refreshTokenIfNecessary() throws Exception {
+		// NOP
+	}
+	
 	@Override
 	public void addAuthenticationHeaders(HttpMessage httpMessage) throws Exception {
+		if(refreshToken!=null) {
+			refreshTokenIfNecessary();
+		}
 		if(token==null) {
-			getAnonymousClientConfiguration();
+			retrieveToken();
 		}
 		if(token!=null)httpMessage.setHeader("Authorization", "Bearer "+token);
 	}

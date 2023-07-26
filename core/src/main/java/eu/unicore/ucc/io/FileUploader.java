@@ -8,7 +8,6 @@ import java.util.Map;
 
 import de.fzj.unicore.uas.fts.FiletransferOptions;
 import de.fzj.unicore.uas.fts.FiletransferOptions.IMonitorable;
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
 import eu.unicore.client.data.UFTPConstants;
@@ -44,7 +43,7 @@ public class FileUploader extends FileTransferBase {
 	}
 
 	@Override
-	public void perform(StorageClient sms, MessageWriter msg)throws Exception{
+	public void perform(StorageClient sms)throws Exception{
 		File fileSpec = new File(from);
 		boolean hasWildCards = false;
 		boolean isDirectory = fileSpec.isDirectory();
@@ -55,7 +54,7 @@ public class FileUploader extends FileTransferBase {
 		}
 
 		chosenProtocol = determineProtocol(preferredProtocol, sms);
-		Map<String,String>extraParameters=makeExtraParameters(chosenProtocol, msg);
+		Map<String,String>extraParameters = makeExtraParameters(chosenProtocol);
 
 		if(!hasWildCards && !isDirectory){
 			//single regular file
@@ -63,7 +62,7 @@ public class FileUploader extends FileTransferBase {
 			if(isValidDirectory(to, sms)){
 				to = to+"/"+fileSpec.getName();
 			}
-			uploadFile(fileSpec, to, sms, chosenProtocol, extraParameters, msg);
+			uploadFile(fileSpec, to, sms, chosenProtocol, extraParameters);
 			return;
 		}
 
@@ -80,7 +79,7 @@ public class FileUploader extends FileTransferBase {
 		}
 		String target=isDirectory?to+fileSpec.getName():to;
 		sms.mkdir(target);
-		uploadFiles(fileset,target,sms,chosenProtocol,extraParameters, msg);
+		uploadFiles(fileset,target,sms,chosenProtocol,extraParameters);
 	}
 
 	/**
@@ -95,19 +94,19 @@ public class FileUploader extends FileTransferBase {
 	 * @throws Exception
 	 */
 	private void uploadFiles(File[]files, String remoteDirectory, StorageClient sms, String protocol, 
-			Map<String,String>extraParameters, MessageWriter msg)throws Exception{
+			Map<String,String>extraParameters) throws Exception {
 		for(File localFile: files){
 			String target=remoteDirectory+"/"+localFile.getName();
 			if(localFile.isDirectory()){
 				if(!recurse){
-					msg.verbose("Skipping directory "+localFile.getAbsolutePath());
+					UCC.getConsoleLogger().verbose("Skipping directory "+localFile.getAbsolutePath());
 				}else{
 					File[] fileset=localFile.listFiles();
 					sms.mkdir(target);
-					uploadFiles(fileset,target,sms,protocol,extraParameters, msg);
+					uploadFiles(fileset,target,sms,protocol,extraParameters);
 				}
 			}else{
-				uploadFile(localFile,target,sms,protocol,extraParameters, msg);
+				uploadFile(localFile,target,sms,protocol,extraParameters);
 			}
 		}
 	}
@@ -124,7 +123,7 @@ public class FileUploader extends FileTransferBase {
 	 * @throws Exception
 	 */
 	private void uploadFile(File localFile, String remotePath, StorageClient sms, String protocol, 
-			Map<String,String>extraParameters, MessageWriter msg) throws Exception{
+			Map<String,String>extraParameters) throws Exception {
 		long startTime=System.currentTimeMillis();
 		if(remotePath==null){
 			remotePath="/"+localFile.getName();
@@ -132,7 +131,7 @@ public class FileUploader extends FileTransferBase {
 		else if(remotePath.endsWith("/")){
 			remotePath+=localFile.getName();
 		}
-		msg.verbose("Uploading local file '"+localFile.getAbsolutePath()+"' -> '"
+		UCC.getConsoleLogger().verbose("Uploading local file '"+localFile.getAbsolutePath()+"' -> '"
 				+sms.getEndpoint().getUrl()+"/files/"+remotePath+"'");
 		FiletransferClient ftc = null;
 		try(FileInputStream is=new FileInputStream(localFile.getAbsolutePath())){
@@ -156,19 +155,19 @@ public class FileUploader extends FileTransferBase {
 			}
 			
 			String url=ftc.getEndpoint().getUrl();
-			msg.verbose("File transfer URL : "+url);
+			UCC.getConsoleLogger().verbose("File transfer URL : "+url);
 			ProgressBar p=null;
 			if(ftc instanceof IMonitorable){
 				long size=localFile.length();
 				if(isRange()){
 					size=getRangeSize();
 				}
-				p=new ProgressBar(localFile.getName(),size,msg);
+				p = new ProgressBar(localFile.getName(),size);
 				((IMonitorable) ftc).setProgressListener(p);
 			}
 			FiletransferOptions.Write writer = (FiletransferOptions.Write)ftc;
 			if(isRange()){
-				msg.verbose("Byte range: "+startByte+" - "+(getRangeSize()>0?endByte:""));
+				UCC.getConsoleLogger().verbose("Byte range: "+startByte+" - "+(getRangeSize()>0?endByte:""));
 				long totalSkipped=0;
 				long toSkip = startByte;
 				while(totalSkipped<startByte){
@@ -181,7 +180,7 @@ public class FileUploader extends FileTransferBase {
 			}else{
 				writer.writeAllData(is);
 			}
-			copyProperties(localFile, sms, remotePath, msg);
+			copyProperties(localFile, sms, remotePath);
 
 			if(ftc instanceof IMonitorable){
 				p.finish();
@@ -196,15 +195,13 @@ public class FileUploader extends FileTransferBase {
 					// if("FAILED".equals(finalStatus)){
 					//	msg.error("Filetransfer error: "+description, null);
 					ftc.delete();
-				}catch(Exception e1){
-					msg.error("Could not clean-up the filetransfer at <"+ftc.getEndpoint().getUrl()+">",e1);
-				}
+				}catch(Exception e1){}
 			}
 		}
 		if(timing){
 			long duration=System.currentTimeMillis()-startTime;
 			double rate=(double)localFile.length()/(double)duration;
-			msg.message("Rate: "+UCC.numberFormat.format(rate)+ " kB/sec.");
+			UCC.getConsoleLogger().message("Rate: "+UCC.numberFormat.format(rate)+ " kB/sec.");
 		}
 	}
 
@@ -213,7 +210,7 @@ public class FileUploader extends FileTransferBase {
 	 * @param sourceFile - local file
 	 * @throws Exception
 	 */
-	private void copyProperties(File sourceFile, StorageClient sms, String target, MessageWriter msg)throws Exception{
+	private void copyProperties(File sourceFile, StorageClient sms, String target)throws Exception{
 		try{
 			StringBuilder perms = new StringBuilder("r--r--");
 			if(sourceFile.canExecute()){
@@ -226,7 +223,7 @@ public class FileUploader extends FileTransferBase {
 			}
 			sms.chmod(target, perms.toString());
 		}catch(Exception ex){
-			msg.error("Can't set permissions on remote file.",ex);
+			UCC.getConsoleLogger().error("Can't set permissions on remote file.",ex);
 		}
 	}
 

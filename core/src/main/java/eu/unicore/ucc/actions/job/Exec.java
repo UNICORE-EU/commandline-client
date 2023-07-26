@@ -146,9 +146,7 @@ public class Exec extends ActionBase {
 
 	protected void initBuilder(String[] args){
 		try{
-			builder=new UCCBuilder(registry, configurationProvider);
-			builder.setMessageWriter(this);
-			
+			builder = new UCCBuilder(registry, configurationProvider);
 			builder.setProperty("Output",output.getAbsolutePath());
 			builder.setProperty("IDLocation",output.getAbsolutePath());
 			builder.setProperty("KeepFinishedJob", String.valueOf(keep));
@@ -184,7 +182,7 @@ public class Exec extends ActionBase {
 	}
 
 	protected void run(){
-		runner=new Runner(registry,configurationProvider,builder,this);
+		runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(asynchronous);
 		runner.setBriefOutfileNames(true);
 		runner.setOutputToConsole(true);
@@ -194,7 +192,7 @@ public class Exec extends ActionBase {
 		if(siteName!=null){
 			brokerName = "LOCAL";
 		}
-		runner.setBroker(UCC.getBroker(brokerName, this));
+		runner.setBroker(UCC.getBroker(brokerName));
 		try{
 			runner.run();
 		}catch(RuntimeException ex){

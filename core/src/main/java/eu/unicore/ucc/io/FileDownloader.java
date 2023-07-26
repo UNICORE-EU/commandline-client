@@ -9,7 +9,6 @@ import java.util.Map;
 import de.fzj.unicore.uas.fts.FiletransferOptions;
 import de.fzj.unicore.uas.fts.FiletransferOptions.IMonitorable;
 import de.fzj.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.core.FileList;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
@@ -50,11 +49,11 @@ public class FileDownloader extends FileTransferBase {
 	}
 	
 	@Override
-	public void perform(StorageClient sms, MessageWriter msg)throws Exception{
+	public void perform(StorageClient sms)throws Exception{
 		boolean isWildcard = hasWildCards(from);
 		FileListEntry remoteSource = null;
 		if(isWildcard){
-			performWildCardExport(sms,msg);
+			performWildCardExport(sms);
 		}
 		else {
 			//check if source is a directory
@@ -63,15 +62,16 @@ public class FileDownloader extends FileTransferBase {
 				if(forceFileOnly){
 					throw new IOException("Source is a directory");
 				}
-				performDirectoryExport(remoteSource, new File(to), sms, msg);
+				performDirectoryExport(remoteSource, new File(to), sms);
 			}
 			else{
-				download(remoteSource,new File(to),sms,msg);
+				download(remoteSource,new File(to),sms);
 			}
 		}	
 	}
 	
-	protected void performDirectoryExport(FileListEntry directory, File targetDirectory, StorageClient sms, MessageWriter msg)throws Exception{
+	protected void performDirectoryExport(FileListEntry directory, File targetDirectory, StorageClient sms)
+			throws Exception {
 		if(!targetDirectory.exists()|| !targetDirectory.canWrite()){
 			throw new IOException("Target directory <"+to+"> does not exist or is not writable!");
 		}
@@ -82,22 +82,22 @@ public class FileDownloader extends FileTransferBase {
 		for(FileListEntry file: remoteFiles.list(0, 1000)){
 			if(file.isDirectory){
 				if(!recurse) {
-					msg.verbose("Skipping directory "+file.path);
+					UCC.getConsoleLogger().verbose("Skipping directory "+file.path);
 					continue;
 				}
 				else{
 					File newTargetDirectory=new File(targetDirectory,getName(file.path));
 					boolean success=newTargetDirectory.mkdirs();
 					if(!success)throw new IOException("Can create directory: "+newTargetDirectory.getAbsolutePath());
-					performDirectoryExport(file, newTargetDirectory, sms, msg);
+					performDirectoryExport(file, newTargetDirectory, sms);
 					continue;
 				}
 			}
-			download(file, new File(targetDirectory,getName(file.path)), sms, msg);
+			download(file, new File(targetDirectory,getName(file.path)), sms);
 		}
 	}
 	
-	protected void performWildCardExport(StorageClient sms, MessageWriter msg)throws Exception{
+	protected void performWildCardExport(StorageClient sms)throws Exception{
 		String dir=getDir(from);
 		if(dir==null)dir="/";
 		FileList files=sms.ls(dir);
@@ -106,7 +106,7 @@ public class FileDownloader extends FileTransferBase {
 			if(!targetDir.isDirectory())throw new IOException("Target is not a directory.");
 		}
 		for(FileListEntry f: files.list(0, 1000)){
-			download(f, targetDir, sms, msg);
+			download(f, targetDir, sms);
 		}
 	}	
 	
@@ -127,7 +127,7 @@ public class FileDownloader extends FileTransferBase {
 	 * @param sms
 	 * @throws Exception
 	 */
-	private void download(FileListEntry source, File localFile, StorageClient sms, MessageWriter msg)throws Exception{
+	private void download(FileListEntry source, File localFile, StorageClient sms)throws Exception{
 		if(source==null || source.isDirectory){
 			throw new IllegalStateException("Source="+source); 
 		}
@@ -146,10 +146,12 @@ public class FileDownloader extends FileTransferBase {
 					localFile=new File(localFile,getName(path));
 				}
 				if(mode.equals(Mode.NO_OVERWRITE) && localFile.exists()){
-					msg.verbose("File exists and creation mode was set to 'nooverwrite'.");
+					UCC.getConsoleLogger().verbose("File exists and creation mode was set to 'nooverwrite'.");
 					return; 
 				}
-				msg.verbose("Downloading remote file '"+sms.getEndpoint().getUrl()+"/files/"+path+"' -> "+localFile.getAbsolutePath());
+				UCC.getConsoleLogger().verbose("Downloading remote file '" +
+						sms.getEndpoint().getUrl()+"/files/"+path+
+						"' -> "+localFile.getAbsolutePath());
 				if(resume){
 					setupOffsetForResume(localFile);
 				}
@@ -157,17 +159,17 @@ public class FileDownloader extends FileTransferBase {
 			}
 			
 			chosenProtocol = determineProtocol(preferredProtocol, sms);
-			Map<String,String>extraParameters=makeExtraParameters(chosenProtocol, msg);
+			Map<String,String>extraParameters = makeExtraParameters(chosenProtocol);
 			ftc = sms.createExport(path, chosenProtocol, extraParameters);
 			configure(ftc, extraParameters);
-			msg.verbose("File transfer URL : "+ftc.getEndpoint().getUrl());
+			UCC.getConsoleLogger().verbose("File transfer URL : "+ftc.getEndpoint().getUrl());
 			ProgressBar p=null;
 			if(ftc instanceof IMonitorable  && showProgress){
 				long size = source.size;
 				if(isRange()){
 					size=getRangeSize();
 				}
-				p=new ProgressBar(localFile.getName(),size,msg);
+				p = new ProgressBar(localFile.getName(),size);
 				((IMonitorable) ftc).setProgressListener(p);
 			}
 			long startTime=System.currentTimeMillis();
@@ -176,7 +178,7 @@ public class FileDownloader extends FileTransferBase {
 					throw new Exception("Byte range is defined but protocol does not allow " +
 							"partial read! Please choose a different protocol!");
 				}
-				msg.verbose("Byte range: "+startByte+" - "+(getRangeSize()>0?endByte:""));
+				UCC.getConsoleLogger().verbose("Byte range: "+startByte+" - "+(getRangeSize()>0?endByte:""));
 				SupportsPartialRead pReader=(SupportsPartialRead)ftc;
 				long length = endByte-startByte+1;
 				if(Long.MAX_VALUE==endByte){
@@ -196,9 +198,9 @@ public class FileDownloader extends FileTransferBase {
 			if(timing){
 				long duration=System.currentTimeMillis()-startTime;
 				double rate=(double)localFile.length()/(double)duration;
-				msg.message("Rate: "+UCC.numberFormat.format(rate)+ " kB/sec.");
+				UCC.getConsoleLogger().message("Rate: "+UCC.numberFormat.format(rate)+ " kB/sec.");
 			}
-			if(targetStream==null)copyProperties(source, localFile, msg);
+			if(targetStream==null)copyProperties(source, localFile);
 		}
 		finally{
 			if(targetStream==null){
@@ -216,9 +218,7 @@ public class FileDownloader extends FileTransferBase {
 					//	 msg.error("Filetransfer error: "+description, null);
 					// }
 					ftc.delete();
-				}catch(Exception e1){
-					msg.error("Could not destroy the filetransfer client",e1);
-				}
+				}catch(Exception e1){}
 			}
 		}
 	}
@@ -228,12 +228,12 @@ public class FileDownloader extends FileTransferBase {
 	 * @param targetFile - local file
 	 * @throws Exception
 	 */
-	private void copyProperties(FileListEntry source, File localFile, MessageWriter msg)throws Exception{
+	private void copyProperties(FileListEntry source, File localFile)throws Exception{
 		try{
 			localFile.setExecutable(source.permissions.contains("x"));
 		}
 		catch(Exception ex){
-			msg.error("Can't set 'executable' flag for "+localFile.getName(), ex);
+			UCC.getConsoleLogger().error("Can't set 'executable' flag for "+localFile.getName(), ex);
 		}
 	}
 	

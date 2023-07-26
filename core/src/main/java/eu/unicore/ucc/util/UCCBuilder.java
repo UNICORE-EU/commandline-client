@@ -14,12 +14,11 @@ import org.json.JSONObject;
 import de.fzj.unicore.uas.json.Builder;
 import de.fzj.unicore.uas.json.JSONUtil;
 import de.fzj.unicore.uas.json.Requirement;
-import de.fzj.unicore.uas.util.MessageWriter;
 import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.actions.data.Resolve;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.ucc.helpers.DefaultMessageWriter;
+import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase.Mode;
 import eu.unicore.ucc.io.FileUploader;
@@ -36,7 +35,7 @@ public class UCCBuilder extends Builder {
 	private final List<FileUploader> imports;
 	private final List<FileDownloader> exports;
 	
-	private MessageWriter msg = new DefaultMessageWriter();
+	private ConsoleLogger msg = new ConsoleLogger();
 	private final UCCConfigurationProvider configurationProvider;
 	private final IRegistryClient registry;
 	private boolean checkLocalFiles=true;
@@ -77,11 +76,11 @@ public class UCCBuilder extends Builder {
 		this("{}", registry, configurationProvider);
 	}
 
-	public void setMessageWriter(MessageWriter msg){
+	public void setMessageWriter(ConsoleLogger msg){
 		this.msg=msg;
 	}
 
-	public MessageWriter getMessageWriter(){
+	public ConsoleLogger getMessageWriter(){
 		return msg;
 	}
 	
@@ -120,7 +119,7 @@ public class UCCBuilder extends Builder {
 			try {
 				stage = stages.getJSONObject(i);
 				String uri = stage.getString(key);
-				Location l = Resolve.resolve(uri, registry, configurationProvider, msg);
+				Location l = Resolve.resolve(uri, registry, configurationProvider);
 				stage.put(key, l.getEndpointURL());
 			}catch(JSONException je) {
 				throw new IllegalArgumentException("Malformed staging directive: "
@@ -167,7 +166,7 @@ public class UCCBuilder extends Builder {
 	
 	@Override
 	protected Location createLocation(String descriptor) {
-		return Resolve.resolve(descriptor, registry, configurationProvider, msg);
+		return Resolve.resolve(descriptor, registry, configurationProvider);
 	}
 
 	private JSONArray createLocalExports(JSONArray j)throws IllegalArgumentException {

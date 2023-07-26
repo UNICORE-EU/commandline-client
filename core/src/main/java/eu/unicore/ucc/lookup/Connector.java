@@ -3,7 +3,6 @@ package eu.unicore.ucc.lookup;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.SiteFactoryClient;
 import eu.unicore.client.lookup.Blacklist;
@@ -23,8 +22,6 @@ public class Connector implements Runnable {
 
 	private final UCCConfigurationProvider cfgProvider;
 
-	private final MessageWriter msg;
-
 	final AtomicInteger tsfAvailable=new AtomicInteger(0);
 	final AtomicInteger tssAvailable=new AtomicInteger(0);
 
@@ -38,17 +35,16 @@ public class Connector implements Runnable {
 	 * @param cfgProvider
 	 * @param msg
 	 */
-	public Connector(IRegistryClient registry, UCCConfigurationProvider cfgProvider, MessageWriter msg){
+	public Connector(IRegistryClient registry, UCCConfigurationProvider cfgProvider){
 		this.registry=registry;
 		this.cfgProvider=cfgProvider;
-		this.msg=msg;
 	}
 
 	@Override
 	public void run() {
 		SiteFactoryLister lister=new SiteFactoryLister(UCC.executor,registry,cfgProvider);
 		if(blacklist!=null && blacklist.length>0){
-			msg.verbose("Using blacklist <"+Arrays.asList(blacklist)+">");
+			UCC.getConsoleLogger().verbose("Using blacklist <"+Arrays.asList(blacklist)+">");
 			lister.setAddressFilter(new Blacklist(blacklist));
 		}
 
@@ -58,12 +54,12 @@ public class Connector implements Runnable {
 					break;
 			}
 			else{
-				msg.verbose("Connecting to "+tsf.getEndpoint().getUrl());
+				UCC.getConsoleLogger().verbose("Connecting to "+tsf.getEndpoint().getUrl());
 				try{
 					handleTSF(tsf);
 					tsfAvailable.incrementAndGet();
 				}catch(Exception ex){
-					msg.error("Error creating site at "+tsf.getEndpoint().getUrl(),ex);
+					UCC.getConsoleLogger().error("Error creating site at "+tsf.getEndpoint().getUrl(),ex);
 				}
 			}
 		}
@@ -72,15 +68,15 @@ public class Connector implements Runnable {
 	protected void handleTSF(SiteFactoryClient tsf) throws Exception {
 		try {
 			SiteClient tss = tsf.getOrCreateSite();
-			msg.verbose("TSS at address "+tss.getEndpoint().getUrl());
+			UCC.getConsoleLogger().verbose("TSS at address "+tss.getEndpoint().getUrl());
 			_last_TSS = tss.getEndpoint().getUrl();
 			tssAvailable.incrementAndGet();
 		}catch(Exception e){
 			if(Log.getDetailMessage(e).contains("Access denied")){
-				msg.verbose("Access denied on <"+tsf.getEndpoint().getUrl()+">");
+				UCC.getConsoleLogger().verbose("Access denied on <"+tsf.getEndpoint().getUrl()+">");
 			}
 			else{
-				msg.error("Can't create target system.",e);
+				UCC.getConsoleLogger().error("Can't create target system.",e);
 			}
 		}
 	}

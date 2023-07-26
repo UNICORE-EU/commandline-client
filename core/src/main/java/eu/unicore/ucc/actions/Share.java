@@ -13,6 +13,7 @@ import de.fzj.unicore.uas.json.JSONUtil;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.security.OperationType;
+import eu.unicore.ucc.UCC;
 
 /**
  * Shares resources and shows resource ACLs
@@ -137,7 +138,7 @@ public class Share extends ActionBase {
 						permits.add(p);
 					}
 				}
-				if(verbose){
+				if(UCC.getConsoleLogger().isVerbose()){
 					for(ACLEntry p: permits){
 						verbose("-> allow '"+p.accessType+"' when '"+p.matchType+"' is '"+p.requiredValue+"'");
 					}

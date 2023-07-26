@@ -62,7 +62,7 @@ public class Connect extends ActionBase {
 			verbose("Using site default for TSS lifetime.");
 		}
 
-		Connector c=new Connector(registry, configurationProvider, this);
+		Connector c = new Connector(registry, configurationProvider);
 		c.setBlacklist(blacklist);
 		c.run();
 		int tsfAvailable=c.getAvailableTSF();

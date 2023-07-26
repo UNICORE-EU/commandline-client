@@ -18,10 +18,10 @@ public class TestClientTransfers extends EmbeddedTestBase {
 	public void testDownloader() throws Exception {
 		String[] args=new String[]{"list-storages",
 				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-v"
 		};
 		ActionBase b = (ActionBase)UCC.initCommand(args, false);
 		b.initConfigurationProvider();
-		b.setVerbose(true);
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
 		
 		String url = "https://localhost:65322/rest/core/storages/WORK";
@@ -33,7 +33,7 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		System.out.println(sc.getProperties().toString(2));
 		
 		FileDownloader fd = new FileDownloader("test1.dat", "target/data/download1.dat", FileTransferBase.Mode.NORMAL);
-		fd.perform(sc, b);
+		fd.perform(sc);
 		checkFilesOK(testData, new File("target/data/download1.dat"));
 	}
 
@@ -41,10 +41,10 @@ public class TestClientTransfers extends EmbeddedTestBase {
 	public void testUploader() throws Exception {
 		String[] args=new String[]{"list-storages",
 				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-v"
 		};
 		ActionBase b = (ActionBase)UCC.initCommand(args, false);
 		b.initConfigurationProvider();
-		b.setVerbose(true);
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
 		
 		String url = "https://localhost:65322/rest/core/storages/WORK";
@@ -56,7 +56,7 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		System.out.println(sc.getProperties().toString(2));
 		
 		FileUploader fd = new FileUploader(new File("."), "target/data/test1.dat", "/upload1.dat", FileTransferBase.Mode.NORMAL);
-		fd.perform(sc, b);
+		fd.perform(sc);
 		checkFilesOK(testData, new File("target/data/upload1.dat"));
 	}
 	
@@ -64,10 +64,10 @@ public class TestClientTransfers extends EmbeddedTestBase {
 	public void testUploaderWithBaseDir() throws Exception {
 		String[] args=new String[]{"list-storages",
 				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-v"
 		};
 		ActionBase b = (ActionBase)UCC.initCommand(args, false);
 		b.initConfigurationProvider();
-		b.setVerbose(true);
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
 		
 		String url = "https://localhost:65322/rest/core/storages/WORK";
@@ -79,7 +79,7 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		System.out.println(sc.getProperties().toString(2));
 		
 		FileUploader fd = new FileUploader(new File("target/data"), "test1.dat", "/upload1.dat", FileTransferBase.Mode.NORMAL);
-		fd.perform(sc, b);
+		fd.perform(sc);
 		checkFilesOK(testData, new File("target/data/upload1.dat"));
 	}
 }

@@ -11,11 +11,11 @@ import java.util.ServiceLoader;
 import java.util.regex.Pattern;
 
 import de.fzj.unicore.uas.FiletransferParameterProvider;
-import de.fzj.unicore.uas.util.MessageWriter;
 import de.fzj.unicore.uas.util.PropertyHelper;
 import eu.unicore.client.core.FileList.FileListEntry;
-import eu.unicore.ucc.util.JSONUtil;
 import eu.unicore.client.core.StorageClient;
+import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.util.JSONUtil;
 
 public abstract class FileTransferBase {
 
@@ -48,12 +48,12 @@ public abstract class FileTransferBase {
 
 	protected String preferredProtocol;
 
-	public abstract void perform(StorageClient sms, MessageWriter msg)throws Exception;
+	public abstract void perform(StorageClient sms)throws Exception;
 	
-	protected Map<String,String>makeExtraParameters(String protocol, MessageWriter msg){
+	protected Map<String,String>makeExtraParameters(String protocol){
 		Map<String, String> res;
 		if(extraParameterSource==null){
-			res=new HashMap<String, String>();
+			res=new HashMap<>();
 		}
 		else{
 			String p=String.valueOf(protocol);
@@ -67,7 +67,7 @@ public abstract class FileTransferBase {
 			pp.provideParameters(res, protocol);
 		}
 		if(res.size()>0){
-			msg.verbose("Have "+res.size()+" extra parameters for protocol "+protocol);
+			UCC.getConsoleLogger().verbose("Have "+res.size()+" extra parameters for protocol "+protocol);
 		}
 		return res;
 	}

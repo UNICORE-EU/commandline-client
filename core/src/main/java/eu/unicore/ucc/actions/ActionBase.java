@@ -126,7 +126,7 @@ public abstract class ActionBase extends Command {
 		if(blacklistP!=null) {
 			blacklist = blacklistP.split("[ ,]+");
 		}else blacklist = new String[0];
-		if(verbose && blacklist.length>0) {
+		if(blacklist.length>0) {
 			verbose("Blacklist = "+Arrays.asList(blacklist));
 		}
 	}
@@ -208,7 +208,7 @@ public abstract class ActionBase extends Command {
 		//accept list of registries either comma- or space-separated
 		String[] urls=registryURL.split("[, ]");
 		if(urls.length>1){
-			MultiRegistryClient erc= new MultiRegistryClient(this);
+			MultiRegistryClient erc= new MultiRegistryClient();
 			for(String url: urls){
 				if(url.trim().length()==0)continue;
 				verbose("Registry = "+url);
@@ -272,7 +272,7 @@ public abstract class ActionBase extends Command {
 	}
 	
 	protected Location createLocation(String descriptor) {
-		return Resolve.resolve(descriptor, registry, configurationProvider, this);
+		return Resolve.resolve(descriptor, registry, configurationProvider);
 	}
 	
 	protected boolean isBlacklisted(String url) {

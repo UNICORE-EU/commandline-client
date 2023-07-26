@@ -1,6 +1,5 @@
 package eu.unicore.ucc.lookup;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.io.Location;
@@ -21,11 +20,9 @@ public interface IResolve {
 	 * @param uri
 	 * @param registry
 	 * @param configurationProvider
-	 * @param messageWriter
 	 * @return a {@link Location} object or <code>null</code>
 	 */
-	public Location resolve(String uri, IRegistryClient registry, 
-			UCCConfigurationProvider configurationProvider, MessageWriter messageWriter);
+	public Location resolve(String uri, IRegistryClient registry, UCCConfigurationProvider configurationProvider);
 	
 	public String synopsis();
 }

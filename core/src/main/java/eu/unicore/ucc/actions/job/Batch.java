@@ -258,7 +258,7 @@ public class Batch extends ActionBase {
 				error("Can't read "+swf.getAbsolutePath(),null);
 			}
 			else{
-				siteSelectionStragegy=new WeightedSelection(swf,this);
+				siteSelectionStragegy = new WeightedSelection(swf);
 				verbose("Using site selection weights from "+swf.getAbsolutePath());
 			}
 
@@ -337,7 +337,6 @@ public class Batch extends ActionBase {
 			final UCCBuilder b;
 			File f=new File(nextReq);
 			b=new UCCBuilder(f, registry, configurationProvider);
-			b.setMessageWriter(this);
 			b.setProperty("source", nextReq);
 			String requestName=f.getName();
 			//split off extension
@@ -366,7 +365,7 @@ public class Batch extends ActionBase {
 			if(isShutdown)return;
 			b.setProperty("Output",output.getAbsolutePath());
 			b.setProperty("IDLocation",running.getRequestDir().getAbsolutePath());
-			Runner r = new Runner(registry, configurationProvider, b, this);
+			Runner r = new Runner(registry, configurationProvider, b);
 			r.setAsyncMode(true);
 			r.setQuietMode(false);
 			//TODO r.setCheckResources(!noResourceCheck);
@@ -397,7 +396,6 @@ public class Batch extends ActionBase {
 			if(isShutdown)return;
 			final File f=new File(nextRunning);
 			final UCCBuilder b=new UCCBuilder(f, registry, configurationProvider);
-			b.setMessageWriter(this);
 			b.setProperty("Output",output.getAbsolutePath());
 			b.setProperty("IDLocation",running.getRequestDir().getAbsolutePath());
 			b.setProperty("KeepFinishedJob",""+keepJobs);
@@ -415,8 +413,7 @@ public class Batch extends ActionBase {
 		if(isShutdown)return;
 		String req=b.getProperty("source");
 		try{
-			logger.debug("Processing running job <"+req+">");
-			Runner r=new Runner(registry, configurationProvider, b, this);
+			Runner r = new Runner(registry, configurationProvider, b);
 			r.setAsyncMode(true);
 			//TODO r.setCheckResources(!noResourceCheck);
 			r.setNoFetchOutCome(noFetchOutcome);

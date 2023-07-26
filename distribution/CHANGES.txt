@@ -1,10 +1,19 @@
 UCC Changelog
 =============
-Issue tracker: https://sourceforge.net/p/unicore/issues
+Issue tracker:
+
+ https://github.com/UNICORE-EU/commandline-client/issues
+ https://sourceforge.net/p/unicore/issues
+
 
 *** JAVA VERSION NOTE:
 
    This release requires Java 11 or later!
+
+Version 9.2.3 (released mmm dd, 2023)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ - new feature: OIDC-SERVER authentication method now supports
+   2FA / OTP and refresh token mechanism (tested with Keycloak)
 
 Version 9.2.2 (released Jun 1, 2023)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -68,7 +68,7 @@ public class CatFile extends FileOperation implements StorageConstants {
 			exp.setStartByte(startByte);
 			exp.setEndByte(endByte);
 		}
-		exp.perform(sms, this);
+		exp.perform(sms);
 	}
 
 	OutputStream getStdout(){

@@ -19,9 +19,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.cli.ParseException;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
-import eu.unicore.ucc.helpers.DefaultMessageWriter;
+import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.helpers.JLineLogger;
 import eu.unicore.ucc.runner.Broker;
@@ -47,9 +46,9 @@ public class UCC{
 
 	public static Command lastCommand=null;
 
-	public static NumberFormat numberFormat=NumberFormat.getInstance();
+	public static final NumberFormat numberFormat = NumberFormat.getInstance();
 
-	private static MessageWriter msg = new DefaultMessageWriter();
+	private static final ConsoleLogger msg = new ConsoleLogger();
 
 	public static String getVersion(){
 		String v = UCC.class.getPackage().getSpecificationVersion();
@@ -114,8 +113,8 @@ public class UCC{
 		System.err.println("UCC " + version);
 		System.err.println("Usage: ucc <command> [OPTIONS] <args>");
 		System.err.println("The following commands are available:");
-		List<Command>cmds=getAllCommands();
-		Collections.sort(cmds, new Comparator<Command>() {
+		List<Command>cmds = getAllCommands();
+		Collections.sort(cmds, new Comparator<>() {
 			public int compare(Command e1, Command e2) {
 				return e1.getCommandGroup().compareTo(
 						e2.getCommandGroup());
@@ -247,7 +246,7 @@ public class UCC{
 	 * @param brokerName - broker to use. If <code>null</code>, the best broker will be used
 	 * @param msg - message writer
 	 */
-	public static Broker getBroker(String brokerName, MessageWriter msg){
+	public static Broker getBroker(String brokerName){
 		Broker broker=null;
 		ServiceLoader<Broker>loader=ServiceLoader.load(Broker.class);
 		Iterator<Broker>iter=loader.iterator();
@@ -317,6 +316,7 @@ public class UCC{
 				printVersion();
 			}else{
 				cmd = initCommand(args, !unitTesting);
+				msg.setPrefix("[ucc "+cmd.getName()+"]");
 				cmd.process();
 				cmd.postProcess();
 				lastCommand = cmd;
@@ -344,19 +344,8 @@ public class UCC{
 
 	}
 
-	/**
-	 * get the current default message writer
-	 */
-	public static MessageWriter getMessageWriter(){
+	public static ConsoleLogger getConsoleLogger(){
 		return msg;
-	}
-
-	/**
-	 * set the current default message writer
-	 * @param writer
-	 */
-	public static void setMessageWriter(MessageWriter writer){
-		msg=writer;
 	}
 
 	private static String[] help = {"-?","?","-h","--help","help"};

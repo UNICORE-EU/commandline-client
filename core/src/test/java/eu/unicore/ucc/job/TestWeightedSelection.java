@@ -14,7 +14,7 @@ public class TestWeightedSelection {
 
 	@Test
 	public void test1(){
-		WeightedSelection ws=new WeightedSelection(new File("src/test/resources/conf/testweights.properties"),null);
+		WeightedSelection ws = new WeightedSelection(new File("src/test/resources/conf/testweights.properties"));
 		Set<String> sites=new HashSet<String>();
 		sites.add("SITE1");
 		sites.add("SITE2");
@@ -29,7 +29,7 @@ public class TestWeightedSelection {
 	@Test
 	//test setting weight to zero
 	public void test2(){
-		WeightedSelection ws=new WeightedSelection(new File("src/test/resources/conf/testweights.properties"),null);
+		WeightedSelection ws = new WeightedSelection(new File("src/test/resources/conf/testweights.properties"));
 		Set<String> sites=new HashSet<String>();
 		sites.add("SITE1");
 		sites.add("SITE2");
@@ -46,7 +46,7 @@ public class TestWeightedSelection {
 	@Test
 	//test setting default weight
 	public void test3(){
-		WeightedSelection ws=new WeightedSelection(new File("src/test/resources/conf/testweights.properties"),null);
+		WeightedSelection ws = new WeightedSelection(new File("src/test/resources/conf/testweights.properties"));
 		Set<String> sites=new HashSet<String>();
 		sites.add("SITE1");
 		sites.add("SITE2");

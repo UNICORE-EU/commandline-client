@@ -5,9 +5,6 @@ import java.util.Properties;
 
 import org.json.JSONObject;
 
-import eu.unicore.security.wsutil.client.OAuthBearerTokenOutInterceptor;
-import eu.unicore.util.httpclient.DefaultClientConfiguration;
-
 /**
  * Gets a Bearer token from 'oidc-agent'
  * https://github.com/indigo-dc/oidc-agent
@@ -60,21 +57,9 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 				"\nFor configuring your trusted CAs and certificates, use the usual 'truststore.*' properties\n";
 	}
 
-	@Override
-	public DefaultClientConfiguration getAnonymousClientConfiguration() {
-		DefaultClientConfiguration dcc = super.getAnonymousClientConfiguration();
-		try{
-			retrieveToken(dcc);
-		}catch(Exception ex){
-			throw new RuntimeException(ex);
-		}
-		if(token!=null){
-			dcc.getExtraSecurityTokens().put(OAuthBearerTokenOutInterceptor.TOKEN_KEY, token);
-		}
-		return dcc;
-	}
 
-	protected void retrieveToken(DefaultClientConfiguration dcc) throws Exception {
+	@Override
+	protected void retrieveToken() throws Exception {
 		setupOIDCAgent();
 		
 		String account = oidcProperties.getValue(OIDCAgentProperties.ACCOUNT);
@@ -93,9 +78,8 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 			String error = reply.getString("error");
 			throw new IOException("Error received from oidc-agent: <"+error+">");
 		}
-		
 		token = reply.getString("access_token");
-		
+		refreshToken = reply.getString("refresh_token");
 	}
 
 	protected void setupOIDCAgent() throws Exception {

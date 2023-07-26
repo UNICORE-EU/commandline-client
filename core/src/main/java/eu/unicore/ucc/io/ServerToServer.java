@@ -7,7 +7,6 @@ import java.util.Properties;
 
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import de.fzj.unicore.uas.util.PropertyHelper;
 import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.Endpoint;
@@ -15,7 +14,9 @@ import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.TransferControllerClient;
 import eu.unicore.ucc.Constants;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
+import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.util.JSONUtil;
 import eu.unicore.ucc.util.ProgressBar;
@@ -50,7 +51,7 @@ public class ServerToServer implements Constants {
 
 	private String scheduled=null;
 
-	private MessageWriter msg;
+	private final ConsoleLogger msg;
 
 	private String transferAddress;
 
@@ -61,6 +62,7 @@ public class ServerToServer implements Constants {
 		this.targetDesc = targetDesc;
 		this.configurationProvider = configurationProvider;
 		this.preferredProtocol = "BFT";
+		this.msg = UCC.getConsoleLogger();
 	}
 
 	public void setExtraParameterSource(Properties properties){
@@ -184,7 +186,7 @@ public class ServerToServer implements Constants {
 	 */
 	protected void waitForCompletion()throws Exception{
 		long transferred=-1;
-		ProgressBar p=new ProgressBar(sourceDesc.getName(),remoteSize,msg);
+		ProgressBar p=new ProgressBar(sourceDesc.getName(),remoteSize);
 		tcc.setUpdateInterval(-1);
 		String status = "UNDEFINED";
 		do{
@@ -253,10 +255,6 @@ public class ServerToServer implements Constants {
 		return remoteSize;
 	}
 
-	public void setMessageWriter(MessageWriter msg) {
-		this.msg = msg;
-	}
-	
 	public String getTransferAddress() {
 		return transferAddress;
 	}

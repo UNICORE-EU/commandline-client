@@ -14,7 +14,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Logger;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
 import eu.unicore.util.Log;
@@ -24,15 +23,13 @@ import eu.unicore.util.Log;
  * 
  * @author schuller
  */
-public abstract class Command implements Constants, MessageWriter {
+public abstract class Command implements Constants {
 
 	protected static final Logger logger = Log.getLogger("UCC", Command.class);
 
 	private final UCCOptions options;
 
 	private CommandLine line;
-
-	protected boolean verbose;
 
 	protected long startTime;
 	protected long endTime;
@@ -64,10 +61,9 @@ public abstract class Command implements Constants, MessageWriter {
 		}
 		CommandLineParser parser = new DefaultParser();
 		line = parser.parse( getOptions(), args );
-		UCC.setMessageWriter(this);
 
 		if(getCommandLine().hasOption(OPT_VERBOSE)){
-			verbose=true;
+			UCC.getConsoleLogger().setVerbose(true);
 		}
 
 		loadUserProperties();
@@ -233,7 +229,6 @@ public abstract class Command implements Constants, MessageWriter {
 			printUsage();
 			endProcessing();
 		}
-		verbose = getBooleanOption(OPT_VERBOSE_LONG, OPT_VERBOSE);
 		timing = getBooleanOption(OPT_TIMING_LONG, OPT_TIMING);
 		if(timing){
 			startTime=System.currentTimeMillis();
@@ -394,41 +389,19 @@ public abstract class Command implements Constants, MessageWriter {
 		return val;
 	}
 
-	@Override
 	public void verbose(String message){
-		if(verbose)System.out.println("[ucc "+getName()+"] "+message);
-		logger.debug(message);
+		UCC.getConsoleLogger().verbose(message);
 	}
 	
-	@Override
 	public void message(String message){
 		if(UCC.mute)return;
-		System.out.println(message);
-		logger.debug(message);
+		UCC.getConsoleLogger().message(message);
 	}
 
-	@Override
 	public void error(String message, Throwable cause){
-		System.err.println(message);
-		if(cause!=null){
-			System.err.println("The root error was: "+Log.getDetailMessage(cause));
-			if(verbose)cause.printStackTrace();
-			else{
-				System.err.println("Re-run in verbose mode (-v) to see the full error stack trace.");
-			}
-		}
-		logger.debug(message, cause);
+		UCC.getConsoleLogger().error(message,cause);
 	}
 
-	@Override
-	public boolean isVerbose(){
-		return verbose;
-	}
-	
-	public void setVerbose(boolean verbose){
-		this.verbose = verbose;
-	}
-	
 	public void setOutputDirectory(File output){
 		this.output=output;
 	}

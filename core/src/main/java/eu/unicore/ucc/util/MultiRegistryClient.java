@@ -8,11 +8,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.rest.client.Resources;
+import eu.unicore.ucc.UCC;
 
 /**
  * a more flexible version of a multi-registry client where the
@@ -25,17 +25,11 @@ import eu.unicore.services.rest.client.Resources;
  */
 public class MultiRegistryClient implements IRegistryClient {
 
-	private final List<IRegistryClient>clients = new ArrayList<IRegistryClient>();
+	private final List<IRegistryClient>clients = new ArrayList<>();
 
 	private boolean filterDuplicates=true;
 
 	private String connectionStatus=null;
-
-	private final MessageWriter msg;
-
-	public MultiRegistryClient(MessageWriter msg){
-		this.msg=msg;
-	}
 
 	public void addRegistry(IRegistryClient registry){
 		clients.add(registry);
@@ -53,7 +47,7 @@ public class MultiRegistryClient implements IRegistryClient {
 					result.addAll(res);
 				}
 			}catch(Exception ex){
-				msg.verbose("Registry at "+getAddress(c)+" is not available: "+ex.getMessage());
+				UCC.getConsoleLogger().verbose("Registry at "+getAddress(c)+" is not available: "+ex.getMessage());
 			}
 		}
 		return result;
@@ -71,7 +65,7 @@ public class MultiRegistryClient implements IRegistryClient {
 					result.addAll(res);
 				}
 			}catch(Exception ex){
-				msg.verbose("Registry at "+getAddress(c)+" is not available: "+ex.getMessage());
+				UCC.getConsoleLogger().verbose("Registry at "+getAddress(c)+" is not available: "+ex.getMessage());
 			}
 		}
 		return result;

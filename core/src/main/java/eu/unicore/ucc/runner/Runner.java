@@ -13,8 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.JSONObject;
 
-//import de.fzj.unicore.uas.json.JSONUtil;
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.IJobSubmission;
 import eu.unicore.client.core.JobClient;
@@ -29,7 +27,7 @@ import eu.unicore.ucc.actions.job.Batch;
 import eu.unicore.ucc.actions.job.GetOutcome;
 import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.ucc.helpers.DefaultMessageWriter;
+import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase.Mode;
 import eu.unicore.ucc.util.JSONUtil;
@@ -57,7 +55,7 @@ public class Runner implements Runnable {
 
 	private static final AtomicInteger counter=new AtomicInteger(0);
 
-	private MessageWriter msg;
+	private ConsoleLogger msg;
 
 	private UCCBuilder builder;
 
@@ -145,10 +143,10 @@ public class Runner implements Runnable {
 	}
 
 	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider, UCCBuilder builder){
-		this(registry,configurationProvider,builder,new DefaultMessageWriter());
+		this(registry,configurationProvider,builder,new ConsoleLogger());
 	}
 
-	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider,UCCBuilder builder, MessageWriter writer){
+	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider,UCCBuilder builder, ConsoleLogger writer){
 		this();
 		this.registry=registry;
 		this.builder=builder;
@@ -338,7 +336,7 @@ public class Runner implements Runnable {
 			return;
 		}
 		if(broker==null){
-			broker = UCC.getBroker("LOCAL", msg);
+			broker = UCC.getBroker("LOCAL");
 		}
 		try{
 			Endpoint epr = broker.findTSSAddress(registry, configurationProvider, builder, selectionStrategy);
@@ -364,7 +362,7 @@ public class Runner implements Runnable {
 			return;
 		}
 		if(broker==null){
-			broker = UCC.getBroker("LOCAL", msg);
+			broker = UCC.getBroker("LOCAL");
 		}
 		try{
 			Collection<Endpoint> eprs=broker.listCandidates(registry, configurationProvider, builder);
@@ -434,11 +432,11 @@ public class Runner implements Runnable {
 	}
 
 
-	public MessageWriter getMessageWriter() {
+	public ConsoleLogger getConsoleLogger() {
 		return msg;
 	}
 
-	public void setMessageWriter(MessageWriter msg) {
+	public void setConsoleLogger(ConsoleLogger msg) {
 		this.msg = msg;
 	}
 
@@ -519,9 +517,9 @@ public class Runner implements Runnable {
 				//attempt to recover or fail (and abort / destroy job)?
 				if(!"BFT".equals(e.getChosenProtocol())){
 					//retry with BFT
-					msg.message("ERROR performing file export: "+
+					UCC.getConsoleLogger().message("ERROR performing file export: "+
 							Log.createFaultMessage(re.getErrorReason(), re.getCause()));
-					msg.message("Re-trying import using BFT protocol");
+					UCC.getConsoleLogger().message("Re-trying import using BFT protocol");
 					// e.setPreferredProtocols(...);
 					performExportToLocal(e);
 				}
@@ -537,7 +535,7 @@ public class Runner implements Runnable {
 			if(imp.getChosenProtocol()==null){
 				//imp.setPreferredProtocols(preferredProtocols);
 			}
-			imp.perform(jobClient.getWorkingDirectory(), msg);
+			imp.perform(jobClient.getWorkingDirectory());
 		}
 		catch(Exception ex){
 			if(!imp.isFailOnError()){
@@ -564,7 +562,7 @@ public class Runner implements Runnable {
 		}
 		try{
 			//resolve the "from" address
-			Location l = Resolve.resolve(e.getFrom(), registry, configurationProvider, msg);
+			Location l = Resolve.resolve(e.getFrom(), registry, configurationProvider);
 			StorageClient sms=null;
 			if(!l.isLocal()){
 				String url = l.getSmsEpr();
@@ -576,7 +574,7 @@ public class Runner implements Runnable {
 			else{
 				sms=jobClient.getWorkingDirectory();
 			}
-			e.perform(sms, msg);
+			e.perform(sms);
 		}
 		catch(Exception ex){
 			if(!e.isFailOnError()){
@@ -720,7 +718,7 @@ public class Runner implements Runnable {
 	/**
 	 * writes the current job's properties doc to a file in the output directory, 
 	 * named "job_id.properties" where job_id is the unique ID of the job.
-	 * The absolute path of this file is echoed to the messageWriter 
+	 * The absolute path of this file is echoed to the ConsoleLogger 
 	 *  
 	 * @return the absolute path of the properties file
 	 */
@@ -900,7 +898,7 @@ public class Runner implements Runnable {
 				try{
 					r.doImport();
 				}catch(RunnerException re){
-					r.msg.message("Data import failed, removing the job.");
+					r.msg.error("Data import failed, removing the job.", re);
 					try{
 						r.jobClient.delete();
 					}catch(Exception ex){
@@ -1063,7 +1061,7 @@ public class Runner implements Runnable {
 
 		states.put(FINISHED, new State(){
 			public State process(Runner r){
-				r.msg.message("Job already finished.");
+				r.msg.verbose("Job already finished.");
 				return getState(FINISHED);
 			}
 			public String getName(){
@@ -1077,7 +1075,7 @@ public class Runner implements Runnable {
 
 		states.put(EXITING, new State(){
 			public State process(Runner r){
-				r.msg.message("Dry-run mode, stopping processing.");
+				r.msg.verbose("Dry-run mode, stopping processing.");
 				return getState(EXITING);
 			}
 			public String getName(){

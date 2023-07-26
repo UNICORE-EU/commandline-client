@@ -2,9 +2,9 @@ package eu.unicore.ucc.lookup;
 
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.lookup.Filter;
+import eu.unicore.ucc.UCC;
 
 /**
  * filter according to property values<br/>
@@ -15,8 +15,7 @@ public class PropertyFilter implements Filter {
 	private String modifier;
 	private String value;
 	private String property;
-	private MessageWriter msg;
-	
+
 	private static final String MOD_EQUAL="equals";
 	private static final String MOD_EQUAL_SHORT="eq";
 	private static final String MOD_NOTEQUAL="notequals";
@@ -30,11 +29,10 @@ public class PropertyFilter implements Filter {
 	private static final String MOD_NOTCONTAINS="notcontains";
 	private static final String MOD_NOTCONTAINS_SHORT="nc";
 	
-	private PropertyFilter(String property, String modifier, String value,MessageWriter msg){
+	private PropertyFilter(String property, String modifier, String value){
 		this.modifier=modifier;
 		this.property=property;
 		this.value=value;
-		this.msg=msg;
 	}
 	
 
@@ -45,7 +43,7 @@ public class PropertyFilter implements Filter {
 			String propValue=obj.toString();
 			return compare(value,propValue);
 		}catch(Exception e){
-			msg.error("Can't find property <"+property+">", e);
+			UCC.getConsoleLogger().error("Can't find property <"+property+">", e);
 		}
 		return false;
 	}
@@ -57,7 +55,7 @@ public class PropertyFilter implements Filter {
 		if(modifier.equalsIgnoreCase(MOD_NOTCONTAINS)||modifier.equalsIgnoreCase(MOD_NOTCONTAINS_SHORT))return !actual.contains(expected);
 		if(modifier.equalsIgnoreCase(MOD_LT)||modifier.equalsIgnoreCase(MOD_LT_SHORT))return actual.compareTo(expected)<0;
 		if(modifier.equalsIgnoreCase(MOD_GT)||modifier.equalsIgnoreCase(MOD_GT_SHORT))return actual.compareTo(expected)>0;
-		msg.verbose("Can't compare!");
+		UCC.getConsoleLogger().verbose("Can't compare!");
 		return false;
 	}
 	
@@ -82,17 +80,17 @@ public class PropertyFilter implements Filter {
 		 * accepts arguments: PropertyName [modifier] [value]
 		 * where [modifier] is one of: contains | lessthan | greaterthan | equals | not
 		 */
-		public static Filter create(MessageWriter msg, String... args) {
+		public static Filter create(String... args) {
 			if(args!=null && args.length==3){
 				String propName=args[0];
 				String mod=args[1];
 				String val=args[2];
-				msg.verbose("Filtering on property '"+propName+"'");
+				UCC.getConsoleLogger().verbose("Filtering on property '"+propName+"'");
 				if(acceptModifier(mod)){
-					return new PropertyFilter(propName,mod,val,msg);
+					return new PropertyFilter(propName,mod,val);
 				}
 			}
-			msg.verbose("Could not create filter.");
+			UCC.getConsoleLogger().verbose("Could not create filter.");
 			return null;
 		}
 

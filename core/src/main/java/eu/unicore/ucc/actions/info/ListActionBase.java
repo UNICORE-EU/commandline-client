@@ -120,7 +120,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	}
 	
 	protected Filter createFilter(String[] args){
-		filter=PropertyFilter.Factory.create(this, args);
+		filter=PropertyFilter.Factory.create(args);
 		if(filter==null){
 			throw new IllegalArgumentException("Filter specification <"+Arrays.asList(args)+"> not understood.");
 		}

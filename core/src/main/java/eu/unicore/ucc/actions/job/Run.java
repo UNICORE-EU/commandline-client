@@ -217,7 +217,6 @@ public class Run extends ActionBase {
 		try{
 			File jobFile = new File(jobFileName);
 			builder = new UCCBuilder(jobFile, registry, configurationProvider);
-			builder.setMessageWriter(this);
 			verbose("Read job from <"+jobFileName+">");
 		}catch(Exception e){
 			error("Can't parse job file <"+jobFileName+">",e);
@@ -263,7 +262,7 @@ public class Run extends ActionBase {
 	}
 	
 	protected int run(){
-		runner=new Runner(registry,configurationProvider,builder,this);
+		runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(!synchronous);
 		runner.setQuietMode(quiet);
 		runner.setBriefOutfileNames(brief);
@@ -273,7 +272,7 @@ public class Run extends ActionBase {
 		if(siteName!=null){
 			brokerName = "LOCAL";
 		}
-		runner.setBroker(UCC.getBroker(brokerName, this));
+		runner.setBroker(UCC.getBroker(brokerName));
 		if(allocation!=null) {
 			try {
 				AllocationClient ac = new AllocationClient(new Endpoint(allocation),

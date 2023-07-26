@@ -5,8 +5,8 @@ import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.InfoCmp.Capability;
 
 import de.fzj.unicore.uas.fts.ProgressListener;
-import de.fzj.unicore.uas.util.MessageWriter;
 import de.fzj.unicore.uas.util.UnitParser;
+import eu.unicore.ucc.UCC;
 
 /**
  * console progress bar using jline
@@ -15,8 +15,7 @@ import de.fzj.unicore.uas.util.UnitParser;
  */
 public class ProgressBar implements ProgressListener<Long> {
 
-	private Terminal terminal;	
-	private final MessageWriter msg;
+	private Terminal terminal;
 	private long size=-1;
 	private long have=0;
 	private long startedAt=0;
@@ -36,8 +35,8 @@ public class ProgressBar implements ProgressListener<Long> {
 	 * create a new progress bar
 	 * @param msg - message writer
 	 */
-	public ProgressBar(MessageWriter msg){
-		this("",-1,msg);
+	public ProgressBar(){
+		this("",-1);
 	}
 
 	/**
@@ -46,14 +45,13 @@ public class ProgressBar implements ProgressListener<Long> {
 	 * @param size - if this is non-positive, a "spinning" progress indicator will be displyoed
 	 * @param msg - message writer for logging
 	 */
-	public ProgressBar(String identifier,long size, MessageWriter msg){
+	public ProgressBar(String identifier,long size){
 		this.identifier=identifier;
-		this.msg=msg;
 		startedAt=System.currentTimeMillis();
 		try {
 			terminal = TerminalBuilder.terminal();
 		} catch (Exception e) {
-			msg.error("Could not setup jline console output: "+e,null);
+			UCC.getConsoleLogger().error("Could not setup jline console output: "+e,null);
 		}
 		setSize(size);
 	}
@@ -113,7 +111,7 @@ public class ProgressBar implements ProgressListener<Long> {
 			terminal.flush();
 		}
 		catch (Exception e) {
-			msg.error("Could not output to jline console: "+e,null);
+			UCC.getConsoleLogger().error("Could not output to jline console: "+e,null);
 			terminal = null;
 		}
 	}

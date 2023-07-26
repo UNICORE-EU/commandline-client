@@ -6,12 +6,10 @@ import java.util.ServiceLoader;
 
 import org.apache.commons.cli.Option;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.ucc.helpers.DefaultMessageWriter;
 import eu.unicore.ucc.helpers.ResourceCache;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.lookup.IResolve;
@@ -32,14 +30,9 @@ public class Resolve extends ActionBase {
 	private final static List<IResolve>resolvers = new ArrayList<>();
 
 	static {
-		MessageWriter msg = new DefaultMessageWriter();
-		try{
-			ServiceLoader<IResolve> authn=ServiceLoader.load(IResolve.class);
-			for(IResolve p: authn){
-				addResolver(p);
-			}
-		}catch(Exception ex){
-			msg.error("Could not load URI resolver(s)", ex);
+		ServiceLoader<IResolve> authn=ServiceLoader.load(IResolve.class);
+		for(IResolve p: authn){
+			addResolver(p);
 		}
 	}
 	/**
@@ -78,14 +71,13 @@ public class Resolve extends ActionBase {
 	 * @param messageWriter
 	 * @return Location object corresponding to the given URI
 	 */
-	public static Location resolve(String uri, IRegistryClient registry, UCCConfigurationProvider security, 
-			MessageWriter messageWriter){
+	public static Location resolve(String uri, IRegistryClient registry, UCCConfigurationProvider security){
 		String cached = (String)cache.get("_locations_", uri);
 		if(cached!=null) {
 			return new Location(cached);
 		}
 		for(IResolve r: resolvers){
-			Location loc=r.resolve(uri,registry,security,messageWriter);
+			Location loc=r.resolve(uri,registry,security);
 			if(loc!=null) {
 				cache.put("_locations_", uri, loc.getUnicoreURI());
 				return loc;
@@ -114,7 +106,7 @@ public class Resolve extends ActionBase {
 
 	protected void doResolve() {
 		String target = getCommandLine().getArgs()[1];;
-		targetDesc = resolve(target,registry,configurationProvider,this);
+		targetDesc = resolve(target,registry,configurationProvider);
 		full = getBooleanOption("full", "f");
 		Endpoint e = new Endpoint(targetDesc.getSmsEpr());
 		try{

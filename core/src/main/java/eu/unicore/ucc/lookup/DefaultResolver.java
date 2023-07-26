@@ -2,7 +2,6 @@ package eu.unicore.ucc.lookup;
 
 import java.net.URI;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.StorageClient;
@@ -24,8 +23,7 @@ public class DefaultResolver implements IResolve {
 	}
 	
 	@Override
-	public Location resolve(String uri, IRegistryClient registry, UCCConfigurationProvider configurationProvider,
-			MessageWriter messageWriter) {
+	public Location resolve(String uri, IRegistryClient registry, UCCConfigurationProvider configurationProvider) {
 		if(!uri.startsWith("unicore://"))return null;
 		try{
 			

@@ -63,7 +63,6 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		this.command = command;
 		AuthenticationProvider ap = UCC.getAuthNMethod(authnMethod);
 		if (ap instanceof PropertiesAwareAuthn){
-			
 			if(userProperties.getProperty("truststore.type")==null) {
 				if(acceptAllCAs) {
 					userProperties.setProperty("truststore.type", "directory");
@@ -100,10 +99,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 	}
 
 	protected String getSessionStorageFile() {
-		if (userProperties != null) {
-			 return userProperties.getProperty("ucc-session-ids");
-		}
-		return null;
+		return userProperties!=null? userProperties.getProperty(Constants.SESSION_ID_FILEKEY) : null;
 	}
 
 	@Override

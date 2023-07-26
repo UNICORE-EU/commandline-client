@@ -8,7 +8,6 @@ import java.util.List;
 import org.json.JSONObject;
 
 import de.fzj.unicore.uas.json.Requirement;
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.lookup.Blacklist;
@@ -17,6 +16,7 @@ import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
+import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.lookup.SiteLister;
 import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Log;
@@ -46,7 +46,7 @@ public class TargetSystemFinder implements Broker, Constants {
 	public Endpoint findTSSAddress(final IRegistryClient registry, 
 			final UCCConfigurationProvider configurationProvider, UCCBuilder builder, SiteSelectionStrategy selectionStrategy)
 					throws Exception{
-		MessageWriter msg=builder.getMessageWriter();
+		ConsoleLogger msg=builder.getMessageWriter();
 		if(selectionStrategy==null)selectionStrategy = new RandomSelection();
 		final List<SiteClient>available = listSites(registry, configurationProvider, builder);
 		SiteClient tss=null;
@@ -85,7 +85,7 @@ public class TargetSystemFinder implements Broker, Constants {
 					throws Exception{
 		final Collection<Requirement> requirements = builder.getRequirements();
 		final String siteName=builder.getSite();
-		final MessageWriter msg=builder.getMessageWriter();
+		final ConsoleLogger msg=builder.getMessageWriter();
 		final List<SiteClient>available=Collections.synchronizedList(new ArrayList<>());
 
 		final String blackList=builder.getProperty("blacklist"); 
@@ -128,7 +128,7 @@ public class TargetSystemFinder implements Broker, Constants {
 	/**
 	 * check resource requirements
 	 */
-	public boolean matches(SiteClient tssClient, Collection<Requirement> requirements, ErrorHolder error, boolean checkResources, MessageWriter msg){
+	public boolean matches(SiteClient tssClient, Collection<Requirement> requirements, ErrorHolder error, boolean checkResources, ConsoleLogger msg){
 		try{
 			if(!checkResources || requirements==null || requirements.size()==0){
 				return true;

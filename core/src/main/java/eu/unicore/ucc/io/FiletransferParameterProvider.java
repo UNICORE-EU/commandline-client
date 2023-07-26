@@ -6,9 +6,9 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.UUID;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.util.Log;
 
 public class FiletransferParameterProvider implements
@@ -16,7 +16,7 @@ de.fzj.unicore.uas.FiletransferParameterProvider {
 
 	@Override
 	public void provideParameters(Map<String, String> params, String protocol) {
-		MessageWriter msg=UCC.getMessageWriter();
+		ConsoleLogger msg = UCC.getConsoleLogger();
 
 		if("UFTP".equals(protocol)){
 			//setup client IP for UFTP

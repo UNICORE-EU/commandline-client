@@ -109,6 +109,7 @@ public class Shell extends ActionBase {
 			System.out.println("UCC "+UCC.getVersion());
 			System.out.println("Welcome to the UCC shell. Enter 'help' for a list of commands. Enter 'exit' to quit.");
 			while(true){
+				UCC.getConsoleLogger().setPrefix("[ucc "+getName()+"]");
 				String s = null;
 				try {
 					s=commandFile!=null?is.readLine():is.readLine("ucc>");
@@ -139,7 +140,7 @@ public class Shell extends ActionBase {
 
 				//else it is a command
 				String[] args = parseCmdlineWithVars(s);
-				if(verbose) {
+				if(UCC.getConsoleLogger().isVerbose()) {
 					StringBuilder sb = new StringBuilder();
 					for(String a: args)sb.append(a).append(" ");
 					verbose(sb.toString());
@@ -157,7 +158,7 @@ public class Shell extends ActionBase {
 
 					Command cmd = UCC.initCommand(args,false);
 					//inherit properties
-					if(verbose)properties.put(OPT_VERBOSE_LONG,"true");
+					if(UCC.getConsoleLogger().isVerbose())properties.put(OPT_VERBOSE_LONG,"true");
 					String authNMethod = getOption(OPT_AUTHN_METHOD_LONG, OPT_AUTHN_METHOD, 
 							KeystoreAuthN.X509);
 					properties.put(OPT_AUTHN_METHOD_LONG, authNMethod);
@@ -166,6 +167,7 @@ public class Shell extends ActionBase {
 					}
 					cmd.setProperties(properties);
 					cmd.setPropertiesFile(propertiesFile);
+					UCC.getConsoleLogger().setPrefix("[ucc "+cmd.getName()+"]");
 					cmd.process();
 					cmd.postProcess();
 				}catch(EndProcessingException epe){
@@ -236,7 +238,9 @@ public class Shell extends ActionBase {
 			String[] paramArgs = new String[args.length-1];
 			System.arraycopy(args, 1, paramArgs, 0, paramArgs.length);
 			properties.putAll(PropertyVariablesResolver.getParameters(paramArgs));
+			boolean verbose = UCC.getConsoleLogger().isVerbose();
 			verbose = Boolean.parseBoolean(properties.getProperty("verbose", String.valueOf(verbose)));
+			UCC.getConsoleLogger().setVerbose(verbose);
 		}
 	}
 

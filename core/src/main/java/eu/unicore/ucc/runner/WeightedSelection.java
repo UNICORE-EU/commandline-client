@@ -10,9 +10,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.core.SiteClient;
-import eu.unicore.ucc.helpers.DefaultMessageWriter;
+import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.helpers.ConsoleLogger;
 
 /**
  * this strategy tries to balance job submissions over the available sites,
@@ -22,8 +22,6 @@ import eu.unicore.ucc.helpers.DefaultMessageWriter;
  */
 public class WeightedSelection implements SiteSelectionStrategy {
 
-	private MessageWriter msg=new DefaultMessageWriter();
-	
 	private final File weightsFile;
 	
 	private long lastAccess=0;
@@ -34,9 +32,8 @@ public class WeightedSelection implements SiteSelectionStrategy {
 
 	public static final String DEFAULT_WEIGHT="UCC_DEFAULT_SITE_WEIGHT";
 	
-	public WeightedSelection(File weightsFile, MessageWriter msg){
+	public WeightedSelection(File weightsFile){
 		this.weightsFile=weightsFile;
-		if(msg!=null)this.msg=msg;
 	}
 
 	public SiteClient select(List<SiteClient> available) {
@@ -48,7 +45,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 				names.add(name);
 				map.put(name,tss);
 			}catch(Exception e){
-				msg.error("",e);
+				UCC.getConsoleLogger().error("",e);
 			}
 		}
 		return map.get(select(map.keySet()));
@@ -73,7 +70,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 					selectedTSS=name;
 				}
 			}catch(Exception e){
-				msg.error("",e);
+				UCC.getConsoleLogger().error("",e);
 			}
 		}
 		storeSelection(selectedTSS);
@@ -112,13 +109,12 @@ public class WeightedSelection implements SiteSelectionStrategy {
 	
 	//check if file was modified, and read the weights if it was
 	protected void checkUpdate(){
+		ConsoleLogger msg = UCC.getConsoleLogger();
 		if(lastAccess<weightsFile.lastModified()){
 			lastAccess=weightsFile.lastModified();
 			Properties p=new Properties();
-			try{
-				FileInputStream fis=new FileInputStream(weightsFile);
+			try(FileInputStream fis = new FileInputStream(weightsFile)){
 				p.load(fis);
-				fis.close();
 			}catch(Exception e){
 				msg.error("Problem reading from site weights file", e);
 				return;
@@ -129,14 +125,14 @@ public class WeightedSelection implements SiteSelectionStrategy {
 				try{
 					i=Integer.parseInt(p.getProperty(key));
 				}catch(Exception e){
-					msg.error("Syntax error in weights file (Format: Site name = <integer weight>", e);
+					UCC.getConsoleLogger().error("Syntax error in weights file (Format: Site name = <integer weight>", e);
 				}
 				weights.put(key,i);
 				if(DEFAULT_WEIGHT.equalsIgnoreCase(key)){
-					msg.verbose("Default site weight <"+i+">");
+					UCC.getConsoleLogger().verbose("Default site weight <"+i+">");
 				}
 				else{
-					msg.verbose("Site <"+key+"> weight <"+i+">");
+					UCC.getConsoleLogger().verbose("Site <"+key+"> weight <"+i+">");
 				}
 				if(weights.get(DEFAULT_WEIGHT)==null){
 					weights.put(DEFAULT_WEIGHT, Integer.valueOf(1));

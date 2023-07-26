@@ -14,7 +14,7 @@ public class TestVariousHelpers {
 
 	@Test
 	public void testDefaultMessageWriter(){
-		DefaultMessageWriter msg=new DefaultMessageWriter();
+		ConsoleLogger msg=new ConsoleLogger();
 		assertFalse(msg.isVerbose());
 		msg.message("test");
 		msg.error("test", new Exception("Some error for testing"));

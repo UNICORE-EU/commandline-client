@@ -103,7 +103,6 @@ public class CP extends FileOperation {
 			throw new IllegalArgumentException("One of source or target must be a UNICORE storage!");
 		}
 		ServerToServer transfer = new ServerToServer(sourceDesc, targetDesc, configurationProvider);
-		transfer.setMessageWriter(this);
 		transfer.setScheduled(scheduled);
 		transfer.setSynchronous(synchronous);
 		transfer.setPreferredProtocol(preferredProtocol);
@@ -144,7 +143,7 @@ public class CP extends FileOperation {
 		StorageClient sms=new StorageClient(new Endpoint(url),
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
-		fd.perform(sms, this);
+		fd.perform(sms);
 	}
 	
 	@Override
@@ -176,7 +175,7 @@ public class CP extends FileOperation {
 	private void rawDownload(String url)throws Exception {
 		File tFile = new File(target);
 		try(OutputStream os=new FileOutputStream(tFile)){
-			runRawTransfer(url, os, new ProgressBar(tFile.getName(),-1,this));
+			runRawTransfer(url, os, new ProgressBar(tFile.getName(),-1));
 		}
 	}
 	
