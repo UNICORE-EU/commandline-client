@@ -6,15 +6,16 @@ client for UNICORE, written in Java.
 
 ## Download
 
-The UCC can be downloaded from SourceForge
-https://sourceforge.net/projects/unicore/files/Clients/Commandline%20Client/
+Binary releases of UCC can be downloaded from
 
-Additionally, you will need a Java runtime (version 11 or later).
+* [SourceForge](https://sourceforge.net/projects/unicore/files/Clients/Commandline%20Client)
+* [GitHub](https://github.com/UNICORE-EU/commandline-client/releases)
+
+Running UCC requires a Java runtime (version 11 or later).
 
 ## Documentation
 
-See the manual at
-https://unicore-docs.readthedocs.io/en/latest/user-docs/ucc
+[UCC manual](https://unicore-docs.readthedocs.io/en/latest/user-docs/ucc)
 
 ## Building from source
 
