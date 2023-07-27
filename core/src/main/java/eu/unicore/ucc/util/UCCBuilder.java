@@ -118,7 +118,8 @@ public class UCCBuilder extends Builder {
 			JSONObject stage = null;
 			try {
 				stage = stages.getJSONObject(i);
-				String uri = stage.getString(key);
+				String uri = stage.optString(key, null);
+				if(uri==null)continue;
 				Location l = Resolve.resolve(uri, registry, configurationProvider);
 				stage.put(key, l.getEndpointURL());
 			}catch(JSONException je) {
@@ -142,13 +143,20 @@ public class UCCBuilder extends Builder {
 					String creation=JSONUtil.getString(jObj,"Mode","NORMAL");
 					failOnError=Boolean.parseBoolean(JSONUtil.getString(jObj,"FailOnError","true"));
 					mode=Mode.valueOf(creation);
-					if(source==null || target==null){
-						throw new IllegalArgumentException("File import specification invalid. Syntax: \"From: <source>, To: <uspacefile>, Mode: overwrite|append|nooverwrite\"");
+					// source can be null if it is an inline import
+					if(source==null && target!=null && JSONUtil.getString(jObj, "Data")==null) {
+						throw new IllegalArgumentException("File import specification invalid: need one of 'From' or 'Data'.");
 					}
-					Location l = createLocation(source);
-					if(l.isLocal()){
+					if(target==null){
+						throw new IllegalArgumentException("File import specification invalid: 'To' is missing.");
+					}
+					Location l = null;
+					if(source!=null) {
+						l = createLocation(source);
+					}
+					if(l!=null && l.isLocal()){
 						failOnError=failOnError & checkLocalFiles;
-						imports.add(new FileUploader(baseDirectory, source,target,mode,failOnError));
+						imports.add(new FileUploader(baseDirectory, source, target, mode, failOnError));
 						msg.verbose("Local file import: "+source+" -> "+target);
 					}
 					else {
