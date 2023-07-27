@@ -31,9 +31,9 @@
      <uas.version>2.5.4</uas.version>
      <wf.version>3.5.4</wf.version>
      <secutils.version>3.4.2</secutils.version>
-     <jnr.version>0.38.19</jnr.version>
-     <groovy.version>4.0.12</groovy.version>
-     <guava.version>32.0.0-jre</guava.version>
+     <jnr.version>0.38.20</jnr.version>
+     <groovy.version>4.0.13</groovy.version>
+     <guava.version>32.1.1-jre</guava.version>
      <jline.version>3.23.0</jline.version>
      <commons-cli.version>1.5.0</commons-cli.version>
      <compiler.fork>true</compiler.fork>
