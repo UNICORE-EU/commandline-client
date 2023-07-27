@@ -10,7 +10,7 @@ Issue tracker:
 
    This release requires Java 11 or later!
 
-Version 9.2.3 (released mmm dd, 2023)
+Version 9.2.3 (released Jul 27, 2023)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  - new feature: OIDC-SERVER authentication method now supports
    2FA / OTP and refresh token mechanism (tested with Keycloak)
