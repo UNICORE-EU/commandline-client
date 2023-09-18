@@ -116,8 +116,8 @@ public class UCC{
 		List<Command>cmds = getAllCommands();
 		Collections.sort(cmds, new Comparator<>() {
 			public int compare(Command e1, Command e2) {
-				return e1.getCommandGroup().compareTo(
-						e2.getCommandGroup());
+				return (e1.getCommandGroup()+e1.getName()).compareTo(
+						e2.getCommandGroup()+e2.getName());
 			}
 		});
 		String lastGroup = "";

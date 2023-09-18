@@ -9,7 +9,7 @@
     <fileSet>
       <includes>
         <include>README</include>
-        <include>CHANGES.txt</include>
+        <include>CHANGES.md</include>
 	<include>../LICENSE</include>	
       </includes>
       <excludes>
