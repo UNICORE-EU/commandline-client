@@ -66,13 +66,7 @@ public class GetFileProperties extends SMSOperation {
 	public String getArgumentList(){
 		return "<[Storage-URL#]/path or [u6://SITENAME/[JobId|StorageName]]/path>";
 	}
-	
-	@Override
-	public String getCommandGroup(){
-		return "Data management";
-	}
-	
-	
+
 	@Override
 	public void process() {
 		super.process();

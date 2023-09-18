@@ -30,9 +30,7 @@ public class JobRestart extends JobOperationBase {
 	}
 
 	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
-		for(Pair<JobClient,UCCBuilder> p: jobs){
-			restart(p.getM1());
-		}
+		jobs.forEach( x -> restart(x.getM1()));
 	}
 
 	protected void restart(JobClient job){

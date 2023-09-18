@@ -60,4 +60,9 @@ public abstract class SMSOperation extends ActionBase {
 		}
 	}
 
+	@Override
+	public String getCommandGroup(){
+		return CMD_GRP_DATA;
+	}
+
 }

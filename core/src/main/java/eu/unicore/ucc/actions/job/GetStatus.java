@@ -54,15 +54,13 @@ public class GetStatus extends JobOperationBase {
 		verbose("Showing detailed job status = "+detailed);
 		
 	}
-	
+
 	@Override
 	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
 		allSuccessful = true;
-		for(Pair<JobClient,UCCBuilder> p: jobs){
-			getStatus(p.getM1());
-		}
+		jobs.forEach( x -> getStatus(x.getM1()));
 	}
-	
+
 	protected void getStatus(JobClient job){
 		try{
 			Status status=job.getStatus();

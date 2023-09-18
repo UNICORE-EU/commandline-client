@@ -47,8 +47,5 @@ public class Mkdir extends SMSOperation {
 	public String getArgumentList(){
 		return "<Storage-URL>/files/dir or <unicore://site/storage_name/dir";
 	}
-	@Override
-	public String getCommandGroup(){
-		return "Data management";
-	}
+
 }

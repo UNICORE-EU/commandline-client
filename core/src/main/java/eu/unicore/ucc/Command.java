@@ -114,7 +114,7 @@ public abstract class Command implements Constants {
 	}
 
 	public String getCommandGroup(){
-		return "Other";
+		return CMD_GRP_OTHER;
 	}
 
 	public UCCOptions getOptions(){

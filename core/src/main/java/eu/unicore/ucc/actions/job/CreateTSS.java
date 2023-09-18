@@ -171,7 +171,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 
 	@Override
 	public String getCommandGroup(){
-		return "General";
+		return CMD_GRP_JOBS;
 	}
 	
 	@Override

@@ -100,7 +100,7 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 
 	private List<Endpoint> findURLs()throws Exception{
 		List<Endpoint>tsfs = registry.listEntries(new RegistryClient.ServiceTypeFilter("TargetSystemFactory"));
-		List<Endpoint>result = new ArrayList<Endpoint>();
+		List<Endpoint>result = new ArrayList<>();
 
 		for(Endpoint epr: tsfs){
 			String tsfURL = epr.getUrl();
@@ -134,7 +134,7 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 
 	@Override
 	public String getCommandGroup() {
-		return "Administration";
+		return CMD_GRP_ADMIN;
 	}
 
 }

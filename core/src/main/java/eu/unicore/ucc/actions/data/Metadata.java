@@ -4,14 +4,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
+import eu.unicore.client.utils.TaskClient;
+import eu.unicore.services.rest.client.BaseClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.io.Location;
@@ -105,7 +111,7 @@ public class Metadata extends ActionBase {
 		String storage = getOption(OPT_STORAGE_LONG, OPT_STORAGE);
 		if(storage==null){
 			String desc=getArgument(1);
-			//try to interpret path as a full UNICORE storage path
+			// interpret path as a full UNICORE storage path
 			Location loc = createLocation(desc);
 			storage=loc.getSmsEpr();
 			path=loc.getName();
@@ -124,35 +130,32 @@ public class Metadata extends ActionBase {
 		if (fName != null) {
 			file = new File(fName);
 		}
-
-		if ("read".startsWith(command)) {
-			if(path==null)path = getArgument(1);
-			doGet();
-		} else if ("write".startsWith(command)) {
-			if(path==null)path = getArgument(1);
-			doWrite();
-		} else if ("update".startsWith(command)) {
-			if(path==null)path = getArgument(1);
-			doUpdate();
-		} else if ("delete".startsWith(command)) {
-			if(path==null)path = getArgument(1);
-			doDelete();
-		} else if ("start-extract".startsWith(command)) {
-			path = getArgument(1);
-			//TODO depth
-
-			doStartExtract();
-		} else if ("search".startsWith(command)) {
+		if ("search".startsWith(command)) {
 			if (query == null) {
 				error("Please provide a query string!", null);
 				endProcessing(1);
 			}
 			doSearch();
 		} else {
-			error("Unknown command : " + command, null);
-			endProcessing(1);
+			if(path==null) {
+				path = getArgument(1);
+			}
+			if ("read".startsWith(command)) {
+				doGet();
+			} else if ("write".startsWith(command)) {
+				doWrite();
+			} else if ("update".startsWith(command)) {
+				doUpdate();
+			} else if ("delete".startsWith(command)) {
+				doDelete();
+			} else if ("start-extract".startsWith(command)) {
+				// TODO depth
+				doStartExtract();
+			} else {
+				error("Unknown command : " + command, null);
+				endProcessing(1);
+			}
 		}
-
 	}
 
 	protected void doGet() {
@@ -178,7 +181,7 @@ public class Metadata extends ActionBase {
 			endProcessing(1);
 		}
 	}
-	
+
 	protected void doUpdate() {
 		try {
 			Map<String, String> data = sms.stat(path).metadata;
@@ -189,7 +192,7 @@ public class Metadata extends ActionBase {
 			endProcessing(1);
 		}
 	}
-	
+
 	protected void doSet(Map<String, String> data) throws Exception {
 		JSONObject update = new JSONObject();
 		update.put("metadata", data);
@@ -199,8 +202,16 @@ public class Metadata extends ActionBase {
 	}
 
 	protected void doSearch() {
-		// TODO
-		error("Not yet implemented",null);
+		try {
+			List<String> files = sms.searchMetadata(query);
+			verbose("Have <"+files.size()+"> results.");
+			for(String f: files) {
+				message("  "+f);
+			}
+		} catch (Exception ex) {
+			error("Error searching metadata on <"+sms.getEndpoint().getUrl()+">", ex);
+			endProcessing(1);
+		}
 	}
 
 	protected void doDelete() {
@@ -212,11 +223,44 @@ public class Metadata extends ActionBase {
 		}
 	}
 
+	private String normalize(String path) {
+		while(path.startsWith("//"))path=path.substring(1);
+		if(!path.startsWith("/"))path = "/"+path;
+		path = FilenameUtils.normalize(path, true);
+		return path;
+	}
+
 	protected void doStartExtract() {
+		JSONObject params = new JSONObject();
+		JSONObject reply = null;
 		try {
-			// TODO
-			error("Not yet implemented",null);
-		} catch (Exception ex) {
+			path = normalize(path);
+			String actionURL = sms.getLinkUrl("metadata-extract")+path;
+			verbose("Extraction URL: "+actionURL);
+			BaseClient bc = new BaseClient(actionURL, sms.getSecurityConfiguration(), sms.getAuth());
+			try(ClassicHttpResponse res = bc.post(params)){
+				bc.checkError(res);
+				if(HttpStatus.SC_NO_CONTENT==res.getCode()) {
+					reply = new JSONObject();
+				}
+				else {
+					reply = bc.asJSON(res);
+				}
+			}
+			message(reply.toString(2));
+			String taskHref = reply.optString("taskHref", null);
+			if(wait && taskHref!=null) {
+				verbose("Waiting for task <"+taskHref+"> to finish...");
+				TaskClient tc = new TaskClient(new Endpoint(taskHref),
+						sms.getSecurityConfiguration(), sms.getAuth());
+				while(!tc.isFinished())Thread.sleep(2000);
+				JSONObject taskProps = tc.getProperties();
+				JSONObject result = taskProps.optJSONObject("result", new JSONObject());
+				message("Status: "+tc.getStatus());
+				message("Result: \n"+result.toString(2));
+			}
+		}
+		catch (Exception ex) {
 			error("Error starting metadata extraction for <" + path + ">", ex);
 			endProcessing(1);
 		}
@@ -299,8 +343,8 @@ public class Metadata extends ActionBase {
 	}
 
 	@Override
-	public String getCommandGroup() {
-		return "Data management";
+	public String getCommandGroup(){
+		return CMD_GRP_DATA;
 	}
 
 	private String getArgument(final int argN) {

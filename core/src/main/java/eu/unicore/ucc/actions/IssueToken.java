@@ -157,7 +157,7 @@ public class IssueToken extends ActionBase {
 	
 	@Override
 	public String getCommandGroup(){
-		return "General";
+		return CMD_GRP_UTILITY;
 	}
 	
 	static String lastToken;

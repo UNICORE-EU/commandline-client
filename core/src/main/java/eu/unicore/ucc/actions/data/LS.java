@@ -162,7 +162,7 @@ public class LS extends SMSOperation {
 
 	@Override
 	public String getDescription(){
-		return "list a storage";
+		return "lists files on a storage";
 	}
 
 	@Override
@@ -179,11 +179,7 @@ public class LS extends SMSOperation {
 	public String format(Calendar c){
 		return UnitParser.getSimpleDateFormat().format(c.getTime());
 	}
-	@Override
-	public String getCommandGroup(){
-		return "Data management";
-	}
-	
+
 	//for unit testing
 	static FileListEntry lastLS;
 	

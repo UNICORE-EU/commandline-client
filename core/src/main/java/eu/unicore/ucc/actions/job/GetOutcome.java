@@ -63,9 +63,7 @@ public class GetOutcome extends JobOperationBase {
 	}
 
 	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
-		for(Pair<JobClient,UCCBuilder> p: jobs){
-			getOutput(p.getM2());
-		}
+		jobs.forEach( x -> getOutput(x.getM2()));
 	}
 	
 	protected void getOutput(UCCBuilder builder){

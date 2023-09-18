@@ -126,4 +126,10 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 		}
 		return selectedProtocol;
 	}
+
+	@Override
+	public String getCommandGroup(){
+		return CMD_GRP_DATA;
+	}
+
 }

@@ -53,8 +53,5 @@ public class Rename extends SMSOperation {
 	public String getArgumentList(){
 		return "<source URL> <target name>";
 	}
-	@Override
-	public String getCommandGroup(){
-		return "Data management";
-	}
+
 }

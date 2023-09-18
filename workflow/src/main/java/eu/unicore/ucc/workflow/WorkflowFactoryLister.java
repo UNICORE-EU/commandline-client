@@ -37,8 +37,8 @@ public class WorkflowFactoryLister extends Lister<WorkflowFactoryClient>{
 	/**
 	 * @param registry
 	 * @param configurationProvider
-	 * @param addressFilter - (optional) filter for accepting/rejecting service URLs
 	 * @param includeInternal - whether to also list UNICORE/X-internal workflow engines
+	 * @param addressFilter - (optional) filter for accepting/rejecting service URLs
 	 * @param executor - (optional)
 	 * 
 	 */

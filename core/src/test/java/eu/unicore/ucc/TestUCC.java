@@ -20,6 +20,7 @@ public class TestUCC {
 
 	@Test
 	public void test_ShowHelp(){
+		UCC.unitTesting = true;
 		UCC.mute=true;
 		String[]args=new String []{"-h"};
 		try{

@@ -119,7 +119,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 	
 	@Override
 	public String getDescription(){
-		return "list remote sites";
+		return "list remote job execution sites";
 	}
 
 	@Override
@@ -128,12 +128,12 @@ public class ListSites extends ListActionBase<SiteClient> {
 	}
 	@Override
 	public String getCommandGroup(){
-		return "General";
+		return CMD_GRP_JOBS;
 	}
 	
 	@Override
 	public String getSynopsis() {
-		return "List the UNICORE sites available to you, together " +
+		return "List the UNICORE job execution sites available to you, together " +
 				"with some information about the site's capabilities. "
 				+"Use the -l or -a options to control the amount of information. "
 				+"Use the -s option to limit the list to a single site.";

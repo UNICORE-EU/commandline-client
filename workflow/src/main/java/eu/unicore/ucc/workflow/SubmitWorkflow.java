@@ -377,7 +377,7 @@ public class SubmitWorkflow extends ActionBase implements
 
 	@Override
 	public String getCommandGroup() {
-		return "Workflow";
+		return CMD_GRP_WORKFLOW;
 	}
 
 	@Override

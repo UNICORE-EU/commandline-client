@@ -1,7 +1,6 @@
 package eu.unicore.ucc.io;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -159,13 +158,8 @@ public abstract class FileTransferBase {
 		if(!hasWildCards(original))return new File[]{original};
 		File parent=original.getParentFile();
 		if(parent==null)parent=new File(".");
-		FilenameFilter filter=new FilenameFilter(){
-			Pattern p=createPattern(name);
-			public boolean accept(File file, String name){
-				return p.matcher(name).matches();
-			}
-		};
-		return parent.listFiles(filter);
+		Pattern p=createPattern(name);
+		return parent.listFiles( (f, n) -> p.matcher(n).matches());
 	}
 
 	protected boolean hasWildCards(File file){
@@ -176,7 +170,7 @@ public abstract class FileTransferBase {
 		return name.contains("*") || name.contains("?");
 	}
 
-	private Pattern createPattern(String nameWithWildcards){
+	protected Pattern createPattern(String nameWithWildcards){
 		String regex=nameWithWildcards.replace("?",".").replace("*", ".*");
 		return Pattern.compile(regex);
 	}

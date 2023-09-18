@@ -53,7 +53,7 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 	}
 	@Override
 	public String getCommandGroup(){
-		return "Workflow";
+		return CMD_GRP_WORKFLOW;
 	}
 
 

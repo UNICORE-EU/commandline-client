@@ -164,11 +164,7 @@ public class CP extends FileOperation {
 	public String getArgumentList(){
 		return "<sources(s)> <target>";
 	}
-	@Override
-	public String getCommandGroup(){
-		return "Data management";
-	}
-	
+
 	// for unit-testing
 	public static String lastTransferAddress;
 	

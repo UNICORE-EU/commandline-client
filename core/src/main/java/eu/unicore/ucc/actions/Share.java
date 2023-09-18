@@ -71,7 +71,7 @@ public class Share extends ActionBase {
 	
 	@Override
 	public String getCommandGroup(){
-		return "General";
+		return CMD_GRP_OTHER;
 	}
 	
 	

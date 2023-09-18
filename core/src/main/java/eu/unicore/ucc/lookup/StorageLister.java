@@ -117,9 +117,7 @@ public class StorageLister extends Lister<StorageClient>{
 		@Override
 		public void run() {
 			try{
-				if(log.isDebugEnabled()){
-					log.debug("Processing site at "+epr.getUrl());
-				}
+				log.debug("Processing site at {}", epr.getUrl());
 				handleEndpoint(epr);
 			}
 			catch(Exception ex){

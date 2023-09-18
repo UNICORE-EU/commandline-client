@@ -124,4 +124,8 @@ public class Groovy extends ActionBase{
 		return false;
 	}
 
+	@Override
+	public String getCommandGroup(){
+		return CMD_GRP_UTILITY;
+	}
 }

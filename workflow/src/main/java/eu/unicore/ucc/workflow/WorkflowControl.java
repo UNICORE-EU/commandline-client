@@ -122,7 +122,7 @@ public class WorkflowControl extends ActionBase {
 	
 	@Override
 	public String getCommandGroup(){
-		return "Workflow";
+		return CMD_GRP_WORKFLOW;
 	}
 	
 	static Map<String,String>lastParams;

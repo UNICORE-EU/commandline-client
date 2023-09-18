@@ -139,4 +139,8 @@ public class OpenTunnel extends ActionBase {
 				configurationProvider.getRESTAuthN());
 	}
 
+	@Override
+	public String getCommandGroup(){
+		return CMD_GRP_UTILITY;
+	}
 }

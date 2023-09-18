@@ -83,8 +83,4 @@ public class RM extends SMSOperation {
 		return "[unicore6://SITENAME/[JobId|StorageName]]";
 	}
 
-	@Override
-	public String getCommandGroup(){
-		return "Data management";
-	}
 }

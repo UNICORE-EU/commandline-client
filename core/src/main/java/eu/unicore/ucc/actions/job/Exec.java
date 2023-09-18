@@ -157,7 +157,6 @@ public class Exec extends ActionBase {
 			if(siteName!=null){
 				builder.setProperty("Site", siteName);
 			}
-			
 			Job job = new Job(builder.getJSON());
 			
 			if(args.length == 1)throw new IllegalArgumentException("Must specify a command");
@@ -165,10 +164,6 @@ public class Exec extends ActionBase {
 			job.executable(args[1]);
 			
 			job.run_on_login_node(loginNode);
-			if(!Boolean.getBoolean(properties.getProperty("UCC_JOBDESCRIPTION_V8", "false"))){
-				job.getJSON().put("Job type", "INTERACTIVE");
-			}
-			// add args
 			if(args.length > 1 ){
 				for(int i=2; i<args.length;i++){
 					job.arguments(args[i]);
@@ -178,7 +173,6 @@ public class Exec extends ActionBase {
 			error("",e);
 			endProcessing(ERROR_CLIENT);
 		}
-
 	}
 
 	protected void run(){

@@ -113,7 +113,7 @@ public abstract class JobOperationBase extends ActionBase {
 
 	@Override
 	public String getCommandGroup(){
-		return "Job execution";
+		return CMD_GRP_JOBS;
 	}
 
 	@Override

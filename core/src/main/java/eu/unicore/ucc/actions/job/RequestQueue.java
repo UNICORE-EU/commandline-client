@@ -81,8 +81,7 @@ public class RequestQueue extends Queue {
 		return new FileFilter(){
 			public boolean accept (File file){
 				return file.getName().endsWith(".u")
-                       || file.getName().endsWith(".jsdl") 
-                       || file.getName().endsWith(".xml");
+                       || file.getName().endsWith(".json");
 			}
 		};
 	}

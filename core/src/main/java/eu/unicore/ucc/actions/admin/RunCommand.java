@@ -170,7 +170,7 @@ public class RunCommand extends ActionBase {
 
 	@Override
 	public String getCommandGroup() {
-		return "Administration";
+		return CMD_GRP_ADMIN;
 	}
 
 }

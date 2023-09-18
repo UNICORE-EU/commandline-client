@@ -61,7 +61,7 @@ public class SystemInfo extends ActionBase {
 
 	@Override
 	public String getCommandGroup(){
-		return "General";
+		return CMD_GRP_UTILITY;
 	}
 	
 	@Override

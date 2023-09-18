@@ -75,7 +75,7 @@ public class Connect extends ActionBase {
 
 	@Override
 	public String getCommandGroup(){
-		return "General";
+		return CMD_GRP_JOBS;
 	}
 
 	static String getLastReqistryURL(){

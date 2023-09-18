@@ -173,7 +173,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 			haveValidFactory=true;
 			try{
 				if(infoOnly){
-					message(getDescription(sfc, true));
+					message(getDescription(sfc));
 				}
 				else{
 					doCreate(sfc);
@@ -224,7 +224,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 
 	@Override
 	public String getCommandGroup(){
-		return "General";
+		return CMD_GRP_DATA;
 	}
 
 	@Override
@@ -242,13 +242,13 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		try{
 			IClientConfiguration securityProperties = configurationProvider.getClientConfiguration(epr.getUrl());
 			StorageFactoryClient smf=new StorageFactoryClient(epr, securityProperties, configurationProvider.getRESTAuthN());
-			return getDescription(smf, true);
+			return getDescription(smf);
 		}catch(Exception ex){
 			return "N/A ["+Log.getDetailMessage(ex)+"]";
 		}
 	}
 
-	protected String getDescription(StorageFactoryClient sfc, boolean addParamInfo) throws Exception {
+	protected String getDescription(StorageFactoryClient sfc) throws Exception {
 		JSONObject pr=sfc.getProperties().getJSONObject("storageDescriptions");
 		StringBuilder sb=new StringBuilder();
 		boolean first=true;
@@ -259,9 +259,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 			String type = types.next();
 			JSONObject desc = pr.getJSONObject(type);
 			sb.append(getBriefDescription(type, desc));
-			if(addParamInfo){
-				sb.append(newline).append(getParameterDescription(desc));
-			}
+			sb.append(newline).append(getParameterDescription(desc));
 			first=false;
 		}
 		return sb.toString();
@@ -271,13 +269,27 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		StringBuilder sb=new StringBuilder();
 		sb.append(type);
 		try{
-			// TODO
+			String description = desc.optString("description", null);
+			if(description!=null) {
+				sb.append(": ").append(description);
+			}
 		}catch(Exception ex){}
 		return sb.toString();
 	}
 
 	protected String getParameterDescription(JSONObject desc) throws JSONException {
-		return desc.toString(2);
+		StringBuilder sb=new StringBuilder();
+		sb.append("  Parameters:");
+		JSONObject parameterDesc = desc.optJSONObject("parameters", new JSONObject());
+		String newline = System.getProperty("line.separator");
+		Iterator<String> params = parameterDesc.keys();
+		while(params.hasNext()){
+			sb.append(newline).append("    ");
+			String p = params.next();
+			String pDesc = parameterDesc.optString(p, "n/a");
+			sb.append(p).append(": ").append(pDesc);
+		}	
+		return sb.toString();
 	}
 
 	private static String lastStorageAddress;

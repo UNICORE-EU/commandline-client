@@ -102,6 +102,6 @@ public class ListJobs extends ListActionBase<JobClient> {
 	}
 	@Override
 	public String getCommandGroup(){
-		return "General";
+		return CMD_GRP_JOBS;
 	}
 }

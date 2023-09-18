@@ -120,7 +120,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	}
 	@Override
 	public String getCommandGroup(){
-		return "General";
+		return CMD_GRP_DATA;
 	}
 
 }

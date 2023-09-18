@@ -93,9 +93,5 @@ public class CatFile extends FileOperation implements StorageConstants {
 	public String getArgumentList(){
 		return "<file_url>";
 	}
-	@Override
-	public String getCommandGroup(){
-		return "Data management";
-	}
 
 }

@@ -58,7 +58,7 @@ public class UCC{
 
 	public static final ExecutorService executor=new ThreadPoolExecutor(4,4,
 			100,TimeUnit.MILLISECONDS,
-			new LinkedBlockingQueue<Runnable>(),
+			new LinkedBlockingQueue<>(),
 			new ThreadFactory(){
 		final AtomicInteger threadNumber = new AtomicInteger(1);
 		public Thread newThread(Runnable r) {
@@ -222,7 +222,7 @@ public class UCC{
 	}
 
 	public static List<Command>getAllCommands(){
-		List<Command>result=new ArrayList<Command>();
+		List<Command>result = new ArrayList<>();
 		for(Class <? extends Command>c: cmds.values()){
 			try{
 				result.add(c.getConstructor().newInstance());

@@ -59,13 +59,12 @@ public class Umask extends ActionBase {
 	public String getArgumentList(){
 		return "<Storage-URL | TargetSystem-URL>";
 	}
-	
+
 	@Override
 	public String getCommandGroup(){
-		return "Data management";
+		return CMD_GRP_DATA;
 	}
-	
-	
+
 	@Override
 	public void process() {
 		super.process();

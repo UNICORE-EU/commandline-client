@@ -101,7 +101,7 @@ public class TestMetadata extends EmbeddedTestBase {
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-s", storage,
 				"-C", "start-extract",
-				"/",
+				"testfile",
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);

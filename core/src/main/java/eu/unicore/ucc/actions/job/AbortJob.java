@@ -23,11 +23,9 @@ public class AbortJob extends JobOperationBase {
 	public String getDescription(){
 		return "abort job(s)";
 	}
-	
+
 	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
-		for(Pair<JobClient,UCCBuilder> p: jobs){
-			abort(p.getM1());
-		}
+		jobs.forEach( x -> abort(x.getM1()));
 	}
 
 	protected void abort(JobClient job){

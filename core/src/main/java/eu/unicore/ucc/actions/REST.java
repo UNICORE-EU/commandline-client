@@ -78,6 +78,11 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		return "perform a low-level REST API operation";
 	}
 
+	@Override
+	public String getCommandGroup(){
+		return CMD_GRP_UTILITY;
+	}
+
 	protected boolean requireRegistry(){
 		return false;
 	}

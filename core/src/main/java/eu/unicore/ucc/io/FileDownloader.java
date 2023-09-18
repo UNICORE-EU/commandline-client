@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import de.fzj.unicore.uas.fts.FiletransferOptions;
 import de.fzj.unicore.uas.fts.FiletransferOptions.IMonitorable;
@@ -98,26 +99,29 @@ public class FileDownloader extends FileTransferBase {
 	}
 	
 	protected void performWildCardExport(StorageClient sms)throws Exception{
-		String dir=getDir(from);
+		String dir = getDir(from);
+		Pattern p = createPattern(getName(from));
 		if(dir==null)dir="/";
-		FileList files=sms.ls(dir);
-		File targetDir=targetStream==null?new File(to):null;
+		FileList files = sms.ls(dir);
+		File targetDir = targetStream==null ? new File(to) : null;
 		if(targetStream==null){
 			if(!targetDir.isDirectory())throw new IOException("Target is not a directory.");
 		}
 		for(FileListEntry f: files.list(0, 1000)){
-			download(f, targetDir, sms);
+			if(p.matcher(new File(f.path).getName()).matches()){
+				download(f, targetDir, sms);
+			}
 		}
 	}	
-	
+
 	private String getDir(String path){
 		return new File(path).getParent();
 	}
-	
+
 	private String getName(String path){
 		return new File(path).getName();
 	}
-	
+
 	/**
 	 * download a single regular file
 	 * 
@@ -157,7 +161,7 @@ public class FileDownloader extends FileTransferBase {
 				}
 				os=new FileOutputStream(localFile.getAbsolutePath(), append);
 			}
-			
+
 			chosenProtocol = determineProtocol(preferredProtocol, sms);
 			Map<String,String>extraParameters = makeExtraParameters(chosenProtocol);
 			ftc = sms.createExport(path, chosenProtocol, extraParameters);

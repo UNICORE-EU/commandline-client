@@ -76,6 +76,6 @@ public class CopyFileStatus extends ActionBase {
 	}
 	@Override
 	public String getCommandGroup(){
-		return "Data management";
+		return CMD_GRP_DATA;
 	}
 }
