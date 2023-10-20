@@ -6,6 +6,10 @@ UCC Changelog
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
+Version 9.x.x (released mmm dd, 2023)
+-------------------------------------
+ - fix: shell: OAuth authentication fails when refresh token is present, but expired
+
 Version 9.3.0 (released Sept 15, 2023)
 --------------------------------------
  - fix: metadata: implement missing 'search' and 'start-extract' subcommands

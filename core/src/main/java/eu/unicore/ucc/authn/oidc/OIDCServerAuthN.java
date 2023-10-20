@@ -123,6 +123,7 @@ public class OIDCServerAuthN extends TokenBasedAuthN {
 		try {
 			handleReply(executeCall(params));
 		}catch(Exception e) {
+			token = null;
 			msg.verbose(Log.createFaultMessage("Token was not refreshed.", e));
 		}
 	}
