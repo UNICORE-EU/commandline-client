@@ -6,9 +6,10 @@ UCC Changelog
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
-Version 9.x.x (released mmm dd, 2023)
--------------------------------------
+Version 10.0.0 (released Jan dd, 2024)
+--------------------------------------
  - fix: shell: OAuth authentication fails when refresh token is present, but expired
+ - update to UNICORE 10.0.0 base libs
 
 Version 9.3.0 (released Sept 15, 2023)
 --------------------------------------
