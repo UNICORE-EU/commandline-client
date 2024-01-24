@@ -11,11 +11,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.json.Builder;
-import de.fzj.unicore.uas.json.JSONUtil;
-import de.fzj.unicore.uas.json.Requirement;
-import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.uas.json.Builder;
+import eu.unicore.uas.json.JSONUtil;
+import eu.unicore.uas.json.Requirement;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.actions.data.Resolve;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.helpers.ConsoleLogger;

@@ -9,10 +9,10 @@ import org.apache.commons.cli.Option;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.json.JSONUtil;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.security.OperationType;
+import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.ucc.UCC;
 
 /**

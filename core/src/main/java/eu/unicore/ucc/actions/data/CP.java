@@ -13,10 +13,10 @@ import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase;
 import eu.unicore.ucc.io.FileTransferBase.Mode;
-import eu.unicore.ucc.util.ProgressBar;
 import eu.unicore.ucc.io.FileUploader;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.io.ServerToServer;
+import eu.unicore.ucc.util.ProgressBar;
 
 /**
  * Copy multiple file(s) to a destination<br/>

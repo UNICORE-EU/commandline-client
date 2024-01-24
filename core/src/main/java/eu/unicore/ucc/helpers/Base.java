@@ -5,9 +5,9 @@ import java.util.Properties;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
-import de.fzj.unicore.uas.util.MessageWriter;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.uas.util.MessageWriter;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import groovy.lang.Script;
 

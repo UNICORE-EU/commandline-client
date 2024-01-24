@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.json.JSONUtil;
-import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
+import eu.unicore.uas.json.JSONUtil;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.lookup.StorageLister;
 

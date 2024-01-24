@@ -4,13 +4,13 @@ import java.util.Iterator;
 
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.lookup.Blacklist;
 import eu.unicore.client.lookup.CoreEndpointLister;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
 import eu.unicore.util.Log;
 

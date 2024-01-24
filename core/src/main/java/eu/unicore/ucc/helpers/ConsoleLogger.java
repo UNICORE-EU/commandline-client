@@ -2,7 +2,7 @@ package eu.unicore.ucc.helpers;
 
 import org.apache.logging.log4j.Logger;
 
-import de.fzj.unicore.uas.util.MessageWriter;
+import eu.unicore.uas.util.MessageWriter;
 import eu.unicore.util.Log;
 
 public class ConsoleLogger {

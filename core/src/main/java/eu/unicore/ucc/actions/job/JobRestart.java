@@ -2,9 +2,9 @@ package eu.unicore.ucc.actions.job;
 
 import java.util.List;
 
-import de.fzj.unicore.uas.util.Pair;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.ucc.util.UCCBuilder;
+import eu.unicore.util.Pair;
 
 /**
  * job restart
@@ -29,6 +29,7 @@ public class JobRestart extends JobOperationBase {
 		return "restart job(s)";
 	}
 
+	@Override
 	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
 		jobs.forEach( x -> restart(x.getM1()));
 	}

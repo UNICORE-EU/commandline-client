@@ -7,12 +7,12 @@ import java.util.Properties;
 
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.util.PropertyHelper;
-import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.TransferControllerClient;
+import eu.unicore.uas.util.PropertyHelper;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;

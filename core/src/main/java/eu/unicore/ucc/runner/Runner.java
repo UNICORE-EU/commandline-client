@@ -30,10 +30,10 @@ import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase.Mode;
-import eu.unicore.ucc.util.JSONUtil;
-import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.ucc.io.FileUploader;
 import eu.unicore.ucc.io.Location;
+import eu.unicore.ucc.util.JSONUtil;
+import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Log;
 
 /**

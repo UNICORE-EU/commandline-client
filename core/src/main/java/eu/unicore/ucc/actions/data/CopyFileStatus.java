@@ -5,10 +5,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.data.TransferControllerClient;
 import eu.unicore.client.data.TransferControllerClient.Status;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.actions.ActionBase;
 
 /**

@@ -7,12 +7,12 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.json.Requirement;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.lookup.Blacklist;
 import eu.unicore.client.lookup.SiteNameFilter;
 import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.uas.json.Requirement;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;

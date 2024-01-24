@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.apache.commons.cli.Option;
 
-import de.fzj.unicore.uas.util.Pair;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.ucc.runner.Runner;
 import eu.unicore.ucc.util.UCCBuilder;
+import eu.unicore.util.Pair;
 
 public class GetOutcome extends JobOperationBase {
 

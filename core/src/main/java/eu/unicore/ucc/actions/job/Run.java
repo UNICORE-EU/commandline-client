@@ -6,10 +6,10 @@ import java.util.Arrays;
 
 import org.apache.commons.cli.Option;
 
-import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.AllocationClient;
 import eu.unicore.client.core.JobClient.Status;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.helpers.EndProcessingException;

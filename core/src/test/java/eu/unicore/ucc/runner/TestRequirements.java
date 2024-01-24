@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import de.fzj.unicore.uas.json.ApplicationRequirement;
+import eu.unicore.uas.json.ApplicationRequirement;
 
 public class TestRequirements {
 	

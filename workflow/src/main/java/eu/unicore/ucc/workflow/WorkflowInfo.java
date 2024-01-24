@@ -1,4 +1,4 @@
-package eu.unicore.ucc.workflow;
+	package eu.unicore.ucc.workflow;
 
 import java.io.File;
 import java.util.Iterator;
@@ -9,10 +9,10 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.json.JSONUtil;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.EnumerationClient;
+import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.ucc.actions.info.ListActionBase;
 import eu.unicore.util.Log;
 import eu.unicore.workflow.WorkflowClient;

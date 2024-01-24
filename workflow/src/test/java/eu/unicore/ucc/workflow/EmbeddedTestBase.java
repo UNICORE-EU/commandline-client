@@ -19,8 +19,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import de.fzj.unicore.uas.UAS;
-import de.fzj.unicore.uas.util.MessageWriter;
+import eu.unicore.uas.UAS;
+import eu.unicore.uas.util.MessageWriter;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
 

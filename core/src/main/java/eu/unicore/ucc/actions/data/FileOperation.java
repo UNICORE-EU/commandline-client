@@ -5,10 +5,10 @@ import java.io.OutputStream;
 import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
-import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.data.HttpFileTransferClient;
+import eu.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.StorageConstants;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.io.Location;

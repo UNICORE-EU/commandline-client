@@ -12,7 +12,7 @@ import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.util.Log;
 
 public class FiletransferParameterProvider implements
-de.fzj.unicore.uas.FiletransferParameterProvider {
+eu.unicore.uas.FiletransferParameterProvider {
 
 	@Override
 	public void provideParameters(Map<String, String> params, String protocol) {

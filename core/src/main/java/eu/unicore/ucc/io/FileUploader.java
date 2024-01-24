@@ -6,12 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import de.fzj.unicore.uas.fts.FiletransferOptions;
-import de.fzj.unicore.uas.fts.FiletransferOptions.IMonitorable;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
 import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.client.data.UFTPFileTransferClient;
+import eu.unicore.uas.fts.FiletransferOptions;
+import eu.unicore.uas.fts.FiletransferOptions.IMonitorable;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.util.ProgressBar;
 

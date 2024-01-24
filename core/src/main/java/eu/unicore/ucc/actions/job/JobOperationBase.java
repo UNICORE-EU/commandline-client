@@ -6,11 +6,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.fzj.unicore.uas.util.Pair;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.util.UCCBuilder;
+import eu.unicore.util.Pair;
 
 /**
  * base class for job operations

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  * 
  * @author schuller
  */
-public class Location implements de.fzj.unicore.uas.json.Location {
+public class Location implements eu.unicore.uas.json.Location {
 
 	// the raw location as passed to the constructor
 	protected final String originalDescriptor;

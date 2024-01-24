@@ -14,14 +14,14 @@ import java.util.concurrent.TimeoutException;
 
 import org.bouncycastle.util.encoders.Base64;
 
-import de.fzj.unicore.uas.metadata.ExtractionStatistics;
-import de.fzj.unicore.uas.metadata.FederatedSearchResultCollection;
-import de.fzj.unicore.uas.metadata.SearchResult;
-import de.fzj.unicore.uas.metadata.StorageMetadataManager;
-import de.fzj.unicore.uas.util.Pair;
-import de.fzj.unicore.xnjs.io.IStorageAdapter;
 import eu.unicore.client.data.Metadata;
 import eu.unicore.security.Client;
+import eu.unicore.uas.metadata.ExtractionStatistics;
+import eu.unicore.uas.metadata.FederatedSearchResultCollection;
+import eu.unicore.uas.metadata.SearchResult;
+import eu.unicore.uas.metadata.StorageMetadataManager;
+import eu.unicore.util.Pair;
+import eu.unicore.xnjs.io.IStorageAdapter;
 
 public class MockMetadataManager implements StorageMetadataManager{
 
@@ -29,11 +29,7 @@ public class MockMetadataManager implements StorageMetadataManager{
 
 	private String basePath;
 
-	private static final Map<String,Map<String,String>>meta=new HashMap<String,Map<String,String>>();
-
-	public MockMetadataManager(){
-
-	}
+	private static final Map<String,Map<String,String>>meta = new HashMap<>();
 
 	public void setStorageAdapter(IStorageAdapter storage, String uniqueID) {
 		this.storage = storage;

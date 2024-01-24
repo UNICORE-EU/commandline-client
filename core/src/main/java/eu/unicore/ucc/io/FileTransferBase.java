@@ -9,10 +9,10 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.regex.Pattern;
 
-import de.fzj.unicore.uas.FiletransferParameterProvider;
-import de.fzj.unicore.uas.util.PropertyHelper;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
+import eu.unicore.uas.FiletransferParameterProvider;
+import eu.unicore.uas.util.PropertyHelper;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.util.JSONUtil;
 

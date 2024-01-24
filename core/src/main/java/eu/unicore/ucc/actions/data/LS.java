@@ -5,10 +5,10 @@ import java.util.Calendar;
 import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.core.FileList;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
+import eu.unicore.uas.util.UnitParser;
 
 /**
  * lists a storage

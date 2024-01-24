@@ -9,20 +9,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.Logger;
 
-import de.fzj.unicore.uas.util.Pair;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.SiteFactoryClient;
+import eu.unicore.client.lookup.AddressFilter;
+import eu.unicore.client.lookup.Lister;
+import eu.unicore.client.lookup.Producer;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.Log;
+import eu.unicore.util.Pair;
 import eu.unicore.util.httpclient.IClientConfiguration;
-import eu.unicore.client.lookup.AddressFilter;
-import eu.unicore.client.lookup.Lister;
-import eu.unicore.client.lookup.Producer;
 
 public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 

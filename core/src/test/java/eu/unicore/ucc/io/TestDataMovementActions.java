@@ -11,7 +11,7 @@ import java.util.Calendar;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import de.fzj.unicore.uas.util.UnitParser;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.CP;

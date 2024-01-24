@@ -7,15 +7,15 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import de.fzj.unicore.uas.fts.FiletransferOptions;
-import de.fzj.unicore.uas.fts.FiletransferOptions.IMonitorable;
-import de.fzj.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
 import eu.unicore.client.core.FileList;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
 import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.client.data.UFTPFileTransferClient;
+import eu.unicore.uas.fts.FiletransferOptions;
+import eu.unicore.uas.fts.FiletransferOptions.IMonitorable;
+import eu.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.util.ProgressBar;
 

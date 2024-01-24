@@ -15,10 +15,10 @@ import org.apache.commons.cli.Option;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.fzj.unicore.uas.util.UnitParser;
 import eu.unicore.client.core.FileList.FileListEntry;
-import eu.unicore.ucc.util.JSONUtil;
 import eu.unicore.client.core.StorageClient;
+import eu.unicore.uas.util.UnitParser;
+import eu.unicore.ucc.util.JSONUtil;
 
 /**
  * Gets detailed information about a file.

@@ -10,19 +10,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
-import de.fzj.unicore.xnjs.XNJS;
-import de.fzj.unicore.xnjs.ems.ExecutionException;
-import de.fzj.unicore.xnjs.idb.Incarnation;
-import de.fzj.unicore.xnjs.resources.ResourceRequest;
-import de.fzj.unicore.xnjs.tsi.IReservation;
-import de.fzj.unicore.xnjs.tsi.ReservationStatus;
-import de.fzj.unicore.xnjs.tsi.ReservationStatus.Status;
-import de.fzj.unicore.xnjs.tsi.remote.TSIMessages;
 import eu.unicore.security.Client;
+import eu.unicore.xnjs.XNJS;
+import eu.unicore.xnjs.ems.ExecutionException;
+import eu.unicore.xnjs.idb.Incarnation;
+import eu.unicore.xnjs.resources.ResourceRequest;
+import eu.unicore.xnjs.tsi.IReservation;
+import eu.unicore.xnjs.tsi.ReservationStatus;
+import eu.unicore.xnjs.tsi.ReservationStatus.Status;
+import eu.unicore.xnjs.tsi.remote.TSIMessages;
 
 public class MockReservation implements IReservation {
 
-	private final static Map<String, ReservationStatus> reservations = new HashMap<String, ReservationStatus>();
+	private final static Map<String, ReservationStatus> reservations = new HashMap<>();
 
 	public static String lastTSICommand;
 	

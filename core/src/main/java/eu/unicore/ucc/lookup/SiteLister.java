@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.Logger;
 
-import de.fzj.unicore.uas.util.Pair;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.SiteClient;
@@ -22,6 +21,7 @@ import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.Log;
+import eu.unicore.util.Pair;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
 public class SiteLister extends Lister<SiteClient>{

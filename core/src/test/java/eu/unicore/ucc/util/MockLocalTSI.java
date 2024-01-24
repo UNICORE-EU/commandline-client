@@ -2,12 +2,12 @@ package eu.unicore.ucc.util;
 
 import javax.inject.Inject;
 
-import de.fzj.unicore.xnjs.XNJSProperties;
-import de.fzj.unicore.xnjs.ems.ExecutionException;
-import de.fzj.unicore.xnjs.ems.InternalManager;
-import de.fzj.unicore.xnjs.io.ChangeACL;
-import de.fzj.unicore.xnjs.tsi.local.LocalTS;
-import de.fzj.unicore.xnjs.tsi.local.LocalTSIProperties;
+import eu.unicore.xnjs.XNJSProperties;
+import eu.unicore.xnjs.ems.ExecutionException;
+import eu.unicore.xnjs.ems.InternalManager;
+import eu.unicore.xnjs.io.ChangeACL;
+import eu.unicore.xnjs.tsi.local.LocalTS;
+import eu.unicore.xnjs.tsi.local.LocalTSIProperties;
 
 public class MockLocalTSI extends LocalTS {
 
