@@ -1,6 +1,6 @@
 package eu.unicore.ucc.util;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import eu.unicore.xnjs.XNJSProperties;
 import eu.unicore.xnjs.ems.ExecutionException;

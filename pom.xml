@@ -34,7 +34,7 @@
      <jnr.version>0.38.21</jnr.version>
      <groovy.version>4.0.13</groovy.version>
      <guava.version>33.0.0-jre</guava.version>
-     <jline.version>3.25.0</jline.version>
+     <jline.version>3.25.1</jline.version>
      <commons-cli.version>1.6.0</commons-cli.version>
      <compiler.fork>true</compiler.fork>
   </properties>
