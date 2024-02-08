@@ -148,7 +148,7 @@ public class TestGeneralActions extends EmbeddedTestBase {
 	}
 	
 	@Test
-	public void testIssueToken() throws Exception {
+	public void test_IssueToken() throws Exception {
 		int lifetime = 60;
 		String[]args=new String[]{"issue-token",
 				"-c", "src/test/resources/conf/userprefs.embedded",

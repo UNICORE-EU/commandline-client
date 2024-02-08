@@ -3,6 +3,7 @@ package eu.unicore.ucc.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import eu.unicore.ucc.actions.data.LS;
 import eu.unicore.ucc.actions.shell.Shell;
 import eu.unicore.ucc.helpers.JLineLogger;
 import eu.unicore.ucc.io.FiletransferParameterProvider;
+import eu.unicore.xnjs.util.IOUtils;
 
 public class TestVarious {
 
@@ -154,4 +156,11 @@ public class TestVarious {
 		assertEquals("0-9", cl.getOptionValue("B"));
 	}
 	
+	@Test
+	public void testSampleJob() throws Exception {
+		try (InputStream is = getClass().getClassLoader().getResourceAsStream(
+				"META-INF/examples/basic.json")){
+			new JSONObject(IOUtils.toString(is, 8192));
+		}
+	}
 }

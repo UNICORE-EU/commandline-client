@@ -26,6 +26,7 @@ import eu.unicore.ucc.actions.info.ListStorages;
 import eu.unicore.ucc.actions.info.ListTransfers;
 import eu.unicore.ucc.actions.info.SystemInfo;
 import eu.unicore.ucc.actions.job.AbortJob;
+import eu.unicore.ucc.actions.job.Allocate;
 import eu.unicore.ucc.actions.job.Batch;
 import eu.unicore.ucc.actions.job.CreateTSS;
 import eu.unicore.ucc.actions.job.Exec;
@@ -53,6 +54,7 @@ public class CoreCommands implements ProvidedCommands {
 				new AbortJob(),
 				new JobRestart(),
 				new Exec(),
+				new Allocate(),
 				
 				// data management
 				new CreateStorage(),

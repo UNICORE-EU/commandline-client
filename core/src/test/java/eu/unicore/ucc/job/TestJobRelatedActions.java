@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.job.Allocate;
 import eu.unicore.ucc.actions.job.CreateTSS;
 import eu.unicore.ucc.actions.job.GetStatus;
 import eu.unicore.ucc.actions.job.Run;
@@ -90,7 +91,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		connect();
 		runDate();
 		
-		String[] args=new String[]{"list-jobs", "-v", 
+		String[] args=new String[]{"list-jobs", "-v", "-l",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 		};
 		UCC.main(args);
@@ -254,6 +255,17 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	}
 	
 	@Test
+	public void test_Run_PrintSampleJob(){
+
+		String[] args=new String[]{"run", "-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-H"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
+
+	@Test
 	public void test_Exec(){
 		connect();
 		String[] args=new String[]{"exec", "-v",
@@ -264,6 +276,19 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
+	@Test
+	public void test_Allocate(){
+		connect();
+		String[] args=new String[]{"allocate", "-v", "--dry-run",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"Nodes=2", "Runtime=1h", "Queue=dev"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		assertEquals("2", Allocate.lastParams.get("Nodes"));
+		assertEquals("1h", Allocate.lastParams.get("Runtime"));
+		assertEquals("dev", Allocate.lastParams.get("Queue"));
+	}
 
 	@Test
 	public void test_CreateTSS() throws Exception {

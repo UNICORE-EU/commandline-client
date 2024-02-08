@@ -149,6 +149,7 @@ public class IssueToken extends ActionBase {
 
 	public void showDetails(String token) throws Exception {
 		JSONObject o = JWTUtils.getPayload(token);
+		message("Subject:      "+o.optString("sub"));
 		message("Lifetime (s): "+(o.getInt("exp")-o.getInt("iat")));
 		message("Issued by:    "+o.optString("iss"));
 		message("Valid for:    "+o.optString("aud", "<unlimited>"));

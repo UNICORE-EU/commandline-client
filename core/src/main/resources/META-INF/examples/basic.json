@@ -1,0 +1,16 @@
+{
+  "Executable": "./my_script.sh",
+  "Arguments": [ "--someoption", "--debug" ],
+  "Environment": [ "PATH=/mydir:$PATH" ],
+
+  "Imports": [
+      { "From": "/local_path/my_script.sh", "To": "my_script.sh" },
+  ],
+
+  "Resources": {
+     "Project": "some_project", 
+     "Queue": "batch",
+     "Nodes": 2,
+     "Runtime": "1h",
+  }
+}

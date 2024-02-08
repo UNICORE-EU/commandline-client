@@ -2,9 +2,11 @@ package eu.unicore.ucc.actions.job;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import org.apache.commons.cli.Option;
+import org.apache.commons.io.IOUtils;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.AllocationClient;
@@ -286,12 +288,14 @@ public class Run extends ActionBase {
 		try{
 			runner.run();
 			if(!dryRun){
-				lastJobPropertiesFile=runner.dumpJobProperties();
 				lastJobAddress=runner.getJob().getEndpoint().getUrl();
-				lastJobFile=builder.getProperty("jobIdFile");
-				try{
-					lastJobDirectory=runner.getJob().getLinkUrl("workingDirectory");
-				}catch(Exception ex){}
+				if(!synchronous) {
+					lastJobPropertiesFile=runner.dumpJobProperties();
+					lastJobFile=builder.getProperty("jobIdFile");
+					try{
+						lastJobDirectory=runner.getJob().getLinkUrl("workingDirectory");
+					}catch(Exception ex){}
+				}
 			}
 		}catch(RuntimeException ex){
 			runner.dumpJobLog();
@@ -307,9 +311,16 @@ public class Run extends ActionBase {
 	}
 
 	public void printSampleJob(){
-		message(UCCBuilder.getJobSample());
+		message("Example job:");
+		try (InputStream is = getClass().getClassLoader().getResourceAsStream(
+				"META-INF/examples/basic.json")){
+			message(IOUtils.toString(is, "UTF-8"));
+		}catch(Exception ex) {
+			throw new RuntimeException(ex);
+		}
+		message("For a full description, see:");
+		message("https://unicore-docs.readthedocs.io/en/latest/user-docs/rest-api/job-description/index.html");
 	}
-
 
 	/*
 	 * for unit testing

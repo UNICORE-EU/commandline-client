@@ -859,10 +859,12 @@ public class Runner implements Runnable {
 		public String getName();
 
 		/** whether to proceed to the next state (in async mode) **/
-		public boolean autoProceedToNextState();
+		public default boolean autoProceedToNextState() {
+			return true;
+		}
 	}
 
-	private static Map<String,State>states=new HashMap<String, State>();
+	private static Map<String,State>states = new HashMap<>();
 
 	static{
 
@@ -882,9 +884,6 @@ public class Runner implements Runnable {
 				return NEW;
 			}
 
-			public boolean autoProceedToNextState(){
-				return true;
-			}
 		});
 
 		/**
@@ -919,9 +918,6 @@ public class Runner implements Runnable {
 				return STAGEIN;
 			}
 
-			public boolean autoProceedToNextState(){
-				return true;
-			}
 		});
 
 		/**
@@ -942,9 +938,6 @@ public class Runner implements Runnable {
 				return READY;
 			}
 
-			public boolean autoProceedToNextState(){
-				return true;
-			}
 		});
 
 		/**
@@ -1027,9 +1020,6 @@ public class Runner implements Runnable {
 				return STAGEOUT;
 			}
 
-			public boolean autoProceedToNextState(){
-				return true;
-			}
 		});
 
 		/**
@@ -1054,9 +1044,6 @@ public class Runner implements Runnable {
 				return DONE;
 			}
 
-			public boolean autoProceedToNextState(){
-				return true;
-			}
 		});
 
 		states.put(FINISHED, new State(){

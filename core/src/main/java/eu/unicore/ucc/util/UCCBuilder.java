@@ -284,46 +284,7 @@ public class UCCBuilder extends Builder {
 			}
 		}catch(JSONException je) {}
 	}
-
-	public static String getJobSample(){
-		StringBuilder s=new StringBuilder();
-		writeLine("{",s);
-		writeLine("  ApplicationName: \"Date\", ApplicationVersion: \"1.0\",",s);
-		writeLine("  Executable: \"/bin/date\",",s);
-		writeLine("  Arguments: [\"-l\", \"-v\", ],",s);
-		writeLine("  Parameters: { VERBOSE: true, INPUTFILE: foo.txt},",s);
-		writeLine("  Environment: [\"VERBOSE=true\", \"TIMING=false\", ],",s);
-		writeLine("  Job type: \"normal | interactive\",",s);
-		writeLine("", s);
-		writeLine("  Imports: [",s);
-		writeLine("    { From: \"localFile | remoteFile\", To: \"jobdirFile\", Mode: \"overwrite | append | nooverwrite\" , FailOnError: \"true | false\" },",s);
-		writeLine("  ],",s);
-		writeLine("  Exports: [",s);
-		writeLine("    { From: \"jobdirFile\", To: \"localFile | remoteFile\", Mode: \"overwrite | append | nooverwrite\" }, ",s);
-		writeLine("  ],",s);
-		writeLine("  Umask: \"0022\",",s);
-		writeLine("  Name: \"my test job\",",s);
-		writeLine("  User email: foo@bar.org,",s);
-		writeLine("  Notification: \"https://someservice.org\",",s);
-		writeLine("  Tags: [\"testing\", \"demo\"] ,",s);
-		writeLine("  Not before: \"2021-11-11T12:00:00+200\",",s);
-		writeLine("  Site: \"DEMO-SITE\",",s);
-		writeLine("  Project: some_project,",s);
-		writeLine("  Resources: {",s);
-		writeLine("    Queue: batch,",s);
-		writeLine("    CPUs: 4,",s);
-		writeLine("    Nodes: 2,",s);
-		writeLine("    CPUsPerNode: 2,",s);
-		writeLine("    Memory: 2048M,",s);
-		writeLine("    Runtime: 4h,",s);
-		writeLine("    Reservation: 1234,",s);
-		writeLine("  },",s);
-		writeLine("  Preferred protocols: \"UFTP BFT\",",s);
-		writeLine("  Output: \"localdir\",",s);
-		writeLine("}",s);
-		return s.toString();
-	}
-
+	
 	static final String lineSep=System.getProperty("line.separator");
 
 	static void writeLine(String line,StringBuilder sb){

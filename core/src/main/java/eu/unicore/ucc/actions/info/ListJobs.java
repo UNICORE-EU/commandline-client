@@ -1,10 +1,13 @@
 package eu.unicore.ucc.actions.info;
 
+import java.util.Date;
+
 import org.apache.commons.cli.Option;
 
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.client.lookup.CoreEndpointLister;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.lookup.JobLister;
 
 /**
@@ -38,6 +41,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		CoreEndpointLister siteLister = new CoreEndpointLister(registry, configurationProvider,
 				configurationProvider.getRESTAuthN());
+		if(detailed)printHeader();
 		for(CoreClient c: siteLister){
 			if(c==null){
 				if(!siteLister.isRunning()){
@@ -49,8 +53,6 @@ public class ListJobs extends ListActionBase<JobClient> {
 				try{
 					if(isBlacklisted(siteURL))continue;
 					if(!siteNameMatches(siteName, siteURL))continue;
-					
-					verbose("Listing site at "+siteURL);
 					for(JobClient job: new JobLister(c, tags)){
 						if(filterMatch(job)){
 							listJob(job);
@@ -68,19 +70,29 @@ public class ListJobs extends ListActionBase<JobClient> {
 
 	protected void listJob(JobClient job){
 		properties.put(PROP_LAST_RESOURCE_URL, job.getEndpoint().getUrl());
-		message(job.getEndpoint().getUrl()+getDetails(job));
+		if(detailed) {
+			message(getDetails(job));
+		}
+		else {
+			message(job.getEndpoint().getUrl());
+		}
 		printProperties(job);
 	}
 
+	String format = " %16s | %10s | %s";
+	protected void printHeader() {
+		message(String.format(format, "Submitted", "Status", "URL"));
+		message(" -----------------|------------|----------------");
+	}
 
 	@Override
 	protected String getDetails(JobClient job){
-		if(!detailed)return "";
-
 		try	{
-			return " "+job.getStatus();
+			Date sTime = UnitParser.getISO8601().parse(job.getSubmissionTime());
+			String t = UnitParser.getSimpleDateFormat().format(sTime);
+			return String.format(format, t, job.getStatus(), job.getEndpoint().getUrl());
 		}catch(Exception ex){
-			return " ERROR getting status";
+			return " ERROR: "+ex.getMessage();
 		}
 	}
 

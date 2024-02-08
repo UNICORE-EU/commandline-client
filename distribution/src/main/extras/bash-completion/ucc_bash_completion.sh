@@ -5,7 +5,7 @@ _ucc()
   COMPREPLY=()
   cur=`_get_cword`
   prev="${COMP_WORDS[COMP_CWORD-1]}"
-  commands="admin-info admin-runcommand batch cat connect copy-file-status cp create-storage create-tss exec get-output issue-token job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir open-tunnel rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
+  commands="admin-info admin-runcommand allocate batch cat connect copy-file-status cp create-storage create-tss exec get-output issue-token job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir open-tunnel rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
   global_opts="--accept --accept-all-issuers --authentication-method --configuration --content-type --help --output --preference --registry --verbose --with-timing"
 
 
@@ -23,6 +23,9 @@ _ucc()
     ;;
     admin-runcommand)
     opts="$global_opts --sitename --url"
+    ;;
+    allocate)
+    opts="$global_opts --asynchronous --broker --dry-run --sitename --tags"
     ;;
     batch)
     opts="$global_opts --f --input --keep --max --max-new-jobs --no-fetch-outcome --no-resource-check --site-weights --sitename --submit-only --threads --update"
@@ -46,7 +49,7 @@ _ucc()
     opts="$global_opts --factory-url --lifetime --sitename"
     ;;
     exec)
-    opts="$global_opts --asynchronous --broker --dry-run --keep --login-node --sitename --tags"
+    opts="$global_opts --allocation --asynchronous --broker --dry-run --keep --login-node --sitename --tags"
     ;;
     get-output)
     opts="$global_opts --brief --quiet"

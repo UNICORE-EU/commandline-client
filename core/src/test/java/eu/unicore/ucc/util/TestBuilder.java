@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 
-import org.json.JSONObject;
 import org.junit.Test;
 
 public class TestBuilder{
@@ -16,15 +15,6 @@ public class TestBuilder{
 		UCCBuilder bob = new UCCBuilder(jobFile,null,null);
 		assertNotNull(bob);
 		assertEquals(2,bob.getImports().size());
-	}
-	
-
-	//check that the sample job is syntactically valid
-	@Test
-	public void testPrintSample()throws Exception{
-		String sample = UCCBuilder.getJobSample();
-		JSONObject o=new JSONObject(sample);
-		assertEquals("Date",o.get("ApplicationName"));
 	}
 	
 }
