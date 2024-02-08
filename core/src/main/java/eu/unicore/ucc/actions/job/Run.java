@@ -292,10 +292,10 @@ public class Run extends ActionBase {
 				if(!synchronous) {
 					lastJobPropertiesFile=runner.dumpJobProperties();
 					lastJobFile=builder.getProperty("jobIdFile");
-					try{
-						lastJobDirectory=runner.getJob().getLinkUrl("workingDirectory");
-					}catch(Exception ex){}
 				}
+				try{
+					lastJobDirectory=runner.getJob().getLinkUrl("workingDirectory");
+				}catch(Exception ex){}
 			}
 		}catch(RuntimeException ex){
 			runner.dumpJobLog();

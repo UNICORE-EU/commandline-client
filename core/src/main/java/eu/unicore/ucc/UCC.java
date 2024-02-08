@@ -332,6 +332,7 @@ public class UCC{
 			if (cmd == null) {
 				String msg=Log.createFaultMessage("Error setting up UCC command '"+args[0]+"'", e);
 				System.err.println(msg);
+				e.printStackTrace();
 			} else {
 				cmd.error("An error occurred.", e);
 			}

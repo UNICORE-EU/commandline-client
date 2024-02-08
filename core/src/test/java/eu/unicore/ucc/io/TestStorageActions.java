@@ -103,7 +103,6 @@ public class TestStorageActions extends EmbeddedTestBase {
 	public void test_Umask()throws Exception{
 		connect();
 		String storage=createNewUspace();
-
 		String[] args=new String[]{"umask",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				storage,

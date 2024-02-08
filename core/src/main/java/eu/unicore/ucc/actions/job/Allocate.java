@@ -176,7 +176,7 @@ public class Allocate extends ActionBase {
 		runner.setBroker(UCC.getBroker(brokerName));
 		try{
 			runner.run();
-			if(!asynchronous) {
+			if(!asynchronous && !dryRun) {
 				// make sure job is "RUNNING"
 				JobClient job = runner.getJob();
 				verbose("Allocation job is "+job.getStatus());
