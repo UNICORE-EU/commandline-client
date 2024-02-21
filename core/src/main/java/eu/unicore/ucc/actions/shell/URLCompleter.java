@@ -20,7 +20,7 @@ import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 
 /**
- * Completer for UNICORE URLs in the shell command line
+ * Commandline completer for UNICORE URLs
  *
  * @author schuller
  */
@@ -54,7 +54,7 @@ public class URLCompleter {
 	public boolean completeURLs(LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
 		try{
 			String current = line.word();
-			if(!current.startsWith("https:"))
+			if(!current.startsWith("http"))
 				return false;
 			if(!current.contains("/rest/"))
 				return tryCompleteSite(reader, line, candidates);
@@ -104,7 +104,7 @@ public class URLCompleter {
 				while(m.find()) {
 					String v = m.group();
 					v = v.substring(1, v.length()-1);
-					if(!v.endsWith("/"))v=v+"/";
+					if(!v.endsWith("/")&&!v.contains("?"))v=v+"/";
 					candidates.add(new Candidate(v, v, null, null, null, null, false, 0));
 					found = true;
 				}

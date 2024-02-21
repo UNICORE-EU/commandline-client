@@ -24,7 +24,6 @@ import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.helpers.JLineLogger;
 import eu.unicore.ucc.runner.Broker;
-import eu.unicore.util.Log;
 
 /**
  * UCC main class and entry point
@@ -213,7 +212,7 @@ public class UCC{
 
 	public static Command getCommand(String name){
 		Class<? extends Command> cmdClass = cmds.get(name);
-		if(cmdClass==null)throw new IllegalArgumentException("No such command: "+name);
+		if(cmdClass==null)return null;
 		try{
 			return cmdClass.getConstructor().newInstance();
 		}catch(Exception ex){
@@ -324,25 +323,14 @@ public class UCC{
 			exitCode=0;
 		} catch (EndProcessingException epe) {
 			exitCode = epe.getExitCode();
-		} catch (ParseException pe) {
-			System.err.println("Error parsing commandline");
-			pe.printStackTrace();
-			exitCode = Constants.ERROR;
 		} catch (Exception e) {
-			if (cmd == null) {
-				String msg=Log.createFaultMessage("Error setting up UCC command '"+args[0]+"'", e);
-				System.err.println(msg);
-				e.printStackTrace();
-			} else {
-				cmd.error("An error occurred.", e);
-			}
+			String msg="Error running up UCC command '"+args[0]+"'";
+			getConsoleLogger().error(msg, e);
 			exitCode = Constants.ERROR;
 		}
-
 		if (!unitTesting){
 			System.exit(exitCode);	
 		}
-
 	}
 
 	public static ConsoleLogger getConsoleLogger(){

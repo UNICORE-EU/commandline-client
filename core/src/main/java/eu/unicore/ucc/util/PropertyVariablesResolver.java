@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2014 ICM Uniwersytet Warszawski All rights reserved.
- * See LICENCE.txt file for licensing information.
- */
 package eu.unicore.ucc.util;
 
 import java.io.File;

@@ -20,6 +20,7 @@ import org.jline.reader.impl.history.DefaultHistory;
 
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.UCCOptions;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.KeystoreAuthN;
 import eu.unicore.ucc.helpers.EndProcessingException;
@@ -80,9 +81,9 @@ public class Shell extends ActionBase {
 		run();
 	}
 
-	private String[]internalCommands = { "set", "unset", "system", "!",
+	private List<String> internalCommands = Arrays.asList( "set", "unset", "system", "!",
 			"help", "help-auth", "version",
-			"exit", "quit" };
+			"exit", "quit" );
 
 	public void run(){
 		Command.quitAfterPrintingUsage=false;
@@ -125,7 +126,23 @@ public class Shell extends ActionBase {
 					message("Goodbye.");
 					return;
 				}
-				if("help".equalsIgnoreCase(s)){
+				if(s.startsWith("help")){
+					String[] sub = s.split(" +");
+					String method = null;
+					if(sub.length>1)method = sub[1];
+					if(method!=null) {
+						var cmd = UCC.getCommand(method);
+						if(cmd!=null) {
+							cmd.printUsage();
+							continue;
+						}
+						else if(internalCommands.contains(method)){
+							printShellHelp();
+							continue;
+						}else if(!internalCommands.contains(method)){
+							System.err.println("No such command '"+method+"'");
+						}
+					}
 					UCC.printUsage(false);
 					printShellHelp();
 					continue;
@@ -239,8 +256,12 @@ public class Shell extends ActionBase {
 			System.arraycopy(args, 1, paramArgs, 0, paramArgs.length);
 			properties.putAll(PropertyVariablesResolver.getParameters(paramArgs));
 			boolean verbose = UCC.getConsoleLogger().isVerbose();
-			verbose = Boolean.parseBoolean(properties.getProperty("verbose", String.valueOf(verbose)));
+			verbose = UCCOptions.isTrue(properties.getProperty("verbose", String.valueOf(verbose)));
 			UCC.getConsoleLogger().setVerbose(verbose);
+			boolean debug = UCC.getConsoleLogger().isDebug();
+			debug = UCCOptions.isTrue(properties.getProperty("UCC_DEBUG", String.valueOf(verbose)));
+			UCC.getConsoleLogger().setDebug(debug);
+		
 		}
 	}
 

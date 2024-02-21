@@ -1,14 +1,7 @@
-/*
- * Copyright (c) 2011 ICM Uniwersytet Warszawski All rights reserved.
- * See LICENCE file for licensing information.
- *
- * Created on Sep 23, 2011
- * Author: K. Stasiak <karol.m.stasiak@gmail.com>
- */
-
 package eu.unicore.ucc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -114,4 +107,10 @@ public class UCCOptions extends Options {
 		}
 		return res;
 	}
+	
+	
+	public static boolean isTrue(String var) {
+		return var!=null && Arrays.asList( "1", "true", "yes" ).contains(var.toLowerCase());
+	}
+	
 }

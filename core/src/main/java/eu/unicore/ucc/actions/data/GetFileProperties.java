@@ -1,10 +1,3 @@
-/*
- * Copyright (c) 2011 ICM Uniwersytet Warszawski All rights reserved.
- * See LICENCE file for licencing information.
- *
- * Created on 27-07-2011
- * Author: K. Benedyczak <golbi@mat.umk.pl>
- */
 package eu.unicore.ucc.actions.data;
 
 import java.text.DateFormat;

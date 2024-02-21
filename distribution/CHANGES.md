@@ -6,14 +6,14 @@ UCC Changelog
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
-Version 10.0.0 (released Feb 21, 2024)
+Version 10.0.0 (released Feb 22, 2024)
 --------------------------------------
  - new feature: 'allocate' command for creating an allocation
- - 'shell': fix: OAuth authentication fails when refresh token is present, but expired
- - 'shell: new feature: URL completion for UNICORE URLs
+ - 'shell': new feature: URL completion for UNICORE URLs
  - 'list-jobs': improved job list when using the "--long" option
  - 'issue-token': show subject when inspecting the token
  - 'exec': new option "--allocation" for running command in an existing allocation
+ - 'shell': fix: OAuth authentication fails when refresh token is present, but expired
  - update to UNICORE 10.0.0 base libs
 
 Version 9.3.0 (released Sept 15, 2023)
