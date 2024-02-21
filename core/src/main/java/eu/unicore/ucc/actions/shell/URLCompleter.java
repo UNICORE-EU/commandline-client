@@ -2,7 +2,10 @@ package eu.unicore.ucc.actions.shell;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +38,14 @@ public class URLCompleter {
 	final List<String> services = Arrays.asList( "factories/", "sites/", "jobs/", "reservations/",
 			"storages/", "storagefactories/", "transfers/", "client-server-transfers/", "tasks/" );
 
+	static final Set<String> sites = new HashSet<>();
+
+	public static void registerSiteURL(String siteURL) {
+		if(siteURL!=null && siteURL.contains("/rest/")) {
+			sites.add(siteURL.substring(0, siteURL.indexOf("/rest/")+6));
+		}
+	}
+
 	/**
 	 * check if the current thing is a UNICORE URL and try to complete it
 	 *
@@ -43,15 +54,14 @@ public class URLCompleter {
 	public boolean completeURLs(LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
 		try{
 			String current = line.word();
-			if(! (current.startsWith("https://") && current.contains("/rest/"))) {
+			if(!current.startsWith("https:"))
 				return false;
-			}
-			if(tryCompleteEndpoint(reader, line, candidates)) {
+			if(!current.contains("/rest/"))
+				return tryCompleteSite(reader, line, candidates);
+			if(tryCompleteEndpoint(reader, line, candidates))
 				return true;
-			}
-			if(tryCompleteService(reader, line, candidates)) {
+			if(tryCompleteService(reader, line, candidates))
 				return true;
-			}
 			URL u = new URL(current);
 			String base = current.substring(0, current.lastIndexOf("/")+1);
 			String fragment = current.substring(current.lastIndexOf("/")+1);
@@ -108,6 +118,11 @@ public class URLCompleter {
 		return false;
 	}
 	
+	private boolean tryCompleteSite(LineReader reader, ParsedLine line, List<Candidate> candidates) throws Exception {
+		doComplete(sites, "", "", reader, line, candidates);
+		return true;
+	}
+	
 	private boolean tryCompleteEndpoint(LineReader reader, ParsedLine line, List<Candidate> candidates) throws Exception {
 		String current = line.word();
 		URL u = new URL(current);
@@ -134,7 +149,7 @@ public class URLCompleter {
 		return false;
 	}
 
-	private void doComplete(final List<String> completions, final String base, final String fragment, 
+	private void doComplete(final Collection<String> completions, final String base, final String fragment, 
 			final LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
 		for(String c: completions) {
 			if(c.startsWith(fragment)) {

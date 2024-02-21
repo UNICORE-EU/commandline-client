@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.shell.URLCompleter;
 import eu.unicore.ucc.lookup.SiteLister;
 import eu.unicore.ucc.util.JSONUtil;
 
@@ -47,13 +48,17 @@ public class ListSites extends ListActionBase<SiteClient> {
 					}catch(Exception ex) {}
 				}
 				else if(filterMatch(c)){
-					if(!siteNameMatches(siteName, c.getEndpoint().getUrl()))continue;
+					String url = c.getEndpoint().getUrl();
+					URLCompleter.registerSiteURL(url);
+					if(!siteNameMatches(siteName, url))continue;
 					listTSS(c);
-					properties.put(PROP_LAST_RESOURCE_URL, c.getEndpoint().getUrl());
+					properties.put(PROP_LAST_RESOURCE_URL, url);
 					lastNumberOfResults++;
 				}
 			}catch(Exception ex){
-				if(c!=null)error("Error listing site at <"+c.getEndpoint().getUrl()+">",ex);
+				if(c!=null && c.getEndpoint()!=null) {
+					error("Error listing site at <"+c.getEndpoint().getUrl()+">",ex);
+				}
 				else error("",ex);
 			}
 		}

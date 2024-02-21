@@ -10,6 +10,7 @@ import eu.unicore.ucc.Command;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.ActionBase;
+import eu.unicore.ucc.actions.shell.URLCompleter;
 
 /**
  * print info about services available in the registry
@@ -105,12 +106,13 @@ public class SystemInfo extends ActionBase {
 			}
 			else{
 				message("... OK, found "+n+" endpoint(s)");
-				if(details){
-					for(Endpoint e: list){
-						String url = e.getUrl();
-						if(isBlacklisted(url) || (pattern!=null && !url.matches(pattern))) {
-							continue;
-						}
+				for(Endpoint e: list){
+					String url = e.getUrl();
+					if(isBlacklisted(url) || (pattern!=null && !url.matches(pattern))) {
+						continue;
+					}
+					URLCompleter.registerSiteURL(url);
+					if(details) {
 						message(" * "+url);
 						String infoS=info.getServiceDetails(e,configurationProvider);
 						if(infoS!=null)message("  "+infoS);

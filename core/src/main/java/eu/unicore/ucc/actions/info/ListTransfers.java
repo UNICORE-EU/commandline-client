@@ -12,6 +12,7 @@ import eu.unicore.client.lookup.Blacklist;
 import eu.unicore.client.lookup.CoreEndpointLister;
 import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.shell.URLCompleter;
 import eu.unicore.util.Log;
 
 /**
@@ -40,6 +41,8 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 				}
 			}
 			else{
+				String url = ep.getEndpoint().getUrl();
+				URLCompleter.registerSiteURL(url);
 				verbose("Site : "+ep.getEndpoint().getUrl());	
 				try{
 					listFiletransfers(ep);

@@ -157,9 +157,9 @@ public class TestShell extends EmbeddedTestBase {
 
 			public int cursor() { return cursor; }
 		};
-
-		// ".../rest/..."
-		String url = "https://localhost:65322/rest/";
+		URLCompleter.registerSiteURL("https://localhost:65322/rest/");
+		// "https:"
+		String url = "https:";
 		words.clear();
 		words.add("rest");
 		words.add("get");
@@ -171,6 +171,22 @@ public class TestShell extends EmbeddedTestBase {
 		cursor = line.length();
 		candidates.clear();
 		LineReader lr = LineReaderBuilder.builder().build();
+		assertTrue(uc.completeURLs(lr, pl, candidates));
+		assertEquals(URLCompleter.sites.size(), candidates.size());
+		assertTrue(candidates.contains(new Candidate("https://localhost:65322/rest/")));
+
+		// ".../rest/..."
+		url = "https://localhost:65322/rest/";
+		words.clear();
+		words.add("rest");
+		words.add("get");
+		words.add(url);
+		
+		wordIndex = 2;
+		wordCursor = url.length();
+		line = "rest get "+url;
+		cursor = line.length();
+		candidates.clear();
 		assertTrue(uc.completeURLs(lr, pl, candidates));
 		assertEquals(uc.endpoints.size(), candidates.size());
 		assertTrue(candidates.contains(new Candidate(url+"core/")));

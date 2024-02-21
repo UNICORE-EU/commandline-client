@@ -8,6 +8,7 @@ import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.client.lookup.CoreEndpointLister;
 import eu.unicore.uas.util.UnitParser;
+import eu.unicore.ucc.actions.shell.URLCompleter;
 import eu.unicore.ucc.lookup.JobLister;
 
 /**
@@ -52,6 +53,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 				String siteURL = c.getEndpoint().getUrl();
 				try{
 					if(isBlacklisted(siteURL))continue;
+					URLCompleter.registerSiteURL(siteURL);
 					if(!siteNameMatches(siteName, siteURL))continue;
 					for(JobClient job: new JobLister(c, tags)){
 						if(filterMatch(job)){

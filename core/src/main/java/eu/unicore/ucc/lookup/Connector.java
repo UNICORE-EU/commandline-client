@@ -8,6 +8,7 @@ import eu.unicore.client.core.SiteFactoryClient;
 import eu.unicore.client.lookup.Blacklist;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.shell.URLCompleter;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.Log;
 
@@ -47,7 +48,6 @@ public class Connector implements Runnable {
 			UCC.getConsoleLogger().verbose("Using blacklist <"+Arrays.asList(blacklist)+">");
 			lister.setAddressFilter(new Blacklist(blacklist));
 		}
-
 		for(SiteFactoryClient tsf: lister){
 			if(tsf == null){
 				if(!lister.isRunning())
@@ -70,6 +70,7 @@ public class Connector implements Runnable {
 			SiteClient tss = tsf.getOrCreateSite();
 			UCC.getConsoleLogger().verbose("TSS at address "+tss.getEndpoint().getUrl());
 			_last_TSS = tss.getEndpoint().getUrl();
+			URLCompleter.registerSiteURL(_last_TSS);
 			tssAvailable.incrementAndGet();
 		}catch(Exception e){
 			if(Log.getDetailMessage(e).contains("Access denied")){

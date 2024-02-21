@@ -9,6 +9,7 @@ import eu.unicore.client.core.StorageClient;
 import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.shell.URLCompleter;
 import eu.unicore.ucc.lookup.StorageLister;
 
 public class ListStorages extends ListActionBase<StorageClient> {
@@ -73,8 +74,10 @@ public class ListStorages extends ListActionBase<StorageClient> {
 
 	protected void listSMS(StorageClient sms){
 		try{
-			message(sms.getEndpoint().getUrl()+System.getProperty("line.separator")+getDetails(sms));
-			properties.put(PROP_LAST_RESOURCE_URL, sms.getEndpoint().getUrl());
+			String url = sms.getEndpoint().getUrl();
+			message(url+System.getProperty("line.separator")+getDetails(sms));
+			properties.put(PROP_LAST_RESOURCE_URL, url);
+			URLCompleter.registerSiteURL(url);
 		}catch(Exception ex){
 			error("Error listing storage at "+sms.getEndpoint().getUrl(), ex);
 		}
