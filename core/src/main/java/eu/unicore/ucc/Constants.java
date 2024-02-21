@@ -66,6 +66,9 @@ public interface Constants {
 	public static final String OPT_ALL_LONG="all";
 	public static final String OPT_ALL="a";
 
+	public static final String OPT_RAW_LONG = "raw";
+	public static final String OPT_RAW = "R";
+	
 	public static final String OPT_FIELDS_LONG="fields";
 	public static final String OPT_FIELDS="F";
 

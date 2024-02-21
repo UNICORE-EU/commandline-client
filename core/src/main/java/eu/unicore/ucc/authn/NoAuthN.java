@@ -9,7 +9,7 @@ import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.util.httpclient.ClientProperties;
 
 /**
- * Username/Password authentication
+ * anonymous (no) authentication
  *
  * @author schuller
  */
@@ -21,7 +21,6 @@ public class NoAuthN extends PropertiesBasedAuthenticationProvider
 	@Override
 	public void addAuthenticationHeaders(HttpMessage httpMessage) throws Exception {
 	}
-	
 
 	@Override
 	public void setProperties(Properties properties) {
@@ -30,11 +29,9 @@ public class NoAuthN extends PropertiesBasedAuthenticationProvider
 		properties.setProperty("client."+ClientProperties.PROP_MESSAGE_SIGNING_ENABLED, "false");
 	}
 
-	public static final String NAME = "none";
-	
 	@Override
 	public String getName() {
-		return NAME;
+		return "none";
 	}
 
 	@Override

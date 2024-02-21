@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.ucc.authn.KeystoreAuthN;
 import eu.unicore.ucc.helpers.EndProcessingException;
 
@@ -35,6 +36,11 @@ public class TestUCC {
 		}
 		args=new String []{"help-auth"};
 		UCC.main(args);
+
+		for(AuthenticationProvider p: UCC.authNMethods.values()) {
+			args=new String []{"help-auth", p.getName()};
+			UCC.main(args);
+		}
 		UCC.mute=false;
 	}
 	

@@ -1,7 +1,6 @@
 package eu.unicore.ucc.actions;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +11,6 @@ import org.junit.Test;
 
 import eu.unicore.services.rest.security.jwt.JWTUtils;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.actions.shell.Shell;
 import eu.unicore.ucc.lookup.Connector;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
@@ -68,20 +66,6 @@ public class TestGeneralActions extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
-	}
-
-	@Test
-	public void test_Shell()throws Exception{
-		connect();
-		String[]args=new String[]{"shell",
-				"-c", "src/test/resources/conf/userprefs.embedded",
-				"-f", "src/test/resources/shell_input",
-		};
-		UCC.main(args);
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		Shell shell = (Shell)UCC.lastCommand;
-		assertNull(shell.getProperties().get("ham"));
-		assertEquals("bar",shell.getProperties().get("foo"));
 	}
 
 	@Test

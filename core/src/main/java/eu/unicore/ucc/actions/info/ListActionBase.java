@@ -19,7 +19,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	
 	protected boolean detailed;
 	
-	protected boolean all;
+	protected boolean raw;
 	
 	protected boolean doFilter;
 	
@@ -47,9 +47,9 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 				.desc("Detailed output")
 				.required(false)
 				.build());
-		getOptions().addOption(Option.builder(OPT_ALL)
-				.longOpt(OPT_ALL_LONG)
-				.desc("Print all properties")
+		getOptions().addOption(Option.builder(OPT_RAW)
+				.longOpt(OPT_RAW_LONG)
+				.desc("Print all properties in JSON format")
 				.required(false)
 				.build());
 		getOptions().addOption(Option.builder(OPT_FIELDS)
@@ -75,7 +75,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		verbose("Filtering = "+doFilter);
 		detailed=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
 		verbose("Detailed listing = "+detailed);
-		all=getBooleanOption(OPT_ALL_LONG, OPT_ALL);
+		raw=getBooleanOption(OPT_RAW_LONG, OPT_RAW);
 		
 		if(doFilter){
 			filter=createFilter(getCommandLine().getOptionValues(OPT_FILTER));
@@ -108,7 +108,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	 * @param entry - the BaseServiceClient for the current list entry
 	 */
 	protected void printProperties(T entry){
-		if(all || (fields!=null && fields.length>0)){
+		if(raw || (fields!=null && fields.length>0)){
 			try{
 				message(entry.getProperties(fields).toString(2));
 			}
@@ -120,7 +120,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	}
 	
 	protected Filter createFilter(String[] args){
-		filter=PropertyFilter.Factory.create(args);
+		filter = PropertyFilter.create(args);
 		if(filter==null){
 			throw new IllegalArgumentException("Filter specification <"+Arrays.asList(args)+"> not understood.");
 		}

@@ -63,7 +63,7 @@ public class TestMetadata extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		assertEquals("bar", Metadata.getLastMeta().get("foo"));
+		assertEquals("bar", Metadata.lastMeta.get("foo"));
 
 		FileUtils.writeStringToFile(metaFile, "{foo: spam}", "UTF-8");
 		args=new String[]{"metadata",
@@ -75,7 +75,7 @@ public class TestMetadata extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		assertEquals("spam", Metadata.getLastMeta().get("foo"));
+		assertEquals("spam", Metadata.lastMeta.get("foo"));
 
 		FileUtils.writeStringToFile(metaFile, "{foo: spam}", "UTF-8");
 		args=new String[]{"metadata",
@@ -95,17 +95,27 @@ public class TestMetadata extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		assertTrue(!Metadata.getLastMeta().containsKey("foo"));
+		assertTrue(!Metadata.lastMeta.containsKey("foo"));
 
 		args=new String[]{"metadata",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-s", storage,
 				"-C", "start-extract",
+				"--wait",
 				"testfile",
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		Thread.sleep(1500);
+		
+		args=new String[]{"metadata",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-s", storage,
+				"-C", "search",
+				"--query", "foo"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		assertTrue(Metadata.lastSearchResults.size()>0);
 	}
 	
 

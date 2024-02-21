@@ -13,19 +13,24 @@ import org.jline.reader.impl.completer.StringsCompleter;
 
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.authn.UCCConfigurationProvider;
 
 /**
  * provide command completion for the "shell" command
  */
-public class UCCCompletor implements Completer {
+public class UCCCompleter implements Completer {
 
 	final StringsCompleter commands;
 	final FileNameCompleter fileNames = new FileNameCompleter();
+	final URLCompleter urlCompleter;
 
-	public UCCCompletor(Collection<String> cmds){
+	public UCCCompleter(Collection<String> cmds, UCCConfigurationProvider configurationProvider){
 		this.commands = new StringsCompleter(cmds);
+		this.urlCompleter = configurationProvider!=null ? 
+				new URLCompleter(configurationProvider) : null;
 	}
 
+	@Override
 	public void complete(LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
 		int index = line.wordIndex();
 		if(index==0) {
@@ -33,12 +38,17 @@ public class UCCCompletor implements Completer {
 		}
 		else {
 			String currentCommand = line.words().get(0);
-			boolean tryFiles = true;
+			boolean stop = false;
 			try {
 				Command c = UCC.getCommand(currentCommand);
-				tryFiles = commandComplete(c, reader, line, candidates);
+				stop = commandComplete(c, reader, line, candidates);
 			}catch(Exception ex) {}
-			if(tryFiles)fileNames.complete(reader, line, candidates);
+			if(!stop && urlCompleter!=null) {
+				stop = urlCompleter.completeURLs(reader, line, candidates);
+			}
+			if(!stop) {
+				fileNames.complete(reader, line, candidates);
+			}
 		}
 	}
 
@@ -62,14 +72,15 @@ public class UCCCompletor implements Completer {
 						}
 					}
 				}
+				return longOpts;
 			}
 			else if ("rest".equals(cmdName) &&line.wordIndex()==1) {
 				for(String x: new String[] {"GET","PUT","POST","DELETE"})
 					candidates.add(new Candidate(x));
-				return false;
+				return true;
 			}
 		} catch(Exception e) {}
-		return true;
+		return false;
 	}
 
 }

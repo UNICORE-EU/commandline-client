@@ -19,7 +19,7 @@ _ucc()
   # looking for arguments matching to command
   case "${COMP_WORDS[1]}" in
     admin-info)
-    opts="$global_opts --all --fields --filter --long --tags"
+    opts="$global_opts --fields --filter --long --raw --tags"
     ;;
     admin-runcommand)
     opts="$global_opts --sitename --url"
@@ -67,19 +67,19 @@ _ucc()
     opts="$global_opts --all --long"
     ;;
     list-jobs)
-    opts="$global_opts --all --fields --filter --long --sitename --tags"
+    opts="$global_opts --fields --filter --long --raw --sitename --tags"
     ;;
     list-sites)
-    opts="$global_opts --all --fields --filter --long --sitename --tags"
+    opts="$global_opts --fields --filter --long --raw --sitename --tags"
     ;;
     list-storages)
-    opts="$global_opts --all --fields --filter --long --tags"
+    opts="$global_opts --fields --filter --long --raw --tags"
     ;;
     list-transfers)
-    opts="$global_opts --all --fields --filter --long --tags"
+    opts="$global_opts --fields --filter --long --raw --tags"
     ;;
     list-workflows)
-    opts="$global_opts --all --fields --filter --long --no-files --no-internal --no-jobs --tags"
+    opts="$global_opts --fields --filter --long --no-files --no-internal --no-jobs --raw --tags"
     ;;
     ls)
     opts="$global_opts --human --long --recursive --show-metadata"
@@ -103,7 +103,7 @@ _ucc()
     opts="$global_opts --quiet"
     ;;
     run)
-    opts="$global_opts --allocation --asynchronous --brief --broker --dry-run --example --quiet --schedule --sitename --tags"
+    opts="$global_opts --allocation --asynchronous --brief --broker --dry-run --example --schedule --sitename --tags"
     ;;
     run-groovy)
     opts="$global_opts --expression --file"

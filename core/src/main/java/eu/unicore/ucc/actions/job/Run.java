@@ -60,11 +60,6 @@ public class Run extends ActionBase {
 	 * be performed but no job will be submitted 
 	 */
 	protected boolean dryRun=false;
-	
-	/**
-	 * quiet mode (e.g. don't write job id files)
-	 */
-	protected boolean quiet = false;
 
 	protected String[] tags;
 
@@ -118,11 +113,6 @@ public class Run extends ActionBase {
 				.required(false)
 				.hasArgs()
 				.valueSeparator(',')
-				.build());
-		getOptions().addOption(Option.builder(OPT_QUIET)
-				.longOpt(OPT_QUIET_LONG)
-				.desc("Quiet mode, don't write job ID file")
-				.required(false)
 				.build());
 		getOptions().addOption(Option.builder(OPT_DRYRUN)
 				.longOpt(OPT_DRYRUN_LONG)
@@ -192,9 +182,6 @@ public class Run extends ActionBase {
 
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
 		verbose("Dry run = "+dryRun);
-
-		quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
-		verbose("Quiet mode = " + quiet);
 
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
@@ -266,7 +253,7 @@ public class Run extends ActionBase {
 	protected int run(){
 		runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(!synchronous);
-		runner.setQuietMode(quiet);
+		runner.setQuietMode(true);
 		runner.setBriefOutfileNames(brief);
 		runner.setDryRun(dryRun);
 		runner.setProperties(properties);
@@ -290,7 +277,6 @@ public class Run extends ActionBase {
 			if(!dryRun){
 				lastJobAddress=runner.getJob().getEndpoint().getUrl();
 				if(!synchronous) {
-					lastJobPropertiesFile=runner.dumpJobProperties();
 					lastJobFile=builder.getProperty("jobIdFile");
 				}
 				try{
@@ -336,8 +322,6 @@ public class Run extends ActionBase {
 	public static String getLastJobDirectory() {
 		return lastJobDirectory;
 	}
-	
-	
 
 	private static String lastJobFile;
 
@@ -345,9 +329,4 @@ public class Run extends ActionBase {
 		return lastJobFile;
 	}
 
-	private static String lastJobPropertiesFile;
-
-	public static String getLastJobPropertiesFile() {
-		return lastJobPropertiesFile;
-	}
 }

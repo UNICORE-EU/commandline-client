@@ -26,7 +26,7 @@ public class OIDCAgentProperties extends PropertiesHelper {
 	public static final String SCOPE = "scope";
 	public static final String LIFETIME = "lifetime";
 	
-	public static final Map<String, PropertyMD> META = new HashMap<String, PropertyMD>();
+	public static final Map<String, PropertyMD> META = new HashMap<>();
 	static
 	{
 		META.put(ACCOUNT, new PropertyMD().setMandatory().setDescription("Account short name."));

@@ -14,9 +14,7 @@ import org.json.JSONObject;
  * @author schuller
  */
 public class OIDCAgentAuthN extends TokenBasedAuthN {
-	
-	public static final String NAME = "oidc-agent";
-	
+
 	protected OIDCAgentProperties oidcProperties;
 
 	protected OIDCAgentProxy ap;
@@ -35,7 +33,7 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 
 	@Override
 	public String getName() {
-		return NAME;
+		return "oidc-agent";
 	}
 
 	@Override
@@ -60,7 +58,7 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 
 	@Override
 	protected void retrieveToken() throws Exception {
-		setupOIDCAgent();
+		if(ap==null)setupOIDCAgent();
 		
 		String account = oidcProperties.getValue(OIDCAgentProperties.ACCOUNT);
 		JSONObject request = new JSONObject();
@@ -85,5 +83,9 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 	protected void setupOIDCAgent() throws Exception {
 		if(!OIDCAgentProxy.isConnectorAvailable())throw new IOException("oidc-agent is not available");
 		ap = new OIDCAgentProxy();
+	}
+	
+	public void setAgentProxy(OIDCAgentProxy ap) {
+		this.ap = ap;
 	}
 }

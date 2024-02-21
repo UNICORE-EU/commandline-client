@@ -3,7 +3,9 @@ package eu.unicore.ucc.actions.data;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
@@ -19,7 +22,6 @@ import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.utils.TaskClient;
 import eu.unicore.services.rest.client.BaseClient;
 import eu.unicore.ucc.actions.ActionBase;
-import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.util.JSONUtil;
 
@@ -101,7 +103,7 @@ public class Metadata extends ActionBase {
 	}
 
 	@Override
-	public void process() {
+	public void process(){
 		super.process();
 		command = getOption(OPT_COMMAND_LONG, OPT_COMMAND);
 		verbose("Operation = " + command);
@@ -117,15 +119,12 @@ public class Metadata extends ActionBase {
 			path=loc.getName();
 		}
 		sms = createStorageClient(storage);
-
 		if (sms == null) {
 			message("Cannot find the requested storage service!");
 			printUsage();
 			endProcessing(ERROR_CLIENT);
 		}
-
 		verbose("Accessing metadata for storage " + sms.getEndpoint().getUrl());
-
 		String fName = getOption(OPT_FILE_LONG, OPT_FILE);
 		if (fName != null) {
 			file = new File(fName);
@@ -166,7 +165,8 @@ public class Metadata extends ActionBase {
 			if (file != null) {
 				FileUtils.writeStringToFile(file, json, "UTF-8");
 			}
-			lastMeta = result;
+			lastMeta.clear();
+			lastMeta.putAll(result);
 		} catch (Exception ex) {
 			error("Error getting metadata for <" + path + ">", ex);
 			endProcessing(1);
@@ -198,15 +198,18 @@ public class Metadata extends ActionBase {
 		update.put("metadata", data);
 		JSONObject reply = sms.getFileClient(path).setProperties(update);
 		message(reply.toString(2));
-		lastMeta = data;
+		lastMeta.clear();
+		lastMeta.putAll(data);
 	}
 
 	protected void doSearch() {
 		try {
+			lastSearchResults.clear();
 			List<String> files = sms.searchMetadata(query);
 			verbose("Have <"+files.size()+"> results.");
 			for(String f: files) {
 				message("  "+f);
+				lastSearchResults.add(f);
 			}
 		} catch (Exception ex) {
 			error("Error searching metadata on <"+sms.getEndpoint().getUrl()+">", ex);
@@ -235,7 +238,13 @@ public class Metadata extends ActionBase {
 		JSONObject reply = null;
 		try {
 			path = normalize(path);
-			String actionURL = sms.getLinkUrl("metadata-extract")+path;
+			String actionURL = null;
+			try{
+				actionURL = sms.getLinkUrl("action:metadata-extract")+path;
+			}catch(JSONException e) {
+				// pre-10 server
+				actionURL = sms.getLinkUrl("metadata-extract")+path;
+			}
 			verbose("Extraction URL: "+actionURL);
 			BaseClient bc = new BaseClient(actionURL, sms.getSecurityConfiguration(), sms.getAuth());
 			try(ClassicHttpResponse res = bc.post(params)){
@@ -297,33 +306,23 @@ public class Metadata extends ActionBase {
 	}
 
 	protected StorageClient createStorageClient(String storage) {
-		Location td = null;
-		StorageClient sms = null;
-		try {
-			td = createLocation(storage);
+		try { 
+			Location td = createLocation(storage);
 			Endpoint epr = new Endpoint(td.getSmsEpr());
-			sms = new StorageClient(epr,
+			StorageClient sms = new StorageClient(epr,
 					configurationProvider.getClientConfiguration(epr.getUrl()),
 					configurationProvider.getRESTAuthN());
 			verbose("Storage " + td.getSmsEpr());
-			return sms;
-		} catch (Exception e) {
-			error("Can't access :" + storage, e);
-			endProcessing(ERROR);
-		}
-
-		try {
 			if (!sms.supportsMetadata()) {
 				message("Storage does not support metadata.");
 				endProcessing(ERROR);
 			}
-		} catch (EndProcessingException epe) {
-			throw epe;
-		} catch (Exception e) {
-			error("Can't get metadata service for :" + storage, e);
-			endProcessing(ERROR);
+			return sms;
+		}catch(RuntimeException ex) {
+			throw ex;
+		}catch(Exception ex) {
+			throw new RuntimeException(ex);
 		}
-		return null;
 	}
 
 	@Override
@@ -358,12 +357,7 @@ public class Metadata extends ActionBase {
 
 	}
 
-	/**
-	 * for unit tests
-	 * @return the result of the last operation
-	 */
-	public static Map<String, String> getLastMeta() {
-		return lastMeta;
-	}
-	private static Map<String, String> lastMeta;
+	public final static Map<String, String> lastMeta = new HashMap<>();
+	public final static Collection<String> lastSearchResults = new HashSet<>();
+	
 }

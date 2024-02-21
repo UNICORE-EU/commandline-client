@@ -60,47 +60,44 @@ public class PropertyFilter implements Filter {
 	}
 	
 	protected boolean compareNumbers(Long expected, Long actual){
-		if(modifier.equalsIgnoreCase("lessthan"))return actual<expected;
-		if(modifier.equalsIgnoreCase("greaterthan"))return actual>expected;
+		if(modifier.equalsIgnoreCase(MOD_LT))return actual<expected;
+		if(modifier.equalsIgnoreCase(MOD_GT))return actual>expected;
 		return false;
 	}
 
-	public static final class Factory {
+	private static final String[] modifiers={
+			MOD_EQUAL,MOD_EQUAL_SHORT,
+			MOD_NOTEQUAL,MOD_NOTEQUAL_SHORT,
+			MOD_CONTAINS,MOD_NOTCONTAINS,
+			MOD_CONTAINS_SHORT,MOD_NOTCONTAINS_SHORT,
+			MOD_GT,MOD_GT_SHORT,
+			MOD_LT,MOD_LT_SHORT,
+	};
 
-		private static final String[] modifiers={
-				MOD_EQUAL,MOD_EQUAL_SHORT,
-				MOD_NOTEQUAL,MOD_NOTEQUAL_SHORT,
-				MOD_CONTAINS,MOD_NOTCONTAINS,
-				MOD_CONTAINS_SHORT,MOD_NOTCONTAINS_SHORT,
-				MOD_GT,MOD_GT_SHORT,
-				MOD_LT,MOD_LT_SHORT,
-		};
-
-		/**
-		 * accepts arguments: PropertyName [modifier] [value]
-		 * where [modifier] is one of: contains | lessthan | greaterthan | equals | not
-		 */
-		public static Filter create(String... args) {
-			if(args!=null && args.length==3){
-				String propName=args[0];
-				String mod=args[1];
-				String val=args[2];
-				UCC.getConsoleLogger().verbose("Filtering on property '"+propName+"'");
-				if(acceptModifier(mod)){
-					return new PropertyFilter(propName,mod,val);
-				}
+	/**
+	 * accepts arguments: PropertyName [modifier] [value]
+	 * where [modifier] is one of: contains | lessthan | greaterthan | equals | not
+	 */
+	public static Filter create(String... args) {
+		if(args!=null && args.length==3){
+			String propName=args[0];
+			String mod=args[1];
+			String val=args[2];
+			UCC.getConsoleLogger().verbose("Filtering on property '"+propName+"'");
+			if(acceptModifier(mod)){
+				return new PropertyFilter(propName,mod,val);
 			}
-			UCC.getConsoleLogger().verbose("Could not create filter.");
-			return null;
 		}
+		UCC.getConsoleLogger().verbose("Could not create filter.");
+		return null;
+	}
 
 
-		private static boolean acceptModifier(String modifier) {
-			for(String s: modifiers){
-				if(s.equalsIgnoreCase(modifier))return true;
-			}
-			return false;
+	private static boolean acceptModifier(String modifier) {
+		for(String s: modifiers){
+			if(s.equalsIgnoreCase(modifier))return true;
 		}
+		return false;
 	}
 	
 }

@@ -167,18 +167,18 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 	private String computeDigest(File file)throws Exception{
 		MessageDigest md=MessageDigest.getInstance("MD5");
 		byte[] buf=new byte[1024];
-		FileInputStream fis=new FileInputStream(file);
-		while(true){
-			int len=fis.read(buf);
-			if(len<0)break;
-			md.update(buf,0,len);
+		try(FileInputStream fis=new FileInputStream(file)) {
+			while(true){
+				int len=fis.read(buf);
+				if(len<0)break;
+				md.update(buf,0,len);
+			}
 		}
-		fis.close();
 		byte[]d1=md.digest();
 		return new String(Base64.encode(d1));
 	}
 
-	final Set<String>expected = new HashSet<String>();
+	final Set<String>expected = new HashSet<>();
 	
 	public boolean gotExpectedOutput = false;
 	

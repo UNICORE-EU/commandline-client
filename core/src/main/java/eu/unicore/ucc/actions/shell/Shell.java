@@ -101,7 +101,7 @@ public class Shell extends ActionBase {
 					cmds.add(s);
 				}
 				is = LineReaderBuilder.builder()
-						.completer(new UCCCompletor(cmds))
+						.completer(new UCCCompleter(cmds, this.configurationProvider))
 						.build();
 				history = getHistory(is);
 			}
