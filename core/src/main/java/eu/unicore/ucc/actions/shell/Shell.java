@@ -18,6 +18,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.history.DefaultHistory;
 
+import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.UCCOptions;
@@ -79,6 +80,16 @@ public class Shell extends ActionBase {
 			commandFile=new File(fileName);
 		}
 		run();
+	}
+	
+	@Override
+	protected void testRegistryConnection(){
+		super.testRegistryConnection();
+		try{
+			for(Endpoint ep: registry.listEntries()) {
+				URLCompleter.registerSiteURL(ep.getUrl());
+			}
+		}catch(Exception ex) {}
 	}
 
 	private List<String> internalCommands = Arrays.asList( "set", "unset", "system", "!",

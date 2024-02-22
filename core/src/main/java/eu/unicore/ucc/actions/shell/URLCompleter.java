@@ -44,6 +44,14 @@ public class URLCompleter {
 		if(siteURL!=null && siteURL.contains("/rest/")) {
 			sites.add(siteURL.substring(0, siteURL.indexOf("/rest/")+6));
 		}
+		try {
+			URL u = new URL(siteURL);
+			String[] ts = u.getPath().split("/rest/");
+			if(ts.length>1) {
+				String siteName = ts[0].replaceFirst("/", "");
+				UCCCompleter.registerSiteName(siteName);
+			}
+		}catch(Exception ex) {}
 	}
 
 	/**
@@ -104,8 +112,9 @@ public class URLCompleter {
 				while(m.find()) {
 					String v = m.group();
 					v = v.substring(1, v.length()-1);
-					if(!v.endsWith("/")&&!v.contains("?"))v=v+"/";
-					candidates.add(new Candidate(v, v, null, null, null, null, false, 0));
+					var isQuery = v.contains("?");
+					if(!v.endsWith("/") && !isQuery)v=v+"/";
+					candidates.add(new Candidate(v, v, null, null, null, null, isQuery, 0));
 					found = true;
 				}
 				if(found) {

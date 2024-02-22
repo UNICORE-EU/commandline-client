@@ -34,6 +34,8 @@ public class StorageLister extends Lister<StorageClient>{
 
 	private final String[] tags;
 	
+	private boolean showAll = false;
+
 	public StorageLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider, String[] tags){
 		this(null,registry,configurationProvider,new AcceptAllFilter(), tags);
 	}
@@ -66,6 +68,10 @@ public class StorageLister extends Lister<StorageClient>{
 		setAddressFilter(addressFilter);
 	}
 	
+	public void showAll(boolean showAll) {
+		this.showAll = showAll;
+	}
+
 	@Override
 	public Iterator<StorageClient> iterator() {
 		try{
@@ -81,9 +87,11 @@ public class StorageLister extends Lister<StorageClient>{
 		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
 		for(Endpoint site: sites){
 			if(addressFilter.accept(site)){
-				addProducer(new StorageProducer(site, 
+				var sp = new StorageProducer(site, 
 						configurationProvider.getClientConfiguration(site.getUrl()),
-						configurationProvider.getRESTAuthN(), addressFilter, tags));
+						configurationProvider.getRESTAuthN(), addressFilter, tags);
+				sp.showAll(showAll);
+				addProducer(sp);
 			}
 		}
 	}
@@ -105,6 +113,8 @@ public class StorageLister extends Lister<StorageClient>{
 		
 		private final String[] tags;
 		
+		private boolean showAll = false;
+
 		public StorageProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, 
 				AddressFilter addressFilter, String[] tags) {
 			this.epr = epr;
@@ -133,6 +143,9 @@ public class StorageLister extends Lister<StorageClient>{
 			String storagesUrl = core.getLinkUrl("storages");
 			EnumerationClient ec = new EnumerationClient(epr.cloneTo(storagesUrl), securityProperties, auth);
 			ec.setDefaultTags(tags);
+			if(showAll) {
+				ec.setFilter("all");
+			}
 			for(String url: ec){
 				if(addressFilter.accept(url)){
 					StorageClient c = new StorageClient(epr.cloneTo(url), securityProperties, auth);
@@ -147,6 +160,10 @@ public class StorageLister extends Lister<StorageClient>{
 		public void init(BlockingQueue<StorageClient> target, AtomicInteger runCount) {
 			this.target=target;
 			this.runCount=runCount;
+		}
+
+		public void showAll(boolean showAll) {
+			this.showAll = showAll;
 		}
 	}
 

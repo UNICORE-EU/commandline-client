@@ -3,6 +3,7 @@ package eu.unicore.ucc.actions.data;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,15 +13,11 @@ import java.util.Map;
 import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.HttpStatus;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.utils.TaskClient;
-import eu.unicore.services.rest.client.BaseClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.util.JSONUtil;
@@ -234,34 +231,15 @@ public class Metadata extends ActionBase {
 	}
 
 	protected void doStartExtract() {
-		JSONObject params = new JSONObject();
-		JSONObject reply = null;
 		try {
 			path = normalize(path);
-			String actionURL = null;
-			try{
-				actionURL = sms.getLinkUrl("action:metadata-extract")+path;
-			}catch(JSONException e) {
-				// pre-10 server
-				actionURL = sms.getLinkUrl("metadata-extract")+path;
+			TaskClient tc = sms.getFileClient(path).startMetadataExtraction(10, new String[0]);
+			if(tc!=null) {
+				message("Extraction started, task = "+tc.getEndpoint().getUrl());
+				properties.put(PROP_LAST_RESOURCE_URL, tc.getEndpoint().getUrl());
 			}
-			verbose("Extraction URL: "+actionURL);
-			BaseClient bc = new BaseClient(actionURL, sms.getSecurityConfiguration(), sms.getAuth());
-			try(ClassicHttpResponse res = bc.post(params)){
-				bc.checkError(res);
-				if(HttpStatus.SC_NO_CONTENT==res.getCode()) {
-					reply = new JSONObject();
-				}
-				else {
-					reply = bc.asJSON(res);
-				}
-			}
-			message(reply.toString(2));
-			String taskHref = reply.optString("taskHref", null);
-			if(wait && taskHref!=null) {
-				verbose("Waiting for task <"+taskHref+"> to finish...");
-				TaskClient tc = new TaskClient(new Endpoint(taskHref),
-						sms.getSecurityConfiguration(), sms.getAuth());
+			if(tc!=null && wait) {
+				verbose("Waiting for extraction task <"+tc.getEndpoint().getUrl()+"> to finish...");
 				while(!tc.isFinished())Thread.sleep(2000);
 				JSONObject taskProps = tc.getProperties();
 				JSONObject result = taskProps.optJSONObject("result", new JSONObject());
@@ -344,6 +322,10 @@ public class Metadata extends ActionBase {
 	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_DATA;
+	}
+	
+	public static final Collection<String>getCommands(){
+		return Arrays.asList("write", "read", "update", "delete", "start-extract", "search");
 	}
 
 	private String getArgument(final int argN) {

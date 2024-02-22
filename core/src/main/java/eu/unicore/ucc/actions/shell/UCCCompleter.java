@@ -1,7 +1,9 @@
 package eu.unicore.ucc.actions.shell;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.cli.Option;
 import org.jline.builtins.Completers.FileNameCompleter;
@@ -12,13 +14,15 @@ import org.jline.reader.ParsedLine;
 import org.jline.reader.impl.completer.StringsCompleter;
 
 import eu.unicore.ucc.Command;
+import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.data.Metadata;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 
 /**
  * provide command completion for the "shell" command
  */
-public class UCCCompleter implements Completer {
+public class UCCCompleter implements Completer, Constants {
 
 	final StringsCompleter commands;
 	final FileNameCompleter fileNames = new FileNameCompleter();
@@ -56,6 +60,7 @@ public class UCCCompleter implements Completer {
 		try{
 			String cmdName = command.getName();
 			String lastToken = line.word();
+			int oldSize = candidates.size();
 			if(lastToken.startsWith("-")){
 				boolean longOpts = lastToken.startsWith("--");
 				while(lastToken.startsWith("-"))lastToken=lastToken.substring(1);
@@ -72,15 +77,56 @@ public class UCCCompleter implements Completer {
 						}
 					}
 				}
-				return longOpts;
+				return candidates.size()>oldSize;
 			}
-			else if ("rest".equals(cmdName) &&line.wordIndex()==1) {
+			else if ("rest".equals(cmdName) && line.wordIndex()==1) {
 				for(String x: new String[] {"GET","PUT","POST","DELETE"})
 					candidates.add(new Candidate(x));
 				return true;
 			}
+			else if ("workflow-control".equals(cmdName) && line.wordIndex()==1) {
+				for(String x: new String[] {"abort","resume"})
+					candidates.add(new Candidate(x));
+				return true;
+			}
+			if(line.wordIndex()>1 && line.words().get(line.wordIndex()-1).startsWith("-")) {
+				String option = line.words().get(line.wordIndex()-1);
+				boolean longOpt = option.startsWith("--");
+				while(option.startsWith("-"))option=option.substring(1);
+				if(option.length()>0) {
+					for(Option opt: command.getOptions().getOptions()){
+						String optionName = longOpt? opt.getLongOpt(): opt.getOpt();
+						if(option.equals(optionName)) {
+							return completeOptionArgs(command, opt, reader, line, candidates);
+						}
+					}
+				}
+			}
 		} catch(Exception e) {}
 		return false;
+	}
+	
+	protected boolean completeOptionArgs(Command command, Option opt, 
+			LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
+		if(OPT_SITENAME_LONG.equals(opt.getLongOpt())){
+			new StringsCompleter(siteNames).complete(reader, line, candidates);
+			return true;
+		}
+		if("metadata".equals(command.getName()) 
+				&& Metadata.OPT_COMMAND_LONG.equals(opt.getLongOpt()))
+		{
+			new StringsCompleter(Metadata.getCommands()).complete(reader, line, candidates);
+			return true;
+		}
+		return false;
+	}
+	
+
+	
+	static final Set<String> siteNames = new HashSet<>();
+
+	public static void registerSiteName(String siteName) {
+		siteNames.add(siteName);
 	}
 
 }

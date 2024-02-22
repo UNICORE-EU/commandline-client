@@ -73,7 +73,7 @@ _ucc()
     opts="$global_opts --fields --filter --long --raw --sitename --tags"
     ;;
     list-storages)
-    opts="$global_opts --fields --filter --long --raw --tags"
+    opts="$global_opts --all --fields --filter --long --raw --tags"
     ;;
     list-transfers)
     opts="$global_opts --fields --filter --long --raw --tags"

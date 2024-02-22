@@ -2,6 +2,7 @@ package eu.unicore.ucc.actions.info;
 
 import java.util.Arrays;
 
+import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
@@ -20,9 +21,24 @@ public class ListStorages extends ListActionBase<StorageClient> {
 
 	protected UnitParser unitParser=UnitParser.getCapacitiesParser(1);
 
+	private boolean showAll = false;
+
+	@Override
+	protected void createOptions() {
+		super.createOptions();
+
+		getOptions().addOption(Option.builder(OPT_ALL)
+				.longOpt(OPT_ALL_LONG)
+				.desc("Show all storages including job directories")
+				.required(false)
+				.build());
+	}
+
 	@Override
 	public void process() {
 		super.process();
+		this.showAll = getCommandLine().hasOption(OPT_ALL);
+		verbose("Listing job directories = "+showAll);
 		// do we have a list of storages
 		if(getCommandLine().getArgList().size()>1){
 			boolean first = true;
@@ -53,6 +69,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	
 	protected void listAll(){
 		StorageLister storageLister=new StorageLister(UCC.executor, registry, configurationProvider, tags);
+		storageLister.showAll(showAll);
 		for(StorageClient sms: storageLister){
 			try {
 				if(sms==null){
@@ -73,13 +90,13 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	}
 
 	protected void listSMS(StorageClient sms){
+		String url = sms.getEndpoint().getUrl();
 		try{
-			String url = sms.getEndpoint().getUrl();
 			message(url+System.getProperty("line.separator")+getDetails(sms));
 			properties.put(PROP_LAST_RESOURCE_URL, url);
 			URLCompleter.registerSiteURL(url);
 		}catch(Exception ex){
-			error("Error listing storage at "+sms.getEndpoint().getUrl(), ex);
+			error("Error listing storage at "+url, ex);
 		}
 		printProperties(sms);
 	}

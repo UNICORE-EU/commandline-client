@@ -9,7 +9,8 @@ UCC Changelog
 Version 10.0.0 (released Feb 22, 2024)
 --------------------------------------
  - new feature: 'allocate' command for creating an allocation
- - 'shell': new feature: URL completion for UNICORE URLs
+ - 'shell': much more powerful commandline completion including UNICORE URLs,
+   site names, and more
  - 'list-jobs': improved job list when using the "--long" option
  - 'issue-token': show subject when inspecting the token
  - 'exec': new option "--allocation" for running command in an existing allocation

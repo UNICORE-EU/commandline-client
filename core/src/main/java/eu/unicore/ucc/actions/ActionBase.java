@@ -247,16 +247,12 @@ public abstract class ActionBase extends Command {
 		String regID = soapURL.split("res=")[1]; 
 		return base+"/rest/registries/"+regID;
 	}
-	/**
-	 * checks if the registry can be contacted
-	 * 
-	 */
+	
 	protected void testRegistryConnection(){
 		if (registry == null)
 		{
 			message("Registry access is not initialized");
 			endProcessing(ERROR_CLIENT);
-			return;
 		}
 		try{
 			verbose("Checking registry connection.");
