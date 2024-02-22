@@ -6,7 +6,7 @@ _ucc()
   cur=`_get_cword`
   prev="${COMP_WORDS[COMP_CWORD-1]}"
   commands="admin-info admin-runcommand allocate batch cat connect copy-file-status cp create-storage create-tss exec get-output issue-token job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir open-tunnel rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
-  global_opts="--accept --accept-all-issuers --authentication-method --configuration --content-type --help --output --preference --registry --verbose --with-timing"
+  global_opts="--accept-all-issuers --authentication-method --configuration --help --output --preference --registry --verbose --with-timing"
 
 
   # parsing for ucc command word (2nd word in commandline.
@@ -133,7 +133,7 @@ _ucc()
     rest)
     #looking for 'rest' command
     if [ $COMP_CWORD -eq 2 ]; then
-      opts="get put post delete $global_opts"
+      opts="get put post delete --accept --content-type $global_opts"
     else
       opts="$global_opts "
     fi

@@ -45,6 +45,8 @@ with open(TEMPLATE) as f:
     
 commands = sorted(find_commands())
 global_opts = sorted(find_options("rest"))
+global_opts.remove("--accept")
+global_opts.remove("--content-type")
 case_body = ""
 
 for command in commands:
