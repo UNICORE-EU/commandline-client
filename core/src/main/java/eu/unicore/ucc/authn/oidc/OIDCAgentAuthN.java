@@ -71,13 +71,13 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 		String scope = oidcProperties.getValue(OIDCAgentProperties.SCOPE);
 		if(scope!=null)request.put("scope", scope);
 		JSONObject reply = new JSONObject(ap.send(request.toString()));
-		boolean success = "success".equalsIgnoreCase(reply.getString("status"));
+		boolean success = "success".equalsIgnoreCase(reply.optString("status"));
 		if(!success){
-			String error = reply.getString("error");
+			String error = reply.optString("error", reply.toString());
 			throw new IOException("Error received from oidc-agent: <"+error+">");
 		}
 		token = reply.getString("access_token");
-		refreshToken = reply.getString("refresh_token");
+		refreshToken = reply.optString("refresh_token", null);
 	}
 
 	protected void setupOIDCAgent() throws Exception {

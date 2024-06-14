@@ -6,6 +6,13 @@ UCC Changelog
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
+Version 10.1.0 (released MMM dd, 2024)
+--------------------------------------
+ - new feature: allow to read auth token from file; allow to set
+   token-type to something else than "Bearer"
+ - fix: oidc-agent authentication: add missing dependency
+ - fix: oidc-agent authentication: don't fail on missing refresh_token
+
 Version 10.0.0 (released Feb 22, 2024)
 --------------------------------------
  - new feature: 'allocate' command for creating an allocation

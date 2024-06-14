@@ -1,7 +1,9 @@
 package eu.unicore.ucc.authn.oidc;
 
+import java.io.File;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.hc.core5.http.HttpMessage;
 
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
@@ -43,9 +45,10 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 		StringBuilder ret = new StringBuilder();
 		ret.append("The following properties can be used in the UCC preference file " +
 				"to configure the "+getName()+" authentication.\n");
-		ret.append("token - the bearer token\n");
+		ret.append("token - the token\n");
+		ret.append("token-type - the token type (defaults to 'Bearer')\n");
 		ret.append("\nFor configuring your trusted CAs and certificates, "
-				+ "use the usual 'truststore.*' properties\n");
+				+ "use the usual 'truststore.*' propertierefreshTokens\n");
 		return ret.toString();
 	}
 	
@@ -58,6 +61,11 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 
 	protected void retrieveToken() throws Exception {
 		token = properties.getProperty("token");
+		if(token==null)throw new IllegalArgumentException("No 'token' defined in properties!");
+		if(token.startsWith("@")) {
+			File f = new File(token.substring(1));
+			token = FileUtils.readFileToString(f, "UTF-8");
+		}
 	}
 
 	protected void refreshTokenIfNecessary() throws Exception {
@@ -72,7 +80,10 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 		if(token==null) {
 			retrieveToken();
 		}
-		if(token!=null)httpMessage.setHeader("Authorization", "Bearer "+token);
+		if(token!=null) {
+			String tokenType = properties.getProperty("token-type", "Bearer");
+			httpMessage.setHeader("Authorization", tokenType+" "+token);
+		}
 	}
 
 }

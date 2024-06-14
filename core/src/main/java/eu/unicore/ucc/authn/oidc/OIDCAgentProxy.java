@@ -5,8 +5,6 @@ import java.io.PrintWriter;
 import java.nio.CharBuffer;
 import java.nio.channels.Channels;
 
-import org.json.JSONObject;
-
 import jnr.unixsocket.UnixSocketAddress;
 import jnr.unixsocket.UnixSocketChannel;
 
@@ -49,22 +47,6 @@ public class OIDCAgentProxy {
         	result.flip();
         	return result.toString();
         }
-	}
-	
-	// testing...
-	public static void main(String[] args) throws Exception {
-		if(!isConnectorAvailable()) {
-			System.out.println("OIDC Agent not found!");
-			return;
-		}
-		else {
-			System.out.println("OIDC agent at "+System.getenv(OIDC_SOCK));
-		}
-		OIDCAgentProxy ap = new OIDCAgentProxy();
-		JSONObject j = new JSONObject();
-		j.put("request", "access_token");
-		j.put("account", "hbp");
-		System.out.println("reply: "+ap.send(j.toString()));
 	}
 
 }
