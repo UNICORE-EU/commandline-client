@@ -8,7 +8,7 @@ truststore.directoryLocations.1=src/test/resources/certs/demo-ca-cert.pem
 ucc-session-ids=target/ucc-session-ids
 ucc-shell-history=target/ucc-shell-history
 
-registry=https://localhost:65322/rest/registries/default_registry
+registry=https://localhost:65322/rest/registries/default_registry,https://127.0.0.1:65322/rest/registries/default_registry
 
 output=target
 

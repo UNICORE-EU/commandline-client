@@ -7,10 +7,6 @@ import org.junit.Test;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
-/**
- * Functional tests for the UCC actions. 
- * These run against an embedded UNICORE instance.
- */
 public class TestActionsNoTruststore extends EmbeddedTestBase {
 	
 	@Override

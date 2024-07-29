@@ -9,10 +9,6 @@ import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 import eu.unicore.ucc.util.KeystoreAuthNWithPasswd;
 
-/**
- * Functional tests for the UCC actions. 
- * These run against an embedded UNICORE instance.
- */
 public class TestActionsWithoutPassword extends EmbeddedTestBase {
 	
 	@Override
@@ -40,7 +36,6 @@ public class TestActionsWithoutPassword extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		
 		assertEquals(1, KeystoreAuthNWithPasswd.QUESTIONS);
 	}
 

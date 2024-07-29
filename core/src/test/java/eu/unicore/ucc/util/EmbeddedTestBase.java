@@ -49,6 +49,7 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 	public synchronized void doPreClean()throws Exception{
 		expected.clear();
 		gotExpectedOutput = false;
+		prefsFile = "src/test/resources/conf/userprefs.embedded";
 	}
 
 	@BeforeClass
@@ -96,14 +97,10 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 		}
 	}
 
+	protected String prefsFile = "src/test/resources/conf/userprefs.embedded"; 
 
 	protected void connect(){
-		UCC.main(new String[]{"connect","-c","src/test/resources/conf/userprefs.embedded"});
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-	}
-
-	protected void systemInfo(){
-		UCC.main(new String[]{"system-info","-l","-c","src/test/resources/conf/userprefs.embedded"});
+		UCC.main(new String[]{"connect","-v","-c",prefsFile});
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 

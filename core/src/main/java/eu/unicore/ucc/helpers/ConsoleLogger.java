@@ -32,7 +32,7 @@ public class ConsoleLogger {
 			System.err.println("The root error was: "+Log.getDetailMessage(cause));
 			if(debug)cause.printStackTrace();
 			else if(verbose){
-				System.err.println("Re-run in debug mode (\"UCC_DEBUG=true; ucc ...\")"
+				System.err.println("Re-run in debug mode (\"UCC_DEBUG=true ucc ...\")"
 						+ " to see the full error stack trace.");
 			}
 		}

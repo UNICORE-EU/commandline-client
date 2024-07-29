@@ -43,9 +43,9 @@ public class TestGeneralActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_WrongSetup_NoRegistry(){
-		UCC.main(new String[]{"connect",
-				"-c", "src/test/resources/conf/userprefs.noregistry",});
-		assertEquals(Integer.valueOf(ActionBase.ERROR),UCC.exitCode);
+		prefsFile = "src/test/resources/conf/userprefs.noregistry";
+		UCC.main(new String[]{"connect","-v","-c",prefsFile});
+		assertEquals(Integer.valueOf(ActionBase.ERROR_CONNECTION),UCC.exitCode);
 	}
 
 	@Test
@@ -66,6 +66,19 @@ public class TestGeneralActions extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
+	}
+
+	@Test
+	public void test_MultiRegistry() throws IOException {
+		File sessions=new File("target","ucc-session-ids");
+		FileUtils.deleteQuietly(sessions);
+		this.prefsFile = "src/test/resources/conf/userprefs.multiregistry";
+		connect();
+		String[] args=new String[]{"system-info", "-l", "-v",
+				"-c", prefsFile
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
 	@Test

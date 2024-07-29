@@ -18,7 +18,7 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 	protected OIDCAgentProperties oidcProperties;
 
 	protected OIDCAgentProxy ap;
-	
+
 	public OIDCAgentAuthN()
 	{
 		super();
@@ -43,7 +43,7 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 				+ "The token is retrieved from the 'oidc-agent' utility. "
 				+ "See https://github.com/indigo-dc/oidc-agent";
 	}
-	
+
 	@Override
 	public String getUsage()
 	{
@@ -55,11 +55,9 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 				"\nFor configuring your trusted CAs and certificates, use the usual 'truststore.*' properties\n";
 	}
 
-
 	@Override
 	protected void retrieveToken() throws Exception {
 		if(ap==null)setupOIDCAgent();
-		
 		String account = oidcProperties.getValue(OIDCAgentProperties.ACCOUNT);
 		JSONObject request = new JSONObject();
 		request.put("request", "access_token");
@@ -80,11 +78,23 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 		refreshToken = reply.optString("refresh_token", null);
 	}
 
+	@Override
+	protected void refreshTokenIfNecessary() throws Exception {
+		long instant = System.currentTimeMillis() / 1000;
+		long interval = oidcProperties.getIntValue(OIDCProperties.REFRESH_INTERVAL);
+		if(instant < lastRefresh + interval){
+			return;
+		}
+		lastRefresh = instant;
+		msg.verbose("Refreshing token (after <"+interval+"> seconds.");
+		retrieveToken();
+	}
+
 	protected void setupOIDCAgent() throws Exception {
 		if(!OIDCAgentProxy.isConnectorAvailable())throw new IOException("oidc-agent is not available");
 		ap = new OIDCAgentProxy();
 	}
-	
+
 	public void setAgentProxy(OIDCAgentProxy ap) {
 		this.ap = ap;
 	}

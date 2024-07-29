@@ -27,6 +27,7 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 	protected String token = null;
 	protected String refreshToken = null;
 	protected ConsoleLogger msg = UCC.getConsoleLogger();
+	protected long lastRefresh;
 
 	@Override
 	public String getName() {

@@ -34,9 +34,8 @@ import eu.unicore.util.httpclient.HttpUtils;
  * @author schuller
  */
 public class OIDCServerAuthN extends TokenBasedAuthN {
-	
+
 	protected OIDCProperties oidcProperties;
-	protected long lastRefresh;
 
 	public OIDCServerAuthN()
 	{
@@ -61,7 +60,6 @@ public class OIDCServerAuthN extends TokenBasedAuthN {
 	{
 		return "Authenticate with an OIDC token. The token is retrieved from an OIDC server. ";
 	}
-	
 
 	@Override
 	public String getUsage()

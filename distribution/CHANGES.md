@@ -10,6 +10,8 @@ Version 10.1.0 (released MMM dd, 2024)
 --------------------------------------
  - new feature: allow to read auth token from file; allow to set
    token-type to something else than "Bearer"
+ - 'rest': add '-i' option for printing the response headers
+ - improvment: oidc-agent authentication: add refreshInterval config parameter
  - fix: oidc-agent authentication: add missing dependency
  - fix: oidc-agent authentication: don't fail on missing refresh_token
 

@@ -2,7 +2,6 @@ package eu.unicore.ucc.actions;
 
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.Formatter;
 
 import org.apache.commons.cli.Option;
@@ -34,10 +33,13 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	public static final String OPT_ACCEPT = "A";
 	public static final String OPT_CONTENT_LONG = "content-type";
 	public static final String OPT_CONTENT = "C";
+	public static final String OPT_INCLUDE_LONG = "include";
+	public static final String OPT_INCLUDE = "i";
 
 
 	private String accept;
 	private String contentType;
+	private boolean includeHeaders;
 
 	@Override
 	protected void createOptions() {
@@ -54,6 +56,11 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 				.desc("Value for the 'Content-Type' HTTP header (default: 'application/json')")
 				.required(false)
 				.hasArg()
+				.build());
+		getOptions().addOption(Option.builder(OPT_INCLUDE)
+				.longOpt(OPT_INCLUDE_LONG)
+				.desc("Include the response HTTP headers in the output")
+				.required(false)
 				.build());
 	}
 
@@ -102,8 +109,9 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			if(length<3){
 				throw new IllegalArgumentException("You must provide at least a URL as argument to this command.");
 			}
-			accept = getCommandLine().getOptionValue(OPT_ACCEPT);
+			accept = getCommandLine().getOptionValue(OPT_ACCEPT, "application/json");
 			contentType = getCommandLine().getOptionValue(OPT_CONTENT, "application/json");
+			includeHeaders = getCommandLine().hasOption(OPT_INCLUDE);
 			int startIndex = 2;
 			JSONObject content = new JSONObject(); 
 			if(length>3){
@@ -134,36 +142,31 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	protected void doProcess(String cmd, String url, JSONObject content) throws Exception {
 		verbose("Accessing endpoint <"+url+">");
 		BaseClient bc = makeClient(url);
-	
+		ContentType ct = ContentType.create(contentType);
+
 		if("get".startsWith(cmd.toLowerCase())){
-			String res = "";
-			if(accept==null || "application/json".equalsIgnoreCase(accept)) {
-				res = bc.getJSON().toString(2);
+			try(ClassicHttpResponse response = bc.get(ContentType.create(accept))){
+				handleResponse(response, bc);
 			}
-			else {
-				try(ClassicHttpResponse response = bc.get(ContentType.create(accept))){
-					res = EntityUtils.toString(response.getEntity());
-				}
-			}
-			message(res);
 		}
 		else if("delete".startsWith(cmd.toLowerCase())){
 			bc.delete();
 		}
 		else if("post".startsWith(cmd.toLowerCase())){
-			handleResponse(bc.post(content), bc);
+			try(ClassicHttpResponse response = bc.post(content)){
+				handleResponse(response, bc);
+			}
 		}
 		else if("put".startsWith(cmd.toLowerCase())){
-			ContentType ct = ContentType.create(contentType);
-			verbose("PUT w/ content-type: "+ct.getMimeType());
-			InputStream in = IOUtils.toInputStream(content.toString(), "UTF-8");
-			handleResponse(bc.put(in, ct), bc);
+			try(ClassicHttpResponse response = bc.put(IOUtils.toInputStream(content.toString(), "UTF-8"), ct)){
+				handleResponse(response, bc);
+			}
 		}
 		else {
-			throw new IllegalArgumentException("Command <"+cmd+"> not (yet) implemented / not understood!");
+			throw new IllegalArgumentException("Command <"+cmd+"> not implemented / not understood!");
 		}
 	}
-	
+
 	protected void handleResponse(ClassicHttpResponse res, BaseClient bc) throws Exception {
 		bc.checkError(res);
 		try {
@@ -172,10 +175,15 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			if(l!=null) {
 				message(l.getValue());
 			}
-			for(Header h: res.getHeaders()) {
-				verbose(h.getName()+": "+h.getValue());
+			if (includeHeaders) for(Header h: res.getHeaders()) {
+				message(h.getName()+": "+h.getValue());
 			}
-			message(bc.asJSON(res).toString(2));
+			if("application/json".equalsIgnoreCase(accept)) {
+				message(bc.asJSON(res).toString(2));
+			}
+			else {
+				message(EntityUtils.toString(res.getEntity(), "UTF-8"));
+			}
 		}catch(Exception ex) {}
 	}
 	
