@@ -1,12 +1,15 @@
 package eu.unicore.ucc.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestPropertyVariables
 {
@@ -24,10 +27,10 @@ public class TestPropertyVariables
 		File tst = new File(cwd, "someFile");
 		tst.createNewFile();
 		PropertyVariablesResolver.substituteVariables(p, tst);
-		Assert.assertEquals("s", p.getProperty("k1"));
-		Assert.assertEquals("s${no such property}t", p.getProperty("k2"));
-		Assert.assertEquals("s" + cwd + "t", p.getProperty("k3"));
-		Assert.assertEquals(cwd+"s"+cwd+"t"+cwd, p.getProperty("k4"));
+		assertEquals("s", p.getProperty("k1"));
+		assertEquals("s${no such property}t", p.getProperty("k2"));
+		assertEquals("s" + cwd + "t", p.getProperty("k3"));
+		assertEquals(cwd+"s"+cwd+"t"+cwd, p.getProperty("k4"));
 	}
 	
 	@Test
@@ -36,9 +39,9 @@ public class TestPropertyVariables
 				"@src/test/resources/conf/testweights.properties",
 				"xx=@src/test/resources/log4j2.properties"};
 		Map<String,String>params = PropertyVariablesResolver.getParameters(args);
-		Assert.assertEquals("b", params.get("a"));
-		Assert.assertEquals("10",params.get("SITE2"));
-		Assert.assertNotNull(params.get("xx"));
-		Assert.assertTrue(params.get("xx").contains("rootLogger"));
+		assertEquals("b", params.get("a"));
+		assertEquals("10",params.get("SITE2"));
+		assertNotNull(params.get("xx"));
+		assertTrue(params.get("xx").contains("rootLogger"));
 	}
 }

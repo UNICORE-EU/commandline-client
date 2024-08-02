@@ -1,7 +1,10 @@
 package eu.unicore.ucc.workflow;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.runner.Broker;
@@ -18,7 +21,7 @@ public class TestLoadCommands {
 			String[] args=new String[]{cmd, "-h"
 			};
 			UCC.main(args);
-			Assert.assertEquals(Integer.valueOf(0),UCC.exitCode);
+			assertEquals(Integer.valueOf(0),UCC.exitCode);
 		}
 	}
 	
@@ -26,8 +29,8 @@ public class TestLoadCommands {
 	public void testFindBrokerImpl(){
 		UCC.unitTesting=true;
 		Broker b = UCC.getBroker("Local");
-		Assert.assertNotNull(b);
-		Assert.assertTrue(b instanceof TargetSystemFinder);
+		assertNotNull(b);
+		assertTrue(b instanceof TargetSystemFinder);
 		
 	}
 }

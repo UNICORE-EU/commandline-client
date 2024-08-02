@@ -1,13 +1,13 @@
 package eu.unicore.ucc.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestLocation {
 
@@ -33,8 +33,8 @@ public class TestLocation {
 		String u1=f.getAbsolutePath();
 		Location td=new Location(u1);
 		assertEquals(u1, td.getName());
-		assertNull("", td.getProtocol());
-		assertNull("", td.getSmsEpr());
+		assertNull(td.getProtocol());
+		assertNull(td.getSmsEpr());
 		assertTrue(td.isLocal());
 		assertFalse(td.isUnicoreURL());
 		assertFalse(td.isRaw());

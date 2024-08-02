@@ -1,7 +1,8 @@
 package eu.unicore.ucc.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -20,8 +21,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.data.UFTPConstants;
@@ -59,8 +59,8 @@ public class TestVarious {
 	public void testUFTPParameterProvider(){
 		Map<String,String>params = new HashMap<String, String>();
 		new FiletransferParameterProvider().provideParameters(params, "UFTP");
-		Assert.assertEquals("1", params.get(UFTPConstants.PARAM_STREAMS));
-		Assert.assertNotNull(params.get(UFTPConstants.PARAM_SECRET));
+		assertEquals("1", params.get(UFTPConstants.PARAM_STREAMS));
+		assertNotNull(params.get(UFTPConstants.PARAM_SECRET));
 	}
 	
 

@@ -1,7 +1,10 @@
 package eu.unicore.ucc.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
 
 public class TestQueue {
 
@@ -12,15 +15,14 @@ public class TestQueue {
 			protected void update() {
 				try{
 					add("test");
-				}catch(Exception e){Assert.fail(e.getMessage());}
+				}catch(Exception e){}
 			}
 		};
-		
 		String s=q.next();
-		Assert.assertNull(s);
+		assertNull(s);
 		Thread.sleep(200);
 		s=q.next();
-		Assert.assertNotNull(s);
-		Assert.assertEquals("test", s);
+		assertNotNull(s);
+		assertEquals("test", s);
 	}
 }

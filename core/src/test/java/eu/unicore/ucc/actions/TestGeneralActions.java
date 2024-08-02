@@ -1,13 +1,13 @@
 package eu.unicore.ucc.actions;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import eu.unicore.services.rest.security.jwt.JWTUtils;
 import eu.unicore.ucc.UCC;
@@ -160,9 +160,9 @@ public class TestGeneralActions extends EmbeddedTestBase {
 		String token = IssueToken.lastToken;
 		JSONObject o = JWTUtils.getPayload(token);
 		System.out.println(o.toString(2));
-		assertEquals("Wrong lifetime", lifetime, o.getInt("exp")-o.getInt("iat"));
-		assertEquals("Should be limited", o.optString("aud"), o.optString("iss"));
-		assertEquals("Should be renewable", "true", o.optString("renewable"));
+		assertEquals(lifetime, o.getInt("exp")-o.getInt("iat"));
+		assertEquals(o.optString("aud"), o.optString("iss"));
+		assertEquals("true", o.optString("renewable"));
 	}
 
 }

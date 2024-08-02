@@ -1,7 +1,6 @@
 package eu.unicore.ucc.workflow;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +14,9 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.encoders.Base64;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 import eu.unicore.uas.UAS;
 import eu.unicore.uas.util.MessageWriter;
@@ -50,7 +49,7 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 		new File(testsRoot, "WORK").mkdir();
 	}
 
-	@Before
+	@BeforeEach
 	public synchronized void doPreClean()throws Exception{
 		expected.clear();
 		gotExpectedOutput = false;
@@ -58,21 +57,16 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 		FileUtils.deleteQuietly(sessions);
 	}
 
-	@BeforeClass
+	@BeforeAll
 	public static synchronized void setUp()throws Exception{
 		setUp("src/test/resources/conf/uas.config");
 	}
 
-	@AfterClass	
+	@AfterAll
 	public static synchronized void tearDown()throws Exception{
 		if(uas==null)return;
 		System.out.println("Stopping embedded UNICORE/X server.");
-		try{
-			uas.getKernel().shutdown();
-		}catch(Exception e){
-			e.printStackTrace();
-			fail();
-		}
+		uas.getKernel().shutdown();
 	}
 
 	public void verbose(String message){
@@ -156,15 +150,10 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 	}
 
 	//check MD5 hash and fail() if no match
-	public void checkFilesOK(File expected, File actual){
-		try{
-			String expectedDigest=computeDigest(expected);
-			String actualDigest=computeDigest(actual);
-			assertEquals(expectedDigest,actualDigest);
-		}
-		catch(Exception ex){
-			fail();
-		}
+	public void checkFilesOK(File expected, File actual) throws Exception {
+		String expectedDigest=computeDigest(expected);
+		String actualDigest=computeDigest(actual);
+		assertEquals(expectedDigest,actualDigest);
 	}
 
 	private String computeDigest(File file)throws Exception{
@@ -181,7 +170,7 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 		return new String(Base64.encode(d1));
 	}
 
-	final Set<String>expected = new HashSet<String>();
+	final Set<String>expected = new HashSet<>();
 	
 	public boolean gotExpectedOutput = false;
 	

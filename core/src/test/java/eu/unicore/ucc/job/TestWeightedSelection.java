@@ -1,12 +1,12 @@
 package eu.unicore.ucc.job;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.runner.WeightedSelection;
 

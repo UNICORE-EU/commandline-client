@@ -1,8 +1,8 @@
 package eu.unicore.ucc.authn;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.File;
 import java.util.Properties;
@@ -10,7 +10,7 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.authn.oidc.OIDCAgentAuthN;
 import eu.unicore.ucc.authn.oidc.OIDCAgentProxy;

@@ -1,7 +1,7 @@
 package eu.unicore.ucc.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +15,9 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.encoders.Base64;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 import eu.unicore.uas.UAS;
 import eu.unicore.uas.util.MessageWriter;
@@ -45,19 +45,19 @@ public abstract class EmbeddedTestBase implements MessageWriter {
 		Command.quitAfterPrintingUsage=false;
 	}
 
-	@Before
+	@BeforeEach
 	public synchronized void doPreClean()throws Exception{
 		expected.clear();
 		gotExpectedOutput = false;
 		prefsFile = "src/test/resources/conf/userprefs.embedded";
 	}
 
-	@BeforeClass
+	@BeforeAll
 	public static synchronized void setUp()throws Exception{
 		setUp("src/test/resources/uas/uas.config");
 	}
 
-	@AfterClass	
+	@AfterAll
 	public static synchronized void tearDown()throws Exception{
 		if(uas==null)return;
 		System.out.println("Stopping embedded UNICORE/X server.");

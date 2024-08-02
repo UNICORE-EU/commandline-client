@@ -1,4 +1,4 @@
-authenticationMethod=USERNAME
+authentication-method=USERNAME
 username=demouser
 password=test123
 

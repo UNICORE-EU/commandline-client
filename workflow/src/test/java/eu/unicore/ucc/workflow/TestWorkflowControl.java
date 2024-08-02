@@ -1,9 +1,9 @@
 package eu.unicore.ucc.workflow;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.UCC;
@@ -11,7 +11,7 @@ import eu.unicore.workflow.WorkflowClient;
 
 public class TestWorkflowControl extends EmbeddedTestBase {
 
-	@Test @Ignore
+	@Test @Disabled
 	public void testAbortWorkflow() throws Exception {
 		connect();
 		String[] args=new String[]{"workflow-submit","-v",

@@ -1,18 +1,18 @@
 package eu.unicore.ucc.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import eu.unicore.uas.util.UnitParser;
 import eu.unicore.client.core.FileList.FileListEntry;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.CP;
 import eu.unicore.ucc.actions.data.LS;
@@ -43,7 +43,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 		File tmpfolder=new File("target/testdata","ucc-"+System.currentTimeMillis());
 		if(!tmpfolder.exists()){
-			assertTrue("can't create test directory", tmpfolder.mkdirs());
+			assertTrue(tmpfolder.mkdirs());
 		}
 		args=new String[]{"cp", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -386,11 +386,11 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		//create a directory with a few files
 		String dirname="ucctest-"+System.currentTimeMillis();
 		File tmp=new File(System.getProperty("java.io.tmpdir"), dirname);
-		assertTrue("Can't create tmpdir",tmp.mkdir());
+		assertTrue(tmp.mkdir());
 		FileUtils.writeStringToFile(new File(tmp,"test1"), "test1", "UTF-8");
 		FileUtils.writeStringToFile(new File(tmp,"test2"), "test2", "UTF-8");
 		File subdir=new File(tmp, "sub");
-		assertTrue("Can't create tmpdir",subdir.mkdir());
+		assertTrue(subdir.mkdir());
 		FileUtils.writeStringToFile(new File(subdir,"sub1"), "sub1", "UTF-8");
 
 		//upload a complete directory
@@ -479,7 +479,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 		File tmpfolder=new File("target/testdata","ucc-"+System.currentTimeMillis());
 		if(!tmpfolder.exists()){
-			assertTrue("can't create test directory", tmpfolder.mkdirs());
+			assertTrue(tmpfolder.mkdirs());
 		}
 		args=new String[]{"cp", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
