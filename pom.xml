@@ -23,6 +23,7 @@
      <uas.version>2.7.0</uas.version>
      <wf.version>3.7.0</wf.version>
      <secutils.version>4.1.1</secutils.version>
+     <bc.version>1.78.1</bc.version>
      <jnr.version>0.38.22</jnr.version>
      <groovy.version>4.0.13</groovy.version>
      <guava.version>33.2.1-jre</guava.version>
@@ -75,6 +76,18 @@
 	    <groupId>com.fasterxml.woodstox</groupId>
 	    <artifactId>woodstox-core</artifactId>
 	  </exclusion>
+	  <exclusion>
+	    <groupId>org.apache.cxf</groupId>
+	    <artifactId>cxf-rt-frontend-jaxws</artifactId>
+	  </exclusion>
+	  <exclusion>
+	    <groupId>org.apache.santuario</groupId>
+	    <artifactId>xmlsec</artifactId>
+	  </exclusion>
+	  <exclusion>
+	    <groupId>io.imunity.samly</groupId>
+	    <artifactId>samly2</artifactId>
+	  </exclusion>
 	</exclusions>
       </dependency>
       <dependency>
@@ -105,6 +118,16 @@
 	    <artifactId>woodstox-core</artifactId>
 	  </exclusion>
 	</exclusions>
+      </dependency>
+      <dependency>
+	<groupId>org.bouncycastle</groupId>
+	<artifactId>bcprov-jdk18on</artifactId>
+	<version>${bc.version}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.bouncycastle</groupId>
+	<artifactId>bcpkix-jdk18on</artifactId>
+	<version>${bc.version}</version>
       </dependency>
       <dependency>
 	<groupId>org.apache.groovy</groupId>

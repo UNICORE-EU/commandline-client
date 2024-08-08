@@ -6,14 +6,16 @@ UCC Changelog
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
-Version 10.1.0 (released MMM dd, 2024)
+Version 10.1.0 (released Aug dd, 2024)
 --------------------------------------
  - new feature: allow to read auth token from file; allow to set
    token-type to something else than "Bearer"
  - 'rest': add '-i' option for printing the response headers
+ - 'run': print job status message in case of job failure
  - improvment: oidc-agent authentication: add refreshInterval config parameter
  - fix: oidc-agent authentication: add missing dependency
  - fix: oidc-agent authentication: don't fail on missing refresh_token
+ - update to UNICORE 10.1 base libs
 
 Version 10.0.0 (released Feb 22, 2024)
 --------------------------------------

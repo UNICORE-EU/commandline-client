@@ -50,6 +50,14 @@
       <artifactId>uas-client</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk18on</artifactId>
+    </dependency>
+    <dependency>
       <groupId>eu.unicore.workflow</groupId>
       <artifactId>workflow-client</artifactId>
     </dependency>
