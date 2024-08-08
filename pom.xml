@@ -13,24 +13,16 @@
   <parent>
     <groupId>eu.unicore</groupId>
     <artifactId>unicore-parent</artifactId>
-    <version>2.3</version>
+    <version>3.0.1</version>
   </parent>
-
-  <repositories>
-    <repository>
-      <id>unicore.eu</id>
-      <name>UNICORE repository</name>
-      <url>https://unicore-dev.zam.kfa-juelich.de/maven</url>
-    </repository>
-  </repositories>
 
   <properties>
     <!-- goes into .jar manifests -->
     <specification.version>10.1.0</specification.version>
 
-     <uas.version>2.6.0</uas.version>
-     <wf.version>3.6.0</wf.version>
-     <secutils.version>4.1.0</secutils.version>
+     <uas.version>2.7.0</uas.version>
+     <wf.version>3.7.0</wf.version>
+     <secutils.version>4.1.1</secutils.version>
      <jnr.version>0.38.22</jnr.version>
      <groovy.version>4.0.13</groovy.version>
      <guava.version>33.2.1-jre</guava.version>

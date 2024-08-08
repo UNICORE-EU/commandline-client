@@ -16,8 +16,6 @@ import eu.unicore.ucc.lookup.IResolve;
 
 /**
  * resolves a remote SMS location given via some "abstract" form or that require lookup
- * 
- * @see Location
  *
  * @author schuller
  */
@@ -37,8 +35,6 @@ public class Resolve extends ActionBase {
 	}
 	/**
 	 * manually register a resolver
-	 * @param uriScheme - the URI scheme that the resolver can handle. This is only used
-	 * internally as a hash key
 	 * @param resolver - the resolver
 	 */
 	public synchronized static void addResolver(IResolve resolver){
@@ -64,11 +60,10 @@ public class Resolve extends ActionBase {
 	}
 	/**
 	 * resolve the given URI using the registered resolvers
-	 * 
+	 *
 	 * @param uri
 	 * @param registry
 	 * @param security
-	 * @param messageWriter
 	 * @return Location object corresponding to the given URI
 	 */
 	public static Location resolve(String uri, IRegistryClient registry, UCCConfigurationProvider security){

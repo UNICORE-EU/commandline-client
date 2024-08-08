@@ -33,19 +33,16 @@ public class ProgressBar implements ProgressListener<Long> {
 
 	/**
 	 * create a new progress bar
-	 * @param msg - message writer
 	 */
 	public ProgressBar(){
 		this("",-1);
 	}
 
 	/**
-	 * 
 	 * @param identifier - fixed ID, e.g. file name, to display
-	 * @param size - if this is non-positive, a "spinning" progress indicator will be displyoed
-	 * @param msg - message writer for logging
+	 * @param size - if this is non-positive, a "spinning" progress indicator will be displayed
 	 */
-	public ProgressBar(String identifier,long size){
+	public ProgressBar(String identifier, long size){
 		this.identifier=identifier;
 		startedAt=System.currentTimeMillis();
 		try {

@@ -243,7 +243,6 @@ public class UCC{
 	/**
 	 * get the named broker implementation
 	 * @param brokerName - broker to use. If <code>null</code>, the best broker will be used
-	 * @param msg - message writer
 	 */
 	public static Broker getBroker(String brokerName){
 		Broker broker=null;

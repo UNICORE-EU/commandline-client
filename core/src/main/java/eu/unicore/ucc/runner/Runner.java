@@ -690,8 +690,13 @@ public class Runner implements Runnable {
 		if(status.equals(Status.SUCCESSFUL) || status.equals(Status.FAILED)){
 			String exit = jobClient.getProperties().optString("exitCode");
 			if(exit!=null){
-				sb.append(" exit code: ");
+				sb.append(" Exit code: ");
 				sb.append(exit);
+			}
+			if(status.equals(Status.FAILED)) {
+				try{
+					sb.append(", ").append(jobClient.getStatusMessage());
+				}catch(Exception ex){}
 			}
 		}
 		if(status.equals(Status.RUNNING)){

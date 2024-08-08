@@ -16,12 +16,10 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <version>${specification.version}</version>
-
   <properties>
     <!-- this is the UCC version we are packaging -->
     <ucc.version>${project.parent.version}</ucc.version>
-    <package.version>${project.version}</package.version>
+    <package.version>${specification.version}</package.version>
     <package.release>1</package.release>
   </properties>
 
@@ -53,7 +51,7 @@
           <descriptors>
             <descriptor>src/main/assembly/dep.xml</descriptor>
           </descriptors>
-          <finalName>unicore-ucc-${project.version}</finalName>
+          <finalName>unicore-ucc-${specification.version}</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <archiverConfig>
              <fileMode>0644</fileMode>

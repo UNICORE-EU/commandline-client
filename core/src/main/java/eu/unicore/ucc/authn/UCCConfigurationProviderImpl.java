@@ -22,14 +22,10 @@ import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 
 /**
- * UCC specific extension of {@link ClientConfigurationProvider}. Configures the object in UCC way (from preferences)
+ * UCC specific extension of {@link ClientConfigurationProvider}.
+ * Configures the object in UCC way (from preferences)
  * and sets up user preferences from UCC options.
- * <p>
- * Support for plain SAML attribute assertions push is managed here with help of {@link SamlPushSupport}.
- * <p>
- * By default this implementation uses a {@link CachingIdentityResolver} however it is advised to configure
- * usage {@link RegistryIdentityResolver}.
- *    
+ *   
  * @author K. Benedyczak
  */
 public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImpl 
@@ -48,9 +44,10 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 			PREFERENCE_ARG_ROLE + ":<val>|" + 
 			PREFERENCE_ARG_SUP_GIDS + ":<val1,val2,...>|";
 
-	private Properties userProperties;
-	private Command command;
-	
+	private final Properties userProperties;
+
+	private final Command command;
+
 	public UCCConfigurationProviderImpl(String authnMethod, Properties userProperties, 
 			Command command, boolean acceptAllCAs) throws Exception
 	{

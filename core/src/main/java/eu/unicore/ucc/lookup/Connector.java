@@ -24,6 +24,7 @@ public class Connector implements Runnable {
 	private final UCCConfigurationProvider cfgProvider;
 
 	final AtomicInteger tsfAvailable=new AtomicInteger(0);
+
 	final AtomicInteger tssAvailable=new AtomicInteger(0);
 
 	/**
@@ -34,7 +35,6 @@ public class Connector implements Runnable {
 	/**
 	 * @param registry
 	 * @param cfgProvider
-	 * @param msg
 	 */
 	public Connector(IRegistryClient registry, UCCConfigurationProvider cfgProvider){
 		this.registry=registry;
@@ -84,7 +84,7 @@ public class Connector implements Runnable {
 
 	/**
 	 * set the blacklist i.e. patterns of site URLs to ignore
-	 * @param blackList
+	 * @param blacklist
 	 */
 	public void setBlacklist(String[] blacklist){
 		this.blacklist = blacklist;
