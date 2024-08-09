@@ -3,7 +3,10 @@ package eu.unicore.ucc.actions.job;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.io.IOUtils;
@@ -24,10 +27,6 @@ import eu.unicore.ucc.util.UCCBuilder;
  * @author schuller
  */
 public class Run extends ActionBase {
-
-	protected Runner runner;
-
-	protected UCCBuilder builder;
 
 	/**
 	 * site to use
@@ -60,6 +59,8 @@ public class Run extends ActionBase {
 	 * be performed but no job will be submitted 
 	 */
 	protected boolean dryRun=false;
+
+	protected boolean multiThreaded=false;
 
 	protected String[] tags;
 
@@ -119,6 +120,11 @@ public class Run extends ActionBase {
 				.desc("Dry run, don't submit anything")
 				.required(false)
 				.build());
+		getOptions().addOption(Option.builder("J")
+				.longOpt("multi-threaded")
+				.desc("Launch a thread for each job file to run.")
+				.required(false)
+				.build());
 	}
 
 	@Override
@@ -154,67 +160,85 @@ public class Run extends ActionBase {
 	@Override
 	public void process(){
 		super.process();
-		boolean success = true;
 		if(getBooleanOption(OPT_SAMPLE_LONG, OPT_SAMPLE)){
 			printSampleJob();
 			endProcessing(0);
 		}
-
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
-
 		allocation = getCommandLine().getOptionValue(OPT_ALLOCATION);
-		
 		if(allocation!=null && siteName!=null) {
 			throw new IllegalArgumentException("Cannot have both 'allocation' and 'sitename' arguments.");
 		}
-
 		synchronous=!getBooleanOption(OPT_MODE_LONG, OPT_MODE);
 		verbose("Synchronous processing = "+synchronous);
-
 		brief=getBooleanOption(OPT_NOPREFIX_LONG, OPT_NOPREFIX);
 		verbose("Adding job id to output file names = "+!brief);
-
 		scheduled=getOption(OPT_SCHEDULED_LONG, OPT_SCHEDULED);
 		if(scheduled!=null){
 			scheduled=UnitParser.convertDateToISO8601(scheduled);
 			verbose("Will schedule job submission for "+scheduled);
 		}
-
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
 		verbose("Dry run = "+dryRun);
-
+		multiThreaded = getBooleanOption("multi-threaded", "J");
+		verbose("Multi threaded = "+multiThreaded);
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
 			verbose("Job tags = " + Arrays.deepToString(tags));
 		}
+		final AtomicBoolean success = new AtomicBoolean(true);
+
 		if(getCommandLine().getArgs().length>1){
+			List<Thread> threads = new ArrayList<>();
 			for(int i=1; i<getCommandLine().getArgs().length;i++){
-				initBuilder(getCommandLine().getArgs()[i]);
-				success = success && run()==0;
+				final String jobFile = getCommandLine().getArgs()[i];
+				if(multiThreaded) {
+					Thread t = new Thread(()->{
+						if(run(readJob(jobFile))!=0) {
+							success.set(false);
+						}
+					});
+					t.setName("[ucc run "+i+"]");
+					threads.add(t);
+					t.start();
+				}
+				else {
+					if(run(readJob(jobFile))!=0){
+						success.set(false);
+					}
+				}
+			}
+			for(Thread t: threads) {
+				try{
+					t.join();
+				}catch(InterruptedException ie) {}
 			}
 		}
 		else{
-			initBuilderFromStdin();
-			success = run()==0;
+			if(run(readJob())!=0){
+				success.set(false);
+			}
 		}
-		if(!success) {
+		if(!success.get()) {
 			throw new EndProcessingException(1, "Job(s) failed.");
 		}
 	}
 
-	protected void initBuilder(String jobFileName){
+	protected UCCBuilder readJob(String jobFileName){
 		try{
 			File jobFile = new File(jobFileName);
-			builder = new UCCBuilder(jobFile, registry, configurationProvider);
+			UCCBuilder builder = new UCCBuilder(jobFile, registry, configurationProvider);
 			verbose("Read job from <"+jobFileName+">");
+			configureBuilder(builder);
+			return builder;
 		}catch(Exception e){
 			error("Can't parse job file <"+jobFileName+">",e);
 			endProcessing(ERROR_CLIENT);
+			return null;
 		}
-		configureBuilder();
 	}
 
-	protected void initBuilderFromStdin(){
+	protected UCCBuilder readJob(){
 		try{
 			message("Reading job from stdin:");
 			message("");
@@ -223,35 +247,31 @@ public class Run extends ActionBase {
 			while((b=System.in.read())!=-1){
 				bos.write(b);
 			}
-			builder = new UCCBuilder(bos.toString(), registry, configurationProvider);
-			configureBuilder();
+			UCCBuilder builder = new UCCBuilder(bos.toString(), registry, configurationProvider);
+			configureBuilder(builder);
+			return builder;
 		}catch(Exception e){
 			error("Can't read job from stdin.",e);
 			endProcessing(ERROR_CLIENT);
+			return null;
 		}
 	}
 
-	protected void configureBuilder(){
+	protected void configureBuilder(UCCBuilder builder){
 		builder.setProperty("Output",output.getAbsolutePath());
-		builder.setProperty("IDLocation",output.getAbsolutePath());
 		builder.setProperty("KeepFinishedJob", "true");
 		builder.setProperty("DetailedStatusDisplay", "true");
 		if(scheduled!=null)builder.setProperty("Not before", scheduled);
-		String siteFromJob = builder.getSite();
 		if(siteName!=null){
 			builder.setProperty("Site", siteName);
-		}
-		else{
-			// commandline option overrides
-			siteName = siteFromJob;
 		}
 		if(tags!=null&&tags.length>0) {
 			builder.addTags(tags);
 		}
 	}
-	
-	protected int run(){
-		runner = new Runner(registry,configurationProvider,builder);
+
+	protected int run(UCCBuilder builder){
+		Runner runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(!synchronous);
 		runner.setQuietMode(true);
 		runner.setBriefOutfileNames(brief);

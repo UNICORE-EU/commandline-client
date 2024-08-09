@@ -143,7 +143,6 @@ public class Allocate extends ActionBase {
 		try{
 			builder = new UCCBuilder(registry, configurationProvider);
 			builder.setProperty("Output",output.getAbsolutePath());
-			builder.setProperty("IDLocation",output.getAbsolutePath());
 			builder.setProperty("DetailedStatusDisplay", "true");
 			if(tags!=null&&tags.length>0) {
 				builder.addTags(tags);

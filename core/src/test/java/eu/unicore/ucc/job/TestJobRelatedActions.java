@@ -37,7 +37,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		String job="src/test/resources/jobs/date.u";
 		String[] args=new String[]{"run",
 				"-c", "src/test/resources/conf/userprefs.embedded",
-				"-a",
+				"-a", "-J",
 				job,job,job
 		};		
 		UCC.main(args);

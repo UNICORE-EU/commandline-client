@@ -31,6 +31,7 @@ public class OIDCProperties extends PropertiesHelper {
 	public static final String CLIENT_SECRET = "clientSecret";
 	public static final String AUTH_MODE = "authentication";
 	public static final String GRANT_TYPE = "grantType";
+	public static final String SCOPE = "scope";
 	public static final String OTP = "otp";
 	public static final String OTP_PARAM_NAME = "request_key_for_otp";
 	public static final String REFRESH_TOKEN_FILENAME = "refreshTokenFile";
@@ -64,6 +65,7 @@ public class OIDCProperties extends PropertiesHelper {
 		META.put(GRANT_TYPE, new PropertyMD("client_credentials").setDescription("Grant type to request."));
 		META.put(AUTH_MODE, new PropertyMD("BASIC").setEnum(AuthMode.BASIC)
 				.setDescription("How to authenticate (i.e. send client id/secret) to the OIDC server (BASIC or POST)."));
+		META.put(SCOPE, new PropertyMD("openid").setDescription("Token scope to request from the OIDC server."));
 	}
 
 	public OIDCProperties(Properties properties) throws ConfigurationException

@@ -398,7 +398,7 @@ public class Batch extends ActionBase {
 			final UCCBuilder b=new UCCBuilder(f, registry, configurationProvider);
 			b.setProperty("Output",output.getAbsolutePath());
 			b.setProperty("IDLocation",running.getRequestDir().getAbsolutePath());
-			b.setProperty("KeepFinishedJob",""+keepJobs);
+			b.setProperty("KeepFinishedJob", String.valueOf(keepJobs));
 			b.setProperty("source", nextRunning);
 			f.delete();
 			executor.execute(new Runnable(){

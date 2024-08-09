@@ -70,7 +70,6 @@ public class GetOutcome extends JobOperationBase {
 		try{
 			builder.setProperty("state", Runner.STARTED);
 			builder.setProperty("Output",output.getAbsolutePath());
-			builder.setProperty("IDLocation",output.getAbsolutePath());
 			builder.setProperty("KeepFinishedJob","true");
 			Runner runner=new Runner(registry,configurationProvider,builder);
 			runner.setBriefOutfileNames(brief);

@@ -82,7 +82,6 @@ public class OIDCServerAuthN extends TokenBasedAuthN {
 				String url = oidcProperties.getValue(OIDCProperties.TOKEN_ENDPOINT);
 				JSONObject token = tokens.optJSONObject(url);
 				refreshToken = token.getString("refresh_token");
-				lastRefresh = token.getLong("last_refresh");
 				msg.verbose("Loaded refresh token for <"+url+">");
 			}
 		} catch (Exception ex) {
@@ -98,7 +97,6 @@ public class OIDCServerAuthN extends TokenBasedAuthN {
 		JSONObject token = new JSONObject();
 		try (FileWriter writer=new FileWriter(tokenFile)){
 			token.put("refresh_token", refreshToken);
-			token.put("last_refresh", lastRefresh);
 			tokens.put(url, token);
 			tokens.write(writer);
 			FilePermHelper.set0600(tokenFile);
@@ -149,8 +147,9 @@ public class OIDCServerAuthN extends TokenBasedAuthN {
 		}
 		params.add(new BasicNameValuePair("username", username));
 		params.add(new BasicNameValuePair("password", password));
-		if(otp!=null) {
-			params.add(new BasicNameValuePair(oidcProperties.getValue(OIDCProperties.OTP_PARAM_NAME), otp));
+		String scope = oidcProperties.getValue(OIDCProperties.SCOPE);
+		if(scope!=null && scope.length()>0){
+			params.add(new BasicNameValuePair("scope", scope));
 		}
 		handleReply(executeCall(params));
 	}

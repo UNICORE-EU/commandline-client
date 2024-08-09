@@ -1,20 +1,25 @@
 UCC Changelog
 =============
 
- - Please use the [GitHub issue tracker](https://github.com/UNICORE-EU/commandline-client/issues)
- - (old) [Sourceforge issue tracker](https://sourceforge.net/p/unicore/issues)
+Report any issues via the
+[GitHub issue tracker](https://github.com/UNICORE-EU/commandline-client/issues)
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
+
 
 Version 10.1.0 (released Aug dd, 2024)
 --------------------------------------
  - new feature: allow to read auth token from file; allow to set
    token-type to something else than "Bearer"
  - 'rest': add '-i' option for printing the response headers
- - 'run': print job status message in case of job failure
+ - 'run': print job status message in case of job failureA
+ - 'run': new option "-J", "--multi-threaded", for running multiple jobs
+   in parallel
  - improvment: oidc-agent authentication: add refreshInterval config parameter
  - fix: oidc-agent authentication: add missing dependency
  - fix: oidc-agent authentication: don't fail on missing refresh_token
+ - fix: oidc-server authentication: allow to configure "oidc.scope" parameter,
+   which defaults to "openid"
  - update to UNICORE 10.1 base libs
 
 Version 10.0.0 (released Feb 22, 2024)
