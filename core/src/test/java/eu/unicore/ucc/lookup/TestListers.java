@@ -20,7 +20,19 @@ public class TestListers extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
-	
+
+	@Test
+	public void test_List_Sites() throws Exception {
+		connect();
+		runDate();
+		String[] args=new String[]{"list-sites", "-v", "-l",
+					"--filter", "resourceStatus", "eq", "READY",
+					"-c", "src/test/resources/conf/userprefs.embedded",
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
+
 	@Test
 	public void test_Resolve() throws Exception {
 		connect();

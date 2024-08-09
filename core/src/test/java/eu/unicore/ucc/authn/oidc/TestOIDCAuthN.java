@@ -2,6 +2,7 @@ package eu.unicore.ucc.authn.oidc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.Properties;
@@ -51,7 +52,6 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 		// check refresh
 		a.token = null;
 		a.lastRefresh = 0l;
-		m = new HttpGet("https://test");
 		a.addAuthenticationHeaders(m);
 		req = MockOIDCServer.x.remove(0);
 		System.out.println(req.toString(2));
@@ -60,6 +60,13 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 		h = m.getHeader("Authorization");
 		assertNotNull(h);
 		assertEquals("Bearer some_access_token", h.getValue());
+		// check refresh token loaded from file
+		a = new OIDCServerAuthN();
+		a.setProperties(p);
+		a.addAuthenticationHeaders(m);
+		req = MockOIDCServer.x.remove(0);
+		System.out.println(req.toString(2));
+		assertEquals("refresh_token", req.getString("grant_type"));
 	}
 
 	@Test
@@ -74,6 +81,11 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 		var h = m.getHeader("Authorization");
 		assertNotNull(h);
 		assertEquals("Bearer some_access_token", h.getValue());
+		a.lastRefresh = 0l;
+		a.token = null;
+		a.refreshTokenIfNecessary();
+		assertTrue(a.lastRefresh>0);
+		assertNotNull(a.token);
 	}
 
 	public static class MockAP extends OIDCAgentProxy {

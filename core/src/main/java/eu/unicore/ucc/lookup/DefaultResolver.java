@@ -26,7 +26,6 @@ public class DefaultResolver implements IResolve {
 	public Location resolve(String uri, IRegistryClient registry, UCCConfigurationProvider configurationProvider) {
 		if(!uri.startsWith("unicore://"))return null;
 		try{
-			
 			URI u = new URI(uri);
 			final String site = u.getHost();
 			String path = u.getPath();
