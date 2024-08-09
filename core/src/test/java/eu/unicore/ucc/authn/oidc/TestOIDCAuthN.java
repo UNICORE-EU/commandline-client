@@ -24,7 +24,7 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 		p.setProperty("oidc.scope", "openid email");
 		p.setProperty("oidc.username", "foo");
 		p.setProperty("oidc.password", "bar");
-		FileUtils.delete(new File("target/oidc_refresh_token"));
+		FileUtils.deleteQuietly(new File("target/oidc_refresh_token"));
 		p.setProperty("oidc.refreshTokenFile", "target/oidc_refresh_token");
 		String ep = "https://localhost:65322/rest/oidc";
 		p.setProperty("oidc.endpoint", ep);
