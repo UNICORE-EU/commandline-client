@@ -1,4 +1,4 @@
-package eu.unicore.ucc.authn;
+package eu.unicore.ucc.authn.oidc;
 
 import java.util.HashSet;
 import java.util.Set;

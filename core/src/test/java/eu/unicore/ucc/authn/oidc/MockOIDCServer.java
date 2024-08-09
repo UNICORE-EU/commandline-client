@@ -1,4 +1,4 @@
-package eu.unicore.ucc.authn;
+package eu.unicore.ucc.authn.oidc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +30,21 @@ public class MockOIDCServer extends ServicesBase {
 	public Response receive(@FormParam("username")String username,
 			@FormParam("password")String password,
 			@FormParam("grant_type") String grantType,
-			@FormParam("otp") String otp) {
+			@FormParam("otp") String otp,
+			@FormParam("scope") String scope,
+			@FormParam("refresh_token")String refreshToken) {
 		JSONObject j = new JSONObject();
 		if(username!=null)j.put("username", username);
 		if(password!=null)j.put("password", password);
 		if(grantType!=null)j.put("grant_type", grantType);
 		if(otp!=null)j.put("otp", otp);
+		if(scope!=null)j.put("scope", scope);
+		if(refreshToken!=null) {
+			j.put("refresh_token", refreshToken);
+			if(!"some_refresh_token".equals(refreshToken)) {
+				return Response.status(403, "wrong refresh token").build();
+			}
+		}
 		x.add(j);
 		JSONObject resp = new JSONObject();
 		resp.put("access_token", "some_access_token");

@@ -1,4 +1,4 @@
-package eu.unicore.ucc.authn;
+package eu.unicore.ucc.authn.oidc;
 import eu.unicore.services.Kernel;
 import eu.unicore.services.rest.RestService;
 import eu.unicore.services.utils.deployment.DeploymentDescriptorImpl;

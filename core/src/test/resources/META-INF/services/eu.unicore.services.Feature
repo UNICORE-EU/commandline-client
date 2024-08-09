@@ -1,1 +1,1 @@
-eu.unicore.ucc.authn.MockOIDCServerFeature
+eu.unicore.ucc.authn.oidc.MockOIDCServerFeature
