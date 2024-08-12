@@ -52,7 +52,7 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		initPreferredProtocol();
 		initRange();

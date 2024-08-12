@@ -17,6 +17,7 @@ import eu.unicore.client.core.StorageFactoryClient;
 import eu.unicore.client.lookup.AddressFilter;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.lookup.StorageFactoryLister;
@@ -118,7 +119,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 
 		initialLifeTime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
@@ -165,30 +166,22 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		while(iter.hasNext()){
 			sfc=sfl.iterator().next();
 			if(sfc==null){
-				error("No suitable storage factory available!",null);
-				endProcessing(ERROR);
+				throw new UCCException("No suitable storage factory available!");
 			}
 			factoryURL = sfc.getEndpoint().getUrl();
 			verbose("Using factory at <"+factoryURL+">");
 			haveValidFactory=true;
-			try{
-				if(infoOnly){
-					message(getDescription(sfc));
-				}
-				else{
-					doCreate(sfc);
-				}
-				break;
-			}catch(Exception ex){
-				String err = infoOnly? "Error" : "Could not create storage"; 
-				error(err,ex);
-				endProcessing(ERROR);
+			if(infoOnly){
+				message(getDescription(sfc));
 			}
+			else{
+				doCreate(sfc);
+			}
+			break;
 		}
 		if(!haveValidFactory){
 			// nothing found
-			error("No suitable storage factory available!",null);
-			endProcessing(ERROR);
+			throw new UCCException("No suitable storage factory available!");
 		}
 	}
 

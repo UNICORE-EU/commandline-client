@@ -20,6 +20,7 @@ import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.UCCException;
 
 /**
  * UCC specific extension of {@link ClientConfigurationProvider}.
@@ -114,7 +115,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 	 * assembled on demand. 
 	 * The base implementation adds the preferences given via {@link Constants#OPT_SECURITY_PREFERENCES}
 	 */
-	private Map<String, String[]> setupExtraAttributes(){
+	private Map<String, String[]> setupExtraAttributes() throws UCCException {
 		Map<String, String[]> securityPreferences = new HashMap<>();
 		String[] vals = command.getCommandLine().getOptionValues(Constants.OPT_SECURITY_PREFERENCES);
 		if (vals == null) {
@@ -129,7 +130,8 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		return securityPreferences;
 	}
 	
-	private void parseSecurityPreference(String pref, Map<String, String[]> securityPreferences) {
+	private void parseSecurityPreference(String pref, Map<String, String[]> securityPreferences) 
+	throws UCCException {
 		if (pref.startsWith(PREFERENCE_ARG_UID + ":")) {
 			String val = pref.substring(PREFERENCE_ARG_UID.length() + 1);
 			securityPreferences.put("uid", new String[]{val});
@@ -146,10 +148,10 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		} else if (pref.startsWith(PREFERENCE_ARG_ADD_OS_GIDS + ":")) {
 			String val = pref.substring(PREFERENCE_ARG_ADD_OS_GIDS.length() + 1);
 			if (!val.equals("true")&&!val.equals("false")) {
-				command.error("Value of the " + PREFERENCE_ARG_ADD_OS_GIDS + 
+				String msg = "Value of the " + PREFERENCE_ARG_ADD_OS_GIDS + 
 						" preference must be 'true' or 'false', but not '" + 
-						val + "'", null);
-				command.endProcessing(Constants.ERROR_CLIENT);
+						val + "'";
+				throw new UCCException(msg);
 			}
 			securityPreferences.put("addDefaultGroups", new String[]{val});
 		} else if (pref.startsWith(PREFERENCE_ARG_VO + ":")) {
@@ -159,9 +161,9 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 			String val = pref.substring(PREFERENCE_ARG_ROLE.length() + 1);
 			securityPreferences.put("role", new String[]{val});
 		} else {
-			command.error("Wrong value '" + pref + "' of the option -" + Constants.OPT_SECURITY_PREFERENCES + 
-					", must have the following format: " + PREFERENCE_ARG_HELP, null);
-			command.endProcessing(Constants.ERROR_CLIENT);
+			String msg = "Wrong value '" + pref + "' of the option -" + Constants.OPT_SECURITY_PREFERENCES + 
+					", must have the following format: " + PREFERENCE_ARG_HELP;
+			throw new UCCException(msg);
 		}
 	}
 	

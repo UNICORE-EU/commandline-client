@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.ucc.authn.KeystoreAuthN;
-import eu.unicore.ucc.helpers.EndProcessingException;
 
 public class TestUCC {
 
@@ -28,7 +27,7 @@ public class TestUCC {
 			for(Command cmd: UCC.getAllCommands()){
 				try{
 					cmd.init(args);
-				}catch(EndProcessingException epe){}
+				}catch(Exception epe){}
 			};
 		}catch(Exception ex){
 			ex.printStackTrace();

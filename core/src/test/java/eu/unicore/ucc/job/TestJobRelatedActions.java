@@ -90,7 +90,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	public void test_Run_and_ListJobs(){
 		connect();
 		runDate();
-		
 		String[] args=new String[]{"list-jobs", "-v", "-l",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 		};
@@ -101,7 +100,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	@Test
 	public void test_Run_Async(){
 		connect();
-
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/date.u",
@@ -128,6 +126,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 			args=new String[]{"job-status",
 					"-c", "src/test/resources/conf/userprefs.embedded",
+					"--all",
 					id1,id2,
 			};
 			UCC.main(args);
@@ -173,6 +172,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		do{
 			args=new String[]{"job-status",
 					"-c", "src/test/resources/conf/userprefs.embedded",
+					"--long",
 					id1
 			};
 			UCC.main(args);

@@ -38,8 +38,7 @@ public class JobRestart extends JobOperationBase {
 		try{
 			job.restart();
 		}catch(Exception e){
-			error("Can't restart job.",e);
-			endProcessing(ERROR);
+			throw new RuntimeException(e);
 		}
 	}
 

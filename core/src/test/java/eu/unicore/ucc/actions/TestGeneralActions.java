@@ -38,14 +38,14 @@ public class TestGeneralActions extends EmbeddedTestBase {
 	public void test_WrongSetup(){
 		UCC.main(new String[]{"connect","-k","NOSUCHAUTHN", 
 				"-c", "src/test/resources/conf/userprefs.embedded",});
-		assertEquals(Integer.valueOf(ActionBase.ERROR_SECURITY),UCC.exitCode);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
 	}
 
 	@Test
 	public void test_WrongSetup_NoRegistry(){
 		prefsFile = "src/test/resources/conf/userprefs.noregistry";
 		UCC.main(new String[]{"connect","-v","-c",prefsFile});
-		assertEquals(Integer.valueOf(ActionBase.ERROR_CONNECTION),UCC.exitCode);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
 	}
 
 	@Test

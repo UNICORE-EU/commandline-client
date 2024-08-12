@@ -6,8 +6,8 @@ import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
-import eu.unicore.ucc.helpers.EndProcessingException;
 
 /**
  * Changes or prints umask of a specified resource. Can be used with SMS and TSS instances.
@@ -59,64 +59,40 @@ public class Umask extends ActionBase {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
-
 		CommandLine cmdLine = getCommandLine(); 
 		if (cmdLine.getArgs().length != 2) {
-			error("Wrong number of arguments", null);
-			printUsage();
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("Wrong number of arguments");
 		}
 		String url = cmdLine.getArgs()[1];
-		
 		String set = getOption(OPT_SET_LONG, OPT_SET);
-		
 		verbose("Will "+(set!=null?" set umask to <"+set+">" : "get umask")+" for service: " + url);
-		
 		BaseServiceClient client = createClient(url);
 		properties.put(PROP_LAST_RESOURCE_URL, url);
-		
 		String umaskS = null;
-		
-		try {
+		try{
 			umaskS = client.getProperties().getString("umask");
 		} catch(Exception ex) {
-			error("Error getting umask property. It seems that the selected service doesn't " +
+			throw new UCCException("Error getting umask property. It seems that the selected service doesn't " +
 					"support umask setting", ex);
-			endProcessing(ERROR);
 		}
-		
 		if (set == null)
 			message("umask: "+umaskS);
 		else {
-			try {
-				JSONObject setDoc = new JSONObject();
-				setDoc.put("umask", set);
-				JSONObject reply = client.setProperties(setDoc);
-				verbose(reply.toString(2));
-				if(!"OK".equals(reply.getString("umask")))throw new Exception(reply.toString(2));
-			} catch (Exception e) {
-				error("Error updating umask", e);
-				endProcessing(ERROR);
-			}
+			JSONObject setDoc = new JSONObject();
+			setDoc.put("umask", set);
+			JSONObject reply = client.setProperties(setDoc);
+			verbose(reply.toString(2));
+			if(!"OK".equals(reply.getString("umask")))throw new Exception(reply.toString(2));
 		}
 	}
 
-	
-	private BaseServiceClient createClient(String url) {
+	private BaseServiceClient createClient(String url) throws Exception {
 		Endpoint e = new Endpoint(url);
-		try {
-			BaseServiceClient client = new BaseServiceClient(e, 
-					configurationProvider.getClientConfiguration(url),	
-					configurationProvider.getRESTAuthN());
-			return client;
-		} catch (Exception ee) {
-			error("Can't create client for " + url, ee);
-			endProcessing(ERROR);
-			//dummy
-			throw new EndProcessingException(ERROR);
-		}
+		return new BaseServiceClient(e, 
+				configurationProvider.getClientConfiguration(url),	
+				configurationProvider.getRESTAuthN());
 	}
 }
 

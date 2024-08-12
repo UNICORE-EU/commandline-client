@@ -61,7 +61,7 @@ public class CP extends FileOperation {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		String[]args = getCommandLine().getArgs();
 		if(args.length<3)throw new IllegalArgumentException("Must have source and target arguments!");
@@ -76,24 +76,18 @@ public class CP extends FileOperation {
 		if(resume)verbose("Resume previous transfer(s)="+resume);
 		String scheduled = getOption(OPT_SCHEDULED_LONG, OPT_SCHEDULED);
 		boolean synchronous = !getBooleanOption(OPT_MODE_LONG, OPT_MODE);
-
-		try{
-			for(String source: sources){
-				Location sourceDesc = createLocation(source);
-				boolean isServerToServer = !sourceDesc.isLocal() && !targetDesc.isLocal();
-				if(isServerToServer){
-					handleServerServer(sourceDesc, targetDesc, scheduled, synchronous);
-				}
-				else{
-					if(sourceDesc.isLocal() && targetDesc.isLocal()) {
-						throw new IllegalArgumentException("One of source or target must be remote!");
-					}
-					handleClientServer(source, sourceDesc, targetDesc);
-				}
+		for(String source: sources){
+			Location sourceDesc = createLocation(source);
+			boolean isServerToServer = !sourceDesc.isLocal() && !targetDesc.isLocal();
+			if(isServerToServer){
+				handleServerServer(sourceDesc, targetDesc, scheduled, synchronous);
 			}
-		}catch(Exception e){
-			error("Can't copy file(s).",e);
-			endProcessing(ERROR);
+			else{
+				if(sourceDesc.isLocal() && targetDesc.isLocal()) {
+					throw new IllegalArgumentException("One of source or target must be remote!");
+				}
+				handleClientServer(source, sourceDesc, targetDesc);
+			}
 		}
 	}
 

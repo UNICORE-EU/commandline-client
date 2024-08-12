@@ -11,21 +11,21 @@ import eu.unicore.util.Log;
 import eu.unicore.util.Pair;
 
 public class GetStatus extends JobOperationBase {
-	
+
 	boolean detailed = false;
 	boolean full = false;
-	
+
 	@Override
 	public String getName(){
 		return "job-status";
 	}
-	
+
 	@Override
 	public String getSynopsis(){
 		return "Gets the status of UNICORE job(s). " +
 				super.getSynopsis();
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "get job status";
@@ -45,7 +45,7 @@ public class GetStatus extends JobOperationBase {
 				.required(false)
 				.build());
 	}
-	
+
 	@Override
 	protected void processAdditionalOptions(){
 		full=getBooleanOption(OPT_ALL_LONG, OPT_ALL_LONG);
@@ -61,7 +61,7 @@ public class GetStatus extends JobOperationBase {
 		jobs.forEach( x -> getStatus(x.getM1()));
 	}
 
-	protected void getStatus(JobClient job){
+	protected void getStatus(JobClient job) {
 		try{
 			Status status=job.getStatus();
 			String url=job.getEndpoint().getUrl();
@@ -86,8 +86,7 @@ public class GetStatus extends JobOperationBase {
 			}
 			message(sb.toString());
 		}catch(Exception e){
-			error("Can't get job status.",e);
-			endProcessing(ERROR);
+			throw new RuntimeException(e);
 		}
 	}
 	

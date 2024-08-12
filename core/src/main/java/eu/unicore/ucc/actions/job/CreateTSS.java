@@ -18,6 +18,7 @@ import eu.unicore.client.core.SiteFactoryClient;
 import eu.unicore.client.lookup.SiteNameFilter;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.lookup.SiteFactoryLister;
@@ -96,7 +97,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 
 		initialLifeTime = getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
@@ -105,50 +106,42 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 		}else{
 			verbose("Using site default for TSS lifetime.");
 		}
-
 		factoryURL = getOption(OPT_FACTORY_LONG, OPT_FACTORY);
 		SiteFactoryClient tsf=null;
-
-		try{
-			if(factoryURL==null){
-				SiteFactoryLister tsfl = new SiteFactoryLister(UCC.executor, registry, configurationProvider);
-				siteName = getOption(OPT_SITENAME_LONG, OPT_SITENAME);
-				if(siteName!=null){
-					verbose("Looking for factory at site <"+siteName+">");
-					tsfl.setAddressFilter(new SiteNameFilter(siteName));
-				}
-				else{
-					verbose("No factory specified, will choose one from registry.");
-				}
-				tsf = tsfl.iterator().next();
+		if(factoryURL==null){
+			SiteFactoryLister tsfl = new SiteFactoryLister(UCC.executor, registry, configurationProvider);
+			siteName = getOption(OPT_SITENAME_LONG, OPT_SITENAME);
+			if(siteName!=null){
+				verbose("Looking for factory at site <"+siteName+">");
+				tsfl.setAddressFilter(new SiteNameFilter(siteName));
 			}
 			else{
-				verbose("Using factory at <"+factoryURL+">");
-				tsf = new SiteFactoryClient(new Endpoint(factoryURL), 
-						configurationProvider.getClientConfiguration(factoryURL), 
-						configurationProvider.getRESTAuthN());
+				verbose("No factory specified, will choose one from registry.");
 			}
-
-			if(tsf==null){
-				error("No suitable target system factory available!",null);
-				endProcessing(ERROR);
-			}
-			else{
-				factoryURL = tsf.getEndpoint().getUrl();
-				verbose("Using factory at <"+factoryURL+">");
-			}
-
-			SiteClient tss = tsf.createSite(getCreationParameters(), getTermTime());
-			String addr = tss.getEndpoint().getUrl();
-			message(addr);
-			properties.put(PROP_LAST_RESOURCE_URL, addr);
-			setLastTSSAddress(addr);
-		}catch(Exception ex){
-			error("Could not create site",ex);
-			endProcessing(ERROR);
+			tsf = tsfl.iterator().next();
 		}
+		else{
+			verbose("Using factory at <"+factoryURL+">");
+			tsf = new SiteFactoryClient(new Endpoint(factoryURL), 
+					configurationProvider.getClientConfiguration(factoryURL), 
+					configurationProvider.getRESTAuthN());
+		}
+
+		if(tsf==null){
+			throw new UCCException("No suitable target system factory available!",null);
+		}
+		else{
+			factoryURL = tsf.getEndpoint().getUrl();
+			verbose("Using factory at <"+factoryURL+">");
+		}
+
+		SiteClient tss = tsf.createSite(getCreationParameters(), getTermTime());
+		String addr = tss.getEndpoint().getUrl();
+		message(addr);
+		properties.put(PROP_LAST_RESOURCE_URL, addr);
+		setLastTSSAddress(addr);
 	}
-	
+
 	protected Map<String,String> getCreationParameters() throws IOException {
 		String[]args = getCommandLine().getArgs();
 		if(args.length>1){
@@ -163,7 +156,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 
 	protected Calendar getTermTime(){
 		if(initialLifeTime<=0)return null;
-		
+
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DATE, initialLifeTime);
 		return c;
@@ -173,7 +166,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 	public String getCommandGroup(){
 		return CMD_GRP_JOBS;
 	}
-	
+
 	@Override
 	public String getType(){
 		return "TargetSystemFactory";
@@ -216,7 +209,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 				sb.append("] ");
 			}sb.append(cr);
 		}
-		
+
 		return sb.toString();
 	}
 
@@ -226,7 +219,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 	public static String getLastTargetSystemAddress() {
 		return lastTargetSystemAddress;
 	}
-	
+
 	protected static void setLastTSSAddress(String lastAddress) {
 		CreateTSS.lastTargetSystemAddress = lastAddress;
 	}

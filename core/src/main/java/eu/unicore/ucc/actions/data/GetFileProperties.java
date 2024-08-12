@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.uas.util.UnitParser;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.util.JSONUtil;
 
 /**
@@ -25,7 +26,7 @@ public class GetFileProperties extends SMSOperation {
 	protected UnitParser unitParser = UnitParser.getCapacitiesParser(1);
 	
 	@Override
-	protected void createOptions() {
+	protected void createOptions(){
 		super.createOptions();
 
 		getOptions().addOption(Option.builder(OPT_HUMAN)
@@ -61,7 +62,7 @@ public class GetFileProperties extends SMSOperation {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		boolean human = getBooleanOption(OPT_HUMAN_LONG, OPT_HUMAN);
 		if (human)
@@ -72,26 +73,16 @@ public class GetFileProperties extends SMSOperation {
 		
 		CommandLine cmdLine = getCommandLine(); 
 		if (cmdLine.getArgs().length != 2) {
-			error("Wrong number of arguments", null);
-			printUsage();
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("Wrong number of arguments");
 		}
 		String target = cmdLine.getArgs()[1];
-		
 		verbose("Getting file properties of " + target);
-		
 		StorageClient sms = getStorageClient(target);
-		
-		try{
-			FileListEntry gridFile = sms.stat(getPathAtStorage(target));
-			String msg = formatStat(gridFile, human, showMetadata);
-			message(msg);
-		}catch(Exception ex){
-			error("Error while getting file properties.",ex);
-			endProcessing(ERROR);
-		}
+		FileListEntry gridFile = sms.stat(getPathAtStorage(target));
+		String msg = formatStat(gridFile, human, showMetadata);
+		message(msg);
 	}
-	
+
 	protected DateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
 	private String formatStat(FileListEntry f, boolean human, boolean showMetadata) {
@@ -102,17 +93,17 @@ public class GetFileProperties extends SMSOperation {
 		String size = human ? unitParser.getHumanReadable(f.size) :
 			String.valueOf(f.size);
 		String type = f.isDirectory ? "directory" : "normal file";
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("File: ").append(f.path).append("\n");
 		sb.append("Size: ").append(size).append("\n");
 		sb.append("Type: ").append(type).append("\n");
-		if (f.permissions != null)
+		if (f.permissions != null) {
 			sb.append("Permissions: ").append(f.permissions).append("\n");
-		
-		if (lastModification != null)
+		}
+		if (lastModification != null) {
 			sb.append("Last modification: ").append(lastModification).append("\n");
-		
+		}
 		if (showMetadata && f.metadata != null) {
 			JSONObject o = JSONUtil.asJSON(f.metadata);
 			try
@@ -123,7 +114,6 @@ public class GetFileProperties extends SMSOperation {
 				error("Can't print metadata", e);
 			}
 		}
-		
 		return sb.toString();
 	}
 

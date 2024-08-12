@@ -29,28 +29,22 @@ public class RM extends SMSOperation {
 	}
 	
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
 		boolean quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
 		String target = getCommandLine().getArgs()[1];
 		StorageClient sms = getStorageClient(target);
-		try{
-			String dir = getPathAtStorage(target); 
-			if(!quiet){
-				boolean confirmed = confirm();
-				if(!confirmed){
-					verbose("Cancelled.");
-					return;
-				}
+		String dir = getPathAtStorage(target); 
+		if(!quiet){
+			boolean confirmed = confirm();
+			if(!confirmed){
+				verbose("Cancelled.");
+				return;
 			}
-			sms.getFileClient(dir).delete();
-		}catch(Exception ex){
-			error("Can't contact storage service.",ex);
-			endProcessing(ERROR);
 		}
-		
+		sms.getFileClient(dir).delete();
 	}
-	
+
 	protected boolean confirm(){
 		LineReader r = null;
 		try{
@@ -72,15 +66,14 @@ public class RM extends SMSOperation {
 	public String getSynopsis() {
 		return "remove a file or directory on a remote storage.";
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "remove a remote file or directory";
 	}
-	
+
 	@Override
 	public String getArgumentList(){
 		return "[unicore6://SITENAME/[JobId|StorageName]]";
 	}
-
 }

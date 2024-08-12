@@ -68,7 +68,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		lastNumberOfResults=0;
 		doFilter=getCommandLine().hasOption(OPT_FILTER);
@@ -107,15 +107,9 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	 * 
 	 * @param entry - the BaseServiceClient for the current list entry
 	 */
-	protected void printProperties(T entry){
+	protected void printProperties(T entry) throws Exception {
 		if(raw || (fields!=null && fields.length>0)){
-			try{
-				message(entry.getProperties(fields).toString(2));
-			}
-			catch(Exception e){
-				error("Could not get resource properties!", e);
-				endProcessing(ERROR);
-			}
+			message(entry.getProperties(fields).toString(2));
 		}
 	}
 	

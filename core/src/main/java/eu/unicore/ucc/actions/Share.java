@@ -17,20 +17,20 @@ import eu.unicore.ucc.UCC;
 
 /**
  * Shares resources and shows resource ACLs
- * 
+ *
  * @author schuller
  */
 public class Share extends ActionBase {
-	
+
 	public static final String OPT_CLEAN_LONG = "clean";
 	public static final String OPT_CLEAN = "b";
 	public static final String OPT_DELETE_LONG = "delete";
 	public static final String OPT_DELETE = "d";
-	
+
 	@Override
 	protected void createOptions() {
 		super.createOptions();
-		
+
 		getOptions().addOption(Option.builder(OPT_CLEAN)
 				.longOpt(OPT_CLEAN_LONG)
 				.desc("Prior to applying all other ACEs (if any are present) the ACL of the resource is cleared.")
@@ -58,113 +58,103 @@ public class Share extends ActionBase {
 				"[read|modify]:[DN|VO|GROUP|UID|ROLE]:[value]\n" +
 				"If no ACEs are given, the current ACL is shown.";
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "share a resource via its ACL";
 	}
-	
+
 	@Override
 	public String getArgumentList(){
 		return "[ACE[ ACE...]] <URL>";
 	}
-	
+
 	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_OTHER;
 	}
-	
-	
+
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		boolean clean = getBooleanOption(OPT_CLEAN_LONG, OPT_CLEAN);
 		verbose("Remove all ACL entries = " + clean);
 		boolean delete = getBooleanOption(OPT_DELETE_LONG, OPT_DELETE);
 		verbose("Delete given ACL entries = " + delete);
-		
+
 		int length=getCommandLine().getArgs().length;
 		boolean onlyShow = !clean && length<3;
-		
 		if(length<2)
 		{
 			error("Not enough arguments!", null);
 			printUsage();
-			endProcessing(ERROR_CLIENT);
+			return;
 		}
-		
 		//URL is last argument
 		String url=getCommandLine().getArgs()[length-1];
 		Endpoint epr = new Endpoint(url);
-		
 		verbose("Modifying ACLs of: " + url);
-		
-		try{
-			BaseServiceClient client = new BaseServiceClient(epr,
-					configurationProvider.getClientConfiguration(url),
-					configurationProvider.getRESTAuthN());
-			
-			List<ACLEntry> permits = new ArrayList<>();
-			for(String acl: JSONUtil.toList(client.getProperties().getJSONArray("acl"))) {
-				permits.add(ACLEntry.parse(acl));
+		BaseServiceClient client = new BaseServiceClient(epr,
+				configurationProvider.getClientConfiguration(url),
+				configurationProvider.getRESTAuthN());
+
+		List<ACLEntry> permits = new ArrayList<>();
+		for(String acl: JSONUtil.toList(client.getProperties().getJSONArray("acl"))) {
+			permits.add(ACLEntry.parse(acl));
+		}
+		lastNumberOfPermits = permits.size();
+
+		if(onlyShow){
+			message("Current ACL for "+url);
+			for(ACLEntry p: permits){
+				message("- allow '"+p.accessType+"' when '"+p.matchType+"' is '"+p.requiredValue+"'");
 			}
-			lastNumberOfPermits = permits.size();
-			
-			if(onlyShow){
-				message("Current ACL for "+url);
-				for(ACLEntry p: permits){
-					message("- allow '"+p.accessType+"' when '"+p.matchType+"' is '"+p.requiredValue+"'");
-				}
+		}
+		else {
+			if(clean){
+				permits.clear();
 			}
-			else {
-				if(clean){
-					permits.clear();
-				}
-				int deleted = 0;
-				for(int i = 1;i<length-1;i++){
-					ACLEntry p = ACLEntry.parse(getCommandLine().getArgs()[i]);
-					if(delete){
-						Iterator<ACLEntry>iter = permits.iterator();
-						while(iter.hasNext()){
-							ACLEntry existing = iter.next();
-							if(existing.toString().equals(p.toString())){
-								iter.remove();
-								deleted++;
-								break;
-							}
+			int deleted = 0;
+			for(int i = 1;i<length-1;i++){
+				ACLEntry p = ACLEntry.parse(getCommandLine().getArgs()[i]);
+				if(delete){
+					Iterator<ACLEntry>iter = permits.iterator();
+					while(iter.hasNext()){
+						ACLEntry existing = iter.next();
+						if(existing.toString().equals(p.toString())){
+							iter.remove();
+							deleted++;
+							break;
 						}
 					}
-					else{
-						permits.add(p);
-					}
 				}
-				if(UCC.getConsoleLogger().isVerbose()){
-					for(ACLEntry p: permits){
-						verbose("-> allow '"+p.accessType+"' when '"+p.matchType+"' is '"+p.requiredValue+"'");
-					}
+				else{
+					permits.add(p);
 				}
-				JSONObject newProps = new JSONObject();
-				JSONArray arr = new JSONArray();
-				for(ACLEntry e: permits) {
-					arr.put(e.toString());
-				}
-				newProps.put("acl", arr);
-				JSONObject res = client.setProperties(newProps);
-				try{
-					message("Service reply: "+res.getString("acl"));
-					if(delete){
-						message("<"+deleted+"> ACL entries were deleted.");
-					}
-				}catch(Exception ex) {}
 			}
-		} catch (Exception ex) {
-			error("Error during ACL manipulation.", ex);
-			endProcessing(ERROR);
+			if(UCC.getConsoleLogger().isVerbose()){
+				for(ACLEntry p: permits){
+					verbose("-> allow '"+p.accessType+"' when '"+p.matchType+"' is '"+p.requiredValue+"'");
+				}
+			}
+			JSONObject newProps = new JSONObject();
+			JSONArray arr = new JSONArray();
+			for(ACLEntry e: permits) {
+				arr.put(e.toString());
+			}
+			newProps.put("acl", arr);
+			JSONObject res = client.setProperties(newProps);
+			try{
+				message("Service reply: "+res.getString("acl"));
+				if(delete){
+					message("<"+deleted+"> ACL entries were deleted.");
+				}
+			}catch(Exception ex) {}
 		}
 	}
-	
+
 	private static final List<String> allowed= Arrays.asList(new String[]{"DN","VO","GROUP","UID","ROLE"});
-		
+
 	public static class ACLEntry {
 
 		public static enum MatchType {
@@ -218,7 +208,7 @@ public class Share extends ActionBase {
 			}catch(Exception ex) {
 				throw new IllegalArgumentException("Wrong access type, must be one of "+allowed, ex);
 			}
-			
+
 			return new ACLEntry(op, tokens[2], match);
 		}
 

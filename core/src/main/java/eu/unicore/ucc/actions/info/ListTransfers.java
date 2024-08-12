@@ -29,7 +29,7 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 	protected UnitParser unitParser=UnitParser.getCapacitiesParser(0);
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		CoreEndpointLister coreLister = new CoreEndpointLister(registry,configurationProvider,configurationProvider.getRESTAuthN());
 		coreLister.setExecutor(UCC.executor);
@@ -69,7 +69,7 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 		}
 	}
 
-	protected void listFiletransfer(BaseServiceClient ftc){
+	protected void listFiletransfer(BaseServiceClient ftc) throws Exception {
 		try{
 			message(ftc.getEndpoint().getUrl()+getDetails(ftc));
 			properties.put(PROP_LAST_RESOURCE_URL, ftc.getEndpoint().getUrl());

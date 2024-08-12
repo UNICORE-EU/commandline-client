@@ -1,18 +1,23 @@
 {
 
-"activities" : [
- {
-   "id": "date1",
-   "type": "JOB",
-   "job": {
-     "ApplicationName": "Date",
-    },
-    "options": {
-     "IGNORE_FAILURE" : true,
-     "MAX_RESUBMITS": 10,
-    },
- },
+"variables": {
+	 "COUNTER": {
+	    "type": "INTEGER",
+	    "initial_value": "123",
+	  }
+},
 
-],
+"activities" : {
+   "date1": {
+      "type": "JOB",
+      "job": {
+         "ApplicationName": "Date",
+      },
+      "options": {
+       "IGNORE_FAILURE" : true,
+       "MAX_RESUBMITS": 10,
+      }
+    }
+ },
 
 }

@@ -13,7 +13,15 @@ import eu.unicore.ucc.runner.TargetSystemFinder;
 public class TestLoadCommands {
 
 	private String[]cmds=new String[]{"workflow-submit", "list-workflows", "workflow-control"};
-	
+
+	@Test
+	public void testHelpCommands(){
+		UCC.unitTesting=true;
+		String[] args=new String[]{"--help"};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
+
 	@Test
 	public void testLoadCommands(){
 		UCC.unitTesting=true;
@@ -24,13 +32,12 @@ public class TestLoadCommands {
 			assertEquals(Integer.valueOf(0),UCC.exitCode);
 		}
 	}
-	
+
 	@Test
 	public void testFindBrokerImpl(){
 		UCC.unitTesting=true;
 		Broker b = UCC.getBroker("Local");
 		assertNotNull(b);
 		assertTrue(b instanceof TargetSystemFinder);
-		
 	}
 }

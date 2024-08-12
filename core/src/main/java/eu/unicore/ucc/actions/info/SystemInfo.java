@@ -73,7 +73,7 @@ public class SystemInfo extends ActionBase {
 
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		details=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
 		pattern = getOption(OPT_PATTERN_LONG, OPT_PATTERN, null);

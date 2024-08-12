@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
@@ -40,7 +39,7 @@ public class TestRunCommand extends EmbeddedTestBase {
 				"no-such-action",
 		};
 		UCC.main(args);
-		assertEquals(Integer.valueOf(Constants.ERROR_CLIENT),UCC.exitCode);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
 	}
 
 }

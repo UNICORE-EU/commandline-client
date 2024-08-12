@@ -21,7 +21,6 @@ import org.apache.commons.cli.ParseException;
 
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.ucc.helpers.ConsoleLogger;
-import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.helpers.JLineLogger;
 import eu.unicore.ucc.runner.Broker;
 
@@ -186,8 +185,7 @@ public class UCC{
 	 *           
 	 * @return an initialised {@link Command} object 
 	 */
-	public static Command initCommand(String[] args, boolean shouldQuit)
-			throws ParseException {
+	public static Command initCommand(String[] args, boolean shouldQuit) throws Exception {
 		String command = args[0];
 		Class<? extends Command> cmdClass = cmds.get(command);
 		if (cmdClass == null) {
@@ -315,15 +313,18 @@ public class UCC{
 			}else{
 				cmd = initCommand(args, !unitTesting);
 				msg.setPrefix("[ucc "+cmd.getName()+"]");
-				cmd.process();
-				cmd.postProcess();
+				if(cmd.getCommandLine().hasOption(Constants.OPT_HELP)){
+					cmd.printUsage();
+				}
+				else {
+					cmd.process();
+					cmd.postProcess();
+				}
 				lastCommand = cmd;
 			}
 			exitCode=0;
-		} catch (EndProcessingException epe) {
-			exitCode = epe.getExitCode();
 		} catch (Exception e) {
-			String msg="Error running up UCC command '"+args[0]+"'";
+			String msg="Error running UCC command '"+args[0]+"'";
 			getConsoleLogger().error(msg, e);
 			exitCode = Constants.ERROR;
 		}

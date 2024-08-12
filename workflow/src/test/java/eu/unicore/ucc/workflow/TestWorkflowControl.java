@@ -2,7 +2,6 @@ package eu.unicore.ucc.workflow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import eu.unicore.client.Endpoint;
@@ -11,16 +10,16 @@ import eu.unicore.workflow.WorkflowClient;
 
 public class TestWorkflowControl extends EmbeddedTestBase {
 
-	@Test @Disabled
+	@Test
 	public void testAbortWorkflow() throws Exception {
 		connect();
 		String[] args=new String[]{"workflow-submit","-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
-				"--wait",
 				"src/test/resources/workflows/date1.json"
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		Thread.sleep(2000);
 		String url = SubmitWorkflow.lastAddress;
 		args=new String[]{"workflow-control","-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",

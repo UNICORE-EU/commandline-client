@@ -16,8 +16,8 @@ import eu.unicore.client.core.AllocationClient;
 import eu.unicore.client.core.JobClient.Status;
 import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
-import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.runner.Runner;
 import eu.unicore.ucc.util.UCCBuilder;
 
@@ -158,11 +158,11 @@ public class Run extends ActionBase {
 
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
 		if(getBooleanOption(OPT_SAMPLE_LONG, OPT_SAMPLE)){
 			printSampleJob();
-			endProcessing(0);
+			return;
 		}
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		allocation = getCommandLine().getOptionValue(OPT_ALLOCATION);
@@ -194,8 +194,13 @@ public class Run extends ActionBase {
 				final String jobFile = getCommandLine().getArgs()[i];
 				if(multiThreaded) {
 					Thread t = new Thread(()->{
-						if(run(readJob(jobFile))!=0) {
+						try {
+							if(run(readJob(jobFile))!=0) {
+								success.set(false);
+							}
+						}catch(Exception ex) {
 							success.set(false);
+							error("Job failed for <"+jobFile+">", ex);
 						}
 					});
 					t.setName("[ucc run "+i+"]");
@@ -220,41 +225,29 @@ public class Run extends ActionBase {
 			}
 		}
 		if(!success.get()) {
-			throw new EndProcessingException(1, "Job(s) failed.");
+			throw new UCCException("Job(s) failed.");
 		}
 	}
 
-	protected UCCBuilder readJob(String jobFileName){
-		try{
-			File jobFile = new File(jobFileName);
-			UCCBuilder builder = new UCCBuilder(jobFile, registry, configurationProvider);
-			verbose("Read job from <"+jobFileName+">");
-			configureBuilder(builder);
-			return builder;
-		}catch(Exception e){
-			error("Can't parse job file <"+jobFileName+">",e);
-			endProcessing(ERROR_CLIENT);
-			return null;
-		}
+	protected UCCBuilder readJob(String jobFileName) throws Exception {
+		File jobFile = new File(jobFileName);
+		UCCBuilder builder = new UCCBuilder(jobFile, registry, configurationProvider);
+		verbose("Read job from <"+jobFileName+">");
+		configureBuilder(builder);
+		return builder;
 	}
 
-	protected UCCBuilder readJob(){
-		try{
-			message("Reading job from stdin:");
-			message("");
-			ByteArrayOutputStream bos=new ByteArrayOutputStream();
-			int b=0;
-			while((b=System.in.read())!=-1){
-				bos.write(b);
-			}
-			UCCBuilder builder = new UCCBuilder(bos.toString(), registry, configurationProvider);
-			configureBuilder(builder);
-			return builder;
-		}catch(Exception e){
-			error("Can't read job from stdin.",e);
-			endProcessing(ERROR_CLIENT);
-			return null;
+	protected UCCBuilder readJob() throws Exception {
+		message("Reading job from stdin:");
+		message("");
+		ByteArrayOutputStream bos=new ByteArrayOutputStream();
+		int b=0;
+		while((b=System.in.read())!=-1){
+			bos.write(b);
 		}
+		UCCBuilder builder = new UCCBuilder(bos.toString(), registry, configurationProvider);
+		configureBuilder(builder);
+		return builder;
 	}
 
 	protected void configureBuilder(UCCBuilder builder){
@@ -305,8 +298,7 @@ public class Run extends ActionBase {
 			}
 		}catch(RuntimeException ex){
 			runner.dumpJobLog();
-			error("Failed to run job",ex);
-			endProcessing(ERROR);
+			return ERROR;
 		}
 		try {
 			if(synchronous && !Status.SUCCESSFUL.equals(runner.getStatus())) {

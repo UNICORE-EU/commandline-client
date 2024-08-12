@@ -11,7 +11,6 @@ import eu.unicore.util.Pair;
 
 public class GetOutcome extends JobOperationBase {
 
-
 	/**
 	 * do not add job id prefixes to output file names 
 	 */
@@ -36,7 +35,7 @@ public class GetOutcome extends JobOperationBase {
 				.required(false)
 				.build());
 	}
-	
+
 	@Override
 	protected void processAdditionalOptions(){
 		brief=getBooleanOption(OPT_NOPREFIX_LONG, OPT_NOPREFIX);
@@ -45,18 +44,18 @@ public class GetOutcome extends JobOperationBase {
 		verbose("Quiet mode = " + quiet);
 
 	}
-		
+
 	@Override
 	public String getName(){
 		return "get-output";
 	}
-	
+
 	@Override
 	public String getSynopsis(){
 		return "Gets the output of UNICORE job(s). " +
 				super.getSynopsis();
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "get output files";
@@ -65,7 +64,7 @@ public class GetOutcome extends JobOperationBase {
 	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
 		jobs.forEach( x -> getOutput(x.getM2()));
 	}
-	
+
 	protected void getOutput(UCCBuilder builder){
 		try{
 			builder.setProperty("state", Runner.STARTED);
@@ -78,10 +77,7 @@ public class GetOutcome extends JobOperationBase {
 			runner.run();
 		}
 		catch(Exception e){
-			error("Error getting output", e);
-			endProcessing(ERROR);
+			throw new RuntimeException(e);
 		}
 	}
-	
-	
 }

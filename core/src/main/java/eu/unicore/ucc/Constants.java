@@ -2,30 +2,8 @@ package eu.unicore.ucc;
 
 public interface Constants {
 
-	//exit codes
-	
-	//general error
-	public static final int ERROR=1;
-	
-	//some client-side error
-	public static final int ERROR_CLIENT=2;
-	
-	//some server-side error
-	public static final int ERROR_SERVER=3;
-	
-	//connections and networking
-	public static final int ERROR_CONNECTION=4;
-	
-	//validation error
-	public static final int ERROR_JOB_INVALID=5;
-	
-	//requested resource not found
-	public static final int NO_SUCH_RESOURCE=404;
-		
-	//security errors
-	public static final int ERROR_SECURITY=128;
-	
-	public static final int ERROR_CERT_INVALID=129;
+	//general error exit code
+	public static final int ERROR = 1;
 	
 	public static final String OPT_PROPERTIES_LONG="configuration";
 	public static final String OPT_PROPERTIES="c";

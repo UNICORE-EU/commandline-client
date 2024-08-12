@@ -199,7 +199,7 @@ public class Batch extends ActionBase {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		//register exit hook
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			public void run(){
@@ -211,14 +211,8 @@ public class Batch extends ActionBase {
 		String inDir=getCommandLine().getOptionValue(OPT_INPUTDIR, properties.getProperty(OPT_INPUTDIR_LONG));
 		inputDir=new File(inDir);
 		if(!inputDir.exists() || !inputDir.isFile()){
-			try{
-				inputDir.mkdirs();
-				verbose("Created request directory <"+inDir+">");
-			}
-			catch(Exception ex){
-				error("Can't access directory <"+inDir+">.", null);
-				endProcessing(1);
-			}
+			inputDir.mkdirs();
+			verbose("Created request directory <"+inDir+">");
 		}
 
 		follow=getBooleanOption(OPT_FOLLOW_LONG, OPT_FOLLOW);
@@ -266,15 +260,11 @@ public class Batch extends ActionBase {
 		executor=new ThreadPoolExecutor(numThreads, numThreads,
 				500L, TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<Runnable>());
-
 		try{
 			doBatch();
-		}catch(Exception e){
-			error("Error executing batch command.", e);
-			endProcessing(1);
+		}finally {
+			doShutdown();
 		}
-
-		doShutdown();
 	}
 
 	private void doShutdown(){
@@ -383,9 +373,8 @@ public class Batch extends ActionBase {
 				activeJobs.incrementAndGet();
 			}
 		}catch(Exception e){
-			error("Error processing request <"+b.getProperty("source")+">",e);
-			//TODO move to 'failed' location
-			endProcessing(1);
+			throw new RuntimeException("Error processing request <"+b.getProperty("source")+">",e);
+			//TODO move to 'failed' location?
 		}finally{
 			activeRequests.decrementAndGet();
 		}

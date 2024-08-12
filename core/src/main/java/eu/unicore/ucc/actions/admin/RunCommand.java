@@ -11,6 +11,7 @@ import eu.unicore.client.admin.AdminServiceClient;
 import eu.unicore.client.admin.AdminServiceClient.AdminCommand;
 import eu.unicore.client.admin.AdminServiceClient.Result;
 import eu.unicore.client.registry.RegistryClient;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 
 public class RunCommand extends ActionBase {
@@ -44,16 +45,14 @@ public class RunCommand extends ActionBase {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		int length=getCommandLine().getArgs().length;
-
 		if(length<2){
 			throw new IllegalArgumentException("You must provide at least a command name as argument.");
 		}
 		params.clear();
 		cmd=getCommandLine().getArgs()[1];
-
 		for(int i=2; i<length; i++){
 			String p=getCommandLine().getArgs()[i];
 			String[]split=p.split("=", 2);
@@ -62,7 +61,6 @@ public class RunCommand extends ActionBase {
 			verbose("Have parameter: "+key+"="+value);
 			params.put(key, value);
 		}
-
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		url=getCommandLine().getOptionValue(OPT_URL);
 		if(siteName==null && url==null){
@@ -75,26 +73,17 @@ public class RunCommand extends ActionBase {
 				}catch(Exception ex){}
 			}
 			if(url==null){
-				error("Either URL or site name must be given!",null);
-				endProcessing(ERROR_CLIENT);
+				throw new UCCException("Either URL or site name must be given!");
 			}
 		}
 		if(siteName!=null && url!=null){
-			error("URL and site name cannot both be given!",null);
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("URL and site name cannot both be given!");
 		}
-
 		AdminServiceClient asc=null;
 		List<AdminCommand>availableCmds = null;
-		try{
-			asc = createClient();
-			verbose("Contacted admin service at <"+url+">");
-			availableCmds = asc.getCommands();
-		}catch(Exception ex){
-			error("Error contacting admin service at <"+url+">",ex);
-			endProcessing(1);
-		}
-		
+		asc = createClient();
+		verbose("Contacted admin service at <"+url+">");
+		availableCmds = asc.getCommands();
 		//check command availability
 		boolean haveCmd = false;
 		for(AdminCommand c: availableCmds){
@@ -104,27 +93,19 @@ public class RunCommand extends ActionBase {
 			}
 		}
 		if(!haveCmd) {
-			error("No such command: <"+cmd+">",null);
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("No such command: <"+cmd+">");
 		}
-		
-		try{
-			Result result = asc.runCommand(cmd, params);
-			if(result.successful){
-				message("SUCCESS, service reply: "+result.message);
-				if(result.results.size()>0){
-					message(String.valueOf(result.results));
-				}
-			}else{
-				message("Action was NOT SUCCESSFUL, service reply: "+result.message);
+		Result result = asc.runCommand(cmd, params);
+		if(result.successful){
+			message("SUCCESS, service reply: "+result.message);
+			if(result.results.size()>0){
+				message(String.valueOf(result.results));
 			}
-		}catch(Exception ex){
-			error("Error executing admin command",ex);
-			endProcessing(1);
+		}else{
+			message("Action was NOT SUCCESSFUL, service reply: "+result.message);
 		}
-
 	}
-	
+
 	private AdminServiceClient createClient()throws Exception{
 		if(url==null){
 			findURL();
@@ -134,7 +115,7 @@ public class RunCommand extends ActionBase {
 				configurationProvider.getRESTAuthN());
 		return asc;
 	}
-	
+
 	private void findURL()throws Exception{
 		List<Endpoint> tsfs = registry.listEntries(new RegistryClient.ServiceTypeFilter("TargetSystemFactory"));
 		for(Endpoint epr: tsfs){
@@ -145,7 +126,7 @@ public class RunCommand extends ActionBase {
 			}	
 		}
 	}
-	
+
 	@Override
 	public String getName() {
 		return "admin-runcommand";
@@ -159,8 +140,7 @@ public class RunCommand extends ActionBase {
 	@Override
 	public String getSynopsis() {
 		return "Runs a server-side administrative command, which can be parametrised, " 
-				+"and displays the results. The mandatory '-s' option is used to select the site. "
-				+"";
+				+"and displays the results. The mandatory '-s' option is used to select the site.";
 	}
 
 	@Override
@@ -172,5 +152,4 @@ public class RunCommand extends ActionBase {
 	public String getCommandGroup() {
 		return CMD_GRP_ADMIN;
 	}
-
 }

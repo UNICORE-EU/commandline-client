@@ -82,7 +82,7 @@ public class Resolve extends ActionBase {
 	}
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
 		if(getCommandLine().hasOption("l")) {
 			doList();
@@ -99,17 +99,12 @@ public class Resolve extends ActionBase {
 		}
 	}
 
-	protected void doResolve() {
+	protected void doResolve() throws Exception {
 		String target = getCommandLine().getArgs()[1];;
 		targetDesc = resolve(target,registry,configurationProvider);
 		full = getBooleanOption("full", "f");
 		Endpoint e = new Endpoint(targetDesc.getSmsEpr());
-		try{
-			verbose("SMS = "+targetDesc.getSmsEpr());
-		}catch(Exception ex){
-			error("Can't contact storage service.",ex);
-			endProcessing(ERROR);
-		}
+		verbose("SMS = "+targetDesc.getSmsEpr());
 		String result = full? targetDesc.getUnicoreURI() : e.getUrl();
 		message(result);
 		if(result!=null)properties.put(PROP_LAST_RESOURCE_URL, result);

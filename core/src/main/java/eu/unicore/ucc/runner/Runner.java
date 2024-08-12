@@ -67,7 +67,7 @@ public class Runner implements Runnable {
 
 	protected Status status;
 
-	protected IRegistryClient registry;
+	protected final IRegistryClient registry;
 
 	protected UCCConfigurationProvider configurationProvider;
 
@@ -138,16 +138,12 @@ public class Runner implements Runnable {
 	public static final String ERR_GET_JOB_STATUS="GettingJobStatusFailed";
 	public static final String ERR_JOB_NOT_COMPLETED_SUCCESSFULLY="JobDidNotCompleteSuccessfully";
 
-	public Runner(){
-		counter.incrementAndGet();
-	}
-
 	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider, UCCBuilder builder){
 		this(registry,configurationProvider,builder,new ConsoleLogger());
 	}
 
 	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider,UCCBuilder builder, ConsoleLogger writer){
-		this();
+		counter.incrementAndGet();
 		this.registry=registry;
 		this.builder=builder;
 		this.msg=writer;
@@ -425,21 +421,6 @@ public class Runner implements Runnable {
 	public UCCBuilder getBuilder() {
 		return builder;
 	}
-
-
-	public void setBuilder(UCCBuilder builder) {
-		this.builder = builder;
-	}
-
-
-	public ConsoleLogger getConsoleLogger() {
-		return msg;
-	}
-
-	public void setConsoleLogger(ConsoleLogger msg) {
-		this.msg = msg;
-	}
-
 
 	protected void doGetStdOut()throws Exception{
 		String stdout = builder.getProperty("Stdout", "stdout");
@@ -758,20 +739,9 @@ public class Runner implements Runnable {
 			msg.error("Could not get job log.",e);
 		}
 	}
-	public IRegistryClient getRegistry() {
-		return registry;
-	}
-
-	public void setRegistry(IRegistryClient registry) {
-		this.registry = registry;
-	}
 
 	public JobClient getJob() {
 		return jobClient;
-	}
-
-	public void setJob(JobClient job) {
-		this.jobClient = job;
 	}
 
 	public String getJobID() throws Exception {
@@ -785,10 +755,6 @@ public class Runner implements Runnable {
 
 	public void setProperties(Properties properties) {
 		this.properties = properties;
-	}
-
-	public String getPreferredProtocols() {
-		return preferredProtocol;
 	}
 
 	public Status getStatus() {

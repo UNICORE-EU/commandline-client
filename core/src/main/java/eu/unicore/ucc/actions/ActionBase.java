@@ -9,12 +9,12 @@ import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.ucc.Command;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.UCCOptions;
 import eu.unicore.ucc.actions.data.Resolve;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.authn.UCCConfigurationProviderImpl;
 import eu.unicore.ucc.authn.UsernameAuthN;
-import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.util.MultiRegistryClient;
 import eu.unicore.util.httpclient.IClientConfiguration;
@@ -109,22 +109,11 @@ public abstract class ActionBase extends Command {
 	}
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
-		try{
-			initConfigurationProvider();
-		}catch(Exception ioe){
-			error("Problem setting up security.",ioe);
-			endProcessing(ERROR_SECURITY);
-		}
-		try {
-			initRegistryClient();
-		}catch(Exception re) {
-			error("Problem setting up registry.", re);
-			endProcessing(ERROR_CONNECTION);
-		}
+		initConfigurationProvider();
+		initRegistryClient();
 		setOutputLocation();
-		
 		String blacklistP = properties.getProperty("blacklist", null);
 		if(blacklistP!=null) {
 			blacklist = blacklistP.split("[ ,]+");
@@ -133,7 +122,7 @@ public abstract class ActionBase extends Command {
 			verbose("Blacklist = "+Arrays.asList(blacklist));
 		}
 	}
-	
+
 	@Override
 	public void postProcess(){
 		super.postProcess();
@@ -190,7 +179,7 @@ public abstract class ActionBase extends Command {
 		if(registryURL==null || registryURL.trim().length()==0){
 			verbose("No registry is configured.");
 			if(requireRegistry()){
-				throw new EndProcessingException(ERROR, "A registry is required: please use the '-r' option " +
+				throw new UCCException("A registry is required: please use the '-r' option " +
 						"or configuration entry to define the registry to be used.");
 			}
 			return;
@@ -223,29 +212,27 @@ public abstract class ActionBase extends Command {
 		return new RegistryClient(url, sec, auth);
 	}
 	
-	protected void testRegistryConnection(){
+	protected void testRegistryConnection() throws UCCException {
 		if (registry == null)
 		{
-			message("Registry access is not initialized");
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("Registry access is not initialized");
 		}
 		try{
 			verbose("Checking registry connection.");
 			String status = registry.getConnectionStatus();
 			verbose("Registry connection status: "+status);
 			if(!status.startsWith("OK") && !skipConnectingToRegistry()) {
-				throw new Exception(status);
+				throw new UCCException(status);
 			}
 		}catch(Exception e){
-			error("Cannot contact registry (set 'contact-registry=false' to ignore this error) ",e);
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("Cannot contact registry (set 'contact-registry=false' to ignore this error) ",e);
 		}
 	}
-	
+
 	protected Location createLocation(String descriptor) {
 		return Resolve.resolve(descriptor, registry, configurationProvider);
 	}
-	
+
 	protected boolean isBlacklisted(String url) {
 		if(blacklist.length>0) {
 			for(String b: blacklist) {

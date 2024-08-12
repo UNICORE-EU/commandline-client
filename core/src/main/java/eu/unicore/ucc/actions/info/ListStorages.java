@@ -35,7 +35,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		this.showAll = getCommandLine().hasOption(OPT_ALL);
 		verbose("Listing job directories = "+showAll);
@@ -48,7 +48,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 					continue;
 				}
 				try{
-					listSMS(makeClient(String.valueOf(arg)));
+					listStorage(makeClient(String.valueOf(arg)));
 				}catch(Exception ex){
 					error("Error listing storage at "+arg, ex);
 				}
@@ -79,7 +79,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 				}
 				else{
 					if(filterMatch(sms)){
-						listSMS(sms);
+						listStorage(sms);
 						lastNumberOfResults++;
 					}
 				}
@@ -89,16 +89,16 @@ public class ListStorages extends ListActionBase<StorageClient> {
 		}
 	}
 
-	protected void listSMS(StorageClient sms){
-		String url = sms.getEndpoint().getUrl();
+	protected void listStorage(StorageClient storage) throws Exception {
+		String url = storage.getEndpoint().getUrl();
 		try{
-			message(url+System.getProperty("line.separator")+getDetails(sms));
+			message(url+System.getProperty("line.separator")+getDetails(storage));
 			properties.put(PROP_LAST_RESOURCE_URL, url);
 			URLCompleter.registerSiteURL(url);
 		}catch(Exception ex){
 			error("Error listing storage at "+url, ex);
 		}
-		printProperties(sms);
+		printProperties(storage);
 	}
 
 	@Override

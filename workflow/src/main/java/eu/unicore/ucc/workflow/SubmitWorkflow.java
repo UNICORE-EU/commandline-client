@@ -23,6 +23,7 @@ import eu.unicore.services.rest.client.IAuthCallback;
 import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.io.FileUploader;
@@ -129,7 +130,7 @@ public class SubmitWorkflow extends ActionBase implements
 	}
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
 		submissionSite=getCommandLine().getOptionValue(OPT_SITENAME);
 
@@ -141,31 +142,21 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 
 		if (getCommandLine().getArgs().length < 2) {
-			error("Please supply the name of the workflow file,",
-					new IllegalArgumentException());
-			endProcessing(1);
+			throw new UCCException("Please supply the name of the workflow file.");
 		} else {
 			workflowFileName = getCommandLine().getArgs()[1];
 		}	
-
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
 			verbose("Workflow tags = " + Arrays.deepToString(tags));
 		}
-
-		try {
-			findSite();
-			createBuilder();
-			createWorkflowDataStorage();
-			if(storageURL!=null) {
-				verbose("Using storage at <"+storageURL);
-			}
-			run();
-		} catch (Exception e) {
-			error("", e);
-			endProcessing(1);
+		findSite();
+		createBuilder();
+		createWorkflowDataStorage();
+		if(storageURL!=null) {
+			verbose("Using storage at <"+storageURL);
 		}
-
+		run();
 	}
 
 	protected void createBuilder()throws Exception{
@@ -196,7 +187,9 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 		if(getCommandLine().hasOption(OPT_STORAGEURL)) {
 			storageURL = getOption(OPT_STORAGEURL_LONG, OPT_STORAGEURL);
-			if(!storageURL.endsWith("/"))storageURL = storageURL+"/";
+			if(storageURL.endsWith("/")) {
+				storageURL = storageURL.substring(0, storageURL.length()-1);
+			}
 			return;
 		}
 		StorageFactoryClient sfc = null;
@@ -213,8 +206,7 @@ public class SubmitWorkflow extends ActionBase implements
 			sfc = sfl.iterator().next();
 		}
 		if(sfc==null){
-			error("No suitable storage factory available!",null);
-			endProcessing(ERROR);
+			throw new UCCException("No suitable storage factory available!");
 		}
 		// create storage now
 		verbose("Creating new storage at <"+sfc.getEndpoint().getUrl());
@@ -269,34 +261,27 @@ public class SubmitWorkflow extends ActionBase implements
 		} while (Status.RUNNING.equals(status));
 	}
 
-	protected void uploadLocalData() {
+	protected void uploadLocalData() throws Exception {
 		if(localFiles==0)return;
-		try {
-			if(!baseDir.endsWith("/"))baseDir = baseDir+"/";
-			StorageClient sc = new StorageClient(new Endpoint(storageURL),
-					configurationProvider.getClientConfiguration(storageURL),
-					configurationProvider.getRESTAuthN());
-
-			for(FileUploader fu: builder.getImports()) {
-				String wfFile = fu.getTo();
-				if(wfFile.startsWith("wf:")) {
-					verbose("Uploading <"+fu.getFrom()+"> as workflow file <"+wfFile+"> ...");
-					fu.setTo(baseDir+wfFile.substring(3));
-					String url = storageURL+"/files"+fu.getTo();
-					inputs.put(wfFile, url);
-					if(dryRun){
-						verbose("Dry run, not uploading.");
-						continue;
-					}
-					fu.perform(sc);
+		if(!baseDir.endsWith("/"))baseDir = baseDir+"/";
+		StorageClient sc = new StorageClient(new Endpoint(storageURL),
+				configurationProvider.getClientConfiguration(storageURL),
+				configurationProvider.getRESTAuthN());
+		for(FileUploader fu: builder.getImports()) {
+			String wfFile = fu.getTo();
+			if(wfFile.startsWith("wf:")) {
+				verbose("Uploading <"+fu.getFrom()+"> as workflow file <"+wfFile+"> ...");
+				fu.setTo(StorageClient.normalize(baseDir+wfFile.substring(3)));
+				String url = storageURL+"/files"+fu.getTo();
+				inputs.put(wfFile, url);
+				if(dryRun){
+					verbose("Dry run, not uploading.");
+					continue;
 				}
+				fu.perform(sc);
 			}
-		}catch(Exception e) {
-			error("Can't upload local files.", e);
-			endProcessing(1);
 		}
 	}
-	
 
 	/**
 	 * Loads workflow from file. 
@@ -328,8 +313,7 @@ public class SubmitWorkflow extends ActionBase implements
 			}
 		}
 		if(unmatchedTemplateParameters.size()>0){
-			error("ERROR: No value defined for template parameters: "+unmatchedTemplateParameters, null);
-			endProcessing(1);
+			throw new UCCException("ERROR: No value defined for template parameters: "+unmatchedTemplateParameters);
 		}
 		workflow = new JSONObject(wf);
 	}
@@ -417,15 +401,9 @@ public class SubmitWorkflow extends ActionBase implements
 	private void serverDetails(StringBuilder sb, JSONObject server) throws JSONException {
 		String cr = System.getProperty("line.separator");
 		sb.append("* server v").append(server.optString("version", "n/a"));
-		
-		String dn = null;
-		try{
-			dn = server.getJSONObject("credential").getString("dn");
-		}catch(JSONException ex) {
-			dn = server.getString("dn");
-		}
+		String dn = server.getJSONObject("credential").getString("dn");
 		sb.append(" ").append(dn).append(cr);
 	}
-	
-	public static String lastAddress;
+
+	static String lastAddress;
 }

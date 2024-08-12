@@ -15,14 +15,13 @@ import eu.unicore.services.rest.client.ForwardingHelper;
  * Open a listening socket on the client side
  * Wait for a connection, and connect to a backend-service 
  * (port forwarding)
- * 
+ *
  * @author schuller
  */
 public class OpenTunnel extends ActionBase {
 
 	public static final String OPT_LOCAL_ADDRESS_LONG = "local-address";
 	public static final String OPT_LOCAL_ADDRESS = "L";
-
 
 	private String endpoint;
 
@@ -81,26 +80,20 @@ public class OpenTunnel extends ActionBase {
 	int maxConnections = 0;
 		
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
-		try{
-			int length=getCommandLine().getArgs().length;
-			if(length<2){
-				throw new IllegalArgumentException("You must provide a URL as argument to this command.");
-			}
-			String[] localAddress = getOption(OPT_LOCAL_ADDRESS_LONG, OPT_LOCAL_ADDRESS).split(":",2);
-			localPort = Integer.valueOf(localAddress[localAddress.length-1]);
-			localInterface = localAddress.length>1? localAddress[0] : "localhost";
-			endpoint = getCommandLine().getArgs()[1];	
-			keepListening = getCommandLine().hasOption(OPT_KEEP) ?
-				getBooleanOption(OPT_KEEP_LONG, OPT_KEEP) : true;
-			if(!keepListening)maxConnections=1;
-
-			doProcess();
-		}catch(Exception e){
-			error("Can't open tunnel", e);
-			endProcessing(ERROR);
+		int length=getCommandLine().getArgs().length;
+		if(length<2){
+			throw new IllegalArgumentException("You must provide a URL as argument to this command.");
 		}
+		String[] localAddress = getOption(OPT_LOCAL_ADDRESS_LONG, OPT_LOCAL_ADDRESS).split(":",2);
+		localPort = Integer.valueOf(localAddress[localAddress.length-1]);
+		localInterface = localAddress.length>1? localAddress[0] : "localhost";
+		endpoint = getCommandLine().getArgs()[1];	
+		keepListening = getCommandLine().hasOption(OPT_KEEP) ?
+				getBooleanOption(OPT_KEEP_LONG, OPT_KEEP) : true;
+		if(!keepListening)maxConnections=1;
+		doProcess();
 	}
 
 	protected void doProcess() throws Exception {

@@ -21,10 +21,10 @@ import org.jline.reader.impl.history.DefaultHistory;
 import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.UCCOptions;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.KeystoreAuthN;
-import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
 
 /**
@@ -73,7 +73,7 @@ public class Shell extends ActionBase {
 	}
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
 		String fileName=getOption(OPT_FILE_LONG, OPT_FILE);
 		if(fileName!=null){
@@ -83,13 +83,15 @@ public class Shell extends ActionBase {
 	}
 	
 	@Override
-	protected void testRegistryConnection(){
+	protected void testRegistryConnection() throws UCCException {
 		super.testRegistryConnection();
 		try{
 			for(Endpoint ep: registry.listEntries()) {
 				URLCompleter.registerSiteURL(ep.getUrl());
 			}
-		}catch(Exception ex) {}
+		}catch(Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	private List<String> internalCommands = Arrays.asList( "set", "unset", "system", "!",
@@ -198,8 +200,6 @@ public class Shell extends ActionBase {
 					UCC.getConsoleLogger().setPrefix("[ucc "+cmd.getName()+"]");
 					cmd.process();
 					cmd.postProcess();
-				}catch(EndProcessingException epe){
-					//OK just read next command
 				}
 				catch(ParseException pex){
 					error("Error parsing commandline arguments.",pex);

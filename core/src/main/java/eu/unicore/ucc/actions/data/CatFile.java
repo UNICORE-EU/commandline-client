@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.StorageConstants;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase.Mode;
 import eu.unicore.ucc.io.Location;
@@ -21,32 +22,26 @@ public class CatFile extends FileOperation implements StorageConstants {
 	protected StorageClient sms;
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 
 		if(getCommandLine().getArgs().length>1){
 			for(int i=1; i<getCommandLine().getArgs().length;i++){
 				String source=getCommandLine().getArgs()[1];
 				sourceDesc = createLocation(source);
-				try{
-					if(sourceDesc.isRaw()){
-						verbose("Source file URL "+sourceDesc.getSmsEpr());
-						runRawTransfer(sourceDesc.getSmsEpr(), getStdout(), null);
-					}
-					else{
-						verbose("Source file URL "+sourceDesc.getUnicoreURI());
-						runFileDownloader();
-					}
-				}catch(Exception e){
-					error("Can't get file.",e);
-					endProcessing(ERROR);
+				if(sourceDesc.isRaw()){
+					verbose("Source file URL "+sourceDesc.getSmsEpr());
+					runRawTransfer(sourceDesc.getSmsEpr(), getStdout(), null);
+				}
+				else{
+					verbose("Source file URL "+sourceDesc.getUnicoreURI());
+					runFileDownloader();
 				}
 				System.out.println();
 			}
 		}
 		else{
-			error("Please specify a remote file!",null);
-			endProcessing(ERROR);
+			throw new UCCException("Please specify a remote file!");
 		}
 	}
 
@@ -84,6 +79,7 @@ public class CatFile extends FileOperation implements StorageConstants {
 	public String getSynopsis() {
 		return "Prints a file from remote location to stdout";
 	}
+
 	@Override
 	public String getDescription(){
 		return "cat remote files";
@@ -93,5 +89,4 @@ public class CatFile extends FileOperation implements StorageConstants {
 	public String getArgumentList(){
 		return "<file_url>";
 	}
-
 }

@@ -19,30 +19,24 @@ import eu.unicore.ucc.actions.info.ListActionBase;
 public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
-
-		try{
-			List<AdminServiceClient>clients = createClients();
-			for(AdminServiceClient asc: clients){
-				try{
-					verbose("Contacting admin service at <"+asc.getEndpoint().getUrl()+">");
-				}catch(Exception ex){
-					verbose("Can't access <"+asc.getEndpoint().getUrl()+">");
-					continue;
-				}
-				if(filterMatch(asc)){
-					try{
-						list(asc);
-						lastNumberOfResults++;
-					}catch(Exception ex){
-						error("Error showing admin service info at <"+asc.getEndpoint().getUrl()+">",ex);
-					}
-				}						
+		List<AdminServiceClient>clients = createClients();
+		for(AdminServiceClient asc: clients){
+			try{
+				verbose("Contacting admin service at <"+asc.getEndpoint().getUrl()+">");
+			}catch(Exception ex){
+				verbose("Can't access <"+asc.getEndpoint().getUrl()+">");
+				continue;
 			}
-		}catch(Exception ex){
-			error("Error executing admin command",ex);
-			endProcessing(1);
+			if(filterMatch(asc)){
+				try{
+					list(asc);
+					lastNumberOfResults++;
+				}catch(Exception ex){
+					error("Error showing admin service info at <"+asc.getEndpoint().getUrl()+">",ex);
+				}
+			}						
 		}
 	}
 
@@ -58,7 +52,7 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 		boolean first=true;
 
 		Map<String,String> allMetrics = asc.getMetrics();
-		
+
 		first=true;
 		for(String m: allMetrics.keySet()){
 			if(first){
@@ -79,7 +73,7 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 			details.append(ac.name);
 			details.append(" : ").append(ac.description);
 		}
-		
+
 		return details.toString();
 	}
 
@@ -111,7 +105,7 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 		}
 		return result;
 	}
-	
+
 	@Override
 	public String getName() {
 		return "admin-info";

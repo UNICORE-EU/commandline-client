@@ -8,6 +8,7 @@ import java.util.List;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.JobClient;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Pair;
@@ -21,29 +22,22 @@ public abstract class JobOperationBase extends ActionBase {
 
 	/**
 	 * get job client and job info for the given job file or job URL
-	 *  
+	 *
 	 * @param jobDescriptor 
 	 * @return pair containing {@link JobClient} and {@link UCCBuilder}
 	 */
-	protected Pair<JobClient,UCCBuilder> createJobClient(String jobDescriptor){
+	protected Pair<JobClient,UCCBuilder> createJobClient(String jobDescriptor) throws Exception {
 		Pair<JobClient,UCCBuilder>res = new Pair<>();
 		JobClient job=null;
 		UCCBuilder builder=createBuilder(jobDescriptor);
 		res.setM2(builder);
 		String url=builder.getProperty("epr");
 		if(url==null){
-			error("Job address not found! Maybe <"+jobDescriptor+"> has not been produced by ucc.",null);
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("Job address not found! Maybe <"+jobDescriptor+"> has not been produced by ucc.");
 		}
-		try{
-			job = new JobClient(new Endpoint(url),
+		job = new JobClient(new Endpoint(url),
 					configurationProvider.getClientConfiguration(url),
 					configurationProvider.getRESTAuthN());
-		}
-		catch(Exception e){
-			error("Can't create job client.",e);
-			endProcessing(ERROR);
-		}
 		res.setM1(job);
 		return res;
 	}
@@ -52,7 +46,7 @@ public abstract class JobOperationBase extends ActionBase {
 	 * create a {@link UCCBuilder} instance
 	 * @param arg - denoting either a file, or a URL
 	 */
-	protected UCCBuilder createBuilder(String arg){
+	protected UCCBuilder createBuilder(String arg) throws Exception {
 		UCCBuilder builder=null;
 		try{
 			File job=new File(arg);
@@ -69,14 +63,13 @@ public abstract class JobOperationBase extends ActionBase {
 				builder.setProperty("epr", arg);
 			}
 		}catch(Exception e){
-			error("Can't use <"+arg+">.",e);
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("Can't use <"+arg+">.", e);
 		}
 		return builder;
 	}
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
 		processAdditionalOptions();
 		
@@ -87,8 +80,7 @@ public abstract class JobOperationBase extends ActionBase {
 				String arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
 				args.add(arg);
 			}catch(Exception e){
-				error("Can't read job descriptor from stdin.",e);
-				endProcessing(ERROR_CLIENT);
+				throw new UCCException("Can't read job descriptor from stdin.",e);
 			}	
 		}
 		else{
@@ -96,7 +88,6 @@ public abstract class JobOperationBase extends ActionBase {
 				args.add(getCommandLine().getArgs()[i]);
 			}
 		}
-
 		List<Pair<JobClient,UCCBuilder>>jobClients = new ArrayList<>();
 		for(String arg: args){
 			jobClients.add(createJobClient(arg));

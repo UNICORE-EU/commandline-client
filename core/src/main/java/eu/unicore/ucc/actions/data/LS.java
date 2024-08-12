@@ -9,10 +9,11 @@ import eu.unicore.client.core.FileList;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.uas.util.UnitParser;
+import eu.unicore.ucc.UCCException;
 
 /**
  * lists a storage
- * 
+ *
  * @author schuller
  */
 public class LS extends SMSOperation {
@@ -60,7 +61,7 @@ public class LS extends SMSOperation {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		detailed=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
 		if(detailed)verbose("Detailed listing.");
@@ -74,36 +75,24 @@ public class LS extends SMSOperation {
 	}
 
 
-	protected void doProcess(){
+	protected void doProcess() throws Exception {
 		if(getCommandLine().getArgs().length<2){
-			message("Please provide a storage address!");
-			printUsage();
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("Please provide a storage address!");
 		}
 		String address=getCommandLine().getArgs()[1];
-		
 		sms = getStorageClient(address);
 		String path = getPathAtStorage(address);
-		
 		if(path==null){
 			if(getCommandLine().getArgs().length>2){
 				path=getCommandLine().getArgs()[2];
 			}	
 		}
 		if(path==null)path="/";
-
 		doListing(path);
-
 	}
 
-	protected void doListing(String path){
-		FileListEntry listing=null;
-		try{
-			listing = sms.stat(path);
-		}catch(Exception e){
-			error("Error getting properties for path: "+path,e);
-			endProcessing(ERROR);
-		}
+	protected void doListing(String path) throws Exception {
+		FileListEntry listing = sms.stat(path);
 		if(listing.isDirectory){
 			listDirectory(path);
 		}
@@ -112,31 +101,21 @@ public class LS extends SMSOperation {
 		}
 	}
 
-	protected void listDirectory(String path){
-		try{
-			FileList listing = sms.ls(path);
-			for(FileListEntry f: listing.list(0, 1000)){
-				listSingleFile(f);
-				if(f.isDirectory && recurse){
-					doListing(f.path);
-				}
+	protected void listDirectory(String path) throws Exception {
+		FileList listing = sms.ls(path);
+		for(FileListEntry f: listing.list(0, 1000)){
+			listSingleFile(f);
+			if(f.isDirectory && recurse){
+				doListing(f.path);
 			}
-		}catch(Exception e){
-			error("Error listing path: "+path,e);
-			endProcessing(ERROR);
 		}
 	}
 
-	protected void listSingleFile(FileListEntry file){
+	protected void listSingleFile(FileListEntry file) throws Exception {
 		lastLS=file;
 		message(detailed? detailedListing(file):normalListing(file));
 		if(!file.isDirectory && showMetadata){
-			try{
-				printMetadata(file);
-			}catch(Exception ex){
-				logger.error("Error printing metadata for "+file, ex);
-				message("Error! Can't print metadata.");
-			}
+			printMetadata(file);
 		}
 	}
 
@@ -182,7 +161,7 @@ public class LS extends SMSOperation {
 
 	//for unit testing
 	static FileListEntry lastLS;
-	
+
 	public static FileListEntry getLastLS(){
 		return lastLS;
 	}

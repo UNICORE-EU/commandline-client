@@ -17,7 +17,6 @@ import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.helpers.ConsoleLogger;
-import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.util.JSONUtil;
 import eu.unicore.ucc.util.ProgressBar;
 
@@ -68,7 +67,7 @@ public class ServerToServer implements Constants {
 	public void setExtraParameterSource(Properties properties){
 		this.extraParameterSource = properties;
 	}
-	
+
 	public void process() throws Exception {
 		if(scheduled!=null){
 			scheduled=UnitParser.convertDateToISO8601(scheduled);
@@ -81,15 +80,15 @@ public class ServerToServer implements Constants {
 		if(bothSidesUNICORE  && sourceDesc.getSmsEpr().equalsIgnoreCase(targetDesc.getSmsEpr())) {
 			Endpoint target = new Endpoint(targetDesc.getSmsEpr());
 			StorageClient sms = new StorageClient(target,
-				configurationProvider.getClientConfiguration(target.getUrl()),
-				configurationProvider.getRESTAuthN());
+					configurationProvider.getClientConfiguration(target.getUrl()),
+					configurationProvider.getRESTAuthN());
 			smsCopyFile(sms);
 		}
 		else {
 			copyFile();
 		}
 	}
-	
+
 	protected boolean assertSourceExists(Location remote) throws Exception {
 		if(hasWildCards(remote.getName()))return true;
 		StorageClient source = new StorageClient(new Endpoint(remote.getSmsEpr()),
@@ -99,19 +98,18 @@ public class ServerToServer implements Constants {
 		remoteSize = fle.size;
 		return true;
 	}
-	
+
 	public boolean hasWildCards(String name){
 		return name.contains("*") || name.contains("?");
 	}
-	
+
 	/**
 	 * perform the remote copy, and cleanup the file transfer resource (if not in async mode)
 	 */
-	protected void copyFile(){
-		try{
-			if(!sourceDesc.isRaw())assertSourceExists(sourceDesc);
-			UNICOREReceives = sourceDesc.isRaw();
-			
+	protected void copyFile() throws Exception {
+		if(!sourceDesc.isRaw())assertSourceExists(sourceDesc);
+		UNICOREReceives = sourceDesc.isRaw();
+		try {
 			if(bothSidesUNICORE || UNICOREReceives) {
 				Endpoint target = new Endpoint(targetDesc.getSmsEpr());
 				StorageClient sms = new StorageClient(target,
@@ -138,12 +136,8 @@ public class ServerToServer implements Constants {
 				return;
 			}
 			waitForCompletion();
-		}catch(Exception e){
-			msg.error("Can't copy file.",e);
-			throw new EndProcessingException(ERROR_CLIENT);
-		}
-		finally{
-			if(synchronous){
+		} finally{
+			if(synchronous && tcc!=null){
 				try{ tcc.delete(); }
 				catch(Exception e1){
 					msg.error("Could not destroy the filetransfer client",e1);
@@ -158,7 +152,7 @@ public class ServerToServer implements Constants {
 			params.put("scheduledStartTime",scheduled);
 		}
 		String protocol = sourceDesc.getProtocol();
-		
+
 		if(extraParameterSource!=null){
 			Map<String, String> res = new HashMap<>();
 			String p = String.valueOf(protocol);
@@ -168,7 +162,7 @@ public class ServerToServer implements Constants {
 				msg.verbose("Have "+res.size()+" extra parameters for protocol "+protocol);
 				params.putAll(res);
 			}
-			
+
 			// TODO check if required
 			if(res.containsKey("uftp.streams")){
 				params.put("streams", res.get("uftp.streams"));
@@ -203,17 +197,12 @@ public class ServerToServer implements Constants {
 		}
 	}
 
-	protected void smsCopyFile(StorageClient sms){
-		try{
-			msg.verbose("Copy on remote storage: "+sourceDesc.getName()+"->"+targetDesc.getName());
-			JSONObject params = new JSONObject();
-			params.put("from", sourceDesc.getName());
-			params.put("to", targetDesc.getName());
-			sms.executeAction("copy", params);
-		} catch(Exception e){
-			msg.error("Can't copy file.",e);
-			throw new EndProcessingException(ERROR);
-		}
+	protected void smsCopyFile(StorageClient sms) throws Exception {
+		msg.verbose("Copy on remote storage: "+sourceDesc.getName()+"->"+targetDesc.getName());
+		JSONObject params = new JSONObject();
+		params.put("from", sourceDesc.getName());
+		params.put("to", targetDesc.getName());
+		sms.executeAction("copy", params);
 	}
 
 	protected String checkProtocols(StorageClient sms)throws Exception{
@@ -239,20 +228,12 @@ public class ServerToServer implements Constants {
 		this.synchronous = synchronous;
 	}
 
-	public String getScheduled() {
-		return scheduled;
-	}
-
 	public void setScheduled(String scheduled) {
 		this.scheduled = scheduled;
 	}
 
 	public String getPreferredProtocol() {
 		return preferredProtocol;
-	}
-
-	public long getRemoteSize() {
-		return remoteSize;
 	}
 
 	public String getTransferAddress() {

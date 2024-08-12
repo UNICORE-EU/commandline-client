@@ -19,30 +19,20 @@ public class CopyFileStatus extends ActionBase {
 	protected UnitParser up = UnitParser.getCapacitiesParser(3);
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		List<String> urls = new ArrayList<>();
 		if(getCommandLine().getArgs().length==1){
-			try{
-				String arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
-				urls.add(arg);
-			}catch(Exception e){
-				error("Can't read transfer URL from stdin.",e);
-				endProcessing(ERROR_CLIENT);
-			}
+			String arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
+			urls.add(arg);
 		}
 		else{
 			for(int i=1; i<getCommandLine().getArgs().length;i++){
 				urls.add(getCommandLine().getArgs()[i]);
 			}
 		}
-		try{
-			for(String url: urls) {
-				doCheck(url);
-			}
-		}catch(Exception e){
-			error("Can't check status.",e);
-			endProcessing(ERROR);
+		for(String url: urls) {
+			doCheck(url);
 		}
 	}
 
@@ -54,7 +44,7 @@ public class CopyFileStatus extends ActionBase {
 		Status status = tcc.getStatus();
 		message(tcc.getEndpoint().getUrl()+" "+status+", <"+up.getHumanReadable(transferred)+"> bytes");
 	}
-	
+
 	@Override
 	public String getName() {
 		return "copy-file-status";
@@ -64,16 +54,17 @@ public class CopyFileStatus extends ActionBase {
 	public String getSynopsis() {
 		return "Checks the status of server-to-server transfers.";
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "check status of server-to-server transfers";
 	}
-	
+
 	@Override
 	public String getArgumentList(){
 		return "TransferURL(s)";
 	}
+
 	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_DATA;

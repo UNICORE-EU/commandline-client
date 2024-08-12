@@ -24,7 +24,7 @@ import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**
  * low-level REST API interactions
- * 
+ *
  * @author schuller
  */
 public class REST extends ActionBase implements IServiceInfoProvider {
@@ -35,7 +35,6 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	public static final String OPT_CONTENT = "C";
 	public static final String OPT_INCLUDE_LONG = "include";
 	public static final String OPT_INCLUDE = "i";
-
 
 	private String accept;
 	private String contentType;
@@ -92,53 +91,47 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	protected boolean requireRegistry(){
 		return false;
 	}
-	
+
 	protected boolean skipConnectingToRegistry() {
 		return true;
 	}
-	
+
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
-		try{
-			int length=getCommandLine().getArgs().length;
-			if(length<2){
-				throw new IllegalArgumentException("You must provide at least a command (GET, PUT, ...) as argument.");
+		int length=getCommandLine().getArgs().length;
+		if(length<2){
+			throw new IllegalArgumentException("You must provide at least a command (GET, PUT, ...) as argument.");
+		}
+		String cmd=getCommandLine().getArgs()[1];
+		if(length<3){
+			throw new IllegalArgumentException("You must provide at least a URL as argument to this command.");
+		}
+		accept = getCommandLine().getOptionValue(OPT_ACCEPT, "application/json");
+		contentType = getCommandLine().getOptionValue(OPT_CONTENT, "application/json");
+		includeHeaders = getCommandLine().hasOption(OPT_INCLUDE);
+		int startIndex = 2;
+		JSONObject content = new JSONObject(); 
+		if(length>3){
+			String ref = getCommandLine().getArgs()[2];
+			if(ref.startsWith("@")){
+				File f = new File(ref.substring(1));
+				content = new JSONObject(FileUtils.readFileToString(f, "UTF-8"));
+				startIndex++;
 			}
-			String cmd=getCommandLine().getArgs()[1];
-			if(length<3){
-				throw new IllegalArgumentException("You must provide at least a URL as argument to this command.");
-			}
-			accept = getCommandLine().getOptionValue(OPT_ACCEPT, "application/json");
-			contentType = getCommandLine().getOptionValue(OPT_CONTENT, "application/json");
-			includeHeaders = getCommandLine().hasOption(OPT_INCLUDE);
-			int startIndex = 2;
-			JSONObject content = new JSONObject(); 
-			if(length>3){
-				String ref = getCommandLine().getArgs()[2];
-				if(ref.startsWith("@")){
-					File f = new File(ref.substring(1));
-					content = new JSONObject(FileUtils.readFileToString(f, "UTF-8"));
+			else if(!ref.toLowerCase().startsWith("http")) {
+				try{
+					content = new JSONObject(ref);
 					startIndex++;
-				}
-				else if(!ref.toLowerCase().startsWith("http")) {
-					try{
-						content = new JSONObject(ref);
-						startIndex++;
-					}catch(JSONException je) {}
-				}
+				}catch(JSONException je) {}
 			}
-			for(int i = startIndex; i<length; i++) {
-				String url=getCommandLine().getArgs()[i];
-				doProcess(cmd, url, content);
-			}
-			
-		}catch(Exception e){
-			error("Can't perform REST operation", e);
-			endProcessing(ERROR);
+		}
+		for(int i = startIndex; i<length; i++) {
+			String url=getCommandLine().getArgs()[i];
+			doProcess(cmd, url, content);
 		}
 	}
-	
+
 	protected void doProcess(String cmd, String url, JSONObject content) throws Exception {
 		verbose("Accessing endpoint <"+url+">");
 		BaseClient bc = makeClient(url);
@@ -186,13 +179,13 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			}
 		}catch(Exception ex) {}
 	}
-	
+
 	protected BaseClient makeClient(String url) throws Exception {
 		return new BaseClient(url,
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
 	}
-	
+
 	@Override
 	public String getType() {
 		return "CoreServices";
@@ -219,7 +212,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		}
 		return sb.toString();
 	}
-	
+
 	private void clientDetails(StringBuilder sb, JSONObject client) throws JSONException {
 		String cr = System.getProperty("line.separator");
 		String role = client.getJSONObject("role").getString("selected");
@@ -229,7 +222,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 					client.getString("dn"), role, uid, cr);
 		}
 	}
-	
+
 	private void serverDetails(StringBuilder sb, JSONObject server) throws JSONException {
 		String cr = System.getProperty("line.separator");
 		String dn = null;

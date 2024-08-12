@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.utils.TaskClient;
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.util.JSONUtil;
@@ -100,7 +101,7 @@ public class Metadata extends ActionBase {
 	}
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
 		command = getOption(OPT_COMMAND_LONG, OPT_COMMAND);
 		verbose("Operation = " + command);
@@ -117,9 +118,7 @@ public class Metadata extends ActionBase {
 		}
 		sms = createStorageClient(storage);
 		if (sms == null) {
-			message("Cannot find the requested storage service!");
-			printUsage();
-			endProcessing(ERROR_CLIENT);
+			throw new UCCException("Cannot find the requested storage service!");
 		}
 		verbose("Accessing metadata for storage " + sms.getEndpoint().getUrl());
 		String fName = getOption(OPT_FILE_LONG, OPT_FILE);
@@ -128,8 +127,7 @@ public class Metadata extends ActionBase {
 		}
 		if ("search".startsWith(command)) {
 			if (query == null) {
-				error("Please provide a query string!", null);
-				endProcessing(1);
+				throw new UCCException("Please provide a query string!");
 			}
 			doSearch();
 		} else {
@@ -148,46 +146,30 @@ public class Metadata extends ActionBase {
 				// TODO depth
 				doStartExtract();
 			} else {
-				error("Unknown command : " + command, null);
-				endProcessing(1);
+				throw new UCCException("Unknown command : " + command, null);
 			}
 		}
 	}
 
-	protected void doGet() {
-		try {
-			Map<String, String> result = sms.stat(path).metadata;
-			String json = JSONUtil.asJSON(result).toString(2);
-			message(json);
-			if (file != null) {
-				FileUtils.writeStringToFile(file, json, "UTF-8");
-			}
-			lastMeta.clear();
-			lastMeta.putAll(result);
-		} catch (Exception ex) {
-			error("Error getting metadata for <" + path + ">", ex);
-			endProcessing(1);
+	protected void doGet() throws Exception {
+		Map<String, String> result = sms.stat(path).metadata;
+		String json = JSONUtil.asJSON(result).toString(2);
+		message(json);
+		if (file != null) {
+			FileUtils.writeStringToFile(file, json, "UTF-8");
 		}
+		lastMeta.clear();
+		lastMeta.putAll(result);
 	}
 
-	protected void doWrite() {
-		try {
-			doSet(readData());
-		} catch (Exception ex) {
-			error("Error writing metadata for <" + path + ">", ex);
-			endProcessing(1);
-		}
+	protected void doWrite() throws Exception {
+		doSet(readData());
 	}
 
-	protected void doUpdate() {
-		try {
-			Map<String, String> data = sms.stat(path).metadata;
-			data.putAll(readData());
-			doSet(data);
-		} catch (Exception ex) {
-			error("Error creating/updating metadata for <" + path + ">", ex);
-			endProcessing(1);
-		}
+	protected void doUpdate() throws Exception {
+		Map<String, String> data = sms.stat(path).metadata;
+		data.putAll(readData());
+		doSet(data);
 	}
 
 	protected void doSet(Map<String, String> data) throws Exception {
@@ -199,28 +181,18 @@ public class Metadata extends ActionBase {
 		lastMeta.putAll(data);
 	}
 
-	protected void doSearch() {
-		try {
-			lastSearchResults.clear();
-			List<String> files = sms.searchMetadata(query);
-			verbose("Have <"+files.size()+"> results.");
-			for(String f: files) {
-				message("  "+f);
-				lastSearchResults.add(f);
-			}
-		} catch (Exception ex) {
-			error("Error searching metadata on <"+sms.getEndpoint().getUrl()+">", ex);
-			endProcessing(1);
+	protected void doSearch() throws Exception {
+		lastSearchResults.clear();
+		List<String> files = sms.searchMetadata(query);
+		verbose("Have <"+files.size()+"> results.");
+		for(String f: files) {
+			message("  "+f);
+			lastSearchResults.add(f);
 		}
 	}
 
-	protected void doDelete() {
-		try {
-			doSet(new HashMap<>());
-		} catch (Exception ex) {
-			error("Error deleting metadata for <" + path + ">", ex);
-			endProcessing(1);
-		}
+	protected void doDelete() throws Exception {
+		doSet(new HashMap<>());
 	}
 
 	private String normalize(String path) {
@@ -230,26 +202,20 @@ public class Metadata extends ActionBase {
 		return path;
 	}
 
-	protected void doStartExtract() {
-		try {
-			path = normalize(path);
-			TaskClient tc = sms.getFileClient(path).startMetadataExtraction(10, new String[0]);
-			if(tc!=null) {
-				message("Extraction started, task = "+tc.getEndpoint().getUrl());
-				properties.put(PROP_LAST_RESOURCE_URL, tc.getEndpoint().getUrl());
-			}
-			if(tc!=null && wait) {
-				verbose("Waiting for extraction task <"+tc.getEndpoint().getUrl()+"> to finish...");
-				while(!tc.isFinished())Thread.sleep(2000);
-				JSONObject taskProps = tc.getProperties();
-				JSONObject result = taskProps.optJSONObject("result", new JSONObject());
-				message("Status: "+tc.getStatus());
-				message("Result: \n"+result.toString(2));
-			}
+	protected void doStartExtract() throws Exception {
+		path = normalize(path);
+		TaskClient tc = sms.getFileClient(path).startMetadataExtraction(10, new String[0]);
+		if(tc!=null) {
+			message("Extraction started, task = "+tc.getEndpoint().getUrl());
+			properties.put(PROP_LAST_RESOURCE_URL, tc.getEndpoint().getUrl());
 		}
-		catch (Exception ex) {
-			error("Error starting metadata extraction for <" + path + ">", ex);
-			endProcessing(1);
+		if(tc!=null && wait) {
+			verbose("Waiting for extraction task <"+tc.getEndpoint().getUrl()+"> to finish...");
+			while(!tc.isFinished())Thread.sleep(2000);
+			JSONObject taskProps = tc.getProperties();
+			JSONObject result = taskProps.optJSONObject("result", new JSONObject());
+			message("Status: "+tc.getStatus());
+			message("Result: \n"+result.toString(2));
 		}
 	}
 
@@ -283,24 +249,17 @@ public class Metadata extends ActionBase {
 		return JSONUtil.asMap(j);
 	}
 
-	protected StorageClient createStorageClient(String storage) {
-		try { 
-			Location td = createLocation(storage);
-			Endpoint epr = new Endpoint(td.getSmsEpr());
-			StorageClient sms = new StorageClient(epr,
-					configurationProvider.getClientConfiguration(epr.getUrl()),
-					configurationProvider.getRESTAuthN());
-			verbose("Storage " + td.getSmsEpr());
-			if (!sms.supportsMetadata()) {
-				message("Storage does not support metadata.");
-				endProcessing(ERROR);
-			}
-			return sms;
-		}catch(RuntimeException ex) {
-			throw ex;
-		}catch(Exception ex) {
-			throw new RuntimeException(ex);
+	protected StorageClient createStorageClient(String storage) throws Exception {
+		Location td = createLocation(storage);
+		Endpoint epr = new Endpoint(td.getSmsEpr());
+		StorageClient sms = new StorageClient(epr,
+				configurationProvider.getClientConfiguration(epr.getUrl()),
+				configurationProvider.getRESTAuthN());
+		verbose("Storage " + td.getSmsEpr());
+		if (!sms.supportsMetadata()) {
+			throw new UCCException ("Storage does not support metadata.");
 		}
+		return sms;
 	}
 
 	@Override
@@ -332,14 +291,10 @@ public class Metadata extends ActionBase {
 		try {
 			return getCommandLine().getArgs()[argN];
 		} catch (IndexOutOfBoundsException ex) {
-			error("This method requires at least " + argN + " arguments", null);
-			endProcessing();
+			throw new IllegalArgumentException("This method requires at least " + argN + " arguments", null);
 		}
-		return null;
-
 	}
 
 	public final static Map<String, String> lastMeta = new HashMap<>();
 	public final static Collection<String> lastSearchResults = new HashSet<>();
-	
 }

@@ -17,7 +17,7 @@ import eu.unicore.ucc.util.UCCBuilder;
 
 /**
  * Allocates resources on the batch system via UNICORE
- * 
+ *
  * @author schuller
  */
 public class Allocate extends ActionBase {
@@ -48,7 +48,7 @@ public class Allocate extends ActionBase {
 	 * resources name / value pairs
 	 */
 	private final Map<String,String>resourceRequests=new HashMap<>();
-	
+
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -123,7 +123,7 @@ public class Allocate extends ActionBase {
 	}
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
@@ -139,29 +139,24 @@ public class Allocate extends ActionBase {
 		run();
 	}
 
-	protected void initBuilder(){
-		try{
-			builder = new UCCBuilder(registry, configurationProvider);
-			builder.setProperty("Output",output.getAbsolutePath());
-			builder.setProperty("DetailedStatusDisplay", "true");
-			if(tags!=null&&tags.length>0) {
-				builder.addTags(tags);
-			}
-			if(siteName!=null){
-				builder.setProperty("Site", siteName);
-			}
-			Job job = new Job(builder.getJSON());
-			job.type(Type.ALLOCATE);
-			for(String rName: resourceRequests.keySet()) {
-				job.resources().other(rName, resourceRequests.get(rName));
-			}
-		}catch(Exception e){
-			error("",e);
-			endProcessing(ERROR_CLIENT);
+	protected void initBuilder() throws Exception {
+		builder = new UCCBuilder(registry, configurationProvider);
+		builder.setProperty("Output",output.getAbsolutePath());
+		builder.setProperty("DetailedStatusDisplay", "true");
+		if(tags!=null&&tags.length>0) {
+			builder.addTags(tags);
+		}
+		if(siteName!=null){
+			builder.setProperty("Site", siteName);
+		}
+		Job job = new Job(builder.getJSON());
+		job.type(Type.ALLOCATE);
+		for(String rName: resourceRequests.keySet()) {
+			job.resources().other(rName, resourceRequests.get(rName));
 		}
 	}
 
-	protected void run(){
+	protected void run() throws Exception {
 		runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(true);
 		runner.setBriefOutfileNames(true);
@@ -173,26 +168,21 @@ public class Allocate extends ActionBase {
 			brokerName = "LOCAL";
 		}
 		runner.setBroker(UCC.getBroker(brokerName));
-		try{
-			runner.run();
-			if(!asynchronous && !dryRun) {
-				// make sure job is "RUNNING"
-				JobClient job = runner.getJob();
-				verbose("Allocation job is "+job.getStatus());
-				do {
-					if(runner.getJob().getStatus().ordinal()>=Status.RUNNING.ordinal()) {
-						break;
-					}
-					Thread.sleep(2000);
+		runner.run();
+		if(!asynchronous && !dryRun) {
+			// make sure job is "RUNNING"
+			JobClient job = runner.getJob();
+			verbose("Allocation job is "+job.getStatus());
+			do {
+				if(runner.getJob().getStatus().ordinal()>=Status.RUNNING.ordinal()) {
+					break;
 				}
-				while(true);
-				verbose("Allocation job is "+job.getStatus());
+				Thread.sleep(2000);
 			}
-		}catch(Exception ex){
-			runner.dumpJobLog();
-			error("Failed to allocate resources", ex);
-			endProcessing(ERROR);
+			while(true);
+			verbose("Allocation job is "+job.getStatus());
 		}
+
 	}
 
 	// for unit testing

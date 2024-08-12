@@ -139,7 +139,7 @@ public class Exec extends ActionBase {
 
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		allocation = getCommandLine().getOptionValue(OPT_ALLOCATION);
@@ -161,31 +161,26 @@ public class Exec extends ActionBase {
 		run();
 	}
 
-	protected void initBuilder(String[] args){
-		try{
-			builder = new UCCBuilder(registry, configurationProvider);
-			builder.setProperty("Output",output.getAbsolutePath());
-			builder.setProperty("KeepFinishedJob", String.valueOf(keep));
-			builder.setProperty("DetailedStatusDisplay", "true");
-			if(tags!=null&&tags.length>0) {
-				builder.addTags(tags);
+	protected void initBuilder(String[] args) throws Exception {
+		builder = new UCCBuilder(registry, configurationProvider);
+		builder.setProperty("Output",output.getAbsolutePath());
+		builder.setProperty("KeepFinishedJob", String.valueOf(keep));
+		builder.setProperty("DetailedStatusDisplay", "true");
+		if(tags!=null&&tags.length>0) {
+			builder.addTags(tags);
+		}
+		if(siteName!=null){
+			builder.setProperty("Site", siteName);
+		}
+		Job job = new Job(builder.getJSON());
+		if(args.length == 1)throw new IllegalArgumentException("Must specify a command");
+		// first arg is command
+		job.executable(args[1]);
+		job.run_on_login_node(loginNode);
+		if(args.length > 1 ){
+			for(int i=2; i<args.length;i++){
+				job.arguments(args[i]);
 			}
-			if(siteName!=null){
-				builder.setProperty("Site", siteName);
-			}
-			Job job = new Job(builder.getJSON());
-			if(args.length == 1)throw new IllegalArgumentException("Must specify a command");
-			// first arg is command
-			job.executable(args[1]);
-			job.run_on_login_node(loginNode);
-			if(args.length > 1 ){
-				for(int i=2; i<args.length;i++){
-					job.arguments(args[i]);
-				}
-			}
-		}catch(Exception e){
-			error("",e);
-			endProcessing(ERROR_CLIENT);
 		}
 	}
 
@@ -215,9 +210,7 @@ public class Exec extends ActionBase {
 			runner.run();
 		}catch(RuntimeException ex){
 			runner.dumpJobLog();
-			error("Failed to execute remote command", ex);
-			endProcessing(ERROR);
+			throw ex;
 		}
 	}
-
 }

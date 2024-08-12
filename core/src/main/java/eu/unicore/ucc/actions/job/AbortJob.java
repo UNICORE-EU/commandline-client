@@ -24,19 +24,18 @@ public class AbortJob extends JobOperationBase {
 		return "abort job(s)";
 	}
 
-	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
+	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs) {
 		jobs.forEach( x -> abort(x.getM1()));
 	}
 
-	protected void abort(JobClient job){
+	protected void abort(JobClient job) {
+		verbose("Job id: " +job.getEndpoint().getUrl());
 		try{
-			verbose("Job id: " +job.getEndpoint().getUrl());
 			job.abort();
-			message("Job aborted.");
-		}catch(Exception e){
-			error("Can't abort job.",e);
-			endProcessing(ERROR);
+		}catch(Exception ex) {
+			throw new RuntimeException(ex);
 		}
+		message("Job aborted.");
 	}
 	
 }

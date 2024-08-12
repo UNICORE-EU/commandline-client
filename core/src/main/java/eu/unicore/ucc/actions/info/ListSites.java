@@ -33,7 +33,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 	}
 	
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		SiteLister tssLister = new SiteLister(UCC.executor,registry,configurationProvider);

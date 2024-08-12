@@ -11,10 +11,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Logger;
 
-import eu.unicore.ucc.helpers.EndProcessingException;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
 import eu.unicore.util.Log;
 
@@ -54,35 +52,27 @@ public abstract class Command implements Constants {
 		createOptions();
 	}
 
-	public void init(String [] args) throws ParseException{
+	public void init(String [] args) throws Exception {
 		if(handleHelp(args)){
 			printUsage();
-			endProcessing(0);
+			if(quitAfterPrintingUsage)System.exit(0);
 		}
 		CommandLineParser parser = new DefaultParser();
 		line = parser.parse( getOptions(), args );
-
 		if(getCommandLine().hasOption(OPT_VERBOSE)){
 			UCC.getConsoleLogger().setVerbose(true);
 		}
-
 		loadUserProperties();
 	}
 
-
-	protected void setOutputLocation(){
+	protected void setOutputLocation() throws Exception {
 		verbose("Current directory is <"+new File("").getAbsolutePath()+">");
 		String outputLoc=getCommandLine().getOptionValue(OPT_OUTPUT, properties.getProperty(OPT_OUTPUT_LONG));
 		if(outputLoc==null)outputLoc=".";
-		try{
-			output=new File(outputLoc);
-			if(!output.exists())output.mkdirs();
-			if(!output.isDirectory())throw new IllegalArgumentException("<"+outputLoc+"> is not a directory.");
-			verbose("Output goes to <"+outputLoc+">");
-		}catch(Exception e){
-			error("Problem with <"+outputLoc+">",e);
-			endProcessing();
-		}
+		output=new File(outputLoc);
+		if(!output.exists())output.mkdirs();
+		if(!output.isDirectory())throw new IllegalArgumentException("<"+outputLoc+"> is not a directory.");
+		verbose("Output goes to <"+outputLoc+">");
 	}
 
 
@@ -123,17 +113,6 @@ public abstract class Command implements Constants {
 
 	public CommandLine getCommandLine(){
 		return line;
-	}
-
-	public void endProcessing(){
-		endProcessing(0);
-	}
-
-	public void endProcessing(int exitCode){
-		if(quitAfterPrintingUsage){
-			System.exit(exitCode);
-		}
-		else throw new EndProcessingException(exitCode);
 	}
 
 	/**
@@ -224,11 +203,7 @@ public abstract class Command implements Constants {
 	 * NOTE: Subclasses <em>must</em> call super.process() to ensure
 	 * proper initialisation, preferences handling etc. 
 	 */
-	public void process(){
-		if(getCommandLine().hasOption(OPT_HELP)){
-			printUsage();
-			endProcessing();
-		}
+	public void process() throws Exception {
 		timing = getBooleanOption(OPT_TIMING_LONG, OPT_TIMING);
 		if(timing){
 			startTime=System.currentTimeMillis();
@@ -252,7 +227,7 @@ public abstract class Command implements Constants {
 	/**
 	 * read user's properties file
 	 */
-	protected void loadUserProperties(){
+	protected void loadUserProperties() throws Exception {
 		if(properties!=null)return;
 		verbose("UCC "+UCC.getVersion());
 
@@ -261,7 +236,6 @@ public abstract class Command implements Constants {
 		CommandLine line=getCommandLine();
 		String defaultProps=System.getProperty("user.home")+File.separator+".ucc"+File.separator+"preferences";
 		String props=System.getProperty("ucc.preferences",defaultProps);
-
 		if(propertiesFile==null){
 			if(line.hasOption(OPT_PROPERTIES)){
 				props=line.getOptionValue(OPT_PROPERTIES);
@@ -272,34 +246,28 @@ public abstract class Command implements Constants {
 		}
 		if(propertiesFile.exists()){
 			verbose("Reading properties file <"+props+">");
-			try{
-				properties.load(new FileInputStream(propertiesFile));
-			}catch(Exception e){
-				error("Could not read from <"+props+">.",e);
-				endProcessing(1);
+			try(FileInputStream fis = new FileInputStream(propertiesFile)){
+				properties.load(fis);
 			}
 		}
 		else{
 			if(userSpecified){
-				error("Properties file <"+props+"> does not exist.",null);
-				endProcessing(1);
+				throw new UCCException("Properties file <"+props+"> does not exist.");
 			}
 			else{
 				verbose("No properties file found at <"+props+">");	
 			}
 		}
-		
 		// set default session ID file, if not set
 		if(properties.getProperty(SESSION_ID_FILEKEY)==null){
 			String defaultSessionsFile=System.getProperty("user.home")+File.separator+".ucc"
 					+File.separator+SESSION_ID_FILEKEY;
 			properties.put(SESSION_ID_FILEKEY, defaultSessionsFile);
 		}
-		
 		PropertyVariablesResolver.substituteVariables(properties, propertiesFile);
 		checkDeprecation();
 	}
-	
+
 	protected void checkDeprecation() {
 		if(properties==null)throw new IllegalStateException();
 		String authMethod = properties.getProperty("authenticationMethod");

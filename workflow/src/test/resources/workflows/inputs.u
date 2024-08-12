@@ -1,7 +1,7 @@
 {
 
 "Imports" : [
-  { "From": "inputs.u", "To": "infile1" }
+  { "From": "inputs.u", "To": "wf:infile1" }
  ]
 
 }

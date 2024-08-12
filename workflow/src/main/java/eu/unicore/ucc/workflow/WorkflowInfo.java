@@ -1,12 +1,10 @@
 	package eu.unicore.ucc.workflow;
 
-import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.Option;
-import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
@@ -37,14 +35,13 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 
 	@Override
 	public String getArgumentList(){
-		return "[<url> | <url-file>]";
+		return "[<url1> ... <urlN>]";
 	}
 
 	@Override
 	public String getSynopsis(){
-		return "Lists info about workflows. " +
-				"The workflow address is given directly or is read from <workflow-file>, " +
-				"if not given, all workflows are shown.";
+		return "Lists info about workflows(s). "
+				+ "If no address is given, all workflows are shown.";
 	}
 
 	@Override
@@ -78,95 +75,57 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 	}
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
-
 		listFiles=detailed && !getBooleanOption("nofiles", "N");
-
 		listJobs=detailed && !getBooleanOption("nojobs", "j");
-
 		if(detailed){
 			verbose("Listing jobs: "+listJobs);
 			verbose("Listing names of files: "+listFiles);
 		}
-		try{
-			run();
-		}catch(Exception e){
-			error("",e);
-			endProcessing(1);
-		}
-	}
-
-	//read the workflow address
-	protected Endpoint initEPR()throws Exception{
-		String arg=null;
-		Endpoint workflowEPR;
-
-		if(doFilter || getCommandLine().getArgs().length<2)return null;
-
-		arg=getCommandLine().getArgs()[1];
-
-		File wf=new File(arg);
-		if(wf.exists())
-		{
-			workflowEPR = new Endpoint(FileUtils.readFileToString(wf, "UTF-8").trim());
-			verbose("Read Workflow address from <"+arg+">");
-		}
-		else{
-			//arg is an Address
-			workflowEPR = new Endpoint(arg);
-		}
-		String url = workflowEPR.getUrl();
-		verbose("Checking workflow at "+url);
-		return workflowEPR;
-	}
-
-	protected WorkflowClient createClient(Endpoint ep) throws Exception {
-		return new WorkflowClient(ep, 
-				configurationProvider.getClientConfiguration(ep.getUrl()),
-				configurationProvider.getRESTAuthN());
+		run();
 	}
 	
 	protected void run() throws Exception{
-		Endpoint singleEPR = initEPR();
-		if(singleEPR!=null){
-			WorkflowClient wf = createClient(singleEPR);
-			if(filterMatch(wf)){
-				listOne(wf);
+		if(getCommandLine().getArgs().length>=2) {
+			for(int i=1; i<getCommandLine().getArgs().length; i++) {
+				listOne(getCommandLine().getArgs()[i]);
 			}
-			return;
 		}
-		boolean includeInternal = !getBooleanOption("no-internal", "n");
-		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry, configurationProvider, includeInternal);
-		for(WorkflowFactoryClient wf: workflowFactories){
-			try{
-				verbose("Listing workflows from "+wf.getEndpoint().getUrl());
-				EnumerationClient jobs = wf.getWorkflowList();
-				jobs.setDefaultTags(tags);
-				Iterator<String>urls = jobs.iterator();
-				while(urls.hasNext()) {
-					String url = urls.next();
-					try {
-						WorkflowClient wfc = new WorkflowClient(new Endpoint(url), 
-								configurationProvider.getClientConfiguration(url),
-								configurationProvider.getRESTAuthN());
-						if(filterMatch(wfc)){
-							listOne(wfc);
+		else {
+			// list all
+			boolean includeInternal = !getBooleanOption("no-internal", "n");
+			WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry, configurationProvider, includeInternal);
+			for(WorkflowFactoryClient wf: workflowFactories){
+				try{
+					verbose("Listing workflows from "+wf.getEndpoint().getUrl());
+					EnumerationClient jobs = wf.getWorkflowList();
+					jobs.setDefaultTags(tags);
+					Iterator<String>urls = jobs.iterator();
+					while(urls.hasNext()) {
+						String url = urls.next();
+						try {
+							listOne(url);
+						}catch(Exception e) {
+							error("Error accessing workflow  "+url, e);						
 						}
-					}catch(Exception e) {
-						error("Error accessing workflow  "+url, e);						
 					}
+				}catch(Exception e){
+					error("Error accessing workflows at: "+wf.getEndpoint().getUrl(), e);
 				}
-			}catch(Exception e){
-				error("Error accessing workflows at: "+wf.getEndpoint().getUrl(), e);
 			}
-
 		}
 	}
 
-	protected void listOne(WorkflowClient workflow) throws Exception{
-		message(workflow.getEndpoint().getUrl()+getDetails(workflow));;
-		printProperties(workflow);
+	protected void listOne(String url) throws Exception{
+		WorkflowClient wf = new WorkflowClient(new Endpoint(url), 
+				configurationProvider.getClientConfiguration(url),
+				configurationProvider.getRESTAuthN());
+		if(!filterMatch(wf)){
+			return;
+		}
+		message(url+getDetails(wf));
+		printProperties(wf);
 	}
 
 	@Override
@@ -181,16 +140,12 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 		if("FAILED".equals(status)){
 			details.append(sep).append("  Error(s): tbd");
 		}
-		
 		List<String> tags =  JSONUtil.toList(props.getJSONArray("tags"));
 		details.append(sep).append("  Tags: ").append(tags);
-		
 		listParameters(props, details);
-		
 		if(listFiles){
 			listFiles(workflow, details);
 		}
-		
 		if(listJobs){
 			try{
 				details.append(sep).append("  Jobs: ");
@@ -206,34 +161,21 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 		return details.toString();
 	}
 
-
-	protected void listFiles(WorkflowClient workflow, StringBuilder details){
-		try{
-			details.append(sep).append("  Files: ");
-			BaseServiceClient fileListClient = workflow.getFileList();
-			JSONObject props = fileListClient.getProperties();
-			Iterator<String> iter = props.keys();
-			while(iter.hasNext()){
-				String wf = iter.next();
-				String url = props.getString(wf);
-				details.append(sep).append("    ").append(wf).append(" : ").append(url);
-			}
-		}catch(Exception e){
-			String msg = Log.createFaultMessage("Can't list workflow files!", e);
-			details.append(sep).append("  ** ERROR: ").append(msg);
+	protected void listFiles(WorkflowClient workflow, StringBuilder details) throws Exception {
+		details.append(sep).append("  Files: ");
+		BaseServiceClient fileListClient = workflow.getFileList();
+		JSONObject props = fileListClient.getProperties();
+		Iterator<String> iter = props.keys();
+		while(iter.hasNext()){
+			String wf = iter.next();
+			String url = props.getString(wf);
+			details.append(sep).append("    ").append(wf).append(" : ").append(url);
 		}
 	}
 
-	protected void listParameters(JSONObject props, StringBuilder details){
-		try{
-			for(Map.Entry<String,String>e: JSONUtil.asMap(props.getJSONObject("parameters")).entrySet()){
-				details.append(sep).append("  Parameter: ").append(e.getKey()).append("=").append(e.getValue());
-			}
-		}catch(Exception e){
-			String msg = Log.createFaultMessage("Can't process workflow parameters!", e);
-			details.append(sep).append("  ** ERROR: ").append(msg);
+	protected void listParameters(JSONObject props, StringBuilder details) {
+		for(Map.Entry<String,String>e: JSONUtil.asMap(props.getJSONObject("parameters")).entrySet()){
+			details.append(sep).append("  Parameter: ").append(e.getKey()).append("=").append(e.getValue());
 		}
 	}
-	
-	
 }

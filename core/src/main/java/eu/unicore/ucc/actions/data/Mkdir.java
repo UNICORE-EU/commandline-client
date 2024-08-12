@@ -15,17 +15,11 @@ public class Mkdir extends SMSOperation {
 	protected Location targetDesc;
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		String target = getCommandLine().getArgs()[1];;
 		StorageClient sms = getStorageClient(target);
-		try {
-			sms.mkdir(getPathAtStorage(target));
-		} catch(Exception ex) {
-			error("Can't create a directory.", ex);
-			endProcessing(ERROR);
-		}
-		
+		sms.mkdir(getPathAtStorage(target));
 	}
 	
 	@Override

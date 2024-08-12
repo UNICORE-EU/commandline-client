@@ -12,6 +12,7 @@ import eu.unicore.client.lookup.CoreEndpointLister;
 import eu.unicore.client.lookup.SiteNameFilter;
 import eu.unicore.services.rest.client.BaseClient;
 import eu.unicore.services.rest.security.jwt.JWTUtils;
+import eu.unicore.ucc.UCCException;
 
 /**
  * Call a /rest/token endpoint to issue a JWT token 
@@ -20,17 +21,15 @@ import eu.unicore.services.rest.security.jwt.JWTUtils;
  */
 public class IssueToken extends ActionBase {
 
-	/**
-	 * token lifetime (in seconds)
-	 */
+	// token lifetime (in seconds)
 	private int lifetime;;
 
 	private boolean limited=false;
-	
+
 	private boolean renewable=false;
-	
+
 	private boolean inspect=false;
-	
+
 	private String siteName;
 
 	@Override
@@ -82,20 +81,20 @@ public class IssueToken extends ActionBase {
 		return "Gets a JWT authentication token from a UNICORE token endpoint. " +
 		"Lifetime and other properties can be configured.";
 	}
+
 	@Override
 	public String getDescription(){
 		return "issue an authentication token";
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		siteName = getOption(OPT_SITENAME_LONG, OPT_SITENAME);
 		String url;
 		if(getCommandLine().getArgs().length>1) {
 			if(siteName!=null) {
-				error("Please give only one of --sitename or token endpoint URL!", null);
-				endProcessing(ERROR);
+				throw new UCCException("Please give only one of --sitename or token endpoint URL!");
 			}
 			url = getCommandLine().getArgs()[1];
 		}else {
@@ -110,39 +109,33 @@ public class IssueToken extends ActionBase {
 		limited = getBooleanOption("limited", "L");
 		renewable = getBooleanOption("renewable", "R");
 		inspect = getBooleanOption("inspect", "I");
-		
-		try {
-			URIBuilder b = new URIBuilder(url);
-			if(lifetime>0)b.addParameter("lifetime", String.valueOf(lifetime));
-			if(renewable)b.addParameter("renewable", "true");
-			if(limited)b.addParameter("limited", "true");
-			BaseClient bc = new BaseClient(b.build().toString(),
-					configurationProvider.getClientConfiguration(url),
-					configurationProvider.getRESTAuthN());
-			verbose("Requesting token from "+bc.getURL());
-			try(ClassicHttpResponse res = bc.get(ContentType.TEXT_PLAIN)){
-				String token = EntityUtils.toString(res.getEntity());
-				if(inspect) {
-					showDetails(token);
-				}
-				message(token);
-				lastToken = token;
+
+		URIBuilder b = new URIBuilder(url);
+		if(lifetime>0)b.addParameter("lifetime", String.valueOf(lifetime));
+		if(renewable)b.addParameter("renewable", "true");
+		if(limited)b.addParameter("limited", "true");
+		BaseClient bc = new BaseClient(b.build().toString(),
+				configurationProvider.getClientConfiguration(url),
+				configurationProvider.getRESTAuthN());
+		verbose("Requesting token from "+bc.getURL());
+		try(ClassicHttpResponse res = bc.get(ContentType.TEXT_PLAIN)){
+			String token = EntityUtils.toString(res.getEntity());
+			if(inspect) {
+				showDetails(token);
 			}
-		} catch(Exception e){
-			error("Can't perform issue-token operation", e);
-			endProcessing(ERROR);
+			message(token);
+			lastToken = token;
 		}
 	}
 
-	public String resolveSite() {
+	public String resolveSite() throws Exception {
 		CoreEndpointLister cl = new CoreEndpointLister(registry,
 				configurationProvider,
 				configurationProvider.getRESTAuthN());
 		if(siteName!=null)cl.setAddressFilter(new SiteNameFilter(siteName));
 		CoreClient cc = cl.iterator().next();
 		if(cc==null) {
-			error("No site found! Please --sitename, or give a token endpoint URL.", null);
-			endProcessing(ERROR);
+			throw new UCCException("No site found! Please --sitename, or give a token endpoint URL.");
 		}
 		return cc.getEndpoint().getUrl()+"/token";
 	}
@@ -155,15 +148,12 @@ public class IssueToken extends ActionBase {
 		message("Valid for:    "+o.optString("aud", "<unlimited>"));
 		message("Renewable:    "+o.optString("renewable", "no"));
 	}
-	
+
 	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_UTILITY;
 	}
-	
+
 	static String lastToken;
-	
-	static String getLastToken(){
-		return lastToken;
-	}
+
 }

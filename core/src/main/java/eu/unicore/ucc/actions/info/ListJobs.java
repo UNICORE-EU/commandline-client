@@ -37,7 +37,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		CoreEndpointLister siteLister = new CoreEndpointLister(registry, configurationProvider,
@@ -70,7 +70,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 		}
 	}
 
-	protected void listJob(JobClient job){
+	protected void listJob(JobClient job) throws Exception {
 		properties.put(PROP_LAST_RESOURCE_URL, job.getEndpoint().getUrl());
 		if(detailed) {
 			message(getDetails(job));

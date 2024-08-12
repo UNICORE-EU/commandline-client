@@ -2,6 +2,7 @@ package eu.unicore.ucc.actions;
 
 import org.apache.commons.cli.Option;
 
+import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.lookup.Connector;
 
 /**
@@ -16,7 +17,7 @@ public class Connect extends ActionBase {
 	private int initialLifeTime;
 
 	private static String lastRegistryURL;
-	
+
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -44,24 +45,22 @@ public class Connect extends ActionBase {
 		return "Connects to UNICORE. " +
 		"If not yet done, target system services are initialised.";
 	}
+
 	@Override
 	public String getDescription(){
 		return "connect to UNICORE";
 	}
 
 	@Override
-	public void process() {
+	public void process() throws Exception {
 		super.process();
-
 		lastRegistryURL=registryURL;
-		
 		initialLifeTime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(initialLifeTime>0){
 			verbose("New TSSs will have a lifetime of <"+initialLifeTime+"> days.");
 		}else{
 			verbose("Using site default for TSS lifetime.");
 		}
-
 		Connector c = new Connector(registry, configurationProvider);
 		c.setBlacklist(blacklist);
 		c.run();
@@ -70,7 +69,9 @@ public class Connect extends ActionBase {
 		int tssAvailable=c.getAvailableTSS();
 		message("You can access "+tssAvailable+" target system(s).");
 		//it should be considered an error if no sites are available
-		if(tssAvailable==0)endProcessing(ERROR);
+		if(tssAvailable==0) {
+			throw new UCCException("No sites available!");
+		}
 	}
 
 	@Override

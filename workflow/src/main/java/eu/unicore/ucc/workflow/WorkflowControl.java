@@ -53,33 +53,22 @@ public class WorkflowControl extends ActionBase {
 	}
 
 	@Override
-	public void process(){
+	public void process() throws Exception {
 		super.process();
-		try{
-			run();
-		}catch(Exception e){
-			error("",e);
-			endProcessing(1);
-		}
+		run();
 	}
 
 	//read the workflow address and the command to perform
-	protected void getBasicCmdlineParams()throws Exception{
+	protected void getBasicCmdlineParams()throws Exception {
 		cmd=getCommandLine().getArgs()[1];
 		String arg=null;
-		if(getCommandLine().getArgs().length>2)arg=getCommandLine().getArgs()[2];
-		
-		if(arg==null){
-			try{
-				arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
-			}catch(Exception e){
-				error("Can't read workflow address from stdin.",e);
-				endProcessing(1);
-			}
+		if(getCommandLine().getArgs().length>2) {
+			arg=getCommandLine().getArgs()[2];
 		}
-		
+		if(arg==null){
+			arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
+		}
 		workflowURL = arg;
-		
 		verbose("Checking workflow at "+workflowURL);
 		workflow=new WorkflowClient(new Endpoint(workflowURL),
 				configurationProvider.getClientConfiguration(workflowURL), 
