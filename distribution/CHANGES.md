@@ -7,8 +7,7 @@ Report any issues via the
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
 
-Version 10.1.0 (released Aug dd, 2024)
---------------------------------------
+Version 10.1.0 (released Aug 121212121212121212121212------------------------
  - new feature: allow to read auth token from file; allow to set
    token-type to something else than "Bearer"
  - 'rest': add '-i' option for printing the response headers
