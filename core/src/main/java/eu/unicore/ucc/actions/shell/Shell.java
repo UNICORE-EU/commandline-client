@@ -20,6 +20,7 @@ import org.jline.reader.impl.history.DefaultHistory;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.Command;
+import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.UCCOptions;
@@ -198,8 +199,13 @@ public class Shell extends ActionBase {
 					cmd.setProperties(properties);
 					cmd.setPropertiesFile(propertiesFile);
 					UCC.getConsoleLogger().setPrefix("[ucc "+cmd.getName()+"]");
-					cmd.process();
-					cmd.postProcess();
+					if(cmd.getCommandLine().hasOption(Constants.OPT_HELP)){
+						cmd.printUsage();
+					}
+					else {
+						cmd.process();
+						cmd.postProcess();
+					}
 				}
 				catch(ParseException pex){
 					error("Error parsing commandline arguments.",pex);
