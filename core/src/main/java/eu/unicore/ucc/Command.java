@@ -52,10 +52,15 @@ public abstract class Command implements Constants {
 		createOptions();
 	}
 
-	public void init(String [] args) throws Exception {
+	/**
+	 * handles --help, parses commandline args, loads properties file
+	 * returns <code>false</code> if command processing should not continue
+	 */
+	public boolean init(String [] args) throws Exception {
 		if(handleHelp(args)){
 			printUsage();
 			if(quitAfterPrintingUsage)System.exit(0);
+			return false;
 		}
 		CommandLineParser parser = new DefaultParser();
 		line = parser.parse( getOptions(), args );
@@ -63,6 +68,7 @@ public abstract class Command implements Constants {
 			UCC.getConsoleLogger().setVerbose(true);
 		}
 		loadUserProperties();
+		return true;
 	}
 
 	protected void setOutputLocation() throws Exception {

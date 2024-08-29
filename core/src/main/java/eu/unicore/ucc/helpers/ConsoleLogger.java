@@ -3,6 +3,7 @@ package eu.unicore.ucc.helpers;
 import org.apache.logging.log4j.Logger;
 
 import eu.unicore.ucc.UCCOptions;
+import eu.unicore.uftp.dpc.Utils;
 import eu.unicore.util.Log;
 
 public class ConsoleLogger {
@@ -11,7 +12,7 @@ public class ConsoleLogger {
 	
 	private boolean verbose;
 
-	private boolean debug = UCCOptions.isTrue(System.getenv("UCC_DEBUG"));
+	private boolean debug = UCCOptions.isTrue(Utils.getProperty("UCC_DEBUG", null));
 	
 	private String prefix = "[ucc]";
 

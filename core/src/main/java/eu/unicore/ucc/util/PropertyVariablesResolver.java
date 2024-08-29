@@ -29,7 +29,7 @@ public class PropertyVariablesResolver
 	{
 		final String UCC_CONFIG = "UCC_CONFIG";
 		Pattern pattern = Pattern.compile("\\$\\{[^}]*\\}");
-		Map<String, String> replacements = new HashMap<String, String>(System.getenv());
+		Map<String, String> replacements = new HashMap<>(System.getenv());
 		if (propertiesFile != null && propertiesFile.exists() && propertiesFile.isFile()
 				 && propertiesFile.getParentFile()!=null)
 			replacements.put(UCC_CONFIG, propertiesFile.getParentFile().getAbsolutePath());

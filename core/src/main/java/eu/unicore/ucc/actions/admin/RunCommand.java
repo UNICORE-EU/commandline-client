@@ -56,6 +56,9 @@ public class RunCommand extends ActionBase {
 		for(int i=2; i<length; i++){
 			String p=getCommandLine().getArgs()[i];
 			String[]split=p.split("=", 2);
+			if(split.length<2) {
+				throw new IllegalArgumentException("'"+p+"': format must be key=value");
+			}
 			String key=split[0];
 			String value=split[1];
 			verbose("Have parameter: "+key+"="+value);

@@ -14,10 +14,6 @@ import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.lookup.Connector;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
-/**
- * Functional tests for the UCC actions. 
- * These run against an embedded UNICORE instance.
- */
 public class TestGeneralActions extends EmbeddedTestBase {
 
 	@Test

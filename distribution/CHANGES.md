@@ -9,6 +9,7 @@ Report any issues via the
 
 Version 10.1.1 (released MMM dd, 2024)
 --------------------------------------
+ - new feature: add authentication via ssh-style keys
  - fix: 'shell': correctly handle command help ('-h')
 
 Version 10.1.0 (released Aug 12, 2024)

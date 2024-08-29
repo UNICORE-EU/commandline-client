@@ -17,8 +17,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.cli.ParseException;
-
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.helpers.JLineLogger;
@@ -195,16 +193,9 @@ public class UCC{
 			}
 			return null;
 		}
-		Command cmd=getCommand(command);
-		if(cmd!=null){
-			try{
-				cmd.init(args);
-			} catch (ParseException pe) {
-				cmd.printUsage();
-				throw pe;
-			}
-		}
-		return cmd;
+		Command cmd = getCommand(command);
+		boolean ok = cmd.init(args);
+		return ok? cmd : null;
 	}
 
 
@@ -312,15 +303,12 @@ public class UCC{
 				printVersion();
 			}else{
 				cmd = initCommand(args, !unitTesting);
-				msg.setPrefix("[ucc "+cmd.getName()+"]");
-				if(cmd.getCommandLine().hasOption(Constants.OPT_HELP)){
-					cmd.printUsage();
-				}
-				else {
+				if(cmd!=null){
+					msg.setPrefix("[ucc "+cmd.getName()+"]");
 					cmd.process();
 					cmd.postProcess();
+					lastCommand = cmd;
 				}
-				lastCommand = cmd;
 			}
 			exitCode=0;
 		} catch (Exception e) {

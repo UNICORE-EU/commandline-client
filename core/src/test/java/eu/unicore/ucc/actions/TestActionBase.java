@@ -23,14 +23,13 @@ public class TestActionBase {
 		p.put(ClientProperties.DEFAULT_PREFIX + ClientProperties.PROP_MESSAGE_SIGNING_ENABLED, "false");
 		return p;
 	}
-	
 
 	@Test
 	public void testTimeoutParameters()throws Exception{
 		Properties p=new Properties();
-		InputStream is=new FileInputStream("src/test/resources/conf/userprefs.embedded");
-		p.load(is);
-		is.close();
+		try(InputStream is = new FileInputStream("src/test/resources/conf/userprefs.embedded")){
+			p.load(is);
+		}
 		ActionBase cmd=(ActionBase)UCC.initCommand(new String[]{"connect","-r","http://localhost:65322/services/WRONG_SERVICE", 
 				"-c", "src/test/resources/conf/userprefs.embedded"},false);
 		cmd.setProperties(p);
@@ -87,7 +86,9 @@ public class TestActionBase {
 	
 	private void verifyCommandPref(ActionBase cmd, String propertiesLoc) throws Exception {
 		Properties props = new Properties();
-		props.load(new FileInputStream(propertiesLoc));
+		try(InputStream is = new FileInputStream(propertiesLoc)){
+			props.load(is);
+		}
 		cmd.setProperties(props);
 		cmd.initConfigurationProvider();
 		Map<String, String[]> pref = cmd.getConfigurationProvider().getSecurityPreferences();

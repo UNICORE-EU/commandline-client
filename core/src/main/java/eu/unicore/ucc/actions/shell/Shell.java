@@ -196,13 +196,10 @@ public class Shell extends ActionBase {
 					if(acceptAllIssuers) {
 						properties.put(OPT_AUTHN_ACCEPT_ALL_LONG, "true");
 					}
-					cmd.setProperties(properties);
-					cmd.setPropertiesFile(propertiesFile);
-					UCC.getConsoleLogger().setPrefix("[ucc "+cmd.getName()+"]");
-					if(cmd.getCommandLine().hasOption(Constants.OPT_HELP)){
-						cmd.printUsage();
-					}
-					else {
+					if(cmd!=null){
+						cmd.setProperties(properties);
+						cmd.setPropertiesFile(propertiesFile);
+						UCC.getConsoleLogger().setPrefix("[ucc "+cmd.getName()+"]");
 						cmd.process();
 						cmd.postProcess();
 					}

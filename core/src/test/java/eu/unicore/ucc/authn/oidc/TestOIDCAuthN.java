@@ -12,9 +12,19 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
 public class TestOIDCAuthN extends EmbeddedTestBase {
+
+	@Test
+	public void testLoadAuthN() throws Exception {
+		assertTrue(UCC.getAuthNMethod(new OIDCServerAuthN().getName())!=null);
+		assertTrue(UCC.getAuthNMethod(new OIDCServerAuthN().getName()) instanceof OIDCServerAuthN);
+
+		assertTrue(UCC.getAuthNMethod(new OIDCAgentAuthN().getName())!=null);
+		assertTrue(UCC.getAuthNMethod(new OIDCAgentAuthN().getName()) instanceof OIDCAgentAuthN);
+	}
 
 	@Test
 	public void testOIDCServerAuthN() throws Exception {
