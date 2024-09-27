@@ -20,12 +20,10 @@ import org.jline.reader.impl.history.DefaultHistory;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.Command;
-import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.UCCOptions;
 import eu.unicore.ucc.actions.ActionBase;
-import eu.unicore.ucc.authn.KeystoreAuthN;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
 
 /**
@@ -140,6 +138,13 @@ public class Shell extends ActionBase {
 					message("Goodbye.");
 					return;
 				}
+				if(s.startsWith("help-auth")){
+					String[] sub = s.split(" +");
+					String method = null;
+					if(sub.length>1)method = sub[1];
+					UCC.printAuthNUsage(method);
+					continue;
+				}
 				if(s.startsWith("help")){
 					String[] sub = s.split(" +");
 					String method = null;
@@ -161,14 +166,6 @@ public class Shell extends ActionBase {
 					printShellHelp();
 					continue;
 				}
-				if(s.startsWith("help-auth")){
-					String[] sub = s.split(" +");
-					String method = null;
-					if(sub.length>1)method = sub[1];
-					UCC.printAuthNUsage(method);
-					continue;
-				}
-
 				//else it is a command
 				String[] args = parseCmdlineWithVars(s);
 				if(UCC.getConsoleLogger().isVerbose()) {
@@ -190,8 +187,7 @@ public class Shell extends ActionBase {
 					Command cmd = UCC.initCommand(args,false);
 					//inherit properties
 					if(UCC.getConsoleLogger().isVerbose())properties.put(OPT_VERBOSE_LONG,"true");
-					String authNMethod = getOption(OPT_AUTHN_METHOD_LONG, OPT_AUTHN_METHOD, 
-							KeystoreAuthN.X509);
+					String authNMethod = getOption(OPT_AUTHN_METHOD_LONG, OPT_AUTHN_METHOD);
 					properties.put(OPT_AUTHN_METHOD_LONG, authNMethod);
 					if(acceptAllIssuers) {
 						properties.put(OPT_AUTHN_ACCEPT_ALL_LONG, "true");

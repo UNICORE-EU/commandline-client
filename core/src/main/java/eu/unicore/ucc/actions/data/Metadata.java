@@ -283,9 +283,16 @@ public class Metadata extends ActionBase {
 		return CMD_GRP_DATA;
 	}
 	
-	public static final Collection<String>getCommands(){
-		return Arrays.asList("write", "read", "update", "delete", "start-extract", "search");
+	@Override
+	public Collection<String> getAllowedOptionValues(String option) {
+		if(OPT_COMMAND.equals(option)) {
+			return commands;
+		}
+		return null;
 	}
+
+	private static final Collection<String> commands = Arrays.asList(
+		"write", "read", "update", "delete", "start-extract", "search");
 
 	private String getArgument(final int argN) {
 		try {

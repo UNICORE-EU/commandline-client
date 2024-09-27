@@ -6,7 +6,7 @@ _ucc()
   cur=`_get_cword`
   prev="${COMP_WORDS[COMP_CWORD-1]}"
   commands="admin-info admin-runcommand allocate batch cat connect copy-file-status cp create-storage create-tss exec get-output issue-token job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir open-tunnel rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
-  global_opts="--accept --accept-all-issuers --accept-all-issuers --authentication-method --authentication-method --configuration --configuration --content-type --help --help --include --include --output --output --preference --preference --registry --registry --verbose --verbose --with-timing --with-timing"
+  global_opts="--accept-all-issuers --authentication-method --configuration --help --include --output --preference --registry --verbose --with-timing"
 
 
   # parsing for ucc command word (2nd word in commandline.
@@ -64,7 +64,7 @@ _ucc()
     opts="$global_opts "
     ;;
     job-status)
-    opts="$global_opts --all --long"
+    opts="$global_opts --all --long --timeout --wait-for"
     ;;
     list-jobs)
     opts="$global_opts --fields --filter --long --raw --sitename --tags"

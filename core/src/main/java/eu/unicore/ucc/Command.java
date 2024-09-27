@@ -3,6 +3,7 @@ package eu.unicore.ucc;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
@@ -153,6 +154,15 @@ public abstract class Command implements Constants {
 					.build()
 					,UCCOptions.GRP_GENERAL);
 		}
+	}
+
+	/**
+	 * for use by the completor: returns possible values for
+	 * the given option
+	 * @param option - short option
+	 */
+	public Collection<String> getAllowedOptionValues(String option) {
+		return null;
 	}
 
 	/**

@@ -10,14 +10,17 @@ Report any issues via the
 Version 10.1.1 (released MMM dd, 2024)
 --------------------------------------
  - new feature: add authentication via ssh-style keys
+ - new feature: 'job-status' can now be used to wait for a specific job status (e.g. 'RUNNING')
  - fix: 'shell': correctly handle command help ('-h')
+ - improvement: system-info shows the user's available groups for core endpoints
+ - fix: open-tunnel failed when endpoint (gateway address) does not have explicit port
 
 Version 10.1.0 (released Aug 12, 2024)
 --------------------------------------
  - new feature: allow to read auth token from file; allow to set
    token-type to something else than "Bearer"
  - 'rest': add '-i' option for printing the response headers
- - 'run': print job status message in case of job failureA
+ - 'run': print job status message in case of job failure
  - 'run': new option "-J", "--multi-threaded", for running multiple jobs
    in parallel
  - improvment: oidc-agent authentication: add refreshInterval config parameter

@@ -80,10 +80,7 @@ public class UCC{
 		}catch(Exception ex){
 			msg.error("Could not load commands!", ex);
 		}
-
 		loadAuthNMethods();
-
-
 		numberFormat.setMaximumFractionDigits(2);
 	}
 
@@ -144,7 +141,11 @@ public class UCC{
 		System.out.println("UCC " + version);
 		System.out.println("Select the authentication method using the '-k', '--authenticationMethod' option.");
 		System.out.println("The following authentication methods are available:");
-		for (AuthenticationProvider entry : authNMethods.values()) {
+		List<AuthenticationProvider>methods = new ArrayList<>(authNMethods.values());
+		Collections.sort(methods, (a,b)->{
+			return a.getName().compareTo(b.getName());
+		});
+		for (AuthenticationProvider entry: methods) {
 			System.out.println();
 			System.out.printf(" %-20s - %s", entry.getName(), entry.getDescription());
 			System.out.println();
@@ -234,9 +235,8 @@ public class UCC{
 	 * @param brokerName - broker to use. If <code>null</code>, the best broker will be used
 	 */
 	public static Broker getBroker(String brokerName){
-		Broker broker=null;
-		ServiceLoader<Broker>loader=ServiceLoader.load(Broker.class);
-		Iterator<Broker>iter=loader.iterator();
+		Broker broker = null;
+		Iterator<Broker>iter = ServiceLoader.load(Broker.class).iterator();
 		while(iter.hasNext()){
 			try{
 				Broker b=iter.next();
@@ -254,21 +254,18 @@ public class UCC{
 				msg.error("Could not load broker implementation", ex);
 			}
 		}
-		if(broker!=null){
+		if(broker!=null && "LOCAL"!=broker.getName()){
 			msg.verbose("Using broker "+broker.getName());
 		}	
-
 		if(broker == null){
 			throw new IllegalArgumentException("Broker '"+brokerName+"' cannot be found");
 		}
-		
 		return broker;
 	}
 	
 	public static String getBrokerList() {
 		StringBuilder sb = new StringBuilder();
-		ServiceLoader<Broker>loader=ServiceLoader.load(Broker.class);
-		Iterator<Broker>iter=loader.iterator();
+		Iterator<Broker>iter = ServiceLoader.load(Broker.class).iterator();
 		while(iter.hasNext()) {
 			if(sb.length()>0)sb.append(", ");
 			sb.append(iter.next().getName());

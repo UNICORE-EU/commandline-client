@@ -31,7 +31,7 @@ import eu.unicore.ucc.actions.job.Batch;
 import eu.unicore.ucc.actions.job.CreateTSS;
 import eu.unicore.ucc.actions.job.Exec;
 import eu.unicore.ucc.actions.job.GetOutcome;
-import eu.unicore.ucc.actions.job.GetStatus;
+import eu.unicore.ucc.actions.job.JobStatus;
 import eu.unicore.ucc.actions.job.JobRestart;
 import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.actions.shell.Shell;
@@ -48,7 +48,7 @@ public class CoreCommands implements ProvidedCommands {
 				// job execution
 				new CreateTSS(),
 				new Run(),
-				new GetStatus(),
+				new JobStatus(),
 				new GetOutcome(),
 				new Batch(),
 				new AbortJob(),

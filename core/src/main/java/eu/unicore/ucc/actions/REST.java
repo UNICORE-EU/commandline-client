@@ -12,12 +12,14 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.StatusLine;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.services.rest.client.BaseClient;
 import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.httpclient.IClientConfiguration;
@@ -221,6 +223,11 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			f.format("  * authenticated as: '%s' role='%s' uid='%s'%s",
 					client.getString("dn"), role, uid, cr);
 		}
+		try(Formatter f = new Formatter(sb)){
+			JSONArray groups = client.getJSONObject("xlogin").getJSONArray("availableGroups");
+			f.format("  * available groups: %s", JSONUtil.toList(groups));
+		}
+		
 	}
 
 	private void serverDetails(StringBuilder sb, JSONObject server) throws JSONException {

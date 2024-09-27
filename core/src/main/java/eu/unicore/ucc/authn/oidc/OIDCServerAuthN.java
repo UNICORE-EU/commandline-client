@@ -58,7 +58,7 @@ public class OIDCServerAuthN extends TokenBasedAuthN {
 	@Override
 	public String getDescription()
 	{
-		return "Authenticate with an OIDC token. The token is retrieved from an OIDC server. ";
+		return "Authenticate with an OIDC token retrieved from an OIDC server. ";
 	}
 
 	@Override

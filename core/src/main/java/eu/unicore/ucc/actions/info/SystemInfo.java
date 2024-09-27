@@ -46,15 +46,14 @@ public class SystemInfo extends ActionBase {
 						+ "the given regexp (e.g. \".*/storage.*\"")
 				.required(false)
 				.hasArg()
-				.build());	
+				.build());
 	}
-	
+
 	@Override
 	public String getName() {
 		return "system-info";
 	}
-	
-	
+
 	@Override
 	public String getDescription() {
 		return "check the availability of services";

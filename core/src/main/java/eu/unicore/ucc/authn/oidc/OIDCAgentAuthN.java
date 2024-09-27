@@ -39,8 +39,8 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 	@Override
 	public String getDescription()
 	{
-		return "Authenticate with an OIDC token. "
-				+ "The token is retrieved from the 'oidc-agent' utility. "
+		return "Authenticate with an OIDC token "
+				+ "retrieved from the 'oidc-agent' utility. "
 				+ "See https://github.com/indigo-dc/oidc-agent";
 	}
 

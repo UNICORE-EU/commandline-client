@@ -16,7 +16,6 @@ import org.jline.reader.impl.completer.StringsCompleter;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.actions.data.Metadata;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 
 /**
@@ -105,24 +104,21 @@ public class UCCCompleter implements Completer, Constants {
 		} catch(Exception e) {}
 		return false;
 	}
-	
+
 	protected boolean completeOptionArgs(Command command, Option opt, 
 			LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
 		if(OPT_SITENAME_LONG.equals(opt.getLongOpt())){
 			new StringsCompleter(siteNames).complete(reader, line, candidates);
 			return true;
 		}
-		if("metadata".equals(command.getName()) 
-				&& Metadata.OPT_COMMAND_LONG.equals(opt.getLongOpt()))
-		{
-			new StringsCompleter(Metadata.getCommands()).complete(reader, line, candidates);
+		Collection<String> values = command.getAllowedOptionValues(opt.getOpt());
+		if(values!=null && values.size()>0) {
+			new StringsCompleter(values).complete(reader, line, candidates);
 			return true;
 		}
 		return false;
 	}
-	
 
-	
 	static final Set<String> siteNames = new HashSet<>();
 
 	public static void registerSiteName(String siteName) {

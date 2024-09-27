@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.job.Allocate;
 import eu.unicore.ucc.actions.job.CreateTSS;
-import eu.unicore.ucc.actions.job.GetStatus;
+import eu.unicore.ucc.actions.job.JobStatus;
 import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
@@ -123,7 +123,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		
 		int c=0;
 		do{
-
 			args=new String[]{"job-status",
 					"-c", "src/test/resources/conf/userprefs.embedded",
 					"--all",
@@ -136,7 +135,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 				Thread.sleep(2000);
 			}catch(InterruptedException i){};
 
-		}while(c<5 && !GetStatus.allSuccessful);
+		}while(c<5 && !JobStatus.allSuccessful);
 
 
 		args=new String[]{"get-output", "-v",
@@ -182,7 +181,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 				Thread.sleep(2000);
 			}catch(InterruptedException i){};
 
-		}while(c<5 && !GetStatus.allSuccessful);
+		}while(c<5 && !JobStatus.allSuccessful);
 
 
 		args=new String[]{"get-output", "-v",

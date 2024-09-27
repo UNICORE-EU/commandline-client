@@ -1,19 +1,25 @@
 package eu.unicore.ucc.actions.job;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.cli.Option;
 
 import eu.unicore.client.core.JobClient;
 import eu.unicore.client.core.JobClient.Status;
+import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Log;
 import eu.unicore.util.Pair;
 
-public class GetStatus extends JobOperationBase {
+public class JobStatus extends JobOperationBase {
 
 	boolean detailed = false;
 	boolean full = false;
+	Status waitFor = null;
+	int timeout = -1;
 
 	@Override
 	public String getName(){
@@ -31,6 +37,9 @@ public class GetStatus extends JobOperationBase {
 		return "get job status";
 	}
 
+	private static final Collection<String> allowedStatuses = Arrays.asList(
+			"STAGINGIN", "QUEUED", "RUNNING", "STAGINGOUT", "SUCCESSFUL");
+
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -44,21 +53,71 @@ public class GetStatus extends JobOperationBase {
 				.desc("Full job status including log")
 				.required(false)
 				.build());
+		getOptions().addOption(Option.builder(OPT_WAIT)
+				.longOpt(OPT_WAIT_LONG)
+				.desc("Wait for the given job status ("+allowedStatuses+")")
+				.hasArg(true)
+				.required(false)
+				.build());
+		getOptions().addOption(Option.builder(OPT_TIMEOUT)
+				.longOpt(OPT_TIMEOUT_LONG)
+				.desc("Timeout for job status polling")
+				.hasArg(true)
+				.required(false)
+				.build());
+	}
+	
+	@Override
+	public Collection<String> getAllowedOptionValues(String option) {
+		if(OPT_WAIT.equals(option)) {
+			return allowedStatuses;
+		}
+		return null;
 	}
 
 	@Override
 	protected void processAdditionalOptions(){
-		full=getBooleanOption(OPT_ALL_LONG, OPT_ALL_LONG);
+		full = getBooleanOption(OPT_ALL_LONG, OPT_ALL);
 		verbose("Showing full job details = "+full);
-		detailed=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED) || full;
+		detailed = getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED) || full;
 		verbose("Showing detailed job status = "+detailed);
-		
+		String waitForSpec = getOption(OPT_WAIT_LONG, OPT_WAIT);
+		if(waitForSpec!=null) {
+			try{
+				waitFor = Status.valueOf(waitForSpec);
+				if(waitFor==Status.FAILED || waitFor==Status.UNDEFINED) {
+					throw new Exception();
+				}
+			}catch(Exception ex) {
+				throw new IllegalArgumentException("'--wait-for' accepts one of: "+Arrays.asList(allowedStatuses));
+			}
+			String timeoutSpec = getCommandLine().getOptionValue(OPT_TIMEOUT);
+			if(timeoutSpec!=null) {
+				timeout = (int)UnitParser.getTimeParser(0).getDoubleValue(timeoutSpec);
+				verbose("Status polling (--wait-for) timeout = "+timeout+" sec.");
+			}
+		}
 	}
 
 	@Override
 	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
 		allSuccessful = true;
-		jobs.forEach( x -> getStatus(x.getM1()));
+		jobs.forEach( x -> {
+			JobClient j = x.getM1();
+			if(waitFor!=null) {
+				try{
+					j.poll(waitFor, timeout);
+					getStatus(j);
+				}catch(TimeoutException te) {
+					verbose("Timeout polling "+j.getEndpoint().getUrl());
+				}catch(Exception ex) {
+					verbose(Log.createFaultMessage("Error polling "+j.getEndpoint().getUrl(), ex));
+				}
+			}
+			else {
+				getStatus(j);
+			}
+		});
 	}
 
 	protected void getStatus(JobClient job) {
@@ -95,24 +154,23 @@ public class GetStatus extends JobOperationBase {
 	 * the overall status and exit code.
 	 */
 	protected String getDetails(JobClient job){
-		StringBuilder sb=new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		String lineBreak = System.getProperty("line.separator");
-		if(detailed){
-			try	{
-				Status status=job.getStatus();
-				sb.append(" Status: ").append(status).append(" ").append(job.getStatusMessage());
-				sb.append(lineBreak);
-				sb.append(" Queue: ").append(job.getQueue());
-				
-				if(full){
-					List<String> log = job.getLog();
-					for(String line: log){
-						sb.append(lineBreak).append(" Log: ").append(line);
-					}
-				}
-			}catch(Exception ex){
-				sb.append(Log.createFaultMessage("ERROR getting job details",ex));
+		try	{
+			sb.append(" Working directory: ").append(job.getWorkingDirectory().getEndpoint().getUrl());
+			sb.append(lineBreak);
+			String t = job.getProperties().optString("jobType","N/A");
+			sb.append(" Job type: ").append(t);
+			if(!"ON_LOGIN_NODE".equals(t)) {
+				sb.append(", queue: '").append(job.getQueue()).append("'");
 			}
+			if(full){
+				for(String line: job.getLog()){
+					sb.append(lineBreak).append(" Log: ").append(line);
+				}
+			}
+		}catch(Exception ex){
+			sb.append(Log.createFaultMessage("ERROR getting job details",ex));
 		}
 		return sb.toString();
 	}

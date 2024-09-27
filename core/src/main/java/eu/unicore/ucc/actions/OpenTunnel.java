@@ -66,7 +66,7 @@ public class OpenTunnel extends ActionBase {
 
 	@Override
 	public String getDescription(){
-		return "Open a port forwarding session";
+		return "open a port forwarding session";
 	}
 
 	protected boolean requireRegistry(){
@@ -100,7 +100,7 @@ public class OpenTunnel extends ActionBase {
 	protected void doProcess() throws Exception {
 		BaseClient bc = makeClient(endpoint);
 		ForwardingHelper fh = new ForwardingHelper(bc);
-		verbose("Opening listening socket on <"+localInterface+":"+localPort+">");
+		verbose("Opening listening socket on <"+localInterface+":"+localPort+">, waiting for local client connection...");
 		try(ServerSocketChannel sc = ServerSocketChannel.open()){
 			sc.configureBlocking(false);
 			sc.bind(new InetSocketAddress(localInterface, localPort), 1);

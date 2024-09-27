@@ -47,9 +47,9 @@ public abstract class JobOperationBase extends ActionBase {
 	 * @param arg - denoting either a file, or a URL
 	 */
 	protected UCCBuilder createBuilder(String arg) throws Exception {
-		UCCBuilder builder=null;
 		try{
-			File job=new File(arg);
+			UCCBuilder builder = null;
+			File job = new File(arg);
 			if(job.exists())
 			{
 				builder=new UCCBuilder(job, registry, configurationProvider);
@@ -62,21 +62,20 @@ public abstract class JobOperationBase extends ActionBase {
 				builder.setCheckLocalFiles(false);
 				builder.setProperty("epr", arg);
 			}
+			return builder;
 		}catch(Exception e){
 			throw new UCCException("Can't use <"+arg+">.", e);
 		}
-		return builder;
 	}
 
 	@Override
 	public void process() throws Exception {
 		super.process();
 		processAdditionalOptions();
-		
 		List<String> args = new ArrayList<>();
-
 		if(getCommandLine().getArgs().length==1){
 			try{
+				verbose("Enter job URL:");
 				String arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
 				args.add(arg);
 			}catch(Exception e){
