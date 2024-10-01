@@ -1,0 +1,10 @@
+{
+ "Executable": "/bin/hostname",
+ "Site": "SOME_HOST"
+ "Project": "myproject",
+ "Resources": {
+    "Queue" : "bath",
+    "Runtime": "1m",
+    "Nodes": "1"
+  }
+}
