@@ -1,9 +1,9 @@
 {
- "Executable": "/bin/hostname",
- "Site": "SOME_HOST"
+ "Executable": "srun --ntasks=4 date",
+ "Site": "DEMO-SITE",
  "Project": "myproject",
  "Resources": {
-    "Queue" : "bath",
+    "Queue" : "batch",
     "Runtime": "1m",
     "Nodes": "1"
   }
