@@ -7,13 +7,14 @@ Report any issues via the
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
 
-Version 10.1.1 (released MMM dd, 2024)
---------------------------------------
- - new feature: add authentication via ssh-style keys
+Version 10.1.1 (released Oct 2, 2024)
+-------------------------------------
  - new feature: 'job-status' can now be used to wait for a specific job status (e.g. 'RUNNING')
+ - new feature: add authentication via ssh-style keys as in uftp client
  - fix: 'shell': correctly handle command help ('-h')
- - improvement: system-info shows the user's available groups for core endpoints
- - fix: open-tunnel failed when endpoint (gateway address) does not have explicit port
+ - improvement: 'system-info' shows the user's available groups for core endpoints
+ - fix: 'open-tunnel' failed when endpoint (gateway address) does not have explicit port
+ - fix: timeouts in 'create-tss' were unrealistically short - increased to 10s
 
 Version 10.1.0 (released Aug 12, 2024)
 --------------------------------------

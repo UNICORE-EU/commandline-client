@@ -107,7 +107,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 			verbose("Using site default for TSS lifetime.");
 		}
 		factoryURL = getOption(OPT_FACTORY_LONG, OPT_FACTORY);
-		SiteFactoryClient tsf=null;
+		SiteFactoryClient tsf;
 		if(factoryURL==null){
 			SiteFactoryLister tsfl = new SiteFactoryLister(UCC.executor, registry, configurationProvider);
 			siteName = getOption(OPT_SITENAME_LONG, OPT_SITENAME);
@@ -126,7 +126,6 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 					configurationProvider.getClientConfiguration(factoryURL), 
 					configurationProvider.getRESTAuthN());
 		}
-
 		if(tsf==null){
 			throw new UCCException("No suitable target system factory available!",null);
 		}
@@ -134,7 +133,6 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 			factoryURL = tsf.getEndpoint().getUrl();
 			verbose("Using factory at <"+factoryURL+">");
 		}
-
 		SiteClient tss = tsf.createSite(getCreationParameters(), getTermTime());
 		String addr = tss.getEndpoint().getUrl();
 		message(addr);

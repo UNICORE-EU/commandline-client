@@ -105,7 +105,7 @@ public class MultiRegistryClient implements IRegistryClient {
 	private Boolean compute(Callable<Boolean>task, int timeout){
 		try{
 			Future<Boolean>f = Resources.getExecutorService().submit(task);
-			return f.get(timeout, TimeUnit.MILLISECONDS);
+			return f.get(timeout, TimeUnit.SECONDS);
 		}catch(Exception ex){
 			return Boolean.FALSE;
 		}
@@ -113,17 +113,17 @@ public class MultiRegistryClient implements IRegistryClient {
 
 	/**
 	 * check the connection to the services. If the service does
-	 * not reply within a fixed 2 second timeout, returns <code>false</code>
+	 * not reply within a fixed 10 second timeout, returns <code>false</code>
 	 */
 	public boolean checkConnection(){
-		return checkConnection(2000);
+		return checkConnection(10);
 	}
 
 	/**
 	 * check the connection to the services. If no service 
 	 * replies within the given timeout, returns <code>false</code>
 	 * 
-	 * @param timeout - connection timeout in milliseconds
+	 * @param timeout - connection timeout in seconds
 	 */
 	public boolean checkConnection(int timeout){
 		final StringBuffer status=new StringBuffer();
@@ -134,8 +134,7 @@ public class MultiRegistryClient implements IRegistryClient {
 					return Boolean.valueOf(c.checkConnection());
 				}
 			};
-
-			Boolean res=compute(task, timeout);
+			Boolean res = compute(task, timeout);
 			boolean currentOK=res!=null?res.booleanValue():false;
 			if(!currentOK){
 				status.append("[NOT AVAILABLE: ").append(getAddress(c));

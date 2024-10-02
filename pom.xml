@@ -7,7 +7,7 @@
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
   <url>https://www.unicore.eu</url>
-  <version>2.7.1-SNAPSHOT</version>
+  <version>2.7.1</version>
   <name>UNICORE Commandline Client (UCC)</name>
 
   <parent>
@@ -20,15 +20,16 @@
     <!-- goes into .jar manifests -->
     <specification.version>10.1.1</specification.version>
 
-     <uas.version>2.7.0</uas.version>
-     <wf.version>3.7.0</wf.version>
-     <secutils.version>4.1.1</secutils.version>
+     <uas.version>2.7.1</uas.version>
+     <wf.version>3.7.1</wf.version>
+     <secutils.version>4.1.2</secutils.version>
      <bc.version>1.78.1</bc.version>
      <jnr.version>0.38.22</jnr.version>
      <groovy.version>4.0.13</groovy.version>
-     <guava.version>33.3.0-jre</guava.version>
-     <jline.version>3.26.3</jline.version>
+     <guava.version>33.3.1-jre</guava.version>
+     <jline.version>3.27.0</jline.version>
      <commons-cli.version>1.9.0</commons-cli.version>
+     <junit.version>5.11.1</junit.version>
      <compiler.fork>true</compiler.fork>
   </properties>
   
@@ -36,7 +37,7 @@
     <connection>scm:git:https://www.github.com/UNICORE-EU/commandline-client</connection>
     <developerConnection>scm:git:https://www.github.com/UNICORE-EU/commandline-client</developerConnection>
     <url>https://github.com/UNICORE-EU/commandline-client</url>
-    <tag>HEAD</tag>
+    <tag>10.1.1</tag>
   </scm>
 
   <issueManagement>
@@ -139,7 +140,7 @@
       <dependency>
 	<groupId>org.junit.jupiter</groupId>
 	<artifactId>junit-jupiter</artifactId>
-	<version>5.11.0</version>
+	<version>${junit.version}</version>
 	<scope>test</scope>
       </dependency>
       <dependency>

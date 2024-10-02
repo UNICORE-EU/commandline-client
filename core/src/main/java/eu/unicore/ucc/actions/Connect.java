@@ -11,9 +11,8 @@ import eu.unicore.ucc.lookup.Connector;
  * @author schuller
  */
 public class Connect extends ActionBase {
-	/**
-	 * the initial lifetime (in days) for newly created TSSs
-	 */
+
+	// the initial lifetime (in days) for newly created TSSs
 	private int initialLifeTime;
 
 	private static String lastRegistryURL;

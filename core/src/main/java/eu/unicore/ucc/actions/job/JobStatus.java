@@ -96,6 +96,7 @@ public class JobStatus extends JobOperationBase {
 				timeout = (int)UnitParser.getTimeParser(0).getDoubleValue(timeoutSpec);
 				verbose("Status polling (--wait-for) timeout = "+timeout+" sec.");
 			}
+			verbose("Waiting for job to be "+waitFor+" ...");
 		}
 	}
 

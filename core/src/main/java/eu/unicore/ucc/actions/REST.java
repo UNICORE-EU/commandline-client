@@ -2,7 +2,9 @@ package eu.unicore.ucc.actions;
 
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Formatter;
+import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
@@ -98,14 +100,27 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		return true;
 	}
 
+	public static List<String> cmds = Arrays.asList("GET", "POST", "PUT", "DELETE");
+	
 	@Override
 	public void process() throws Exception {
 		super.process();
 		int length=getCommandLine().getArgs().length;
 		if(length<2){
-			throw new IllegalArgumentException("You must provide at least a command (GET, PUT, ...) as argument.");
+			throw new IllegalArgumentException("You must provide at least a command (GET, PUT, POST, DELETE) as argument.");
 		}
-		String cmd=getCommandLine().getArgs()[1];
+		String cmdSpec = getCommandLine().getArgs()[1].toUpperCase();
+		String cmd = null;
+		for(String c: cmds) {
+			if(c.startsWith(cmdSpec)) {
+				cmd = c;
+				break;
+			}
+		}
+		if(cmd==null) {
+			throw new IllegalArgumentException("Operation <"+getCommandLine().getArgs()[1]+
+					"> not implemented / not understood!");
+		}
 		if(length<3){
 			throw new IllegalArgumentException("You must provide at least a URL as argument to this command.");
 		}
@@ -135,30 +150,26 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	}
 
 	protected void doProcess(String cmd, String url, JSONObject content) throws Exception {
-		verbose("Accessing endpoint <"+url+">");
+		verbose(cmd+" "+url);
 		BaseClient bc = makeClient(url);
 		ContentType ct = ContentType.create(contentType);
-
-		if("get".startsWith(cmd.toLowerCase())){
+		if("GET".equals(cmd)) {
 			try(ClassicHttpResponse response = bc.get(ContentType.create(accept))){
 				handleResponse(response, bc);
 			}
 		}
-		else if("delete".startsWith(cmd.toLowerCase())){
+		else if("DELETE".equals(cmd)) {
 			bc.delete();
 		}
-		else if("post".startsWith(cmd.toLowerCase())){
+		else if("POST".equals(cmd)) {
 			try(ClassicHttpResponse response = bc.post(content)){
 				handleResponse(response, bc);
 			}
 		}
-		else if("put".startsWith(cmd.toLowerCase())){
+		else if("PUT".equals(cmd)){
 			try(ClassicHttpResponse response = bc.put(IOUtils.toInputStream(content.toString(), "UTF-8"), ct)){
 				handleResponse(response, bc);
 			}
-		}
-		else {
-			throw new IllegalArgumentException("Command <"+cmd+"> not implemented / not understood!");
 		}
 	}
 

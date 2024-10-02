@@ -16,6 +16,7 @@ import org.jline.reader.impl.completer.StringsCompleter;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.REST;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 
 /**
@@ -79,8 +80,7 @@ public class UCCCompleter implements Completer, Constants {
 				return candidates.size()>oldSize;
 			}
 			else if ("rest".equals(cmdName) && line.wordIndex()==1) {
-				for(String x: new String[] {"GET","PUT","POST","DELETE"})
-					candidates.add(new Candidate(x));
+				for(String x: REST.cmds)candidates.add(new Candidate(x));
 				return true;
 			}
 			else if ("workflow-control".equals(cmdName) && line.wordIndex()==1) {
