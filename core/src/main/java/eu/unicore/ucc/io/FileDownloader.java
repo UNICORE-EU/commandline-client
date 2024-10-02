@@ -51,6 +51,7 @@ public class FileDownloader extends FileTransferBase {
 	
 	@Override
 	public void perform(StorageClient sms)throws Exception{
+		assertReady(sms);
 		boolean isWildcard = hasWildCards(from);
 		FileListEntry remoteSource = null;
 		if(isWildcard){

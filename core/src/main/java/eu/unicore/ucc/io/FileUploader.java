@@ -43,7 +43,8 @@ public class FileUploader extends FileTransferBase {
 	}
 
 	@Override
-	public void perform(StorageClient sms)throws Exception{
+	public void perform(StorageClient sms)throws Exception {
+		assertReady(sms);
 		File fileSpec = new File(from);
 		boolean hasWildCards = false;
 		boolean isDirectory = fileSpec.isDirectory();

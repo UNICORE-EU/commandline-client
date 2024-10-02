@@ -9,6 +9,8 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
+
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.uas.FiletransferParameterProvider;
@@ -222,5 +224,21 @@ public abstract class FileTransferBase {
 		}catch(Exception ex) {}
 		return "BFT";
 	}
-	
+
+	protected void assertReady(StorageClient sms) throws Exception {
+		int i=0;
+		while(i < 60) {
+			JSONObject props = sms.getProperties("resourceStatus");
+			if("READY".equals(props.optString("resourceStatus","n/a"))){
+				return;
+			}
+			else {
+				i++;
+				Thread.sleep(1000);
+			}
+		}
+		throw new Exception("Timeout waiting for Storage <"+
+				sms.getEndpoint().getUrl()+"> to become ready");
+	}
+
 }
