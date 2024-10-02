@@ -15,6 +15,7 @@ Version 10.1.1 (released Oct 2, 2024)
  - improvement: 'system-info' shows the user's available groups for core endpoints
  - fix: 'open-tunnel' failed when endpoint (gateway address) does not have explicit port
  - fix: timeouts in 'create-tss' were unrealistically short - increased to 10s
+ - fix: 'run': make sure working directory is ready before uploading local files
 
 Version 10.1.0 (released Aug 12, 2024)
 --------------------------------------
