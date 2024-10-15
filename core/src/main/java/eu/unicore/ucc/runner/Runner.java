@@ -14,12 +14,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
+import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.IJobSubmission;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.client.core.JobClient.Status;
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.services.rest.client.UserPreferences;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.Resolve;
@@ -35,6 +37,7 @@ import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.util.JSONUtil;
 import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Log;
+import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**
  * Helper class that runs a job, using the following sequence of actions 
@@ -292,13 +295,21 @@ public class Runner implements Runnable {
 		}catch(Exception e){
 			throw new RunnerException(ERR_INVALID_JOB_DEFINITION,"Could not setup job definition",e);
 		}
-
+		// honor group and uid preference from job
+		UserPreferences up = ((BaseServiceClient)tss).getUserPreferences();
+		String grp = builder.getProperty("Group", null);
+		if(grp!=null && up.getGroup()==null) {
+			up.setGroup(grp);
+		}
+		String uid = builder.getProperty("User", null);
+		if(uid!=null && up.getUid()==null) {
+			up.setUid(uid);
+		}
 		try{
 			jobClient = tss.submitJob(submit);
 		}catch(Exception e){
 			throw new RunnerException(ERR_SUBMIT_FAILED,"Could not submit job",e);
 		}
-
 		String url = jobClient.getEndpoint().getUrl();
 		builder.setProperty("epr", url);
 		builder.setProperty("type", "job");
