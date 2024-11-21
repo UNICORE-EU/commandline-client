@@ -1,5 +1,8 @@
 package eu.unicore.ucc;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 public interface Constants {
 
 	//general error exit code
@@ -156,5 +159,9 @@ public interface Constants {
 	public static final String CMD_GRP_ADMIN = "Administration";
 	public static final String CMD_GRP_WORKFLOW = "Workflow";
 	public static final String CMD_GRP_OTHER = "Other";
+
+	// job stati
+	public static final Collection<String> waitableJobStatuses = Arrays.asList(
+			"STAGINGIN", "QUEUED", "RUNNING", "STAGINGOUT", "SUCCESSFUL");
 
 }

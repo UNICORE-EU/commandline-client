@@ -358,9 +358,8 @@ public class Batch extends ActionBase {
 			Runner r = new Runner(registry, configurationProvider, b);
 			r.setAsyncMode(true);
 			r.setQuietMode(false);
-			//TODO r.setCheckResources(!noResourceCheck);
+			// TODO r.setCheckResources(!noResourceCheck);
 			r.setNoFetchOutCome(noFetchOutcome);
-			r.setSubmitOnly(submitOnly);
 			r.setSiteSelectionStrategy(siteSelectionStragegy);
 			r.setProperties(properties);
 			if(siteName!=null){

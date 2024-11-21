@@ -7,7 +7,7 @@ import org.apache.commons.cli.Option;
 
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
-import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.UCCOptions;
@@ -222,7 +222,7 @@ public abstract class ActionBase extends Command {
 			String status = registry.getConnectionStatus();
 			verbose("Registry connection status: "+status);
 			if(!status.startsWith("OK") && !skipConnectingToRegistry()) {
-				throw new UCCException(status);
+				throw new Exception(status);
 			}
 		}catch(Exception e){
 			throw new UCCException("Cannot contact registry (set 'contact-registry=false' to ignore this error) ",e);

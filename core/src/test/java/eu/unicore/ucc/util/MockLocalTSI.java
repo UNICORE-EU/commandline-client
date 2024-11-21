@@ -1,13 +1,12 @@
 package eu.unicore.ucc.util;
 
-import jakarta.inject.Inject;
-
 import eu.unicore.xnjs.XNJSProperties;
 import eu.unicore.xnjs.ems.ExecutionException;
 import eu.unicore.xnjs.ems.InternalManager;
 import eu.unicore.xnjs.io.ChangeACL;
 import eu.unicore.xnjs.tsi.local.LocalTS;
 import eu.unicore.xnjs.tsi.local.LocalTSIProperties;
+import jakarta.inject.Inject;
 
 public class MockLocalTSI extends LocalTS {
 

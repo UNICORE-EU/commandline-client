@@ -18,7 +18,7 @@ import eu.unicore.client.lookup.Lister;
 import eu.unicore.client.lookup.Producer;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
-import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.Log;
 import eu.unicore.util.Pair;

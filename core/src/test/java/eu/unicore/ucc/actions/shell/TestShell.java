@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.ParsedLine;
 import org.junit.jupiter.api.Test;
 
+import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.util.EmbeddedTestBase;
@@ -27,6 +29,26 @@ import eu.unicore.ucc.util.EmbeddedTestBase;
  * These run against an embedded UNICORE instance.
  */
 public class TestShell extends EmbeddedTestBase {
+
+	
+	@Test
+	public void testShellArgsParsing() throws Exception {
+		String cmd = "this is a test";
+		List<String> res = Arrays.asList(Shell.parseCmdline(cmd));
+		assertEquals(4, res.size());	
+		cmd = "this \"is a\" test";
+		res = Arrays.asList(Shell.parseCmdline(cmd));
+		assertEquals(3, res.size());
+		assertEquals("is a", res.get(1));
+		cmd = "this \"is a test\"";
+		res = Arrays.asList(Shell.parseCmdline(cmd));
+		assertEquals(2, res.size());
+		assertEquals("is a test", res.get(1));
+		cmd = "set a=b";
+		res = Arrays.asList(Shell.parseCmdline(cmd));
+		assertEquals(2, res.size());
+		assertEquals("a=b", res.get(1));		
+	}
 
 	@Test
 	public void test_Shell()throws Exception{
@@ -38,11 +60,12 @@ public class TestShell extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		Shell shell = (Shell)UCC.lastCommand;
+		assertFalse(shell.requireRegistry());
 		assertNull(shell.getProperties().get("ham"));
 		assertEquals("bar",shell.getProperties().get("foo"));
+		assertEquals(3, shell.getNumberOfErrors());
 	}
 
-	
 	static int wordIndex = 0;
 	static int wordCursor = 0;
 	static int cursor = 0;
@@ -78,7 +101,7 @@ public class TestShell extends EmbeddedTestBase {
 
 		cc.complete(null, pl, candidates);
 		assertEquals(cmds.size(), candidates.size());
-		
+
 		// "run --..."
 		words.clear();
 		words.add("run");
@@ -86,14 +109,28 @@ public class TestShell extends EmbeddedTestBase {
 		wordIndex = 1;
 		wordCursor = 0;
 		line = "run --";
-		cursor = 6;
+		cursor = line.length();
 		candidates.clear();
 		LineReader lr = LineReaderBuilder.builder().build();
 		cc.complete(lr, pl, candidates);
 
 		assertTrue(candidates.contains(new Candidate("--help")));
 		assertFalse(candidates.contains(new Candidate("pom.xml")));
-		
+
+		// "run -..."
+		words.clear();
+		words.add("run");
+		words.add("-");
+		wordIndex = 1;
+		wordCursor = 0;
+		line = "run -";
+		cursor = line.length();
+		candidates.clear();
+		cc.complete(lr, pl, candidates);
+
+		assertTrue(candidates.contains(new Candidate("-J")));
+		assertFalse(candidates.contains(new Candidate("pom.xml")));
+
 		// "run ..."
 		words.clear();
 		words.add("run");
@@ -101,11 +138,24 @@ public class TestShell extends EmbeddedTestBase {
 		wordIndex = 1;
 		wordCursor = 0;
 		line = "run ";
-		cursor = 4;
+		cursor = line.length();
 		candidates.clear();
 		cc.complete(lr, pl, candidates);
 
 		assertTrue(candidates.contains(new Candidate("pom.xml")));
+
+		// "run --wait-for ..."
+		words.clear();
+		words.add("run");
+		words.add("--"+Constants.OPT_WAIT_LONG);
+		words.add("");
+		wordIndex = 2;
+		wordCursor = 0;
+		line = "run --wait-for ";
+		cursor = line.length();
+		candidates.clear();
+		cc.complete(lr, pl, candidates);
+		assertTrue(candidates.contains(new Candidate("QUEUED")));
 
 		// "rest ..."
 		words.clear();
@@ -114,7 +164,7 @@ public class TestShell extends EmbeddedTestBase {
 		wordIndex = 1;
 		wordCursor = 0;
 		line = "rest ";
-		cursor = 5;
+		cursor = line.length();
 		candidates.clear();
 		cc.complete(lr, pl, candidates);
 		assertEquals(4, candidates.size());

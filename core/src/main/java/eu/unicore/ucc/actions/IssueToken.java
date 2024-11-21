@@ -10,8 +10,8 @@ import org.json.JSONObject;
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.lookup.CoreEndpointLister;
 import eu.unicore.client.lookup.SiteNameFilter;
-import eu.unicore.services.rest.client.BaseClient;
-import eu.unicore.services.rest.security.jwt.JWTUtils;
+import eu.unicore.services.restclient.BaseClient;
+import eu.unicore.services.restclient.jwt.JWTUtils;
 import eu.unicore.ucc.UCCException;
 
 /**

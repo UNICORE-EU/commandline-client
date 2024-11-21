@@ -9,7 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-import eu.unicore.services.rest.security.jwt.JWTUtils;
+import eu.unicore.services.restclient.jwt.JWTUtils;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.lookup.Connector;
 import eu.unicore.ucc.util.EmbeddedTestBase;

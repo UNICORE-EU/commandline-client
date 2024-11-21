@@ -63,7 +63,7 @@ public class Metadata extends ActionBase {
 
 		getOptions().addOption(Option.builder(OPT_COMMAND)
 				.longOpt(OPT_COMMAND_LONG)
-				.desc("Metadata command: write, read, update, delete, start-extract, search")
+				.desc("Metadata command ("+commands+")")
 				.required(true)
 				.hasArg()
 				.build());

@@ -31,8 +31,7 @@ public class TestActionBase {
 			p.load(is);
 		}
 		ActionBase cmd=(ActionBase)UCC.initCommand(new String[]{"connect","-r","http://localhost:65322/services/WRONG_SERVICE", 
-				"-c", "src/test/resources/conf/userprefs.embedded"},false);
-		cmd.setProperties(p);
+				"-c", "src/test/resources/conf/userprefs.embedded"},false,p);
 		cmd.initConfigurationProvider();
 		IClientConfiguration cp=cmd.getConfigurationProvider().getAnonymousClientConfiguration();
 		assertTrue(cp.getHttpClientProperties().getSocketTimeout()>0);
@@ -50,7 +49,7 @@ public class TestActionBase {
 				"-" + Constants.OPT_SECURITY_PREFERENCES, "pgid:someGid",
 				"-" + Constants.OPT_SECURITY_PREFERENCES, "useOSgids:false",
 				"-" + Constants.OPT_SECURITY_PREFERENCES, "supgids:someSupGid1,someSupGid2",
-				}, false);
+				}, false, null);
 		verifyCommandPref(cmd, "src/test/resources/conf/userprefs.embedded");
 
 		ActionBase cmd2=(ActionBase)UCC.initCommand(new String[]{
@@ -62,7 +61,7 @@ public class TestActionBase {
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG, "pgid:someGid",
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG, "useOSgids:false",
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG, "supgids:someSupGid1,someSupGid2",
-				}, false);
+				}, false, null);
 		verifyCommandPref(cmd2, "src/test/resources/conf/userprefs.embedded");
 
 		ActionBase cmd3=(ActionBase)UCC.initCommand(new String[]{
@@ -74,13 +73,13 @@ public class TestActionBase {
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG + "=pgid:someGid",
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG + "=useOSgids:false",
 				"--" + Constants.OPT_SECURITY_PREFERENCES_LONG + "=supgids:someSupGid1,someSupGid2",
-				}, false);
+				}, false, null);
 		verifyCommandPref(cmd3, "src/test/resources/conf/userprefs.embedded");
 		
 		ActionBase cmd4=(ActionBase)UCC.initCommand(new String[]{
 				"connect","-r","https://localhost:65322/services/WRONG_SERVICE", 
 				"-c", "src/test/resources/conf/userprefs-withSecPrefs.embedded"
-				}, false);
+				}, false, null);
 		verifyCommandPref(cmd4, "src/test/resources/conf/userprefs-withSecPrefs.embedded");
 	}
 	

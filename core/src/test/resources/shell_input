@@ -1,11 +1,27 @@
+version
+
 connect
 list-sites
 
+# help
 help
 help-auth
+help job-status
+help system
 
+# variables
 set
 set foo=bar
 set foo2=bar=x
 set ham=spam
 unset ham
+
+# external cmd
+set mycmd=date
+system ${mycmd}
+unset mycmd
+
+# some error cases
+help no-such-command
+system /nosuchcommand
+run --no-such-option

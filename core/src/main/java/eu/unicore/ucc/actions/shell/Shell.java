@@ -24,6 +24,7 @@ import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.UCCOptions;
 import eu.unicore.ucc.actions.ActionBase;
+import eu.unicore.ucc.authn.UsernameAuthN;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
 
 /**
@@ -38,7 +39,7 @@ public class Shell extends ActionBase {
 	public static final String OPT_FILE="f";
 	public static final String OPT_FILE_LONG="file";
 
-	private File commandFile=null;
+	private File commandFile;
 
 	@Override
 	public String getDescription() {
@@ -89,7 +90,7 @@ public class Shell extends ActionBase {
 				URLCompleter.registerSiteURL(ep.getUrl());
 			}
 		}catch(Exception ex) {
-			throw new RuntimeException(ex);
+			throw UCCException.wrapped(ex);
 		}
 	}
 
@@ -131,7 +132,7 @@ public class Shell extends ActionBase {
 					s="exit";
 				}
 				s=s.trim();
-				if(s.isEmpty())continue;
+				if(s.isEmpty() || s.startsWith("#"))continue;
 
 				if("exit".equalsIgnoreCase(s) || "quit".equalsIgnoreCase(s)){
 					message("");
@@ -158,7 +159,8 @@ public class Shell extends ActionBase {
 						else if(internalCommands.contains(method)){
 							printShellHelp();
 							continue;
-						}else if(!internalCommands.contains(method)){
+						}else {
+							numberOfErrors++;
 							System.err.println("No such command '"+method+"'");
 						}
 					}
@@ -183,15 +185,14 @@ public class Shell extends ActionBase {
 						message("No such command: "+args[0]);
 						continue;
 					}
-
-					Command cmd = UCC.initCommand(args,false);
-					//inherit properties
+					// update properties
 					if(UCC.getConsoleLogger().isVerbose())properties.put(OPT_VERBOSE_LONG,"true");
-					String authNMethod = getOption(OPT_AUTHN_METHOD_LONG, OPT_AUTHN_METHOD);
+					String authNMethod = getOption(OPT_AUTHN_METHOD_LONG, OPT_AUTHN_METHOD, UsernameAuthN.NAME);
 					properties.put(OPT_AUTHN_METHOD_LONG, authNMethod);
 					if(acceptAllIssuers) {
 						properties.put(OPT_AUTHN_ACCEPT_ALL_LONG, "true");
 					}
+					Command cmd = UCC.initCommand(args, false, properties);
 					if(cmd!=null){
 						cmd.setProperties(properties);
 						cmd.setPropertiesFile(propertiesFile);
@@ -201,9 +202,11 @@ public class Shell extends ActionBase {
 					}
 				}
 				catch(ParseException pex){
+					numberOfErrors++;
 					error("Error parsing commandline arguments.",pex);
 				}
 				catch(Exception ex){
+					numberOfErrors++;
 					error("Error processing command", ex);
 				}
 			}
@@ -225,7 +228,7 @@ public class Shell extends ActionBase {
 	 * handle special "shell" commands like 'set'
 	 * @param args
 	 */
-	protected boolean processSpecial(String[] args) throws Exception {
+	private boolean processSpecial(String[] args) throws Exception {
 		String cmd = args[0];
 		if("set".equalsIgnoreCase(cmd)){
 			handleSet(args);
@@ -245,7 +248,7 @@ public class Shell extends ActionBase {
 		return true;
 	}
 
-	protected void handleSet(String[] args) throws IOException {
+	private void handleSet(String[] args) throws IOException {
 		if(args.length==1){
 			//print properties
 			for(Object keyObj: properties.keySet()){
@@ -275,7 +278,7 @@ public class Shell extends ActionBase {
 		}
 	}
 
-	protected void handleSystem(String[] args) throws Exception {
+	private void handleSystem(String[] args) throws Exception {
 		if(args.length<2)return;
 		
 		String[] paramArgs = new String[args.length-1];
@@ -286,17 +289,17 @@ public class Shell extends ActionBase {
 		p.waitFor();
 	}
 
-	protected void handleUnset(String[] args){
+	private void handleUnset(String[] args){
 		for(int i=1; i<args.length;i++){
 			properties.remove(args[i]);
 		}
 	}
 
-	protected void handleVersion(){
+	private void handleVersion(){
 		UCC.printVersion();
 	}
 
-	protected void printShellHelp(){
+	private void printShellHelp(){
 		System.err.println("Additional commands in the UCC shell:");
 		System.err.println(" set [name=value]... - show variables / set a variable");
 		System.err.println(" unset <name>...     - unset a variable");
@@ -309,7 +312,7 @@ public class Shell extends ActionBase {
 		return false;
 	}
 
-	protected History getHistory(LineReader lineReader) {
+	private History getHistory(LineReader lineReader) {
 		try{
 			String historyFile = properties.getProperty(HISTORY_FILEKEY);
 			if(historyFile == null){
@@ -327,7 +330,7 @@ public class Shell extends ActionBase {
 
 	private static Pattern p = Pattern.compile("\"([^\"]*)\"|(\\S+)");
 		
-	public String[] parseCmdlineWithVars(String cmdArgs) throws IOException {
+	private String[] parseCmdlineWithVars(String cmdArgs) throws IOException {
 		String[] args = parseCmdline(cmdArgs);
 		for(int i=0; i<args.length; i++) {
 			String s = args[i];
@@ -351,7 +354,13 @@ public class Shell extends ActionBase {
 		return var;
 	}
 	
-	public static String[] parseCmdline(String cmdArgs) throws IOException {
+	private int numberOfErrors = 0;
+
+	public int getNumberOfErrors(){
+		return numberOfErrors;
+	}
+	
+	static String[] parseCmdline(String cmdArgs) throws IOException {
 		List<String>result = new ArrayList<>();
 		Matcher m = p.matcher(cmdArgs);
 		while (m.find()) {
@@ -365,10 +374,8 @@ public class Shell extends ActionBase {
 		}
 		return result.toArray(new String[result.size()]);
 	}
-	
-	
 
-	public final String getHeader() {
+	private String getHeader() {
 		String lineSep = System.getProperty("line.separator");
 		String s = lineSep
 				+ " _    _ _   _ _____ _____ ____  _____  ______" + lineSep
@@ -379,5 +386,4 @@ public class Shell extends ActionBase {
 				+ " \\____/|_| \\_|_____\\_____\\____/|_|  \\_\\______|";
 		return s;
 	}
-
 }

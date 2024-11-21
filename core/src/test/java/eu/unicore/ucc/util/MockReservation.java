@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jakarta.inject.Inject;
-
+import eu.unicore.security.Client;
 import eu.unicore.xnjs.XNJS;
 import eu.unicore.xnjs.ems.ExecutionException;
 import eu.unicore.xnjs.idb.Incarnation;
@@ -18,7 +17,7 @@ import eu.unicore.xnjs.tsi.IReservation;
 import eu.unicore.xnjs.tsi.ReservationStatus;
 import eu.unicore.xnjs.tsi.ReservationStatus.Status;
 import eu.unicore.xnjs.tsi.remote.TSIMessages;
-import eu.unicore.security.Client;
+import jakarta.inject.Inject;
 
 public class MockReservation implements IReservation {
 

@@ -19,8 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
-import eu.unicore.services.rest.client.BaseClient;
-import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.services.restclient.BaseClient;
+import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
@@ -235,10 +235,16 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 					client.getString("dn"), role, uid, cr);
 		}
 		try(Formatter f = new Formatter(sb)){
-			JSONArray groups = client.getJSONObject("xlogin").getJSONArray("availableGroups");
-			f.format("  * available groups: %s", JSONUtil.toList(groups));
+			JSONArray groups = client.getJSONObject("xlogin").optJSONArray("availableGroups");
+			if(groups!=null) {
+				f.format("  * available groups: %s", JSONUtil.toList(groups));
+			}
 		}
-		
+		try(Formatter f = new Formatter(sb)){
+			JSONArray roles = client.getJSONObject("role").optJSONArray("availableRoles");
+			if(roles!=null && roles.length()>1)
+			f.format("  * available roles: %s", JSONUtil.toList(roles));
+		}
 	}
 
 	private void serverDetails(StringBuilder sb, JSONObject server) throws JSONException {

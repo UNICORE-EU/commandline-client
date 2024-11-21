@@ -28,17 +28,16 @@ public abstract class JobOperationBase extends ActionBase {
 	 */
 	protected Pair<JobClient,UCCBuilder> createJobClient(String jobDescriptor) throws Exception {
 		Pair<JobClient,UCCBuilder>res = new Pair<>();
-		JobClient job=null;
-		UCCBuilder builder=createBuilder(jobDescriptor);
+		
+		UCCBuilder builder = createBuilder(jobDescriptor);
 		res.setM2(builder);
-		String url=builder.getProperty("epr");
+		String url = builder.getProperty("epr");
 		if(url==null){
 			throw new UCCException("Job address not found! Maybe <"+jobDescriptor+"> has not been produced by ucc.");
 		}
-		job = new JobClient(new Endpoint(url),
+		res.setM1(new JobClient(new Endpoint(url),
 					configurationProvider.getClientConfiguration(url),
-					configurationProvider.getRESTAuthN());
-		res.setM1(job);
+					configurationProvider.getRESTAuthN()));
 		return res;
 	}
 

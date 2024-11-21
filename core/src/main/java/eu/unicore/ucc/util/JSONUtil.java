@@ -11,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import eu.unicore.services.rest.client.BaseClient;
+import eu.unicore.services.restclient.BaseClient;
 
 public class JSONUtil {
 	

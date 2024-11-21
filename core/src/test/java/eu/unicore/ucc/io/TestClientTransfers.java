@@ -20,7 +20,7 @@ public class TestClientTransfers extends EmbeddedTestBase {
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-v"
 		};
-		ActionBase b = (ActionBase)UCC.initCommand(args, false);
+		ActionBase b = (ActionBase)UCC.initCommand(args, false, null);
 		b.initConfigurationProvider();
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
 		
@@ -43,7 +43,7 @@ public class TestClientTransfers extends EmbeddedTestBase {
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-v"
 		};
-		ActionBase b = (ActionBase)UCC.initCommand(args, false);
+		ActionBase b = (ActionBase)UCC.initCommand(args, false, null);
 		b.initConfigurationProvider();
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
 		
@@ -66,7 +66,7 @@ public class TestClientTransfers extends EmbeddedTestBase {
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-v"
 		};
-		ActionBase b = (ActionBase)UCC.initCommand(args, false);
+		ActionBase b = (ActionBase)UCC.initCommand(args, false, null);
 		b.initConfigurationProvider();
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
 		

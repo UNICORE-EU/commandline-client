@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.ucc.actions.data.LS;
-import eu.unicore.ucc.actions.shell.Shell;
 import eu.unicore.ucc.helpers.JLineLogger;
 import eu.unicore.ucc.io.FiletransferParameterProvider;
 import eu.unicore.xnjs.util.IOUtils;
@@ -109,30 +107,6 @@ public class TestVarious {
 			return "localhost";
 		}
 
-	}
-	
-	@Test
-	public void testShellArgsParsing() throws Exception {
-		String cmd = "this is a test";
-		List<String> res = Arrays.asList(Shell.parseCmdline(cmd));
-		assertEquals(4, res.size());
-		
-		cmd = "this \"is a\" test";
-		res = Arrays.asList(Shell.parseCmdline(cmd));
-		assertEquals(3, res.size());
-		assertEquals("is a", res.get(1));
-		
-		cmd = "this \"is a test\"";
-		res = Arrays.asList(Shell.parseCmdline(cmd));
-		assertEquals(2, res.size());
-		assertEquals("is a test", res.get(1));
-		
-		
-		cmd = "set a=b";
-		res = Arrays.asList(Shell.parseCmdline(cmd));
-		assertEquals(2, res.size());
-		assertEquals("a=b", res.get(1));
-		
 	}
 	
 	@Test

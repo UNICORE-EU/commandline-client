@@ -6,8 +6,8 @@ import org.apache.hc.core5.http.HttpMessage;
 
 import eu.unicore.security.canl.PasswordCallback;
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
-import eu.unicore.services.rest.client.IAuthCallback;
-import eu.unicore.services.rest.client.UsernamePassword;
+import eu.unicore.services.restclient.IAuthCallback;
+import eu.unicore.services.restclient.UsernamePassword;
 import eu.unicore.util.httpclient.ClientProperties;
 
 /**
@@ -40,8 +40,7 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 				password = new String(pw);
 			}
 		}
-		UsernamePassword up = new UsernamePassword(username,password);
-		up.addAuthenticationHeaders(httpMessage);
+		new UsernamePassword(username,password).addAuthenticationHeaders(httpMessage);
 	}
 	
 

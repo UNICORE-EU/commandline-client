@@ -8,8 +8,19 @@ public class UCCException extends Exception {
 		super(message);
 	}
 
+	public UCCException(Throwable cause) {
+		super(cause);
+	}
+
 	public UCCException(String message, Throwable cause) {
 		super(message, cause);
+	}
+
+	public static UCCException wrapped(Exception e) throws UCCException {
+		if(e instanceof UCCException) {
+			throw (UCCException)e;
+		}
+		throw new UCCException(e);
 	}
 
 }

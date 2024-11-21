@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
-import eu.unicore.services.rest.client.Resources;
+import eu.unicore.services.restclient.Resources;
 import eu.unicore.ucc.UCC;
 
 /**

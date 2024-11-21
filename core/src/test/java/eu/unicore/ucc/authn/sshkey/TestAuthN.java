@@ -8,7 +8,7 @@ import java.util.Properties;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.junit.jupiter.api.Test;
 
-import eu.unicore.services.rest.security.jwt.JWTUtils;
+import eu.unicore.services.restclient.jwt.JWTUtils;
 import eu.unicore.ucc.UCC;
 
 public class TestAuthN {

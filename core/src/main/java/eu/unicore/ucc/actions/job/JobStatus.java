@@ -37,9 +37,6 @@ public class JobStatus extends JobOperationBase {
 		return "get job status";
 	}
 
-	private static final Collection<String> allowedStatuses = Arrays.asList(
-			"STAGINGIN", "QUEUED", "RUNNING", "STAGINGOUT", "SUCCESSFUL");
-
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -55,7 +52,7 @@ public class JobStatus extends JobOperationBase {
 				.build());
 		getOptions().addOption(Option.builder(OPT_WAIT)
 				.longOpt(OPT_WAIT_LONG)
-				.desc("Wait for the given job status ("+allowedStatuses+")")
+				.desc("Wait for the given job status ("+waitableJobStatuses+")")
 				.hasArg(true)
 				.required(false)
 				.build());
@@ -70,7 +67,7 @@ public class JobStatus extends JobOperationBase {
 	@Override
 	public Collection<String> getAllowedOptionValues(String option) {
 		if(OPT_WAIT.equals(option)) {
-			return allowedStatuses;
+			return waitableJobStatuses;
 		}
 		return null;
 	}
@@ -89,7 +86,7 @@ public class JobStatus extends JobOperationBase {
 					throw new Exception();
 				}
 			}catch(Exception ex) {
-				throw new IllegalArgumentException("'--wait-for' accepts one of: "+Arrays.asList(allowedStatuses));
+				throw new IllegalArgumentException("'--wait-for' accepts one of: "+Arrays.asList(waitableJobStatuses));
 			}
 			String timeoutSpec = getCommandLine().getOptionValue(OPT_TIMEOUT);
 			if(timeoutSpec!=null) {
@@ -158,6 +155,10 @@ public class JobStatus extends JobOperationBase {
 		StringBuilder sb = new StringBuilder();
 		String lineBreak = System.getProperty("line.separator");
 		try	{
+			if(job.getStatus().equals(Status.FAILED)){
+				sb.append(" Error message: ").append(job.getStatusMessage());
+				sb.append(lineBreak);
+			}
 			sb.append(" Working directory: ").append(job.getWorkingDirectory().getEndpoint().getUrl());
 			sb.append(lineBreak);
 			String t = job.getProperties().optString("jobType","N/A");

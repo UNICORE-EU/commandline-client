@@ -10,13 +10,12 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 
 import eu.emi.security.authn.x509.ValidationError;
-import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.security.wsutil.client.authn.ClientConfigurationProvider;
 import eu.unicore.security.wsutil.client.authn.ClientConfigurationProviderImpl;
 import eu.unicore.security.wsutil.client.authn.JsonSecuritySessionPersistence;
-import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
@@ -55,8 +54,10 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		super();
 		this.userProperties = userProperties;
 		this.command = command;
+		acceptAll = acceptAllCAs;
 		AuthenticationProvider ap = UCC.getAuthNMethod(authnMethod);
 		if (ap instanceof PropertiesAwareAuthn){
+			PropertiesAwareAuthn paa = (PropertiesAwareAuthn)ap;
 			if(userProperties.getProperty("truststore.type")==null) {
 				if(acceptAllCAs) {
 					userProperties.setProperty("truststore.type", "directory");
@@ -71,16 +72,8 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 					userProperties.setProperty("truststore.directoryLocations.1", path);
 				}
 			}
-			
-			((PropertiesAwareAuthn)ap).setProperties(userProperties);
-			acceptAll = acceptAllCAs;
-			ValidationErrorListener vel = new ValidationErrorListener() {
-				@Override
-				public boolean onValidationError(final ValidationError error) {
-					return queryValidity(error);
-				}
-			};
-			((PropertiesAwareAuthn) ap).setValidationErrorListener(vel);
+			paa.setProperties(userProperties);
+			paa.setValidationErrorListener( err -> { return queryValidity(err); });
 		}
 		setAuthnProvider(ap);
 		setBasicConfiguration(ap.getBaseClientConfiguration());
@@ -94,12 +87,6 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 
 	protected String getSessionStorageFile() {
 		return userProperties!=null? userProperties.getProperty(Constants.SESSION_ID_FILEKEY) : null;
-	}
-
-	@Override
-	public Properties getUserProperties()
-	{
-		return userProperties;
 	}
 	
 	@Override

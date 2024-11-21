@@ -7,7 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.hc.core5.http.HttpMessage;
 
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
-import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.PropertiesAwareAuthn;
 import eu.unicore.ucc.helpers.ConsoleLogger;

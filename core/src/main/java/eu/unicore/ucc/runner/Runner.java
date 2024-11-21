@@ -21,7 +21,7 @@ import eu.unicore.client.core.JobClient.Status;
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.registry.IRegistryClient;
-import eu.unicore.services.rest.client.UserPreferences;
+import eu.unicore.services.restclient.UserPreferences;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.Resolve;
@@ -37,7 +37,6 @@ import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.util.JSONUtil;
 import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Log;
-import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**
  * Helper class that runs a job, using the following sequence of actions 
@@ -62,61 +61,54 @@ public class Runner implements Runnable {
 
 	private UCCBuilder builder;
 
-	protected IJobSubmission tss;
+	private IJobSubmission tss;
 
-	protected JobClient jobClient;
+	private JobClient jobClient;
 
-	protected Float progress;
+	private Float progress;
 
-	protected Status status;
+	private Status status;
 
-	protected final IRegistryClient registry;
+	private final IRegistryClient registry;
 
-	protected UCCConfigurationProvider configurationProvider;
+	private UCCConfigurationProvider configurationProvider;
 
-	protected Broker broker=null;
+	private Broker broker;
 
-	// don't write any files
-	protected boolean quietMode = false;
+	private boolean quietMode = false;
 
-	protected boolean asyncMode=false;
+	private boolean asyncMode = false;
 
-	protected boolean checkResources=true;
+	private boolean mustSave = false;
 
-	protected boolean submitOnly=false;
-
-	protected boolean keepJob=true;
-
-	protected boolean mustSave=false;
-
-	protected boolean needManualJobStart=true;
+	private boolean needManualJobStart = true;
 
 	//do not get stdout/stderr when job is done
-	protected boolean noFetchOutcome;
+	private boolean noFetchOutcome = false;
 
 	//do not append job ID to file names
-	protected boolean briefOutputFiles;
+	private boolean briefOutputFiles = false;
 
-	//send stdout/err to console
-	protected boolean outputToConsole=false;
+	// write stdout/err to console
+	private boolean outputToConsole = false;
 
-	//do not submit jobs
-	protected boolean dryRun;
+	// do not submit anything
+	private boolean dryRun = false;
 
-	protected File output;
+	private File output;
 
-	protected String siteName=null;
+	private String siteName;
 
 	/**
 	 * user's properties
 	 */
-	protected Properties properties;
+	private Properties properties;
 
-	private boolean haveOutDir=false;
+	private boolean haveOutDir;
 
-	protected String preferredProtocol = "BFT";
+	private String preferredProtocol = "BFT";
 
-	protected SiteSelectionStrategy selectionStrategy;
+	private SiteSelectionStrategy selectionStrategy;
 	
 	// state names
 
@@ -156,7 +148,7 @@ public class Runner implements Runnable {
 	public void setQuietMode(boolean quietMode){
 		this.quietMode = quietMode;
 	}
-	
+
 	public void setBroker(Broker broker){
 		this.broker=broker;
 	}
@@ -167,10 +159,6 @@ public class Runner implements Runnable {
 
 	public void setNoFetchOutCome(boolean flag){
 		this.noFetchOutcome=flag;
-	}
-
-	public void setSubmitOnly(boolean flag){
-		this.submitOnly=flag;
 	}
 
 	public void setSiteName(String siteName){
@@ -184,7 +172,11 @@ public class Runner implements Runnable {
 	public void setDryRun(boolean flag){
 		this.dryRun=flag;
 	}
-	
+
+	public void setOutputToConsole(boolean toConsole){
+		this.outputToConsole = toConsole;
+	}
+
 	public void setSiteSelectionStrategy(SiteSelectionStrategy strategy) {
 		this.selectionStrategy = strategy;
 	}
@@ -192,7 +184,46 @@ public class Runner implements Runnable {
 	public void setSubmissionService(IJobSubmission tss) {
 		this.tss = tss;
 	}
-	
+
+	public UCCBuilder getBuilder() {
+		return builder;
+	}
+
+	public JobClient getJob() {
+		return jobClient;
+	}
+
+	public String getJobID() throws Exception {
+		return jobClient!=null ? 
+			JSONUtil.extractResourceID(jobClient.getEndpoint().getUrl()) : null;
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	/**
+	 * get the number of currently executing Runner instances
+	 */
+	public static int getCounter() {
+		return counter.intValue();
+	}
+
+	/**
+	 * Convenience method that waits until a job has finished
+	 * and returns the final status (SUCCESSFUL or FAILED)
+	 * @param timeout in milliseconds (null for no timeout)
+	 * @return status string
+	 */
+	public static String waitUntilDone(JobClient job, int timeout) throws Exception{
+		job.poll(Status.SUCCESSFUL, timeout);
+		return job.getStatus().toString();
+	}
+
 	/**
 	 * processes the job. Errors during processing are handled differently depending
 	 * on the async mode flag.<br/>
@@ -217,15 +248,8 @@ public class Runner implements Runnable {
 	 * quitting at convenient points to allow high throughput. When quitting the job
 	 * is written to a .job file (JSON format, same as the initial .u file), 
 	 * with the current state included in the property "state". 
-	 * 
-	 * In case of an exception,
-	 * it is attempted to write the job to a file in the outcome directory, with a 
-	 * prefix "FAILED".
-	 * 
-	 * @throws RuntimeException in case of errors, with the cause initialised
-	 * to the root exception
 	 */
-	protected void runAsync(){
+	private void runAsync(){
 		String state=builder.getProperty("state",NEW);
 		State s=getState(state);
 		do{
@@ -235,8 +259,7 @@ public class Runner implements Runnable {
 				state=s.getName();
 				builder.setProperty("state", state);
 			}catch(Exception e){
-				String reason=Log.createFaultMessage("Error occurred processing state <"+s.getName()+">",e);
-				writeFailedJobIDFile(reason);
+				String reason = Log.createFaultMessage("Error occurred processing state <"+s.getName()+">",e);
 				throw new RuntimeException(reason, e);
 			}
 		}while(s.autoProceedToNextState());
@@ -248,7 +271,7 @@ public class Runner implements Runnable {
 	 * @throws RuntimeException in case of errors, with the cause initialised
 	 * to the root exception
 	 */
-	protected void runSync(){
+	private void runSync(){
 		String state=builder.getProperty("state",NEW);
 		do{
 			State s=getState(state);
@@ -267,25 +290,20 @@ public class Runner implements Runnable {
 	 * submits a job
 	 * @throws RunnerException in case the job could not be submitted
 	 */
-	protected void doSubmit() throws Exception {
-
+	private void doSubmit() throws Exception {
 		JSONObject submit = builder.getJSON();
-		
 		if(dryRun){
 			listCandidateSites();
 			msg.message("Dry-run, NOT submitting, effective JSON:");
 			msg.message(submit.toString(2));
 			return;
 		}
-
 		findTSS();
-		
 		try{
 			if(builder.getImports().size()==0){
 				submit.put("haveClientStageIn", "false");
 				needManualJobStart=false;
 			}
-			
 			int lifetime=builder.getLifetime();
 			if(lifetime>0){
 				Calendar c=Calendar.getInstance();
@@ -320,7 +338,7 @@ public class Runner implements Runnable {
 	/**
 	 * builds a job client for a running job
 	 */
-	protected void initJobClient(){
+	private void initJobClient(){
 		if(jobClient!=null)return;
 		try{
 			String url = builder.getProperty("epr");
@@ -332,12 +350,11 @@ public class Runner implements Runnable {
 		}
 	}
 
-
 	/**
 	 * find a suitable TSS for job submission.
 	 * @throws RunnerException if no matching TSS can be found
 	 */
-	protected void findTSS()throws RunnerException {
+	private void findTSS()throws RunnerException {
 		if(tss!=null) {
 			msg.verbose("Submission endpoint: "+tss.getEndpoint().getUrl());
 			return;
@@ -363,7 +380,7 @@ public class Runner implements Runnable {
 	/**
 	 * list suitable TSS for job submission.
 	 */
-	protected void listCandidateSites()throws RunnerException {
+	private void listCandidateSites()throws RunnerException {
 		if(tss!=null) {
 			msg.message("Submission endpoint: "+tss.getEndpoint().getUrl());
 			return;
@@ -380,16 +397,13 @@ public class Runner implements Runnable {
 				msg.message("Candidate site: "+epr.getUrl());
 			}
 		}
-		catch(RunnerException re){
-			throw re;
-		}
 		catch(Exception ex){
-			String errorReason=Log.createFaultMessage("Error accessing site(s)", ex);
+			String errorReason = Log.createFaultMessage("Error accessing site(s)", ex);
 			throw new RunnerException(ERR_NO_SITE, errorReason, ex);
 		}
 	}
 
-	protected void setOutputLocation(){
+	private void setOutputLocation(){
 		String outputLoc=builder.getProperty("Output");
 		if(outputLoc==null)outputLoc=".";
 		try{
@@ -401,15 +415,11 @@ public class Runner implements Runnable {
 		}
 	}
 
-	public void setOutputToConsole(boolean toConsole){
-		this.outputToConsole = toConsole;
-	}
-
 	/**
 	 * check whether the update interval has passed and the 
 	 * job status should be retrieved from remote
 	 */
-	protected boolean shouldUpdate(){
+	private boolean shouldUpdate(){
 		String updateInterval=builder.getProperty("Update interval","1");
 		int updateInMillis=Integer.parseInt(updateInterval)*1000;
 		if(updateInMillis<=0)return true;
@@ -429,11 +439,7 @@ public class Runner implements Runnable {
 		return false;
 	}
 
-	public UCCBuilder getBuilder() {
-		return builder;
-	}
-
-	protected void doGetStdOut()throws Exception{
+	private void doGetStdOut()throws Exception{
 		String stdout = builder.getProperty("Stdout", "stdout");
 		FileDownloader e=new FileDownloader(stdout, stdout, Mode.NORMAL, false);
 		if(outputToConsole){
@@ -449,7 +455,7 @@ public class Runner implements Runnable {
 		}
 	}
 
-	protected void doGetStdErr()throws Exception{
+	private void doGetStdErr()throws Exception{
 		String stderr = builder.getProperty("Stderr", "stderr");
 		FileDownloader e=new FileDownloader(stderr, stderr, Mode.NORMAL, false);
 		if(outputToConsole){
@@ -465,14 +471,14 @@ public class Runner implements Runnable {
 		}
 	}
 
-	protected void doImport()throws RunnerException{
+	private void doImport()throws RunnerException{
 		doImport(builder.getImports());
 	}
 
 	/**
 	 * do the imports, including a retry using BFT in case of failure
 	 */
-	protected void doImport(List<FileUploader>fu)throws RunnerException{
+	private void doImport(List<FileUploader>fu)throws RunnerException{
 		for(FileUploader e: fu){
 			try{
 				performImportFromLocal(e);
@@ -490,18 +496,18 @@ public class Runner implements Runnable {
 		}
 	}
 
-	protected void doExport()throws Exception{
+	private void doExport()throws Exception{
 		doExport(builder.getExports());
 	}
 
-	protected void doExport(FileDownloader ...fd)throws Exception{
+	private void doExport(FileDownloader ...fd)throws Exception{
 		doExport(Arrays.asList(fd));
 	}
 
 	/**
 	 * do exports, including a retry using BFT in case of error
 	 */
-	protected void doExport(List<FileDownloader>fd)throws Exception{
+	private void doExport(List<FileDownloader>fd)throws Exception{
 		for(FileDownloader e: fd){
 			try{
 				performExportToLocal(e);
@@ -519,9 +525,7 @@ public class Runner implements Runnable {
 		}
 	}
 
-
-
-	protected void performImportFromLocal(FileUploader imp) throws RunnerException{
+	private void performImportFromLocal(FileUploader imp) throws RunnerException{
 		try{
 			imp.setExtraParameterSource(properties);
 			if(imp.getChosenProtocol()==null){
@@ -540,8 +544,7 @@ public class Runner implements Runnable {
 		}
 	}
 
-
-	protected void performExportToLocal(FileDownloader e)throws Exception{
+	private void performExportToLocal(FileDownloader e)throws Exception{
 		File out=new File(e.getTo());
 		if(!out.isAbsolute()){
 			createOutfileDirectory();
@@ -579,10 +582,7 @@ public class Runner implements Runnable {
 		}
 	}
 
-	/**
-	 * start the job
-	 */
-	protected void start()throws RunnerException{
+	private void startJob()throws RunnerException{
 		try{
 			//jobClient.waitUntilReady(0);
 			jobClient.start();
@@ -593,7 +593,7 @@ public class Runner implements Runnable {
 		}
 	}
 
-	protected void writeJobIDFile(){
+	private void writeJobIDFile(){
 		if(quietMode || !mustSave)return;
 		try	{
 			String dump=builder.getProperty("jobIdFile",null);
@@ -618,33 +618,12 @@ public class Runner implements Runnable {
 	}
 
 	/**
-	 * writes a .job file to the output directory with a prefix "FAILED"
-	 * @param errorReason - a short description of the error
-	 */
-	protected void writeFailedJobIDFile(String errorReason){
-		if(quietMode)return;
-		try{
-			File dumpFile = new File(output.getAbsolutePath(),"FAILED_"+getJobID()+".job");
-			try(FileWriter fw = new FileWriter(dumpFile)) {
-				if(errorReason!=null){
-					builder.setProperty("ucc-errorReason", errorReason);
-				}
-				builder.writeTo(fw);
-				msg.message(dumpFile.getAbsolutePath());
-			}
-		}
-		catch(Exception e){
-			msg.error("Could not write failed job to file.",e);
-		}
-	}
-
-	/**
 	 * creates a dedicated output directory for this runner (if not
 	 * disabled via the "briefOutputFiles" option). 
 	 * The name consists of the unique ID, and
 	 * (if present) the name of the request file
 	 */
-	protected void createOutfileDirectory(){
+	private void createOutfileDirectory(){
 		if(!haveOutDir){
 			if(!briefOutputFiles){
 				StringBuilder sb=new StringBuilder();
@@ -663,14 +642,14 @@ public class Runner implements Runnable {
 		}
 	}
 
-	protected void initPreferredProtocols(){
+	private void initPreferredProtocols(){
 //		for(ProtocolType.Enum p : builder.getPreferredProtocols()){
 //			preferredProtocols.add(p);
 //		}
 		preferredProtocol = "BFT";
 	}
 
-	protected void getStatus(boolean printOnlyIfChanged)throws Exception{
+	private void getStatus(boolean printOnlyIfChanged)throws Exception{
 		boolean changed=false;
 		Status newStatus=jobClient.getStatus();
 		if(!newStatus.equals(status)){
@@ -681,8 +660,8 @@ public class Runner implements Runnable {
 		sb.append(newStatus);
 		if(status.equals(Status.SUCCESSFUL) || status.equals(Status.FAILED)){
 			String exit = jobClient.getProperties().optString("exitCode");
-			if(exit!=null){
-				sb.append(" Exit code: ");
+			if(exit!=null && exit.length()>0){
+				sb.append(", exit code: ");
 				sb.append(exit);
 			}
 			if(status.equals(Status.FAILED)) {
@@ -693,141 +672,23 @@ public class Runner implements Runnable {
 		}
 		if(status.equals(Status.RUNNING)){
 			String newProgressS = jobClient.getProperties().optString("progress");
-			if(newProgressS!=null && !newProgressS.isEmpty()){
+			if(newProgressS!=null && newProgressS.length()>0){
 				try {
 					Float newProgress = Float.valueOf(newProgressS);
 					if(!newProgress.equals(progress)){
 						progress=newProgress;
 						changed=true;
 					}
-					sb.append(" progress: ");
+					sb.append(", progress: ");
 					sb.append(100*progress);
 					sb.append('%');
 				}catch(Exception ex) {}
 			}
 		}
-
 		if(!printOnlyIfChanged)msg.message(sb.toString());
 		else if(changed)msg.message(sb.toString());
-
 	}
 
-	/**
-	 * writes the current job's properties doc to a file in the output directory, 
-	 * named "job_id.properties" where job_id is the unique ID of the job.
-	 * The absolute path of this file is echoed to the ConsoleLogger 
-	 *  
-	 * @return the absolute path of the properties file
-	 */
-	public String dumpJobProperties(){
-		if(quietMode)return null;
-		String path=null;
-		try{
-			String p = jobClient.getProperties().toString(2);
-			String id = JSONUtil.extractResourceID(jobClient.getEndpoint().getUrl());
-			File dump = new File(output, id+".properties");
-			try(FileWriter fw = new FileWriter(dump)){
-				fw.append(p);
-			}
-			path = dump.getAbsolutePath();
-			msg.message(path);
-		}catch(Exception e){
-			msg.error("Could not get job properties.",e);
-		}
-		return path;
-	}
-
-	public void dumpJobLog(){
-		if(jobClient==null){
-			msg.verbose("No job log available, because job was not created.");
-			return;
-		}
-		try{
-			List<String> p = JSONUtil.asList(jobClient.getProperties().getJSONArray("log"));
-			msg.message("Job log: ");
-			msg.message(String.valueOf(p));
-		}catch(Exception e){
-			msg.error("Could not get job log.",e);
-		}
-	}
-
-	public JobClient getJob() {
-		return jobClient;
-	}
-
-	public String getJobID() throws Exception {
-		return jobClient!=null ? 
-			JSONUtil.extractResourceID(jobClient.getEndpoint().getUrl()) : null;
-	}
-
-	public Properties getProperties() {
-		return properties;
-	}
-
-	public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	/**
-	 * get the number of currently executing Runner instances
-	 */
-	public static int getCounter() {
-		return counter.intValue();
-	}
-
-	/**
-	 * Convenience method that waits until a job has finished
-	 * and returns the final status (SUCCESSFUL or FAILED)
-	 * @param timeout in milliseconds (null for no timeout)
-	 * @return status string
-	 */
-	public static String waitUntilDone(JobClient job, int timeout) throws Exception{
-		Status status = Status.UNDEFINED;
-		long start=System.currentTimeMillis();
-		long elapsed=0;
-		while(true){
-			if(timeout>0 && elapsed>timeout)break;
-			elapsed=System.currentTimeMillis()-start;
-			status = job.getStatus();
-			if(status.equals(Status.SUCCESSFUL) || status.equals(Status.FAILED)){
-				break;
-			}
-			Thread.sleep(500);
-		}
-		return status.toString();
-	}
-	
-	/**
-	 * Convenience method that waits until a job is READY
-	 * and can be started. If the job is already past the READY state,
-	 * an exception is thrown.
-	 * @param timeout in milliseconds (null for no timeout)
-	 * @return status
-	 */
-	public static String waitUntilReady(JobClient job, int timeout) throws Exception{
-		Status status=Status.UNDEFINED;
-		String description = "n/a";
-		long start=System.currentTimeMillis();
-		long elapsed=0;
-		while(true){
-			if(timeout>0 && elapsed>timeout)break;
-			elapsed=System.currentTimeMillis()-start;
-			status = job.getStatus();
-			description = job.getProperties().getString("statusMessage");
-			if(status.equals(Status.READY))break;
-			if(status.equals(Status.FAILED)||status.equals(Status.SUCCESSFUL)){
-				throw new Exception("Job is already done, status is <"+status.toString()
-					+">, error description is <"+description+">");
-			}
-			Thread.sleep(500);
-		}
-		return status.toString();
-	}
-	
 	// Runner states
 
 	public interface State {
@@ -846,7 +707,7 @@ public class Runner implements Runnable {
 		}
 	}
 
-	private static Map<String,State>states = new HashMap<>();
+	private static final Map<String,State>states = new HashMap<>();
 
 	static{
 
@@ -865,7 +726,6 @@ public class Runner implements Runnable {
 			public String getName(){
 				return NEW;
 			}
-
 		});
 
 		/**
@@ -899,7 +759,6 @@ public class Runner implements Runnable {
 			public String getName(){
 				return STAGEIN;
 			}
-
 		});
 
 		/**
@@ -911,7 +770,7 @@ public class Runner implements Runnable {
 		states.put(READY, new State(){
 			public State process(Runner r)throws RunnerException{
 				r.initJobClient();
-				r.start();
+				r.startJob();
 				r.mustSave=true;
 				return Runner.getState(STARTED);
 			}
@@ -919,7 +778,6 @@ public class Runner implements Runnable {
 			public String getName(){
 				return READY;
 			}
-
 		});
 
 		/**
@@ -1001,7 +859,6 @@ public class Runner implements Runnable {
 			public String getName(){
 				return STAGEOUT;
 			}
-
 		});
 
 		/**
@@ -1025,7 +882,6 @@ public class Runner implements Runnable {
 			public String getName(){
 				return DONE;
 			}
-
 		});
 
 		states.put(FINISHED, new State(){

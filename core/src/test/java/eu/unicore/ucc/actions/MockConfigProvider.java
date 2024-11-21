@@ -3,11 +3,10 @@ package eu.unicore.ucc.actions;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.security.wsutil.client.authn.SecuritySessionPersistence;
-import eu.unicore.services.rest.client.IAuthCallback;
+import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.httpclient.DefaultClientConfiguration;
 import eu.unicore.util.httpclient.IClientConfiguration;
@@ -52,7 +51,7 @@ public class MockConfigProvider implements UCCConfigurationProvider
 	@Override
 	public Map<String, String[]> getSecurityPreferences()
 	{
-		return new HashMap<String, String[]>();
+		return new HashMap<>();
 	}
 
 	@Override
@@ -69,12 +68,6 @@ public class MockConfigProvider implements UCCConfigurationProvider
 
 	@Override
 	public SecuritySessionPersistence getSessionsPersistence()
-	{
-		return null;
-	}
-
-	@Override
-	public Properties getUserProperties()
 	{
 		return null;
 	}

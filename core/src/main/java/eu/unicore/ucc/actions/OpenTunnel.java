@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.cli.Option;
 
-import eu.unicore.services.rest.client.BaseClient;
-import eu.unicore.services.rest.client.ForwardingHelper;
+import eu.unicore.services.restclient.BaseClient;
+import eu.unicore.services.restclient.ForwardingHelper;
 
 /**
  * Open a listening socket on the client side

@@ -206,11 +206,6 @@ public class Exec extends ActionBase {
 				throw new RuntimeException(ex);
 			}
 		}
-		try{
-			runner.run();
-		}catch(RuntimeException ex){
-			runner.dumpJobLog();
-			throw ex;
-		}
+		runner.run();
 	}
 }

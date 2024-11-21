@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.ExecutorService;
@@ -181,10 +182,11 @@ public class UCC{
 	 * 
 	 * @param args - the arguments for the command, where the first argument is the command name
 	 * @param shouldQuit - whether UCC should exit if no command could be found
-	 *           
+	 * @param properties - existing properties (can be null)
 	 * @return an initialised {@link Command} object 
 	 */
-	public static Command initCommand(String[] args, boolean shouldQuit) throws Exception {
+	public static Command initCommand(String[] args, boolean shouldQuit, Properties properties)
+			throws Exception {
 		String command = args[0];
 		Class<? extends Command> cmdClass = cmds.get(command);
 		if (cmdClass == null) {
@@ -195,6 +197,7 @@ public class UCC{
 			return null;
 		}
 		Command cmd = getCommand(command);
+		cmd.setProperties(properties);
 		boolean ok = cmd.init(args);
 		return ok? cmd : null;
 	}
@@ -299,7 +302,7 @@ public class UCC{
 			}else if(showVersion) {
 				printVersion();
 			}else{
-				cmd = initCommand(args, !unitTesting);
+				cmd = initCommand(args, !unitTesting, null);
 				if(cmd!=null){
 					msg.setPrefix("[ucc "+cmd.getName()+"]");
 					cmd.process();

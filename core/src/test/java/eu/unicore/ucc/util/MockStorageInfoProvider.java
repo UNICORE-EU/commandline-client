@@ -3,9 +3,9 @@ package eu.unicore.ucc.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import eu.unicore.services.Kernel;
 import eu.unicore.uas.impl.sms.DefaultStorageInfoProvider;
 import eu.unicore.uas.impl.sms.StorageDescription;
-import eu.unicore.services.Kernel;
 
 public class MockStorageInfoProvider extends DefaultStorageInfoProvider {
 

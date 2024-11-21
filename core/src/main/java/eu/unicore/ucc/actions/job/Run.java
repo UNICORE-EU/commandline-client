@@ -5,8 +5,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.io.IOUtils;
@@ -20,6 +21,8 @@ import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.runner.Runner;
 import eu.unicore.ucc.util.UCCBuilder;
+import eu.unicore.util.Log;
+import eu.unicore.util.Pair;
 
 /**
  * runs a job through UNICORE
@@ -42,6 +45,8 @@ public class Run extends ActionBase {
 	 * synchronous mode
 	 */
 	protected boolean synchronous;
+
+	Status waitFor = null;
 
 	/**
 	 * do not add job id prefixes to output file names 
@@ -125,6 +130,12 @@ public class Run extends ActionBase {
 				.desc("Launch a thread for each job file to run.")
 				.required(false)
 				.build());
+		getOptions().addOption(Option.builder(OPT_WAIT)
+				.longOpt(OPT_WAIT_LONG)
+				.desc("(Async mode) wait for the given job status ("+waitableJobStatuses+") before exiting.")
+				.hasArg(true)
+				.required(false)
+				.build());
 	}
 
 	@Override
@@ -156,6 +167,13 @@ public class Run extends ActionBase {
 		return "Job execution";
 	}
 
+	@Override
+	public Collection<String> getAllowedOptionValues(String option) {
+		if(OPT_WAIT.equals(option)) {
+			return waitableJobStatuses;
+		}
+		return null;
+	}
 
 	@Override
 	public void process() throws Exception {
@@ -167,7 +185,8 @@ public class Run extends ActionBase {
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		allocation = getCommandLine().getOptionValue(OPT_ALLOCATION);
 		if(allocation!=null && siteName!=null) {
-			throw new IllegalArgumentException("Cannot have both 'allocation' and 'sitename' arguments.");
+			throw new IllegalArgumentException("Cannot have both '--"
+					+OPT_ALLOCATION_LONG+"' and '--"+OPT_SITENAME_LONG+"' arguments.");
 		}
 		synchronous=!getBooleanOption(OPT_MODE_LONG, OPT_MODE);
 		verbose("Synchronous processing = "+synchronous);
@@ -186,21 +205,37 @@ public class Run extends ActionBase {
 		if(tags!=null) {
 			verbose("Job tags = " + Arrays.deepToString(tags));
 		}
-		final AtomicBoolean success = new AtomicBoolean(true);
-
+		String waitForSpec = getOption(OPT_WAIT_LONG, OPT_WAIT);
+		if(waitForSpec!=null) {
+			if(synchronous) {
+				throw new IllegalArgumentException("Option '--"+
+						OPT_WAIT_LONG+"' requires '--"+OPT_MODE_LONG+"'");
+			}
+			try{
+				waitFor = Status.valueOf(waitForSpec);
+				if(waitFor==Status.FAILED || waitFor==Status.UNDEFINED) {
+					throw new Exception();
+				}
+			}catch(Exception ex) {
+				throw new IllegalArgumentException("'--"+OPT_WAIT_LONG
+						+"' accepts one of: "+Arrays.asList(waitableJobStatuses));
+			}
+		}
+		final List<String>errors = Collections.synchronizedList(new ArrayList<>());
 		if(getCommandLine().getArgs().length>1){
 			List<Thread> threads = new ArrayList<>();
 			for(int i=1; i<getCommandLine().getArgs().length;i++){
 				final String jobFile = getCommandLine().getArgs()[i];
 				if(multiThreaded) {
 					Thread t = new Thread(()->{
+						Pair<Integer,String> result = null;
 						try {
-							if(run(readJob(jobFile))!=0) {
-								success.set(false);
+							result = run(readJob(jobFile));
+							if(result.getM1()!=0) {
+								errors.add("ERROR running <"+jobFile+">: "+result.getM2());
 							}
 						}catch(Exception ex) {
-							success.set(false);
-							error("Job failed for <"+jobFile+">", ex);
+							errors.add(Log.createFaultMessage("Job failed for <"+jobFile+">", ex));
 						}
 					});
 					t.setName("[ucc run "+i+"]");
@@ -208,8 +243,9 @@ public class Run extends ActionBase {
 					t.start();
 				}
 				else {
-					if(run(readJob(jobFile))!=0){
-						success.set(false);
+					Pair<Integer,String> result = run(readJob(jobFile));
+					if(result.getM1()!=0) {
+						errors.add("ERROR running <"+jobFile+">: "+result.getM2());
 					}
 				}
 			}
@@ -220,11 +256,15 @@ public class Run extends ActionBase {
 			}
 		}
 		else{
-			if(run(readJob())!=0){
-				success.set(false);
+			Pair<Integer,String> result = run(readJob());
+			if(result.getM1()!=0) {
+				errors.add("ERROR: "+result.getM2());
 			}
 		}
-		if(!success.get()) {
+		if(errors.size()>0) {
+			for(String s: errors) {
+				verbose(s);
+			}
 			throw new UCCException("Job(s) failed.");
 		}
 	}
@@ -263,7 +303,7 @@ public class Run extends ActionBase {
 		}
 	}
 
-	protected int run(UCCBuilder builder){
+	protected Pair<Integer, String> run(UCCBuilder builder){
 		Runner runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(!synchronous);
 		runner.setQuietMode(true);
@@ -291,21 +331,24 @@ public class Run extends ActionBase {
 				lastJobAddress=runner.getJob().getEndpoint().getUrl();
 				if(!synchronous) {
 					lastJobFile=builder.getProperty("jobIdFile");
+					if(waitFor!=null) {
+						verbose("Waiting for job to be "+waitFor+" ...");
+						runner.getJob().poll(waitFor);
+					}
 				}
 				try{
 					lastJobDirectory=runner.getJob().getLinkUrl("workingDirectory");
 				}catch(Exception ex){}
 			}
-		}catch(RuntimeException ex){
-			runner.dumpJobLog();
-			return ERROR;
+		}catch(Exception ex){
+			return new Pair<>(ERROR, Log.createFaultMessage("Error processing job", ex));
 		}
 		try {
-			if(synchronous && !Status.SUCCESSFUL.equals(runner.getStatus())) {
-				return ERROR;
+			if(Status.FAILED.equals(runner.getJob().getStatus())) {
+				return new Pair<>(ERROR, runner.getJob().getStatusMessage());
 			}
 		}catch(Exception ex) {}
-		return 0;
+		return new Pair<>(0, "");
 	}
 
 	public void printSampleJob(){

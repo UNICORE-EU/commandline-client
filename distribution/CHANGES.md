@@ -6,6 +6,10 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
+Version 10.1.2 (released MMM dd, 2024)
+--------------------------------------
+ - improvment: 'job-status -l' shows the error message for FAILED jobs
+ - update to UNICORE 10.1.2 base libs
 
 Version 10.1.1 (released Oct 2, 2024)
 -------------------------------------
