@@ -146,34 +146,6 @@ public class ServerToServer implements Constants {
 		}
 	}
 
-	protected Map<String,String>getExtraParams(){
-		Map<String, String>params = new HashMap<>();
-		if(scheduled!=null){
-			params.put("scheduledStartTime",scheduled);
-		}
-		String protocol = sourceDesc.getProtocol();
-
-		if(extraParameterSource!=null){
-			Map<String, String> res = new HashMap<>();
-			String p = String.valueOf(protocol);
-			PropertyHelper ph = new PropertyHelper(extraParameterSource, new String[]{p,p.toLowerCase()});
-			res = ph.getFilteredMap();
-			if(res.size()>0){
-				msg.verbose("Have "+res.size()+" extra parameters for protocol "+protocol);
-				params.putAll(res);
-			}
-
-			// TODO check if required
-			if(res.containsKey("uftp.streams")){
-				params.put("streams", res.get("uftp.streams"));
-			}
-			if(res.containsKey("uftp.encryption")){
-				params.put("encryption", res.get("uftp.encryption"));
-			}
-		}
-		return params;
-	}
-
 	/**
 	 * wait until complete or failed
 	 * @throws Exception
@@ -220,20 +192,12 @@ public class ServerToServer implements Constants {
 		this.preferredProtocol = preferredProtocol;
 	}
 
-	public boolean isSynchronous() {
-		return synchronous;
-	}
-
 	public void setSynchronous(boolean synchronous) {
 		this.synchronous = synchronous;
 	}
 
 	public void setScheduled(String scheduled) {
 		this.scheduled = scheduled;
-	}
-
-	public String getPreferredProtocol() {
-		return preferredProtocol;
 	}
 
 	public String getTransferAddress() {

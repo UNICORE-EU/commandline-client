@@ -1,6 +1,7 @@
 package eu.unicore.ucc.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -55,10 +56,14 @@ public class TestVarious {
 
 	@Test
 	public void testUFTPParameterProvider(){
-		Map<String,String>params = new HashMap<String, String>();
+		Map<String,String>params = new HashMap<>();
 		new FiletransferParameterProvider().provideParameters(params, "UFTP");
 		assertEquals("1", params.get(UFTPConstants.PARAM_STREAMS));
 		assertNotNull(params.get(UFTPConstants.PARAM_SECRET));
+
+		params.put(UFTPConstants.PARAM_CLIENT_HOST, "all");
+		new FiletransferParameterProvider().provideParameters(params, "UFTP");
+		assertFalse("all".equals(params.get(UFTPConstants.PARAM_CLIENT_HOST)));
 	}
 	
 
@@ -87,7 +92,6 @@ public class TestVarious {
 					}
 				}
 			}
-
 
 			canonical = InetAddress.getLocalHost().getCanonicalHostName();
 			if(canonical != null)

@@ -6,9 +6,10 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
-Version 10.1.2 (released MMM dd, 2024)
+Version 10.1.2 (released Nov 22, 2024)
 --------------------------------------
- - improvment: 'job-status -l' shows the error message for FAILED jobs
+ - new feature: 'run' in async mode has --wait-for option to define exit point
+ - improvement: 'job-status -l' shows the error message for FAILED jobs
  - update to UNICORE 10.1.2 base libs
 
 Version 10.1.1 (released Oct 2, 2024)
