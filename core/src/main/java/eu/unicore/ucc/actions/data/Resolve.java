@@ -93,9 +93,9 @@ public class Resolve extends ActionBase {
 	}
 
 	protected void doList() {
-		message("Configured resolvers");
+		console.info("Configured resolvers");
 		for(IResolve r: resolvers) {
-			message(" * "+r.synopsis());
+			console.info(" * {}", r.synopsis());
 		}
 	}
 
@@ -104,9 +104,9 @@ public class Resolve extends ActionBase {
 		targetDesc = resolve(target,registry,configurationProvider);
 		full = getBooleanOption("full", "f");
 		Endpoint e = new Endpoint(targetDesc.getSmsEpr());
-		verbose("SMS = "+targetDesc.getSmsEpr());
+		console.verbose("SMS = {}", targetDesc.getSmsEpr());
 		String result = full? targetDesc.getUnicoreURI() : e.getUrl();
-		message(result);
+		console.info("{}", result);
 		if(result!=null)properties.put(PROP_LAST_RESOURCE_URL, result);
 	}
 

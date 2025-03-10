@@ -12,6 +12,7 @@ import eu.unicore.client.lookup.CoreEndpointLister;
 import eu.unicore.client.lookup.SiteNameFilter;
 import eu.unicore.services.restclient.BaseClient;
 import eu.unicore.services.restclient.jwt.JWTUtils;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.UCCException;
 
 /**
@@ -102,9 +103,9 @@ public class IssueToken extends ActionBase {
 		}
 		lifetime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(lifetime>0){
-			verbose("Requesting lifetime of <"+lifetime+"> seconds.");
+			console.verbose("Requesting lifetime of <{}> seconds.", lifetime);
 		}else{
-			verbose("Using site default for token lifetime.");
+			console.verbose("Using site default for token lifetime.");
 		}
 		limited = getBooleanOption("limited", "L");
 		renewable = getBooleanOption("renewable", "R");
@@ -117,36 +118,41 @@ public class IssueToken extends ActionBase {
 		BaseClient bc = new BaseClient(b.build().toString(),
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
-		verbose("Requesting token from "+bc.getURL());
+		console.verbose("Requesting token from {}", bc.getURL());
 		try(ClassicHttpResponse res = bc.get(ContentType.TEXT_PLAIN)){
 			String token = EntityUtils.toString(res.getEntity());
 			if(inspect) {
 				showDetails(token);
 			}
-			message(token);
+			console.info("{}", token);
 			lastToken = token;
 		}
 	}
 
 	public String resolveSite() throws Exception {
 		CoreEndpointLister cl = new CoreEndpointLister(registry,
-				configurationProvider,
-				configurationProvider.getRESTAuthN());
+				configurationProvider, configurationProvider.getRESTAuthN(),
+				UCC.executor);
 		if(siteName!=null)cl.setAddressFilter(new SiteNameFilter(siteName));
 		CoreClient cc = cl.iterator().next();
 		if(cc==null) {
-			throw new UCCException("No site found! Please --sitename, or give a token endpoint URL.");
+			throw new UCCException("No site found! Please use --sitename, or give a token endpoint URL.");
 		}
 		return cc.getEndpoint().getUrl()+"/token";
 	}
 
 	public void showDetails(String token) throws Exception {
 		JSONObject o = JWTUtils.getPayload(token);
-		message("Subject:      "+o.optString("sub"));
-		message("Lifetime (s): "+(o.getInt("exp")-o.getInt("iat")));
-		message("Issued by:    "+o.optString("iss"));
-		message("Valid for:    "+o.optString("aud", "<unlimited>"));
-		message("Renewable:    "+o.optString("renewable", "no"));
+		String sub = o.getString("sub");
+		String uid = o.optString("uid", null);
+		if(uid!=null) {
+			sub = sub + " (uid="+uid+")";
+		}
+		console.info("Subject:      {}", sub);
+		console.info("Lifetime (s): {}", o.getInt("exp")-o.getInt("iat"));
+		console.info("Issued by:    {}", o.getString("iss"));
+		console.info("Valid for:    {}", o.optString("aud", "<unlimited>"));
+		console.info("Renewable:    {}", o.optString("renewable", "no"));
 	}
 
 	@Override

@@ -1,11 +1,15 @@
 package eu.unicore.ucc.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.data.CreateStorage;
+import eu.unicore.ucc.actions.info.ListActionBase;
 import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
@@ -17,19 +21,24 @@ public class TestStorageActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_CreateStorage() {
-		
-		UCC.main(new String[]{"create-storage","-v", "-c", "src/test/resources/conf/userprefs.embedded"});
+		UCC.main(new String[]{"create-storage",
+				"-v", "-c", "src/test/resources/conf/userprefs.embedded",
+				"-f", "https://localhost:65322/rest/core/storagefactories/default_storage_factory"}
+		);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		assertNotNull(CreateStorage.getLastStorageAddress());
 
 		UCC.main(new String[]{"create-storage","-v", "-c", "src/test/resources/conf/userprefs.embedded",
 				"--lifetime", "14",
 				"-f", "https://localhost:65322/rest/core/storagefactories/default_storage_factory"
 		});
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		
+		assertNotNull(CreateStorage.getLastStorageAddress());
+
 		UCC.main(new String[]{"list-storages","-l", "-v", "-c", "src/test/resources/conf/userprefs.embedded"});
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		
+		assertTrue(ListActionBase.getLastNumberOfResults()>0);
+
 		String[] args=new String[]{"create-storage", "-v", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-t", "DEFAULT", "testkey=testvalue"
@@ -40,7 +49,7 @@ public class TestStorageActions extends EmbeddedTestBase {
 		// wrong factory URL
 		args=new String[]{"create-storage", "-v", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
-				"-f", "https://localhost:65322/services/StorageFactory?res=no_such_factory",
+				"-f", "https://localhost:65322/rest/core/storagefactories/no_such_factory",
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(Constants.ERROR),UCC.exitCode);
@@ -52,15 +61,14 @@ public class TestStorageActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(Constants.ERROR),UCC.exitCode);
-		
+
 		// wrong type
 		args=new String[]{"create-storage", "-v", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-t", "NO_SUCH_TYPE",
 		};
 		UCC.main(args);
-		assertEquals(Integer.valueOf(Constants.ERROR),UCC.exitCode);
-		
+		assertEquals(Integer.valueOf(Constants.ERROR),UCC.exitCode);	
 	}
 
 	@Test

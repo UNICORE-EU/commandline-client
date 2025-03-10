@@ -45,7 +45,7 @@ public class Connector implements Runnable {
 	public void run() {
 		SiteFactoryLister lister=new SiteFactoryLister(UCC.executor,registry,cfgProvider);
 		if(blacklist!=null && blacklist.length>0){
-			UCC.getConsoleLogger().verbose("Using blacklist <"+Arrays.asList(blacklist)+">");
+			UCC.console.verbose("Using blacklist <{}>", Arrays.asList(blacklist));
 			lister.setAddressFilter(new Blacklist(blacklist));
 		}
 		for(SiteFactoryClient tsf: lister){
@@ -54,12 +54,12 @@ public class Connector implements Runnable {
 					break;
 			}
 			else{
-				UCC.getConsoleLogger().verbose("Connecting to "+tsf.getEndpoint().getUrl());
+				UCC.console.verbose("Connecting to {}", tsf.getEndpoint().getUrl());
 				try{
 					handleTSF(tsf);
 					tsfAvailable.incrementAndGet();
 				}catch(Exception ex){
-					UCC.getConsoleLogger().error("Error creating site at "+tsf.getEndpoint().getUrl(),ex);
+					UCC.console.error(ex, "Error creating site at {}", tsf.getEndpoint().getUrl());
 				}
 			}
 		}
@@ -68,16 +68,16 @@ public class Connector implements Runnable {
 	protected void handleTSF(SiteFactoryClient tsf) throws Exception {
 		try {
 			SiteClient tss = tsf.getOrCreateSite();
-			UCC.getConsoleLogger().verbose("TSS at address "+tss.getEndpoint().getUrl());
+			UCC.console.verbose("TSS at address {}", tss.getEndpoint().getUrl());
 			_last_TSS = tss.getEndpoint().getUrl();
 			URLCompleter.registerSiteURL(_last_TSS);
 			tssAvailable.incrementAndGet();
 		}catch(Exception e){
 			if(Log.getDetailMessage(e).contains("Access denied")){
-				UCC.getConsoleLogger().verbose("Access denied on <"+tsf.getEndpoint().getUrl()+">");
+				UCC.console.verbose("Access denied on <{}>", tsf.getEndpoint().getUrl());
 			}
 			else{
-				UCC.getConsoleLogger().error("Can't create target system.",e);
+				UCC.console.error(e, "Can't create target system.");
 			}
 		}
 	}

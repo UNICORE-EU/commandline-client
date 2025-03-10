@@ -38,7 +38,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	public void process() throws Exception {
 		super.process();
 		this.showAll = getCommandLine().hasOption(OPT_ALL);
-		verbose("Listing job directories = "+showAll);
+		console.verbose("Listing job directories = {}", showAll);
 		// do we have a list of storages
 		if(getCommandLine().getArgList().size()>1){
 			boolean first = true;
@@ -50,7 +50,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 				try{
 					listStorage(makeClient(String.valueOf(arg)));
 				}catch(Exception ex){
-					error("Error listing storage at "+arg, ex);
+					console.error(ex, "Error listing storage at {}", arg);
 				}
 			}
 		}
@@ -84,7 +84,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 					}
 				}
 			}catch(Exception ex) {
-				error("Error listing storage at <"+sms.getEndpoint().getUrl()+">",ex);
+				console.error(ex, "Error listing storage at <{}>", sms.getEndpoint().getUrl());
 			}
 		}
 	}
@@ -92,11 +92,11 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	protected void listStorage(StorageClient storage) throws Exception {
 		String url = storage.getEndpoint().getUrl();
 		try{
-			message(url+System.getProperty("line.separator")+getDetails(storage));
+			console.info("{}{}{}", url, System.getProperty("line.separator"), getDetails(storage));
 			properties.put(PROP_LAST_RESOURCE_URL, url);
 			URLCompleter.registerSiteURL(url);
 		}catch(Exception ex){
-			error("Error listing storage at "+url, ex);
+			console.error(ex, "Error listing storage at {}", url);
 		}
 		printProperties(storage);
 	}

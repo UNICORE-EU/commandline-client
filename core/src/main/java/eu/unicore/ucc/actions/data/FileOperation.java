@@ -105,7 +105,7 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 			HttpFileTransferClient hc = new HttpFileTransferClient(ep, props, configurationProvider.getAnonymousClientConfiguration(), null);
 			hc.setProgressListener(p);
 			if(startByte!=null){
-				verbose("Byte range: "+startByte+"-"+endByte);
+				console.verbose("Byte range: {}-{}", startByte, endByte);
 				SupportsPartialRead pReader=(SupportsPartialRead)hc;
 				pReader.readPartial(startByte, endByte-startByte, out);
 			}

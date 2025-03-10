@@ -14,6 +14,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.Logger;
 
+import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
 import eu.unicore.util.Log;
 
@@ -39,9 +40,11 @@ public abstract class Command implements Constants {
 
 	protected File propertiesFile;
 
-	protected Properties properties=null;
+	protected Properties properties = null;
 
-	protected NumberFormat numberFormat=UCC.numberFormat;
+	protected NumberFormat numberFormat = UCC.numberFormat;
+
+	protected static ConsoleLogger console = UCC.console;
 
 	/**
 	 * output directory
@@ -66,20 +69,20 @@ public abstract class Command implements Constants {
 		CommandLineParser parser = new DefaultParser();
 		line = parser.parse( getOptions(), args );
 		if(getCommandLine().hasOption(OPT_VERBOSE)){
-			UCC.getConsoleLogger().setVerbose(true);
+			console.setVerbose(true);
 		}
 		loadUserProperties();
 		return true;
 	}
 
 	protected void setOutputLocation() throws Exception {
-		verbose("Current directory is <"+new File("").getAbsolutePath()+">");
+		console.verbose("Current directory is <{}>", new File("").getAbsolutePath());
 		String outputLoc=getCommandLine().getOptionValue(OPT_OUTPUT, properties.getProperty(OPT_OUTPUT_LONG));
 		if(outputLoc==null)outputLoc=".";
 		output=new File(outputLoc);
 		if(!output.exists())output.mkdirs();
 		if(!output.isDirectory())throw new IllegalArgumentException("<"+outputLoc+"> is not a directory.");
-		verbose("Output goes to <"+outputLoc+">");
+		console.verbose("Output goes to <{}>", outputLoc);
 	}
 
 
@@ -223,7 +226,7 @@ public abstract class Command implements Constants {
 		timing = getBooleanOption(OPT_TIMING_LONG, OPT_TIMING);
 		if(timing){
 			startTime=System.currentTimeMillis();
-			verbose("Timing mode.");
+			console.verbose("Timing mode.");
 		}
 		setOutputLocation();
 	}
@@ -236,7 +239,7 @@ public abstract class Command implements Constants {
 		if(timing){
 			endTime=System.currentTimeMillis();
 			float duration=(endTime-startTime)/1000;
-			message("Time: "+numberFormat.format(duration)+" sec.");
+			console.info("Time: {} sec.", numberFormat.format(duration));
 		}
 	}
 
@@ -245,8 +248,7 @@ public abstract class Command implements Constants {
 	 */
 	protected void loadUserProperties() throws Exception {
 		if(properties!=null)return;
-		verbose("UCC "+UCC.getVersion());
-
+		console.verbose("UCC {}", UCC.getVersion());
 		properties=new Properties();
 		boolean userSpecified=false;
 		CommandLine line=getCommandLine();
@@ -255,13 +257,13 @@ public abstract class Command implements Constants {
 		if(propertiesFile==null){
 			if(line.hasOption(OPT_PROPERTIES)){
 				props=line.getOptionValue(OPT_PROPERTIES);
-				verbose("Properties file: <"+props+">");
+				console.verbose("Properties file: <{}>", props);
 				userSpecified=true;
 			}
 			propertiesFile=new File(props);
 		}
 		if(propertiesFile.exists()){
-			verbose("Reading properties file <"+props+">");
+			console.verbose("Reading properties file: <{}>", props);
 			try(FileInputStream fis = new FileInputStream(propertiesFile)){
 				properties.load(fis);
 			}
@@ -271,7 +273,7 @@ public abstract class Command implements Constants {
 				throw new UCCException("Properties file <"+props+"> does not exist.");
 			}
 			else{
-				verbose("No properties file found at <"+props+">");	
+				console.verbose("No properties file found at <{}>", props);	
 			}
 		}
 		// set default session ID file, if not set
@@ -288,8 +290,8 @@ public abstract class Command implements Constants {
 		if(properties==null)throw new IllegalStateException();
 		String authMethod = properties.getProperty("authenticationMethod");
 		if(authMethod!=null && properties.getProperty(OPT_AUTHN_METHOD_LONG)==null) {
-			verbose("WARN: deprecated config file property 'authenticationMethod', "
-					+ "updating to '"+OPT_AUTHN_METHOD_LONG+"'");
+			console.verbose("WARN: deprecated config file property 'authenticationMethod', "
+					+ "updating to '{}'", OPT_AUTHN_METHOD_LONG);
 			properties.setProperty(OPT_AUTHN_METHOD_LONG, authMethod);
 			properties.remove("authenticationMethod");
 		}
@@ -319,7 +321,7 @@ public abstract class Command implements Constants {
 		try{
 			return Integer.parseInt(val);
 		}catch(Exception e){
-			error("Can't parse supplied value for option <"+longForm+">, using default <"+defaultValue+">",e);
+			console.error(e, "Can't parse supplied value for option <{}>, using default <{}>", longForm, defaultValue);
 			return defaultValue;
 		}
 	}
@@ -371,19 +373,6 @@ public abstract class Command implements Constants {
 			val=properties.getProperty(longForm,defaultValue);
 		}
 		return val;
-	}
-
-	public void verbose(String message){
-		UCC.getConsoleLogger().verbose(message);
-	}
-	
-	public void message(String message){
-		if(UCC.mute)return;
-		UCC.getConsoleLogger().message(message);
-	}
-
-	public void error(String message, Throwable cause){
-		UCC.getConsoleLogger().error(message,cause);
 	}
 
 	public void setOutputDirectory(File output){

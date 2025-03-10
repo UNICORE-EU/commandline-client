@@ -134,7 +134,7 @@ public class Runner implements Runnable {
 	public static final String ERR_JOB_NOT_COMPLETED_SUCCESSFULLY="JobDidNotCompleteSuccessfully";
 
 	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider, UCCBuilder builder){
-		this(registry,configurationProvider,builder,new ConsoleLogger());
+		this(registry,configurationProvider,builder,UCC.console);
 	}
 
 	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider,UCCBuilder builder, ConsoleLogger writer){
@@ -294,11 +294,12 @@ public class Runner implements Runnable {
 		JSONObject submit = builder.getJSON();
 		if(dryRun){
 			listCandidateSites();
-			msg.message("Dry-run, NOT submitting, effective JSON:");
-			msg.message(submit.toString(2));
+			msg.info("Dry-run, NOT submitting, effective JSON:");
+			msg.info(submit.toString(2));
 			return;
 		}
 		findTSS();
+		msg.verbose("Submission endpoint: "+tss.getEndpoint().getUrl());
 		try{
 			if(builder.getImports().size()==0){
 				submit.put("haveClientStageIn", "false");
@@ -331,7 +332,7 @@ public class Runner implements Runnable {
 		String url = jobClient.getEndpoint().getUrl();
 		builder.setProperty("epr", url);
 		builder.setProperty("type", "job");
-		msg.message(url);
+		msg.info(url);
 		properties.put(Constants.PROP_LAST_RESOURCE_URL, url);
 	}
 
@@ -356,7 +357,6 @@ public class Runner implements Runnable {
 	 */
 	private void findTSS()throws RunnerException {
 		if(tss!=null) {
-			msg.verbose("Submission endpoint: "+tss.getEndpoint().getUrl());
 			return;
 		}
 		if(broker==null){
@@ -382,7 +382,7 @@ public class Runner implements Runnable {
 	 */
 	private void listCandidateSites()throws RunnerException {
 		if(tss!=null) {
-			msg.message("Submission endpoint: "+tss.getEndpoint().getUrl());
+			msg.info("Submission endpoint: {}", tss.getEndpoint().getUrl());
 			return;
 		}
 		if(broker==null){
@@ -394,7 +394,7 @@ public class Runner implements Runnable {
 				msg.verbose("No matching target system available (try 'connect' or check job requirements)");
 			}
 			for(Endpoint epr: eprs){
-				msg.message("Candidate site: "+epr.getUrl());
+				msg.info("Candidate site: {}", epr.getUrl());
 			}
 		}
 		catch(Exception ex){
@@ -411,7 +411,7 @@ public class Runner implements Runnable {
 			if(!output.exists())output.mkdirs();
 			if(!output.isDirectory())throw new IllegalArgumentException("<"+outputLoc+"> is not a directory.");
 		}catch(Exception e){
-			msg.error("Problem with <"+outputLoc+">",e);
+			msg.error(e, "Problem with <{}>", outputLoc);
 		}
 	}
 
@@ -486,9 +486,9 @@ public class Runner implements Runnable {
 				//attempt to recover or fail (and abort / destroy job)?
 				if(!"BFT".equals(e.getChosenProtocol())){
 					//retry with BFT
-					msg.message("ERROR performing file import: "+
+					msg.info("ERROR performing file import: {}",
 							Log.createFaultMessage(re.getErrorReason(), re.getCause()));
-					msg.message("Re-trying import using BFT protocol");
+					msg.info("Re-trying import using BFT protocol");
 					// e.setPreferredProtocols(...);
 					performImportFromLocal(e);
 				}
@@ -515,9 +515,9 @@ public class Runner implements Runnable {
 				//attempt to recover or fail (and abort / destroy job)?
 				if(!"BFT".equals(e.getChosenProtocol())){
 					//retry with BFT
-					UCC.getConsoleLogger().message("ERROR performing file export: "+
+					UCC.console.info("ERROR performing file export: {}",
 							Log.createFaultMessage(re.getErrorReason(), re.getCause()));
-					UCC.getConsoleLogger().message("Re-trying import using BFT protocol");
+					UCC.console.info("Re-trying import using BFT protocol");
 					// e.setPreferredProtocols(...);
 					performExportToLocal(e);
 				}
@@ -610,10 +610,10 @@ public class Runner implements Runnable {
 			try(FileWriter fw=new FileWriter(dumpFile)){
 				builder.writeTo(fw);
 			}
-			msg.message(dumpFile.getAbsolutePath());
+			msg.info(dumpFile.getAbsolutePath());
 		}
 		catch(Exception e){
-			msg.error("Could not write job ID file.",e);
+			msg.error(e, "Could not write job ID file.");
 		}
 	}
 
@@ -685,8 +685,8 @@ public class Runner implements Runnable {
 				}catch(Exception ex) {}
 			}
 		}
-		if(!printOnlyIfChanged)msg.message(sb.toString());
-		else if(changed)msg.message(sb.toString());
+		if(!printOnlyIfChanged)msg.info(sb.toString());
+		else if(changed)msg.info(sb.toString());
 	}
 
 	// Runner states
@@ -739,11 +739,11 @@ public class Runner implements Runnable {
 				try{
 					r.doImport();
 				}catch(RunnerException re){
-					r.msg.error("Data import failed, removing the job.", re);
+					r.msg.error(re, "Data import failed, removing the job.");
 					try{
 						r.jobClient.delete();
 					}catch(Exception ex){
-						r.msg.error("Could not cleanup job.", ex);
+						r.msg.error(ex, "Could not cleanup job.");
 					}
 					throw re;
 				}
@@ -872,9 +872,9 @@ public class Runner implements Runnable {
 						r.initJobClient();
 						r.mustSave=true;
 						r.jobClient.delete();
-						r.msg.verbose("Deleted done job "+r.jobClient.getEndpoint().getUrl());
+						r.msg.verbose("Deleted done job {}", r.jobClient.getEndpoint().getUrl());
 					}catch(Exception e){
-						r.msg.error("Could not delete job",e);
+						r.msg.error(e, "Could not delete job");
 					}
 				}		
 				return getState(FINISHED);

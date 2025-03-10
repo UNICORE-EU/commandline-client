@@ -61,7 +61,7 @@ public class RunCommand extends ActionBase {
 			}
 			String key=split[0];
 			String value=split[1];
-			verbose("Have parameter: "+key+"="+value);
+			console.verbose("Have parameter: {}={}", key, value);
 			params.put(key, value);
 		}
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
@@ -72,7 +72,7 @@ public class RunCommand extends ActionBase {
 				try{
 					String regurl = ((RegistryClient)registry).getEndpoint().getUrl();
 					url = regurl.replace("registries/default_registry", "admin");
-					verbose("Will try fallback admin service URL: "+url);
+					console.verbose("Will try fallback admin service URL: <{}>", url);
 				}catch(Exception ex){}
 			}
 			if(url==null){
@@ -85,7 +85,7 @@ public class RunCommand extends ActionBase {
 		AdminServiceClient asc=null;
 		List<AdminCommand>availableCmds = null;
 		asc = createClient();
-		verbose("Contacted admin service at <"+url+">");
+		console.verbose("Contacted admin service at <{}>", url);
 		availableCmds = asc.getCommands();
 		//check command availability
 		boolean haveCmd = false;
@@ -100,12 +100,12 @@ public class RunCommand extends ActionBase {
 		}
 		Result result = asc.runCommand(cmd, params);
 		if(result.successful){
-			message("SUCCESS, service reply: "+result.message);
+			console.info("SUCCESS, service reply: {}", result.message);
 			if(result.results.size()>0){
-				message(String.valueOf(result.results));
+				console.info("{}", result.results);
 			}
 		}else{
-			message("Action was NOT SUCCESSFUL, service reply: "+result.message);
+			console.info("Action was NOT SUCCESSFUL, service reply: {}", result.message);
 		}
 	}
 

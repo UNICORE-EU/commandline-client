@@ -100,7 +100,7 @@ public class OpenTunnel extends ActionBase {
 	protected void doProcess() throws Exception {
 		BaseClient bc = makeClient(endpoint);
 		ForwardingHelper fh = new ForwardingHelper(bc);
-		verbose("Opening listening socket on <"+localInterface+":"+localPort+">, waiting for local client connection...");
+		console.verbose("Opening listening socket on <{}:{}>, waiting for local client connection...", authNMethod, localPort);
 		try(ServerSocketChannel sc = ServerSocketChannel.open()){
 			sc.configureBlocking(false);
 			sc.bind(new InetSocketAddress(localInterface, localPort), 1);
@@ -110,10 +110,10 @@ public class OpenTunnel extends ActionBase {
 				}
 				numClients.incrementAndGet();
 				try {
-					verbose("Client application " + client.getRemoteAddress() +
-							" connected, connecting to backend <"+endpoint+"> ...");
+					console.verbose("Client application {} connected, connecting to backend <{}>...",
+							client.getRemoteAddress(), endpoint);
 					SocketChannel serviceProxy = fh.connect(endpoint);
-					verbose("Connected, starting data forwarding.");
+					console.verbose("Connected, starting data forwarding.");
 					fh.startForwarding(client, serviceProxy);
 				}catch(Exception ex) {
 					throw new RuntimeException(ex);
@@ -121,7 +121,7 @@ public class OpenTunnel extends ActionBase {
 			});
 			if(localPort==0) {
 				localPort = ((InetSocketAddress)sc.getLocalAddress()).getPort();
-				message("Listening on <"+localInterface+":"+localPort+">");
+				console.info("Listening on <{}:{}>", localInterface, localPort);
 			}
 			fh.run();
 		}

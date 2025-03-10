@@ -7,6 +7,7 @@ import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.lookup.AddressFilter;
 import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.io.Location;
 
@@ -34,7 +35,7 @@ public class DefaultResolver implements IResolve {
 			final String storage_id = p[0];
 			final String file = p.length==2? p[1] : "/";
 			
-			StorageLister l = new StorageLister(registry, configurationProvider, null);
+			StorageLister l = new StorageLister(UCC.executor, registry, configurationProvider, null);
 			l.setAddressFilter(new AddressFilter() {
 
 				@Override

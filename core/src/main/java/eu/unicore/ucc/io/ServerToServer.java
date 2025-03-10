@@ -1,8 +1,6 @@
 package eu.unicore.ucc.io;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.json.JSONObject;
@@ -11,7 +9,6 @@ import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.TransferControllerClient;
-import eu.unicore.uas.util.PropertyHelper;
 import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
@@ -61,7 +58,7 @@ public class ServerToServer implements Constants {
 		this.targetDesc = targetDesc;
 		this.configurationProvider = configurationProvider;
 		this.preferredProtocol = "BFT";
-		this.msg = UCC.getConsoleLogger();
+		this.msg = UCC.console;
 	}
 
 	public void setExtraParameterSource(Properties properties){
@@ -126,12 +123,12 @@ public class ServerToServer implements Constants {
 				StorageClient sms = new StorageClient(source,
 						configurationProvider.getClientConfiguration(source.getUrl()),
 						configurationProvider.getRESTAuthN());
-				msg.verbose("Initiating send-file on storage <"+sms.getEndpoint().getUrl()+">," +
-						"sending file <"+sourceDesc.getName()+">, writing to '"+targetDesc.getResolvedURL()+"'");
+				msg.verbose("Initiating send-file on storage <{}>, sending file <{}>, writing to '{}'",
+						sms.getEndpoint().getUrl(),	sourceDesc.getName(), targetDesc.getResolvedURL());
 				tcc = sms.sendFile(sourceDesc.getName(), targetDesc.getResolvedURL(), null);
 			}
 			transferAddress = tcc.getEndpoint().getUrl();
-			msg.verbose("Have filetransfer instance: "+transferAddress);
+			msg.verbose("Have filetransfer instance: {}", transferAddress);
 			if(!synchronous){
 				return;
 			}
@@ -140,7 +137,7 @@ public class ServerToServer implements Constants {
 			if(synchronous && tcc!=null){
 				try{ tcc.delete(); }
 				catch(Exception e1){
-					msg.error("Could not destroy the filetransfer client",e1);
+					msg.error(e1, "Could not destroy the filetransfer client");
 				}
 			}
 		}

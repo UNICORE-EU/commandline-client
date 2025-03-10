@@ -30,7 +30,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	protected String[] fields;
 	
 	//for unit testing
-	public static int lastNumberOfResults;
+	protected static int lastNumberOfResults;
 	
 	@Override
 	protected void createOptions() {
@@ -72,9 +72,9 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		super.process();
 		lastNumberOfResults=0;
 		doFilter=getCommandLine().hasOption(OPT_FILTER);
-		verbose("Filtering = "+doFilter);
+		console.verbose("Filtering = {}", doFilter);
 		detailed=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
-		verbose("Detailed listing = "+detailed);
+		console.verbose("Detailed listing = {}", detailed);
 		raw=getBooleanOption(OPT_RAW_LONG, OPT_RAW);
 		
 		if(doFilter){
@@ -82,11 +82,11 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		}
 		if(getCommandLine().hasOption(OPT_TAGS)){
 			tags = getCommandLine().getOptionValues(OPT_TAGS);
-			verbose("Tags = " + Arrays.deepToString(tags));
+			console.verbose("Tags = {}", Arrays.deepToString(tags));
 		}
 		if(getCommandLine().hasOption(OPT_FIELDS)){
 			fields = getCommandLine().getOptionValues(OPT_FIELDS);
-			verbose("Fields = "+Arrays.asList(fields));
+			console.verbose("Fields = {}", Arrays.asList(fields));
 		}
 	}
 
@@ -109,7 +109,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	 */
 	protected void printProperties(T entry) throws Exception {
 		if(raw || (fields!=null && fields.length>0)){
-			message(entry.getProperties(fields).toString(2));
+			console.info("{}", entry.getProperties(fields).toString(2));
 		}
 	}
 	

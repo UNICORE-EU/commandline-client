@@ -2,6 +2,7 @@ package eu.unicore.ucc.job;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.info.ListActionBase;
 import eu.unicore.ucc.actions.job.Allocate;
 import eu.unicore.ucc.actions.job.CreateTSS;
 import eu.unicore.ucc.actions.job.JobStatus;
@@ -95,6 +97,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		assertTrue(ListActionBase.getLastNumberOfResults()>0);
 	}
 
 	@Test

@@ -100,7 +100,7 @@ public class FileUploader extends FileTransferBase {
 			String target=remoteDirectory+"/"+localFile.getName();
 			if(localFile.isDirectory()){
 				if(!recurse){
-					UCC.getConsoleLogger().verbose("Skipping directory "+localFile.getAbsolutePath());
+					UCC.console.verbose("Skipping directory {}", localFile.getAbsolutePath());
 				}else{
 					File[] fileset=localFile.listFiles();
 					sms.mkdir(target);
@@ -132,31 +132,26 @@ public class FileUploader extends FileTransferBase {
 		else if(remotePath.endsWith("/")){
 			remotePath+=localFile.getName();
 		}
-		UCC.getConsoleLogger().verbose("Uploading local file '"+localFile.getAbsolutePath()+"' -> '"
-				+sms.getEndpoint().getUrl()+"/files/"+remotePath+"'");
+		UCC.console.verbose("Uploading local file '{}' -> '{}/files/{}'",
+				localFile.getAbsolutePath(), sms.getEndpoint().getUrl(), remotePath);
 		FiletransferClient ftc = null;
-		try(FileInputStream is=new FileInputStream(localFile.getAbsolutePath())){
-			
+		try(FileInputStream is = new FileInputStream(localFile.getAbsolutePath())){
 			boolean resume = Mode.RESUME.equals(mode);
 			boolean append = Mode.APPEND.equals(mode) || resume;
-			
 			if(resume){
 				setupOffsetForResume(remotePath, sms);
 			}
 			ftc = sms.createImport(remotePath, append, localFile.length(), protocol, extraParameters);
 			configure(ftc, extraParameters);
-			
 			if(append) {
 				if(ftc instanceof FiletransferOptions.IAppendable) {
 					((FiletransferOptions.IAppendable)ftc).setAppend();
 				}else {
 					throw new Exception("Append is not supported by protocol <"+protocol+">");
-				}
-				
+				}	
 			}
-			
 			String url=ftc.getEndpoint().getUrl();
-			UCC.getConsoleLogger().verbose("File transfer URL : "+url);
+			UCC.console.verbose("File transfer URL: {}", url);
 			ProgressBar p=null;
 			if(ftc instanceof IMonitorable){
 				long size=localFile.length();
@@ -168,7 +163,7 @@ public class FileUploader extends FileTransferBase {
 			}
 			FiletransferOptions.Write writer = (FiletransferOptions.Write)ftc;
 			if(isRange()){
-				UCC.getConsoleLogger().verbose("Byte range: "+startByte+" - "+(getRangeSize()>0?endByte:""));
+				UCC.console.verbose("Byte range: {} - {}", startByte, (getRangeSize()>0?endByte:""));
 				long totalSkipped=0;
 				long toSkip = startByte;
 				while(totalSkipped<startByte){
@@ -202,7 +197,7 @@ public class FileUploader extends FileTransferBase {
 		if(timing){
 			long duration=System.currentTimeMillis()-startTime;
 			double rate=(double)localFile.length()/(double)duration;
-			UCC.getConsoleLogger().message("Rate: "+UCC.numberFormat.format(rate)+ " kB/sec.");
+			UCC.console.info("Rate: {} kB/sec.", UCC.numberFormat.format(rate));
 		}
 	}
 
@@ -224,7 +219,7 @@ public class FileUploader extends FileTransferBase {
 			}
 			sms.chmod(target, perms.toString());
 		}catch(Exception ex){
-			UCC.getConsoleLogger().error("Can't set permissions on remote file.",ex);
+			UCC.console.error(ex, "Can't set permissions on remote file.");
 		}
 	}
 

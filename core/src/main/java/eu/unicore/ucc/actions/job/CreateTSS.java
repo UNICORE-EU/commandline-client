@@ -102,9 +102,9 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 
 		initialLifeTime = getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(initialLifeTime>0){
-			verbose("New TSSs will have a lifetime of <"+initialLifeTime+"> days.");
+			console.verbose("New TSSs will have a lifetime of <{}> days.", initialLifeTime);
 		}else{
-			verbose("Using site default for TSS lifetime.");
+			console.verbose("Using site default for TSS lifetime.");
 		}
 		factoryURL = getOption(OPT_FACTORY_LONG, OPT_FACTORY);
 		SiteFactoryClient tsf;
@@ -112,16 +112,16 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 			SiteFactoryLister tsfl = new SiteFactoryLister(UCC.executor, registry, configurationProvider);
 			siteName = getOption(OPT_SITENAME_LONG, OPT_SITENAME);
 			if(siteName!=null){
-				verbose("Looking for factory at site <"+siteName+">");
+				console.verbose("Looking for factory at site <{}>", siteName);
 				tsfl.setAddressFilter(new SiteNameFilter(siteName));
 			}
 			else{
-				verbose("No factory specified, will choose one from registry.");
+				console.verbose("No factory specified, will choose one from registry.");
 			}
 			tsf = tsfl.iterator().next();
 		}
 		else{
-			verbose("Using factory at <"+factoryURL+">");
+			console.verbose("Using factory at <{}>", factoryURL);
 			tsf = new SiteFactoryClient(new Endpoint(factoryURL), 
 					configurationProvider.getClientConfiguration(factoryURL), 
 					configurationProvider.getRESTAuthN());
@@ -131,11 +131,11 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 		}
 		else{
 			factoryURL = tsf.getEndpoint().getUrl();
-			verbose("Using factory at <"+factoryURL+">");
+			console.verbose("Using factory at <{}>", factoryURL);
 		}
 		SiteClient tss = tsf.createSite(getCreationParameters(), getTermTime());
 		String addr = tss.getEndpoint().getUrl();
-		message(addr);
+		console.info("{}", addr);
 		properties.put(PROP_LAST_RESOURCE_URL, addr);
 		setLastTSSAddress(addr);
 	}

@@ -55,11 +55,10 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 	 */
 	public StorageFactoryLister(ExecutorService executor, IRegistryClient registry, 
 			UCCConfigurationProvider configurationProvider, AddressFilter addressFilter){
-		super();
+		super(executor);
 		this.registry = registry;
 		this.configurationProvider = configurationProvider;
 		setAddressFilter(addressFilter);
-		setExecutor(executor);
 	}
 	
 	@Override

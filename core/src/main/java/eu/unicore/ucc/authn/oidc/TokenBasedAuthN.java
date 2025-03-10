@@ -26,7 +26,7 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 	
 	protected String token = null;
 	protected String refreshToken = null;
-	protected ConsoleLogger msg = UCC.getConsoleLogger();
+	protected ConsoleLogger msg = UCC.console;
 	protected long lastRefresh;
 
 	@Override
@@ -72,7 +72,7 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 	protected void refreshTokenIfNecessary() throws Exception {
 		// NOP
 	}
-	
+
 	@Override
 	public void addAuthenticationHeaders(HttpMessage httpMessage) throws Exception {
 		if(refreshToken!=null) {

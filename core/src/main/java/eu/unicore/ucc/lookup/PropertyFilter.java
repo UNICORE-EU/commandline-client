@@ -43,7 +43,7 @@ public class PropertyFilter implements Filter {
 			String propValue=obj.toString();
 			return compare(value,propValue);
 		}catch(Exception e){
-			UCC.getConsoleLogger().error("Can't find property <"+property+">", e);
+			UCC.console.error(e, "Can't find property <{}>", property);
 		}
 		return false;
 	}
@@ -55,7 +55,7 @@ public class PropertyFilter implements Filter {
 		if(modifier.equalsIgnoreCase(MOD_NOTCONTAINS)||modifier.equalsIgnoreCase(MOD_NOTCONTAINS_SHORT))return !actual.contains(expected);
 		if(modifier.equalsIgnoreCase(MOD_LT)||modifier.equalsIgnoreCase(MOD_LT_SHORT))return actual.compareTo(expected)<0;
 		if(modifier.equalsIgnoreCase(MOD_GT)||modifier.equalsIgnoreCase(MOD_GT_SHORT))return actual.compareTo(expected)>0;
-		UCC.getConsoleLogger().verbose("Can't compare!");
+		UCC.console.error(null, "Can't compare <{}> to <{}>", expected, actual);
 		return false;
 	}
 	
@@ -83,12 +83,12 @@ public class PropertyFilter implements Filter {
 			String propName=args[0];
 			String mod=args[1];
 			String val=args[2];
-			UCC.getConsoleLogger().verbose("Filtering on property '"+propName+"'");
+			UCC.console.verbose("Filtering on property '{}'", propName);
 			if(acceptModifier(mod)){
 				return new PropertyFilter(propName,mod,val);
 			}
 		}
-		UCC.getConsoleLogger().verbose("Could not create filter.");
+		UCC.console.verbose("Could not create filter.");
 		return null;
 	}
 

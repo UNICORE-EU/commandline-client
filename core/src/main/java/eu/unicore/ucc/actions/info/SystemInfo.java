@@ -95,16 +95,16 @@ public class SystemInfo extends ActionBase {
 	protected void getInfo(IServiceInfoProvider info){
 		String type = info.getType();
 		String name = info.getServiceName();
-		message("");
-		message("Checking for <"+name+"> endpoint ...");
+		console.info("");
+		console.info("Checking for <{}> endpoint ...", name);
 		try{
 			List<Endpoint> list = registry.listEntries(new RegistryClient.ServiceTypeFilter(type));
 			int n=list.size();
 			if(n==0){
-				message("... no endpoints available");
+				console.info("... no endpoints available");
 			}
 			else{
-				message("... OK, found "+n+" endpoint(s)");
+				console.info("... OK, found {} endpoint(s)", n);
 				for(Endpoint e: list){
 					String url = e.getUrl();
 					if(isBlacklisted(url) || (pattern!=null && !url.matches(pattern))) {
@@ -112,14 +112,14 @@ public class SystemInfo extends ActionBase {
 					}
 					URLCompleter.registerSiteURL(url);
 					if(details) {
-						message(" * "+url);
+						console.info(" * {}", url);
 						String infoS=info.getServiceDetails(e,configurationProvider);
-						if(infoS!=null)message("  "+infoS);
+						if(infoS!=null)console.info("  {}", infoS);
 					}
 				}
 			}
 		}catch(Exception e){
-			error("... FAILED.",e);
+			console.error(e, "... FAILED.");
 		}
 
 	}	
@@ -127,12 +127,12 @@ public class SystemInfo extends ActionBase {
 	protected void printRawContent() {
 		try{
 			for(Endpoint e: registry.listEntries()){
-				message("Entry:           "+e.getUrl());
-				message("Server identity: "+e.getServerIdentity());
-				message("Service type:    "+e.getInterfaceName());
+				console.info("Entry:           {}", e.getUrl());
+				console.info("Server identity: {}", e.getServerIdentity());
+				console.info("Service type:    {}", e.getInterfaceName());
 			}
 		} catch(Exception ex){
-			error("... FAILED.",ex);
+			console.error(ex, "... FAILED.");
 		}
 	}
 

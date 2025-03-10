@@ -104,7 +104,7 @@ public class Metadata extends ActionBase {
 	public void process() throws Exception {
 		super.process();
 		command = getOption(OPT_COMMAND_LONG, OPT_COMMAND);
-		verbose("Operation = " + command);
+		console.verbose("Operation = {}", command);
 		advanced = getBooleanOption(OPT_QUERYADV_LONG, OPT_QUERYADV);
 		wait = getBooleanOption(OPT_WAIT_LONG, OPT_WAIT);
 		query = getOption(OPT_QUERY_LONG, OPT_QUERY);
@@ -120,7 +120,7 @@ public class Metadata extends ActionBase {
 		if (sms == null) {
 			throw new UCCException("Cannot find the requested storage service!");
 		}
-		verbose("Accessing metadata for storage " + sms.getEndpoint().getUrl());
+		console.verbose("Accessing metadata for storage {}", sms.getEndpoint().getUrl());
 		String fName = getOption(OPT_FILE_LONG, OPT_FILE);
 		if (fName != null) {
 			file = new File(fName);
@@ -154,7 +154,7 @@ public class Metadata extends ActionBase {
 	protected void doGet() throws Exception {
 		Map<String, String> result = sms.stat(path).metadata;
 		String json = JSONUtil.asJSON(result).toString(2);
-		message(json);
+		console.info("{}", json);
 		if (file != null) {
 			FileUtils.writeStringToFile(file, json, "UTF-8");
 		}
@@ -176,7 +176,7 @@ public class Metadata extends ActionBase {
 		JSONObject update = new JSONObject();
 		update.put("metadata", data);
 		JSONObject reply = sms.getFileClient(path).setProperties(update);
-		message(reply.toString(2));
+		console.info("{}", reply.toString(2));
 		lastMeta.clear();
 		lastMeta.putAll(data);
 	}
@@ -184,9 +184,9 @@ public class Metadata extends ActionBase {
 	protected void doSearch() throws Exception {
 		lastSearchResults.clear();
 		List<String> files = sms.searchMetadata(query);
-		verbose("Have <"+files.size()+"> results.");
+		console.verbose("Have <{}> results.", files.size());
 		for(String f: files) {
-			message("  "+f);
+			console.info("  {}", f);
 			lastSearchResults.add(f);
 		}
 	}
@@ -206,16 +206,16 @@ public class Metadata extends ActionBase {
 		path = normalize(path);
 		TaskClient tc = sms.getFileClient(path).startMetadataExtraction(10, new String[0]);
 		if(tc!=null) {
-			message("Extraction started, task = "+tc.getEndpoint().getUrl());
+			console.info("Extraction started, task = {}", tc.getEndpoint().getUrl());
 			properties.put(PROP_LAST_RESOURCE_URL, tc.getEndpoint().getUrl());
 		}
 		if(tc!=null && wait) {
-			verbose("Waiting for extraction task <"+tc.getEndpoint().getUrl()+"> to finish...");
+			console.verbose("Waiting for extraction task <{}> to finish...", tc.getEndpoint().getUrl());
 			while(!tc.isFinished())Thread.sleep(2000);
 			JSONObject taskProps = tc.getProperties();
 			JSONObject result = taskProps.optJSONObject("result", new JSONObject());
-			message("Status: "+tc.getStatus());
-			message("Result: \n"+result.toString(2));
+			console.info("Status: {}", tc.getStatus());
+			console.info("Result: \n{}", result.toString(2));
 		}
 	}
 
@@ -226,12 +226,11 @@ public class Metadata extends ActionBase {
 	protected Map<String, String> readData() throws Exception {
 		String json = null;
 		if (file != null) {
-			verbose("Reading data from the file: " + file.getName());
+			console.verbose("Reading data from file: <{}>", file.getName());
 			json = FileUtils.readFileToString(file, "UTF-8");
 		} else {
 			//read from stdin
-			verbose("Reading from stdIn (it does not work from within the shell)");
-
+			console.verbose("Reading from stdin (it does not work from within the shell)");
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			String str = "";
 			StringBuilder buffer = new StringBuilder();
@@ -255,7 +254,7 @@ public class Metadata extends ActionBase {
 		StorageClient sms = new StorageClient(epr,
 				configurationProvider.getClientConfiguration(epr.getUrl()),
 				configurationProvider.getRESTAuthN());
-		verbose("Storage " + td.getSmsEpr());
+		console.verbose("Storage {}", td.getSmsEpr());
 		if (!sms.supportsMetadata()) {
 			throw new UCCException ("Storage does not support metadata.");
 		}

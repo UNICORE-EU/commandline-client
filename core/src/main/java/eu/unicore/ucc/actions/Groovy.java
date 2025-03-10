@@ -9,6 +9,7 @@ import java.io.InputStream;
 import org.apache.commons.cli.Option;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.helpers.Base;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
@@ -57,7 +58,7 @@ public class Groovy extends ActionBase{
 		binding.setVariable("properties", properties);
 		binding.setVariable("options", getOptions());
 		binding.setVariable("commandLine", getCommandLine());
-		binding.setVariable("messageWriter", this);
+		binding.setVariable("console", UCC.console);
 		if(getCommandLine().hasOption(OPT_GROOVYEXPRESSION)){
 			expression=getCommandLine().getOptionValue(OPT_GROOVYEXPRESSION);
 		}else if (getCommandLine().hasOption(OPT_GROOVYSCRIPT)){

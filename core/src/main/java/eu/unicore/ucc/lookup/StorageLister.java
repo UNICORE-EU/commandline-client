@@ -36,14 +36,11 @@ public class StorageLister extends Lister<StorageClient>{
 	
 	private boolean showAll = false;
 
-	public StorageLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider, String[] tags){
-		this(null,registry,configurationProvider,new AcceptAllFilter(), tags);
-	}
-	
 	/**
 	 * @param executor
 	 * @param registry
 	 * @param configurationProvider
+	 * @param tags
 	 */
 	public StorageLister(ExecutorService executor, IRegistryClient registry, 
 			UCCConfigurationProvider configurationProvider, String[] tags){
@@ -60,11 +57,10 @@ public class StorageLister extends Lister<StorageClient>{
 	public StorageLister(ExecutorService executor, IRegistryClient registry, 
 			UCCConfigurationProvider configurationProvider, AddressFilter addressFilter, 
 			String[] tags){
-		super();
+		super(executor);
 		this.registry = registry;
 		this.configurationProvider = configurationProvider;
 		this.tags = tags;
-		setExecutor(executor);
 		setAddressFilter(addressFilter);
 	}
 	

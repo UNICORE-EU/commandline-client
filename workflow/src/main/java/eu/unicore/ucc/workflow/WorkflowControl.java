@@ -69,7 +69,7 @@ public class WorkflowControl extends ActionBase {
 			arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
 		}
 		workflowURL = arg;
-		verbose("Checking workflow at "+workflowURL);
+		console.verbose("Checking workflow at {}", workflowURL);
 		workflow=new WorkflowClient(new Endpoint(workflowURL),
 				configurationProvider.getClientConfiguration(workflowURL), 
 				configurationProvider.getRESTAuthN());
@@ -92,7 +92,7 @@ public class WorkflowControl extends ActionBase {
 			String[]split=p.split("=");
 			String key=split[0];
 			String value=split[1];
-			verbose("Have parameter: "+key+"="+value);
+			console.verbose("Have parameter: {}={}", key, value);
 			parameters.put(key, value);
 		}
 		//unit testing use
@@ -100,12 +100,12 @@ public class WorkflowControl extends ActionBase {
 	}
 	
 	protected void doAbort()throws Exception{
-		verbose("Aborting workflow "+workflowURL);
+		console.verbose("Aborting workflow {}", workflowURL);
 		workflow.abort();
 	}
 	
 	protected void doResume()throws Exception{
-		verbose("Resuming workflow "+workflowURL);
+		console.verbose("Resuming workflow {}", workflowURL);
 		workflow.resume(parameters);
 	}
 	

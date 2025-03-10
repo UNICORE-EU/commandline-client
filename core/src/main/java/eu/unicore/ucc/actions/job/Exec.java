@@ -148,14 +148,14 @@ public class Exec extends ActionBase {
 		}
 		loginNode=getCommandLine().getOptionValue(OPT_LOGIN_NODE);
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
-		verbose("Dry run = "+dryRun);
+		console.verbose("Dry run = {}", dryRun);
 		keep=getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
-		verbose("Delete job when done = "+!keep);
+		console.verbose("Delete job when done = {}", !keep);
 		asynchronous=getBooleanOption(OPT_MODE_LONG, OPT_MODE);
-		verbose("Asynchronous processing = "+asynchronous);
+		console.verbose("Asynchronous processing = {}", asynchronous);
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
-			verbose("Job tags = " + Arrays.deepToString(tags));
+			console.verbose("Job tags = {}", Arrays.deepToString(tags));
 		}
 		initBuilder(getCommandLine().getArgs());
 		run();

@@ -119,7 +119,7 @@ public abstract class ActionBase extends Command {
 			blacklist = blacklistP.split("[ ,]+");
 		}else blacklist = new String[0];
 		if(blacklist.length>0) {
-			verbose("Blacklist = "+Arrays.asList(blacklist));
+			console.verbose("Blacklist = {}", Arrays.asList(blacklist));
 		}
 	}
 
@@ -129,7 +129,7 @@ public abstract class ActionBase extends Command {
 		try{
 			configurationProvider.flushSessions();
 		}catch(Exception ex){
-			error("Could not store session IDs", ex);
+			console.error(ex, "Could not store session IDs");
 		}
 	}
 
@@ -164,7 +164,7 @@ public abstract class ActionBase extends Command {
 		authNMethod = getOption(OPT_AUTHN_METHOD_LONG, OPT_AUTHN_METHOD, UsernameAuthN.NAME);
 		acceptAllIssuers = getBooleanOption(OPT_AUTHN_ACCEPT_ALL_LONG, OPT_AUTHN_ACCEPT_ALL);
 		if(acceptAllIssuers){
-			verbose("Accepting all server CA certificates.");
+			console.verbose("Accepting all server CA certificates.");
 		}
 		configurationProvider = new UCCConfigurationProviderImpl(authNMethod, properties, this, acceptAllIssuers);
 	}
@@ -177,7 +177,7 @@ public abstract class ActionBase extends Command {
 	protected void initRegistryClient() throws Exception {
 		registryURL=getCommandLine().getOptionValue(OPT_REGISTRY, properties.getProperty(OPT_REGISTRY_LONG));
 		if(registryURL==null || registryURL.trim().length()==0){
-			verbose("No registry is configured.");
+			console.verbose("No registry is configured.");
 			if(requireRegistry()){
 				throw new UCCException("A registry is required: please use the '-r' option " +
 						"or configuration entry to define the registry to be used.");
@@ -185,7 +185,7 @@ public abstract class ActionBase extends Command {
 			return;
 		}
 		if(skipConnectingToRegistry() && !requireRegistry()){
-			verbose("Registry connection will be skipped.");
+			console.verbose("Registry connection will be skipped.");
 			return;
 		}
 		//accept list of registries either comma- or space-separated
@@ -194,13 +194,13 @@ public abstract class ActionBase extends Command {
 			MultiRegistryClient erc = new MultiRegistryClient();
 			for(String url: urls){
 				if(url.trim().length()==0)continue;
-				verbose("Registry = "+url);
+				console.verbose("Registry = {}", url);
 				erc.addRegistry(makeRegistry(url));
 			}
 			registry=erc;
 		}
 		else{
-			verbose("Registry = "+registryURL);
+			console.verbose("Registry = {}", registryURL);
 			registry = makeRegistry(registryURL);
 		}
 		testRegistryConnection();
@@ -218,9 +218,9 @@ public abstract class ActionBase extends Command {
 			throw new UCCException("Registry access is not initialized");
 		}
 		try{
-			verbose("Checking registry connection.");
+			console.verbose("Checking registry connection.");
 			String status = registry.getConnectionStatus();
-			verbose("Registry connection status: "+status);
+			console.verbose("Registry connection status: {}", status);
 			if(!status.startsWith("OK") && !skipConnectingToRegistry()) {
 				throw new Exception(status);
 			}

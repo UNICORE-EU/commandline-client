@@ -80,8 +80,8 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 		listFiles=detailed && !getBooleanOption("nofiles", "N");
 		listJobs=detailed && !getBooleanOption("nojobs", "j");
 		if(detailed){
-			verbose("Listing jobs: "+listJobs);
-			verbose("Listing names of files: "+listFiles);
+			console.verbose("Listing jobs = {}", listJobs);
+			console.verbose("Listing names of files = {}", listFiles);
 		}
 		run();
 	}
@@ -98,7 +98,7 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 			WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry, configurationProvider, includeInternal);
 			for(WorkflowFactoryClient wf: workflowFactories){
 				try{
-					verbose("Listing workflows from "+wf.getEndpoint().getUrl());
+					console.verbose("Listing workflows from {}", wf.getEndpoint().getUrl());
 					EnumerationClient jobs = wf.getWorkflowList();
 					jobs.setDefaultTags(tags);
 					Iterator<String>urls = jobs.iterator();
@@ -107,11 +107,11 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 						try {
 							listOne(url);
 						}catch(Exception e) {
-							error("Error accessing workflow  "+url, e);						
+							console.error(e, "Error accessing workflow {}", url);						
 						}
 					}
 				}catch(Exception e){
-					error("Error accessing workflows at: "+wf.getEndpoint().getUrl(), e);
+					console.error(e, "Error accessing workflows at: {}", wf.getEndpoint().getUrl());
 				}
 			}
 		}
@@ -124,7 +124,7 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 		if(!filterMatch(wf)){
 			return;
 		}
-		message(url+getDetails(wf));
+		console.info("{}{}", url, getDetails(wf));
 		printProperties(wf);
 	}
 

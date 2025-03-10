@@ -47,7 +47,7 @@ public class MultiRegistryClient implements IRegistryClient {
 					result.addAll(res);
 				}
 			}catch(Exception ex){
-				UCC.getConsoleLogger().verbose("Registry at "+getAddress(c)+" is not available: "+ex.getMessage());
+				UCC.console.verbose("Registry at {} is not available: {}", getAddress(c), ex.getMessage());
 			}
 		}
 		return result;
@@ -65,7 +65,7 @@ public class MultiRegistryClient implements IRegistryClient {
 					result.addAll(res);
 				}
 			}catch(Exception ex){
-				UCC.getConsoleLogger().verbose("Registry at "+getAddress(c)+" is not available: "+ex.getMessage());
+				UCC.console.verbose("Registry at {} is not available: {}", getAddress(c), ex.getMessage());
 			}
 		}
 		return result;

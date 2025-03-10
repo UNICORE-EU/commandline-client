@@ -189,21 +189,21 @@ public class Run extends ActionBase {
 					+OPT_ALLOCATION_LONG+"' and '--"+OPT_SITENAME_LONG+"' arguments.");
 		}
 		synchronous=!getBooleanOption(OPT_MODE_LONG, OPT_MODE);
-		verbose("Synchronous processing = "+synchronous);
+		console.verbose("Synchronous processing = {}", synchronous);
 		brief=getBooleanOption(OPT_NOPREFIX_LONG, OPT_NOPREFIX);
-		verbose("Adding job id to output file names = "+!brief);
+		console.verbose("Adding job id to output file names = {}", !brief);
 		scheduled=getOption(OPT_SCHEDULED_LONG, OPT_SCHEDULED);
 		if(scheduled!=null){
 			scheduled=UnitParser.convertDateToISO8601(scheduled);
-			verbose("Will schedule job submission for "+scheduled);
+			console.verbose("Will schedule job submission for {}", scheduled);
 		}
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
-		verbose("Dry run = "+dryRun);
+		console.verbose("Dry run = "+dryRun);
 		multiThreaded = getBooleanOption("multi-threaded", "J");
-		verbose("Multi threaded = "+multiThreaded);
+		console.verbose("Multi threaded = {}", multiThreaded);
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
-			verbose("Job tags = " + Arrays.deepToString(tags));
+			console.verbose("Job tags = {}", Arrays.deepToString(tags));
 		}
 		String waitForSpec = getOption(OPT_WAIT_LONG, OPT_WAIT);
 		if(waitForSpec!=null) {
@@ -263,7 +263,7 @@ public class Run extends ActionBase {
 		}
 		if(errors.size()>0) {
 			for(String s: errors) {
-				verbose(s);
+				console.verbose("{}", s);
 			}
 			throw new UCCException("Job(s) failed.");
 		}
@@ -272,14 +272,14 @@ public class Run extends ActionBase {
 	protected UCCBuilder readJob(String jobFileName) throws Exception {
 		File jobFile = new File(jobFileName);
 		UCCBuilder builder = new UCCBuilder(jobFile, registry, configurationProvider);
-		verbose("Read job from <"+jobFileName+">");
+		console.verbose("Read job from <{}>", jobFileName);
 		configureBuilder(builder);
 		return builder;
 	}
 
 	protected UCCBuilder readJob() throws Exception {
-		message("Reading job from stdin:");
-		message("");
+		console.info("Reading job from stdin:");
+		console.info("");
 		ByteArrayOutputStream bos=new ByteArrayOutputStream();
 		int b=0;
 		while((b=System.in.read())!=-1){
@@ -332,7 +332,7 @@ public class Run extends ActionBase {
 				if(!synchronous) {
 					lastJobFile=builder.getProperty("jobIdFile");
 					if(waitFor!=null) {
-						verbose("Waiting for job to be "+waitFor+" ...");
+						console.verbose("Waiting for job to be {} ...", waitFor);
 						runner.getJob().poll(waitFor);
 					}
 				}
@@ -352,15 +352,14 @@ public class Run extends ActionBase {
 	}
 
 	public void printSampleJob(){
-		message("Example job:");
 		try (InputStream is = getClass().getClassLoader().getResourceAsStream(
 				"META-INF/examples/basic.json")){
-			message(IOUtils.toString(is, "UTF-8"));
+			console.info("Example job:\n{}",IOUtils.toString(is, "UTF-8"));
 		}catch(Exception ex) {
 			throw new RuntimeException(ex);
 		}
-		message("For a full description, see:");
-		message("https://unicore-docs.readthedocs.io/en/latest/user-docs/rest-api/job-description/index.html");
+		console.info("For a full description, see:");
+		console.info("https://unicore-docs.readthedocs.io/en/latest/user-docs/rest-api/job-description/index.html");
 	}
 
 	/*

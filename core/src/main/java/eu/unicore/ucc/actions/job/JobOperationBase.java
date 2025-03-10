@@ -53,10 +53,10 @@ public abstract class JobOperationBase extends ActionBase {
 			{
 				builder=new UCCBuilder(job, registry, configurationProvider);
 				builder.setCheckLocalFiles(false);
-				verbose("Read job info from <"+arg+">");
+				console.verbose("Read job info from <{}>", arg);
 			}
 			else{
-				verbose("Accessing job at <"+arg+">");
+				console.verbose("Accessing job at <{}>", arg);
 				builder=new UCCBuilder(registry, configurationProvider);
 				builder.setCheckLocalFiles(false);
 				builder.setProperty("epr", arg);
@@ -74,7 +74,7 @@ public abstract class JobOperationBase extends ActionBase {
 		List<String> args = new ArrayList<>();
 		if(getCommandLine().getArgs().length==1){
 			try{
-				verbose("Enter job URL:");
+				console.info("Enter job URL:");
 				String arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
 				args.add(arg);
 			}catch(Exception e){

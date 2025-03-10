@@ -42,7 +42,7 @@ public class CopyFileStatus extends ActionBase {
 				configurationProvider.getRESTAuthN());
 		Long transferred = tcc.getTransferredBytes();
 		Status status = tcc.getStatus();
-		message(tcc.getEndpoint().getUrl()+" "+status+", <"+up.getHumanReadable(transferred)+"> bytes");
+		console.info("{} {}, <{}> bytes", tcc.getEndpoint().getUrl(), status, up.getHumanReadable(transferred));
 	}
 
 	@Override

@@ -56,17 +56,17 @@ public class Connect extends ActionBase {
 		lastRegistryURL=registryURL;
 		initialLifeTime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(initialLifeTime>0){
-			verbose("New TSSs will have a lifetime of <"+initialLifeTime+"> days.");
+			console.verbose("New TSSs will have a lifetime of <{}> days.", initialLifeTime);
 		}else{
-			verbose("Using site default for TSS lifetime.");
+			console.verbose("Using site default for TSS lifetime.");
 		}
 		Connector c = new Connector(registry, configurationProvider);
 		c.setBlacklist(blacklist);
 		c.run();
 		int tsfAvailable=c.getAvailableTSF();
-		if(tsfAvailable==0)message("There are no target system factories in the selected registry.");
+		if(tsfAvailable==0)console.info("There are no target system factories in the selected registry.");
 		int tssAvailable=c.getAvailableTSS();
-		message("You can access "+tssAvailable+" target system(s).");
+		console.info("You can access {} target system(s).", tssAvailable);
 		//it should be considered an error if no sites are available
 		if(tssAvailable==0) {
 			throw new UCCException("No sites available!");

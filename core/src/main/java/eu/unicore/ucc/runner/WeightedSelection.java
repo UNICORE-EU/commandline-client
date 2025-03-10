@@ -45,7 +45,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 				names.add(name);
 				map.put(name,tss);
 			}catch(Exception e){
-				UCC.getConsoleLogger().error("",e);
+				UCC.console.error(e, "");
 			}
 		}
 		return map.get(select(map.keySet()));
@@ -70,7 +70,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 					selectedTSS=name;
 				}
 			}catch(Exception e){
-				UCC.getConsoleLogger().error("",e);
+				UCC.console.error(e, "");
 			}
 		}
 		storeSelection(selectedTSS);
@@ -109,14 +109,14 @@ public class WeightedSelection implements SiteSelectionStrategy {
 	
 	//check if file was modified, and read the weights if it was
 	protected void checkUpdate(){
-		ConsoleLogger msg = UCC.getConsoleLogger();
+		ConsoleLogger msg = UCC.console;
 		if(lastAccess<weightsFile.lastModified()){
 			lastAccess=weightsFile.lastModified();
 			Properties p=new Properties();
 			try(FileInputStream fis = new FileInputStream(weightsFile)){
 				p.load(fis);
 			}catch(Exception e){
-				msg.error("Problem reading from site weights file", e);
+				msg.error(e, "Problem reading from site weights file");
 				return;
 			}
 			for(Object oKey: p.keySet()){
@@ -125,18 +125,18 @@ public class WeightedSelection implements SiteSelectionStrategy {
 				try{
 					i=Integer.parseInt(p.getProperty(key));
 				}catch(Exception e){
-					UCC.getConsoleLogger().error("Syntax error in weights file (Format: Site name = <integer weight>", e);
+					msg.error(e, "Syntax error in weights file (Format: Site name = <integer weight>");
 				}
 				weights.put(key,i);
 				if(DEFAULT_WEIGHT.equalsIgnoreCase(key)){
-					UCC.getConsoleLogger().verbose("Default site weight <"+i+">");
+					msg.verbose("Default site weight <{}>", i);
 				}
 				else{
-					UCC.getConsoleLogger().verbose("Site <"+key+"> weight <"+i+">");
+					msg.verbose("Site <{}> weight <{}>", key, i);
 				}
 				if(weights.get(DEFAULT_WEIGHT)==null){
 					weights.put(DEFAULT_WEIGHT, Integer.valueOf(1));
-					msg.verbose("Default site weight is <1> (can be changed using "+DEFAULT_WEIGHT+")");
+					msg.verbose("Default site weight is <1> (can be changed using {})", DEFAULT_WEIGHT);
 				}
 			}
 		}

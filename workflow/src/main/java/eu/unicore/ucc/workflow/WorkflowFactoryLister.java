@@ -15,6 +15,7 @@ import eu.unicore.client.lookup.Lister;
 import eu.unicore.client.lookup.Producer;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.Log;
 import eu.unicore.workflow.WorkflowFactoryClient;
@@ -31,7 +32,7 @@ public class WorkflowFactoryLister extends Lister<WorkflowFactoryClient>{
 	
 	public WorkflowFactoryLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider,
 			boolean includeInternal){
-		this(registry, configurationProvider, includeInternal, null, null);
+		this(registry, configurationProvider, includeInternal, null, UCC.executor);
 	}
 	
 	/**
@@ -46,11 +47,10 @@ public class WorkflowFactoryLister extends Lister<WorkflowFactoryClient>{
 			UCCConfigurationProvider configurationProvider,
 			boolean includeInternal, AddressFilter addressFilter,
 			ExecutorService executor){
-		super();
+		super(executor);
 		this.registry = registry;
 		this.configurationProvider = configurationProvider;
 		this.includeInternal = includeInternal;
-		setExecutor(executor);
 		if(addressFilter!=null)setAddressFilter(addressFilter);
 	}
 	

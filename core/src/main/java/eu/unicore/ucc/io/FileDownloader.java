@@ -84,7 +84,7 @@ public class FileDownloader extends FileTransferBase {
 		for(FileListEntry file: remoteFiles.list(0, 1000)){
 			if(file.isDirectory){
 				if(!recurse) {
-					UCC.getConsoleLogger().verbose("Skipping directory "+file.path);
+					UCC.console.verbose("Skipping directory {}", file.path);
 					continue;
 				}
 				else{
@@ -151,23 +151,22 @@ public class FileDownloader extends FileTransferBase {
 					localFile=new File(localFile,getName(path));
 				}
 				if(mode.equals(Mode.NO_OVERWRITE) && localFile.exists()){
-					UCC.getConsoleLogger().verbose("File exists and creation mode was set to 'nooverwrite'.");
+					UCC.console.verbose("File exists and creation mode was set to 'nooverwrite'.");
 					return; 
 				}
-				UCC.getConsoleLogger().verbose("Downloading remote file '" +
-						sms.getEndpoint().getUrl()+"/files/"+path+
-						"' -> "+localFile.getAbsolutePath());
+				UCC.console.verbose("Downloading remote file '{}/files/{}' -> {}", 
+						sms.getEndpoint().getUrl(), path, localFile.getAbsolutePath());
 				if(resume){
 					setupOffsetForResume(localFile);
 				}
-				os=new FileOutputStream(localFile.getAbsolutePath(), append);
+				os = new FileOutputStream(localFile.getAbsolutePath(), append);
 			}
 
 			chosenProtocol = determineProtocol(preferredProtocol, sms);
 			Map<String,String>extraParameters = makeExtraParameters(chosenProtocol);
 			ftc = sms.createExport(path, chosenProtocol, extraParameters);
 			configure(ftc, extraParameters);
-			UCC.getConsoleLogger().verbose("File transfer URL : "+ftc.getEndpoint().getUrl());
+			UCC.console.verbose("File transfer URL: {}", ftc.getEndpoint().getUrl());
 			ProgressBar p=null;
 			if(ftc instanceof IMonitorable  && showProgress){
 				long size = source.size;
@@ -183,7 +182,7 @@ public class FileDownloader extends FileTransferBase {
 					throw new Exception("Byte range is defined but protocol does not allow " +
 							"partial read! Please choose a different protocol!");
 				}
-				UCC.getConsoleLogger().verbose("Byte range: "+startByte+" - "+(getRangeSize()>0?endByte:""));
+				UCC.console.verbose("Byte range: {} - {}", startByte, (getRangeSize()>0?endByte:""));
 				SupportsPartialRead pReader=(SupportsPartialRead)ftc;
 				long length = endByte-startByte+1;
 				if(Long.MAX_VALUE==endByte){
@@ -203,7 +202,7 @@ public class FileDownloader extends FileTransferBase {
 			if(timing){
 				long duration=System.currentTimeMillis()-startTime;
 				double rate=(double)localFile.length()/(double)duration;
-				UCC.getConsoleLogger().message("Rate: "+UCC.numberFormat.format(rate)+ " kB/sec.");
+				UCC.console.info("Rate: {} kB/sec.", UCC.numberFormat.format(rate));
 			}
 			if(targetStream==null)copyProperties(source, localFile);
 		}
@@ -238,7 +237,7 @@ public class FileDownloader extends FileTransferBase {
 			localFile.setExecutable(source.permissions.contains("x"));
 		}
 		catch(Exception ex){
-			UCC.getConsoleLogger().error("Can't set 'executable' flag for "+localFile.getName(), ex);
+			UCC.console.error(ex, "Can't set 'executable' flag for {}", localFile.getName());
 		}
 	}
 	

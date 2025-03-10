@@ -19,8 +19,8 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 
 	@Test
 	public void testLoadAuthN() throws Exception {
-		assertTrue(UCC.getAuthNMethod(new OIDCServerAuthN().getName())!=null);
-		assertTrue(UCC.getAuthNMethod(new OIDCServerAuthN().getName()) instanceof OIDCServerAuthN);
+		assertTrue(UCC.getAuthNMethod(new UCCOIDCServerAuthN().getName())!=null);
+		assertTrue(UCC.getAuthNMethod(new UCCOIDCServerAuthN().getName()) instanceof UCCOIDCServerAuthN);
 
 		assertTrue(UCC.getAuthNMethod(new OIDCAgentAuthN().getName())!=null);
 		assertTrue(UCC.getAuthNMethod(new OIDCAgentAuthN().getName()) instanceof OIDCAgentAuthN);
@@ -28,7 +28,7 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 
 	@Test
 	public void testOIDCServerAuthN() throws Exception {
-		var a = new OIDCServerAuthN();
+		var a = new UCCOIDCServerAuthN();
 		var p = new Properties();
 		p.setProperty("oidc.clientID", "demouser");
 		p.setProperty("oidc.clientSecret", "test123");
@@ -44,10 +44,10 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 		a.setProperties(p);
 		var m = new HttpGet("https://test");
 		a.addAuthenticationHeaders(m);
-		// first auth call should uthe username/password
+		// first auth call should use username/password
 		JSONObject req = MockOIDCServer.x.remove(0);
 		System.out.println(req.toString(2));
-		assertEquals("client_credentials", req.getString("grant_type"));
+		assertEquals("password", req.getString("grant_type"));
 		assertEquals("foo", req.getString("username"));
 		assertEquals("bar", req.getString("password"));
 		assertEquals("openid email", req.getString("scope"));
@@ -59,9 +59,9 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 		System.out.println(rt.toString(2));
 		String storedRefreshToken = rt.getJSONObject(ep).getString("refresh_token");
 		assertEquals("some_refresh_token", storedRefreshToken);
-		// check refresh
-		a.token = null;
-		a.lastRefresh = 0l;
+		// force using the refresh token
+		a = new UCCOIDCServerAuthN();
+		a.setProperties(p);
 		a.addAuthenticationHeaders(m);
 		req = MockOIDCServer.x.remove(0);
 		System.out.println(req.toString(2));
@@ -71,7 +71,7 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 		assertNotNull(h);
 		assertEquals("Bearer some_access_token", h.getValue());
 		// check refresh token loaded from file
-		a = new OIDCServerAuthN();
+		a = new UCCOIDCServerAuthN();
 		a.setProperties(p);
 		a.addAuthenticationHeaders(m);
 		req = MockOIDCServer.x.remove(0);

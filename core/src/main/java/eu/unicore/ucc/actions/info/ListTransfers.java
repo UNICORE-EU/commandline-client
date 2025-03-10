@@ -31,8 +31,8 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		CoreEndpointLister coreLister = new CoreEndpointLister(registry,configurationProvider,configurationProvider.getRESTAuthN());
-		coreLister.setExecutor(UCC.executor);
+		CoreEndpointLister coreLister = new CoreEndpointLister(registry,configurationProvider,
+				configurationProvider.getRESTAuthN(), UCC.executor);
 		coreLister.setAddressFilter(new Blacklist(blacklist));
 		for(CoreClient ep: coreLister){
 			if(ep==null){
@@ -43,11 +43,11 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 			else{
 				String url = ep.getEndpoint().getUrl();
 				URLCompleter.registerSiteURL(url);
-				verbose("Site : "+ep.getEndpoint().getUrl());	
+				console.verbose("Site :{}", ep.getEndpoint().getUrl());	
 				try{
 					listFiletransfers(ep);
 				}catch(Exception ex){
-					error("Error listing site at "+ep.getEndpoint().getUrl(), ex);
+					console.error(ex, "Error listing site at {}", ep.getEndpoint().getUrl());
 				}
 			}
 		};
@@ -56,7 +56,6 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 	protected void listFiletransfers(CoreClient ep)throws Exception{
 		Endpoint ftEp = ep.getEndpoint().cloneTo(ep.getLinkUrl("transfers")); 
 		EnumerationClient ftEnumeration = new EnumerationClient(ftEp, ep.getSecurityConfiguration(), ep.getAuth());
-		
 		Iterator<String> fts = ftEnumeration.iterator();
 		while(fts.hasNext()){
 			String eprd=fts.next();
@@ -71,10 +70,10 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 
 	protected void listFiletransfer(BaseServiceClient ftc) throws Exception {
 		try{
-			message(ftc.getEndpoint().getUrl()+getDetails(ftc));
+			console.info("{}{}", ftc.getEndpoint().getUrl(), getDetails(ftc));
 			properties.put(PROP_LAST_RESOURCE_URL, ftc.getEndpoint().getUrl());
 		}catch(Exception ex){
-			error("Error listing filetransfer at "+ftc.getEndpoint().getUrl(), ex);
+			console.error(ex,"Error listing filetransfer at {}", ftc.getEndpoint().getUrl());
 		}
 		printProperties(ftc);
 	}

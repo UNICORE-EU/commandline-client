@@ -92,7 +92,7 @@ public class Allocate extends ActionBase {
 			String[]split=p.split("=");
 			String key=split[0];
 			String value=split[1];
-			verbose("Have resource request: "+key+"="+value);
+			console.verbose("Have resource request: {}={}", key, value);
 			resourceRequests.put(key, value);
 		}
 		//unit testing use
@@ -127,12 +127,12 @@ public class Allocate extends ActionBase {
 		super.process();
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
-		verbose("Dry run = "+dryRun);
+		console.verbose("Dry run = {}", dryRun);
 		asynchronous=getBooleanOption(OPT_MODE_LONG, OPT_MODE);
-		verbose("Asynchronous processing = "+asynchronous);
+		console.verbose("Asynchronous processing = {}", asynchronous);
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
-			verbose("Job tags = " + Arrays.deepToString(tags));
+			console.verbose("Job tags = {}", Arrays.deepToString(tags));
 		}
 		readResources();
 		initBuilder();
@@ -172,17 +172,10 @@ public class Allocate extends ActionBase {
 		if(!asynchronous && !dryRun) {
 			// make sure job is "RUNNING"
 			JobClient job = runner.getJob();
-			verbose("Allocation job is "+job.getStatus());
-			do {
-				if(runner.getJob().getStatus().ordinal()>=Status.RUNNING.ordinal()) {
-					break;
-				}
-				Thread.sleep(2000);
-			}
-			while(true);
-			verbose("Allocation job is "+job.getStatus());
+			console.verbose("Waiting for allocation job to be RUNNING...");
+			job.poll(Status.RUNNING);
+			console.verbose("Allocation job is {}", job.getStatus());
 		}
-
 	}
 
 	// for unit testing

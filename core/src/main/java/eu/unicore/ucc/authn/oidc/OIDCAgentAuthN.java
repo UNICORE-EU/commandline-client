@@ -81,7 +81,7 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 	@Override
 	protected void refreshTokenIfNecessary() throws Exception {
 		long instant = System.currentTimeMillis() / 1000;
-		long interval = oidcProperties.getIntValue(OIDCProperties.REFRESH_INTERVAL);
+		long interval = oidcProperties.getIntValue(OIDCAgentProperties.REFRESH_INTERVAL);
 		if(instant < lastRefresh + interval){
 			return;
 		}

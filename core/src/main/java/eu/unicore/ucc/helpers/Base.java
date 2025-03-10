@@ -7,7 +7,6 @@ import org.apache.commons.cli.Options;
 
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.services.restclient.IAuthCallback;
-import eu.unicore.uas.util.MessageWriter;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import groovy.lang.Script;
 
@@ -16,7 +15,7 @@ import groovy.lang.Script;
  *
  * @author schuller
  */
-public abstract class Base extends Script{
+public abstract class Base extends Script {
 
 	IRegistryClient registry;
 	UCCConfigurationProvider configurationProvider;
@@ -25,6 +24,5 @@ public abstract class Base extends Script{
   	Properties properties;
 	Options options;
 	CommandLine commandLine;
-	MessageWriter messageWriter;
-
+	ConsoleLogger console;
 }

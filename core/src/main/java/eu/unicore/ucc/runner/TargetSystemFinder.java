@@ -118,7 +118,7 @@ public class TargetSystemFinder implements Broker, Constants {
 						available.add(tsf);
 					}
 				} catch(Exception ex) {
-					msg.error("Error on TSF "+current,ex);
+					msg.error(ex, "Error on TSF {}", current);
 				}
 			}
 		}

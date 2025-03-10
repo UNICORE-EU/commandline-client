@@ -39,9 +39,9 @@ public class GetOutcome extends JobOperationBase {
 	@Override
 	protected void processAdditionalOptions(){
 		brief=getBooleanOption(OPT_NOPREFIX_LONG, OPT_NOPREFIX);
-		verbose("Adding job id to output file names = "+!brief);
+		console.verbose("Adding job id to output file names = {}", !brief);
 		quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
-		verbose("Quiet mode = " + quiet);
+		console.verbose("Quiet mode = {}", quiet);
 
 	}
 

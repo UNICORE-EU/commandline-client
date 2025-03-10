@@ -15,27 +15,27 @@ eu.unicore.uas.FiletransferParameterProvider {
 
 	@Override
 	public void provideParameters(Map<String, String> params, String protocol) {
-		ConsoleLogger msg = UCC.getConsoleLogger();
+		ConsoleLogger msg = UCC.console;
 
 		if("UFTP".equals(protocol)){
 			// setup client IP for UFTP
 			String hostSpec=params.get(UFTPConstants.PARAM_CLIENT_HOST);
 			if(hostSpec==null || "auto".equalsIgnoreCase(hostSpec)){
-				msg.verbose("UFTP: parameter <"+UFTPConstants.PARAM_CLIENT_HOST+"> will be determined automatically.");
+				msg.verbose("UFTP: parameter <{}> will be determined automatically.", UFTPConstants.PARAM_CLIENT_HOST);
 				params.remove(UFTPConstants.PARAM_CLIENT_HOST);
 			} else if("all".equalsIgnoreCase(hostSpec)){
 				try {
 					String ipList = getAllHostIPs(hostSpec);
-					msg.verbose("UFTP: parameter <"+UFTPConstants.PARAM_CLIENT_HOST+"> determined as <"+ipList+">");
+					msg.verbose("UFTP: parameter <{}> determined as <{}>", UFTPConstants.PARAM_CLIENT_HOST, ipList);
 					params.put(UFTPConstants.PARAM_CLIENT_HOST, ipList);
 				}catch(Exception e) {
-					msg.error("Error determining network address(es), falling back to 'auto' mode", e);
+					msg.error(e, "Error determining network address(es), falling back to 'auto' mode");
 					params.remove(UFTPConstants.PARAM_CLIENT_HOST);
 				}
 			}
-			String streams=params.get(UFTPConstants.PARAM_STREAMS);
+			String streams = params.get(UFTPConstants.PARAM_STREAMS);
 			if(streams==null){
-				msg.verbose("UFTP: parameter <"+UFTPConstants.PARAM_STREAMS+"> is not set, will use default value of <1>");
+				msg.verbose("UFTP: parameter <{}> is not set, will use default value of <1>", UFTPConstants.PARAM_STREAMS);
 				params.put(UFTPConstants.PARAM_STREAMS,"1");
 			}
 			if(params.get(UFTPConstants.PARAM_SECRET)==null) {

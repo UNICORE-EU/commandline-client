@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.Option;
 import org.json.JSONException;
@@ -120,13 +119,14 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 
 	@Override
 	public void process() throws Exception {
+		lastStorageAddress = null;
 		super.process();
 
 		initialLifeTime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(initialLifeTime>0){
-			verbose("New SMSs will have a lifetime of <"+initialLifeTime+"> days.");
+			console.verbose("New SMSs will have a lifetime of <{}> days.", initialLifeTime);
 		}else{
-			verbose("Using site default for SMS lifetime.");
+			console.verbose("Using site default for SMS lifetime.");
 		}
 		
 		factoryURL=getOption(OPT_FACTORY_LONG, OPT_FACTORY);
@@ -135,19 +135,19 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		if(factoryURL==null){
 			siteName=getOption(OPT_SITENAME_LONG, OPT_SITENAME);
 			if(siteName!=null){
-				verbose("Looking for factory at site <"+siteName+">");
+				console.verbose("Looking for factory at site <{}>", siteName);
 			}
 			else{
-				verbose("No factory specified, will choose one.");
+				console.verbose("No factory specified, will choose one.");
 			}
 		}
 
 		storageType=getOption(OPT_TYPE_LONG, OPT_TYPE);
 		if(storageType!=null){
-			verbose("Will create storage of type <"+storageType+">");
+			console.verbose("Will create storage of type <{}>", storageType);
 		}
 		else{
-			verbose("No storage type specified, will use factory's default.");
+			console.verbose("No storage type specified, will use factory's default.");
 		}
 		
 		boolean infoOnly = getBooleanOption(OPT_INFO_LONG, OPT_INFO);
@@ -159,20 +159,19 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		Filter filter = new Filter(byFactoryURL,bySiteName,byType);
 		StorageFactoryLister sfl = new StorageFactoryLister(
 				UCC.executor, registry, configurationProvider, filter);
-		sfl.setTimeout(2, TimeUnit.SECONDS);
-
+		sfl.setTimeout(2);
 		Iterator<StorageFactoryClient>iter = sfl.iterator();
 		boolean haveValidFactory = false;
 		while(iter.hasNext()){
-			sfc=sfl.iterator().next();
+			sfc = iter.next();
 			if(sfc==null){
 				throw new UCCException("No suitable storage factory available!");
 			}
 			factoryURL = sfc.getEndpoint().getUrl();
-			verbose("Using factory at <"+factoryURL+">");
+			console.verbose("Using factory at <{}>", factoryURL);
 			haveValidFactory=true;
 			if(infoOnly){
-				message(getDescription(sfc));
+				console.info("{}", getDescription(sfc));
 			}
 			else{
 				doCreate(sfc);
@@ -193,7 +192,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		}
 		StorageClient sc = sfc.createStorage(storageType, null, getParams(), tt);
 		String addr=sc.getEndpoint().getUrl();
-		message(addr);
+		console.info("{}", addr);
 		properties.put(PROP_LAST_RESOURCE_URL, addr);
 		setLastStorageAddress(addr);
 	}
@@ -338,11 +337,9 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 					if(storageType.equals(types.next()))return true;
 				}
 			}catch(Exception ex){
-				error("Error checking factory at <"+smf.getEndpoint().getUrl()+">",ex);
+				console.error(ex, "Error checking factory at <{}>", smf.getEndpoint().getUrl());
 			}
 			return false;
 		}
-
 	}
-
 }

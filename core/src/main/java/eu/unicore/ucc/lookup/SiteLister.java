@@ -53,8 +53,7 @@ public class SiteLister extends Lister<SiteClient>{
 	 * @param addressFilter - filter for accepting/rejecting service URLs 
 	 */
 	public SiteLister(ExecutorService executor, IRegistryClient registry, UCCConfigurationProvider configurationProvider, AddressFilter addressFilter){
-		super();
-		setExecutor(executor);
+		super(executor);
 		setAddressFilter(addressFilter);
 		this.registry = registry;
 		this.configurationProvider = configurationProvider;

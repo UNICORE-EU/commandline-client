@@ -66,21 +66,20 @@ public class GetFileProperties extends SMSOperation {
 		super.process();
 		boolean human = getBooleanOption(OPT_HUMAN_LONG, OPT_HUMAN);
 		if (human)
-			verbose("Human friendly number format.");
+			console.verbose("Human friendly number format.");
 		boolean showMetadata = getBooleanOption(OPT_SHOW_META_LONG, OPT_SHOW_META);
 		if (showMetadata)
-			verbose("Showing metadata.");
+			console.verbose("Showing metadata.");
 		
 		CommandLine cmdLine = getCommandLine(); 
 		if (cmdLine.getArgs().length != 2) {
 			throw new UCCException("Wrong number of arguments");
 		}
 		String target = cmdLine.getArgs()[1];
-		verbose("Getting file properties of " + target);
+		console.verbose("Getting file properties of <{}>", target);
 		StorageClient sms = getStorageClient(target);
 		FileListEntry gridFile = sms.stat(getPathAtStorage(target));
-		String msg = formatStat(gridFile, human, showMetadata);
-		message(msg);
+		console.info("{}", formatStat(gridFile, human, showMetadata));
 	}
 
 	protected DateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -109,10 +108,7 @@ public class GetFileProperties extends SMSOperation {
 			try
 			{
 				sb.append("Metadata: ").append(o.toString(2));
-			} catch (JSONException e)
-			{
-				error("Can't print metadata", e);
-			}
+			} catch (JSONException e){}
 		}
 		return sb.toString();
 	}

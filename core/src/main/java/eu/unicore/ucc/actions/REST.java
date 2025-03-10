@@ -150,7 +150,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	}
 
 	protected void doProcess(String cmd, String url, JSONObject content) throws Exception {
-		verbose(cmd+" "+url);
+		console.verbose("{} {}", cmd, url);
 		BaseClient bc = makeClient(url);
 		ContentType ct = ContentType.create(contentType);
 		if("GET".equals(cmd)) {
@@ -176,19 +176,19 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	protected void handleResponse(ClassicHttpResponse res, BaseClient bc) throws Exception {
 		bc.checkError(res);
 		try {
-			message(new StatusLine(res).toString());
+			console.info("{}", new StatusLine(res).toString());
 			Header l = res.getFirstHeader("Location");
 			if(l!=null) {
-				message(l.getValue());
+				console.info("{}", l.getValue());
 			}
 			if (includeHeaders) for(Header h: res.getHeaders()) {
-				message(h.getName()+": "+h.getValue());
+				console.info("{}: {}", h.getName(), h.getValue());
 			}
 			if("application/json".equalsIgnoreCase(accept)) {
-				message(bc.asJSON(res).toString(2));
+				console.info("{}", bc.asJSON(res).toString(2));
 			}
 			else {
-				message(EntityUtils.toString(res.getEntity(), "UTF-8"));
+				console.info("{}", EntityUtils.toString(res.getEntity(), "UTF-8"));
 			}
 		}catch(Exception ex) {}
 	}
@@ -221,7 +221,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			serverDetails(sb, props.getJSONObject("server"));
 			clientDetails(sb, props.getJSONObject("client"));
 		}catch(Exception ex) {
-			error("Error accessing REST service at <"+url+">", ex);
+			console.error(ex, "Error accessing REST service at <{}>", url);
 		}
 		return sb.toString();
 	}

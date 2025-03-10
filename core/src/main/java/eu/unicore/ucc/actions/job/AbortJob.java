@@ -29,13 +29,13 @@ public class AbortJob extends JobOperationBase {
 	}
 
 	protected void abort(JobClient job) {
-		verbose("Job id: " +job.getEndpoint().getUrl());
+		console.verbose("Job id: {}", job.getEndpoint().getUrl());
 		try{
 			job.abort();
 		}catch(Exception ex) {
 			throw new RuntimeException(ex);
 		}
-		message("Job aborted.");
+		console.info("Job aborted.");
 	}
 	
 }

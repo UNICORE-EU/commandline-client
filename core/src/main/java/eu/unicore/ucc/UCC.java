@@ -45,7 +45,7 @@ public class UCC{
 
 	public static final NumberFormat numberFormat = NumberFormat.getInstance();
 
-	private static final ConsoleLogger msg = new ConsoleLogger();
+	public static final ConsoleLogger console = new ConsoleLogger();
 
 	public static String getVersion(){
 		String v = UCC.class.getPackage().getSpecificationVersion();
@@ -75,11 +75,11 @@ public class UCC{
 						cmds.put(cmd.getName(), cmd.getClass());
 					}
 				}catch(Exception ex){
-					msg.error("Could not load commands for provider "+p.getClass(), ex);
+					console.error(ex, "Could not load commands for provider <{}>", p.getClass());
 				}
 			}
 		}catch(Exception ex){
-			msg.error("Could not load commands!", ex);
+			console.error(ex, "Could not load commands!");
 		}
 		loadAuthNMethods();
 		numberFormat.setMaximumFractionDigits(2);
@@ -94,11 +94,11 @@ public class UCC{
 				try{
 					authNMethods.put(p.getName().toLowerCase(),p);
 				}catch(Exception ex){
-					msg.error("Problem with AuthN provider "+p.getClass(), ex);
+					console.error(ex, "Problem with AuthN provider <{}>", p.getClass());
 				}
 			}
 		}catch(Exception ex){
-			msg.error("Could not load AuthN options!", ex);
+			console.error(ex, "Could not load AuthN options!");
 		}
 	}
 
@@ -219,7 +219,7 @@ public class UCC{
 			try{
 				result.add(c.getConstructor().newInstance());
 			}catch(Exception ex){
-				msg.error("Could not instantiate "+c.getName(), ex);
+				console.error(ex, "Could not instantiate <{}>", c.getName());
 			}
 		}
 		return result;
@@ -254,11 +254,11 @@ public class UCC{
 					if(b.getPriority()>broker.getPriority())broker=b;
 				}
 			}catch(ServiceConfigurationError ex){
-				msg.error("Could not load broker implementation", ex);
+				console.error(ex, "Could not load broker implementation");
 			}
 		}
 		if(broker!=null && "LOCAL"!=broker.getName()){
-			msg.verbose("Using broker "+broker.getName());
+			console.verbose("Using broker {}", broker.getName());
 		}	
 		if(broker == null){
 			throw new IllegalArgumentException("Broker '"+brokerName+"' cannot be found");
@@ -304,7 +304,7 @@ public class UCC{
 			}else{
 				cmd = initCommand(args, !unitTesting, null);
 				if(cmd!=null){
-					msg.setPrefix("[ucc "+cmd.getName()+"]");
+					console.setPrefix("[ucc "+cmd.getName()+"]");
 					cmd.process();
 					cmd.postProcess();
 					lastCommand = cmd;
@@ -312,17 +312,12 @@ public class UCC{
 			}
 			exitCode=0;
 		} catch (Exception e) {
-			String msg="Error running UCC command '"+args[0]+"'";
-			getConsoleLogger().error(msg, e);
+			console.error(e, "Error running UCC command '{}'", args[0]);
 			exitCode = Constants.ERROR;
 		}
 		if (!unitTesting){
 			System.exit(exitCode);	
 		}
-	}
-
-	public static ConsoleLogger getConsoleLogger(){
-		return msg;
 	}
 
 	private static String[] help = {"-?","?","-h","--help","help"};

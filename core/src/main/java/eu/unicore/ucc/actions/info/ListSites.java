@@ -57,16 +57,17 @@ public class ListSites extends ListActionBase<SiteClient> {
 				}
 			}catch(Exception ex){
 				if(c!=null && c.getEndpoint()!=null) {
-					error("Error listing site at <"+c.getEndpoint().getUrl()+">",ex);
+					console.error(ex, "Error listing site at <{}>", c.getEndpoint().getUrl());
 				}
-				else error("",ex);
+				else console.error(ex, "");
 			}
 		}
 	}
 
 	protected void listTSS(SiteClient tss)throws Exception{
 		properties.put(PROP_LAST_RESOURCE_URL, tss.getEndpoint().getUrl());
-				message(tss.getProperties().getString("siteName")+" "+tss.getEndpoint().getUrl()+" "+getDetails(tss));
+				console.info("{} {} {}", 
+						tss.getProperties().getString("siteName"), tss.getEndpoint().getUrl(), getDetails(tss));
 		printProperties(tss);
 	}
 	

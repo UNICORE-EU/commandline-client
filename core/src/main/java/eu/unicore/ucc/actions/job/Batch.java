@@ -212,48 +212,48 @@ public class Batch extends ActionBase {
 		inputDir=new File(inDir);
 		if(!inputDir.exists() || !inputDir.isFile()){
 			inputDir.mkdirs();
-			verbose("Created request directory <"+inDir+">");
+			console.verbose("Created request directory <{}>", inDir);
 		}
 
 		follow=getBooleanOption(OPT_FOLLOW_LONG, OPT_FOLLOW);
-		verbose("Follow mode = "+follow);
+		console.verbose("Follow mode = {}", follow);
 
 		keepJobs=getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
-		verbose("Cleaning up done jobs = "+!keepJobs);
+		console.verbose("Cleaning up done jobs = {}", !keepJobs);
 
 		runningJobLimit=getNumericOption(OPT_MAXRUNNING_LONG, OPT_MAXRUNNING, DEFAULT_LIMIT);
-		verbose("Limit on number of running jobs = "+runningJobLimit);
+		console.verbose("Limit on number of running jobs = {}", runningJobLimit);
 
 		requestLimit=getNumericOption(OPT_MAXREQUESTS_LONG, OPT_MAXREQUESTS, DEFAULT_REQUEST_LIMIT);
-		if(requestLimit!=DEFAULT_REQUEST_LIMIT)verbose("Limit on number of new job submissions = "+requestLimit);
+		console.verbose("Limit on number of new job submissions = {}", requestLimit);
 
 		updateInterval=getNumericOption(OPT_UPDATEINTERVAL_LONG, OPT_UPDATEINTERVAL, DEFAULT_UPDATE);
-		verbose("Update interval = "+updateInterval+" ms.");
+		console.verbose("Update interval = {} ms.", updateInterval);
 
 		numThreads=getNumericOption(OPT_NUMTHREADS_LONG, OPT_NUMTHREADS, DEFAULT_THREADS);
-		verbose("Number of executor threads = "+numThreads);
+		console.verbose("Number of executor threads = {}", numThreads);
 
 		noResourceCheck=getBooleanOption(OPT_NOCHECKRESOURCES_LONG, OPT_NOCHECKRESOURCES);
-		verbose("Checking available resources = "+!noResourceCheck);
+		console.verbose("Checking available resources = {}", !noResourceCheck);
 
 		noFetchOutcome=getBooleanOption(OPT_NOFETCHOUTCOME_LONG, OPT_NOFETCHOUTCOME);
-		verbose("Getting standard output and standard error = "+!noFetchOutcome);
+		console.verbose("Getting standard output and standard error = {}", !noFetchOutcome);
 
 		submitOnly=getBooleanOption(OPT_SUBMIT_ONLY_LONG, OPT_SUBMIT_ONLY);
-		if(submitOnly)verbose("'Submit only' mode = "+submitOnly);
+		console.verbose("'Submit only' mode = {}", submitOnly);
 
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
-		if(siteName!=null)verbose("Using site = "+siteName);
+		if(siteName!=null)console.verbose("Using site = {}", siteName);
 
 		String siteWeightFile=getCommandLine().getOptionValue(OPT_WEIGHTS);
 		if(siteWeightFile!=null){
 			File swf=new File(siteWeightFile);
 			if(! (swf.exists() && swf.canRead()) ){
-				error("Can't read "+swf.getAbsolutePath(),null);
+				console.error(null, "Can't read {}", swf.getAbsolutePath());
 			}
 			else{
 				siteSelectionStragegy = new WeightedSelection(swf);
-				verbose("Using site selection weights from "+swf.getAbsolutePath());
+				console.verbose("Using site selection weights from {}", swf.getAbsolutePath());
 			}
 
 		}
@@ -270,16 +270,16 @@ public class Batch extends ActionBase {
 	private void doShutdown(){
 		if(isShutdown)return;
 		isShutdown=true;
-		message("UCC batch mode exiting.");
+		console.info("UCC batch mode exiting.");
 		while(Runner.getCounter()>0){
-			message("... waiting for tasks to finish.");
+			console.info("... waiting for tasks to finish.");
 			try{
 				Thread.sleep(2000);
 			}catch(InterruptedException ie){}
 		}
 		executor.shutdown();
-		message("Site selection summary:");
-		message(printSelectionStatistics(siteSelectionStragegy.getSelectionStatistics()));
+		console.info("Site selection summary:");
+		console.info("{}", printSelectionStatistics(siteSelectionStragegy.getSelectionStatistics()));
 	}
 
 	protected void doBatch() throws IOException, InterruptedException{
@@ -289,13 +289,13 @@ public class Batch extends ActionBase {
 		running.setDelay(updateInterval);
 		//initialise to correct value in case batch mode is re-started 
 		activeJobs.set(running.length());
-		verbose("Starting batch processing...");
+		console.verbose("Starting batch processing...");
 		do{
 			//submit as many new jobs as allowed and possible
 			while(activeJobs.get()<runningJobLimit && activeRequests.get()<requestLimit){
 				String nextReq=(String)requests.next();
 				if (nextReq!=null){
-					verbose("Processing request: "+nextReq);
+					console.verbose("Processing request: {}", nextReq);
 					numRequests++;
 					activeRequests.incrementAndGet();
 					createRequest(nextReq);
@@ -319,7 +319,7 @@ public class Batch extends ActionBase {
 		}while(follow || activeRequests.get()>0 || activeJobs.get()>0 || requests.length()>0);
 
 		executor.shutdown();
-		verbose("Exiting, "+numRequests+" requests were processed.");
+		console.verbose("Exiting, {} requests were processed.", numRequests);
 	}
 
 	protected void createRequest(String nextReq){
@@ -345,7 +345,7 @@ public class Batch extends ActionBase {
 					processRequest(b);
 				}});
 		}catch(Exception e){
-			error("",e);
+			console.error(e, "");
 		}
 	}
 
@@ -368,7 +368,7 @@ public class Batch extends ActionBase {
 			}
 			r.run();
 			if(!submitOnly){
-				verbose("Job ID="+r.getBuilder().getProperty("jobIdFile"));
+				console.verbose("Job ID = {}", r.getBuilder().getProperty("jobIdFile"));
 				activeJobs.incrementAndGet();
 			}
 		}catch(Exception e){
@@ -417,7 +417,7 @@ public class Batch extends ActionBase {
 				fw.close();
 			}
 		}catch(Exception e){
-			error("Error processing running job <"+req+">",e);
+			console.error(e, "Error processing running job <{}>", req);
 		}
 	}
 

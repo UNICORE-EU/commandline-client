@@ -24,9 +24,9 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 		List<AdminServiceClient>clients = createClients();
 		for(AdminServiceClient asc: clients){
 			try{
-				verbose("Contacting admin service at <"+asc.getEndpoint().getUrl()+">");
+				console.verbose("Contacting admin service at <{}>", asc.getEndpoint().getUrl());
 			}catch(Exception ex){
-				verbose("Can't access <"+asc.getEndpoint().getUrl()+">");
+				console.error(ex, "Can't access <{}>", asc.getEndpoint().getUrl());
 				continue;
 			}
 			if(filterMatch(asc)){
@@ -34,14 +34,14 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 					list(asc);
 					lastNumberOfResults++;
 				}catch(Exception ex){
-					error("Error showing admin service info at <"+asc.getEndpoint().getUrl()+">",ex);
+					console.error(ex, "Error showing admin service info at <{}>", asc.getEndpoint().getUrl());
 				}
 			}						
 		}
 	}
 
 	protected void list(AdminServiceClient asc)throws Exception{
-		message(asc.getEndpoint().getUrl()+" "+getDetails(asc));
+		console.info("{} {}", asc.getEndpoint().getUrl(), getDetails(asc));
 		printProperties(asc);
 	}
 

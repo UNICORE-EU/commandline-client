@@ -13,7 +13,7 @@ import eu.unicore.util.configuration.PropertyMD;
 
 /**
  * preferences for getting a token from an OIDC token endpoint
-
+ * TBD move to USE restclient?
  * @author schuller
  */
 public class OIDCAgentProperties extends PropertiesHelper {

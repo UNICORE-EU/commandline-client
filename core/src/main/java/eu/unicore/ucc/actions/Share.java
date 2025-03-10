@@ -13,7 +13,6 @@ import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.security.OperationType;
 import eu.unicore.uas.json.JSONUtil;
-import eu.unicore.ucc.UCC;
 
 /**
  * Shares resources and shows resource ACLs
@@ -78,22 +77,22 @@ public class Share extends ActionBase {
 	public void process() throws Exception {
 		super.process();
 		boolean clean = getBooleanOption(OPT_CLEAN_LONG, OPT_CLEAN);
-		verbose("Remove all ACL entries = " + clean);
+		console.verbose("Remove all ACL entries = {}", clean);
 		boolean delete = getBooleanOption(OPT_DELETE_LONG, OPT_DELETE);
-		verbose("Delete given ACL entries = " + delete);
+		console.verbose("Delete given ACL entries = {}", delete);
 
 		int length=getCommandLine().getArgs().length;
 		boolean onlyShow = !clean && length<3;
 		if(length<2)
 		{
-			error("Not enough arguments!", null);
+			console.error(null, "Not enough arguments!");
 			printUsage();
 			return;
 		}
 		//URL is last argument
 		String url=getCommandLine().getArgs()[length-1];
 		Endpoint epr = new Endpoint(url);
-		verbose("Modifying ACLs of: " + url);
+		console.verbose("Modifying ACLs of: {}", url);
 		BaseServiceClient client = new BaseServiceClient(epr,
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
@@ -105,9 +104,9 @@ public class Share extends ActionBase {
 		lastNumberOfPermits = permits.size();
 
 		if(onlyShow){
-			message("Current ACL for "+url);
+			console.info("Current ACL for {}", url);
 			for(ACLEntry p: permits){
-				message("- allow '"+p.accessType+"' when '"+p.matchType+"' is '"+p.requiredValue+"'");
+				console.info("- allow '{}' when '{}' is '{}'", p.accessType, p.matchType, p.requiredValue);
 			}
 		}
 		else {
@@ -132,10 +131,8 @@ public class Share extends ActionBase {
 					permits.add(p);
 				}
 			}
-			if(UCC.getConsoleLogger().isVerbose()){
-				for(ACLEntry p: permits){
-					verbose("-> allow '"+p.accessType+"' when '"+p.matchType+"' is '"+p.requiredValue+"'");
-				}
+			for(ACLEntry p: permits){
+				console.verbose("-> allow '{}' when '{}' is '{}'", p.accessType, p.matchType, p.requiredValue);
 			}
 			JSONObject newProps = new JSONObject();
 			JSONArray arr = new JSONArray();
@@ -145,15 +142,15 @@ public class Share extends ActionBase {
 			newProps.put("acl", arr);
 			JSONObject res = client.setProperties(newProps);
 			try{
-				message("Service reply: "+res.getString("acl"));
+				console.info("Service reply: {}", res.getString("acl"));
 				if(delete){
-					message("<"+deleted+"> ACL entries were deleted.");
+					console.info("<{}> ACL entries were deleted.", deleted);
 				}
 			}catch(Exception ex) {}
 		}
 	}
 
-	private static final List<String> allowed= Arrays.asList(new String[]{"DN","VO","GROUP","UID","ROLE"});
+	private static final List<String> allowed = Arrays.asList(new String[]{"DN","VO","GROUP","UID","ROLE"});
 
 	public static class ACLEntry {
 

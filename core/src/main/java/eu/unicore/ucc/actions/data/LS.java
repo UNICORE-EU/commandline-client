@@ -64,13 +64,13 @@ public class LS extends SMSOperation {
 	public void process() throws Exception {
 		super.process();
 		detailed=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
-		if(detailed)verbose("Detailed listing.");
+		if(detailed)console.verbose("Detailed listing.");
 		recurse=getBooleanOption(OPT_RECURSIVE_LONG, OPT_RECURSIVE);
-		if(recurse)verbose("Listing subdirectories.");
+		if(recurse)console.verbose("Listing subdirectories.");
 		human=getBooleanOption(OPT_HUMAN_LONG, OPT_HUMAN);
-		if(human)verbose("Human friendly number format.");
+		if(human)console.verbose("Human friendly number format.");
 		showMetadata=getBooleanOption(OPT_SHOW_META_LONG, OPT_SHOW_META);
-		if(showMetadata)verbose("Showing metadata.");
+		if(showMetadata)console.verbose("Showing metadata.");
 		doProcess();
 	}
 
@@ -113,7 +113,7 @@ public class LS extends SMSOperation {
 
 	protected void listSingleFile(FileListEntry file) throws Exception {
 		lastLS=file;
-		message(detailed? detailedListing(file):normalListing(file));
+		console.info("{}", detailed? detailedListing(file):normalListing(file));
 		if(!file.isDirectory && showMetadata){
 			printMetadata(file);
 		}
@@ -122,9 +122,9 @@ public class LS extends SMSOperation {
 	protected void printMetadata(FileListEntry meta)throws Exception{
 		JSONObject metadata = sms.getFileClient(meta.path).getProperties().optJSONObject("metadata");
 		if(metadata!=null) {
-			message(metadata.toString(2));
+			console.info("{}", metadata.toString(2));
 		}else {
-			message("(no metadata)");	
+			console.info("(no metadata)");	
 		}
 	}
 

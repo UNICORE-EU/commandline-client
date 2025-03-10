@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import eu.unicore.uas.UAS;
-import eu.unicore.uas.util.MessageWriter;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
 
@@ -28,7 +27,7 @@ import eu.unicore.ucc.UCC;
  * 
  * @author schuller
  */
-public abstract class EmbeddedTestBase implements MessageWriter {
+public abstract class EmbeddedTestBase {
 
 	public boolean isVerbose(){return true;}
 

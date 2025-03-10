@@ -48,7 +48,7 @@ public class ProgressBar implements ProgressListener<Long> {
 		try {
 			terminal = TerminalBuilder.terminal();
 		} catch (Exception e) {
-			UCC.getConsoleLogger().error("Could not setup jline console output: "+e,null);
+			UCC.console.error(e, "Could not setup jline console output");
 		}
 		setSize(size);
 	}
@@ -108,7 +108,7 @@ public class ProgressBar implements ProgressListener<Long> {
 			terminal.flush();
 		}
 		catch (Exception e) {
-			UCC.getConsoleLogger().error("Could not output to jline console: "+e,null);
+			UCC.console.error(e, "Could not output to jline console");
 			terminal = null;
 		}
 	}

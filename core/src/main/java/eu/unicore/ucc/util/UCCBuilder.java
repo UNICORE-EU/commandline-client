@@ -106,7 +106,7 @@ public class UCCBuilder extends Builder {
 			resolveLocations(json.optJSONArray("Imports"), "From");
 			resolveLocations(json.optJSONArray("Exports"), "To");
 		}catch(Exception ex){
-			msg.error("Error building imports/exports for job", ex);
+			msg.error(ex, "Error building imports/exports for job");
 			throw new RuntimeException(ex);
 		}
 	}

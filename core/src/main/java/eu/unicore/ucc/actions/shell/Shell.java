@@ -123,7 +123,7 @@ public class Shell extends ActionBase {
 			System.out.println("UCC "+UCC.getVersion());
 			System.out.println("Welcome to the UCC shell. Enter 'help' for a list of commands. Enter 'exit' to quit.");
 			while(true){
-				UCC.getConsoleLogger().setPrefix("[ucc "+getName()+"]");
+				UCC.console.setPrefix("[ucc "+getName()+"]");
 				String s = null;
 				try {
 					s=commandFile!=null?is.readLine():is.readLine("ucc>");
@@ -135,8 +135,7 @@ public class Shell extends ActionBase {
 				if(s.isEmpty() || s.startsWith("#"))continue;
 
 				if("exit".equalsIgnoreCase(s) || "quit".equalsIgnoreCase(s)){
-					message("");
-					message("Goodbye.");
+					console.info("\nGoodbye.");
 					return;
 				}
 				if(s.startsWith("help-auth")){
@@ -170,10 +169,10 @@ public class Shell extends ActionBase {
 				}
 				//else it is a command
 				String[] args = parseCmdlineWithVars(s);
-				if(UCC.getConsoleLogger().isVerbose()) {
+				if(UCC.console.isVerbose()) {
 					StringBuilder sb = new StringBuilder();
 					for(String a: args)sb.append(a).append(" ");
-					verbose(sb.toString());
+					console.verbose("{}", sb);
 				}
 				try{
 					//check if it is a special command
@@ -182,11 +181,11 @@ public class Shell extends ActionBase {
 					}
 					String command = args[0];
 					if(UCC.cmds.get(command)==null){
-						message("No such command: "+args[0]);
+						console.info("No such command: {}", args[0]);
 						continue;
 					}
 					// update properties
-					if(UCC.getConsoleLogger().isVerbose())properties.put(OPT_VERBOSE_LONG,"true");
+					if(UCC.console.isVerbose())properties.put(OPT_VERBOSE_LONG,"true");
 					String authNMethod = getOption(OPT_AUTHN_METHOD_LONG, OPT_AUTHN_METHOD, UsernameAuthN.NAME);
 					properties.put(OPT_AUTHN_METHOD_LONG, authNMethod);
 					if(acceptAllIssuers) {
@@ -196,22 +195,22 @@ public class Shell extends ActionBase {
 					if(cmd!=null){
 						cmd.setProperties(properties);
 						cmd.setPropertiesFile(propertiesFile);
-						UCC.getConsoleLogger().setPrefix("[ucc "+cmd.getName()+"]");
+						UCC.console.setPrefix("[ucc "+cmd.getName()+"]");
 						cmd.process();
 						cmd.postProcess();
 					}
 				}
 				catch(ParseException pex){
 					numberOfErrors++;
-					error("Error parsing commandline arguments.",pex);
+					console.error(pex, "Error parsing commandline arguments.");
 				}
 				catch(Exception ex){
 					numberOfErrors++;
-					error("Error processing command", ex);
+					console.error(ex, "Error processing command");
 				}
 			}
 		} catch (Exception e) {
-			error("Error",e);
+			console.error(e, "Error");
 		} finally {
 			if (history != null){
 				try{
@@ -256,10 +255,10 @@ public class Shell extends ActionBase {
 				String val=properties.getProperty(key);
 				//naive, but should work rather well :-)
 				if(key.toLowerCase().contains("password")){
-					message(key+"="+"*");
+					console.info("{}=*", key);
 				}
 				else{
-					message(key+"="+val);
+					console.info("{}={}", key, val);
 				}
 			}
 		}
@@ -268,12 +267,12 @@ public class Shell extends ActionBase {
 			String[] paramArgs = new String[args.length-1];
 			System.arraycopy(args, 1, paramArgs, 0, paramArgs.length);
 			properties.putAll(PropertyVariablesResolver.getParameters(paramArgs));
-			boolean verbose = UCC.getConsoleLogger().isVerbose();
+			boolean verbose = UCC.console.isVerbose();
 			verbose = UCCOptions.isTrue(properties.getProperty("verbose", String.valueOf(verbose)));
-			UCC.getConsoleLogger().setVerbose(verbose);
-			boolean debug = UCC.getConsoleLogger().isDebug();
+			UCC.console.setVerbose(verbose);
+			boolean debug = UCC.console.isDebug();
 			debug = UCCOptions.isTrue(properties.getProperty("UCC_DEBUG", String.valueOf(verbose)));
-			UCC.getConsoleLogger().setDebug(debug);
+			UCC.console.setDebug(debug);
 		
 		}
 	}
@@ -323,7 +322,7 @@ public class Shell extends ActionBase {
 			return new DefaultHistory(lineReader);
 		}
 		catch(Exception e){
-			verbose("Cannot setup history");
+			UCC.console.verbose("Cannot setup history");
 			return null;
 		}
 	}

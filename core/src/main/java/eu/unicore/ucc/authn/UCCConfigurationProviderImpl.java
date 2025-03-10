@@ -67,7 +67,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 					// fallback to a default truststore
 					String path = new File(System.getProperty("user.home"), 
 							".ucc"+File.separator+"trusted-certs"+File.separator+"*.pem").getPath();
-					command.verbose("Default truststore "+path);
+					UCC.console.verbose("Default truststore {}", path);
 					userProperties.setProperty("truststore.type", "directory");
 					userProperties.setProperty("truststore.directoryLocations.1", path);
 				}

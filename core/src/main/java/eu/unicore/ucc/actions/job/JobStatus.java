@@ -75,9 +75,9 @@ public class JobStatus extends JobOperationBase {
 	@Override
 	protected void processAdditionalOptions(){
 		full = getBooleanOption(OPT_ALL_LONG, OPT_ALL);
-		verbose("Showing full job details = "+full);
+		console.verbose("Showing full job details = {}", full);
 		detailed = getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED) || full;
-		verbose("Showing detailed job status = "+detailed);
+		console.verbose("Showing detailed job status = {}", detailed);
 		String waitForSpec = getOption(OPT_WAIT_LONG, OPT_WAIT);
 		if(waitForSpec!=null) {
 			try{
@@ -91,9 +91,9 @@ public class JobStatus extends JobOperationBase {
 			String timeoutSpec = getCommandLine().getOptionValue(OPT_TIMEOUT);
 			if(timeoutSpec!=null) {
 				timeout = (int)UnitParser.getTimeParser(0).getDoubleValue(timeoutSpec);
-				verbose("Status polling (--wait-for) timeout = "+timeout+" sec.");
+				console.verbose("Status polling (--wait-for) timeout = {} sec.", timeout); 
 			}
-			verbose("Waiting for job to be "+waitFor+" ...");
+			console.verbose("Waiting for job to be {} ...", waitFor);
 		}
 	}
 
@@ -107,9 +107,9 @@ public class JobStatus extends JobOperationBase {
 					j.poll(waitFor, timeout);
 					getStatus(j);
 				}catch(TimeoutException te) {
-					verbose("Timeout polling "+j.getEndpoint().getUrl());
+					console.verbose("Timeout polling {}", j.getEndpoint().getUrl());
 				}catch(Exception ex) {
-					verbose(Log.createFaultMessage("Error polling "+j.getEndpoint().getUrl(), ex));
+					console.error(ex, "Error polling {}", j.getEndpoint().getUrl());
 				}
 			}
 			else {
@@ -141,7 +141,7 @@ public class JobStatus extends JobOperationBase {
 				sb.append("\n");
 				sb.append(getDetails(job));
 			}
-			message(sb.toString());
+			console.info("{}", sb);
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}

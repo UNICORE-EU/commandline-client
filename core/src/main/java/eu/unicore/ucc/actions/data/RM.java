@@ -38,7 +38,7 @@ public class RM extends SMSOperation {
 		if(!quiet){
 			boolean confirmed = confirm();
 			if(!confirmed){
-				verbose("Cancelled.");
+				console.verbose("Cancelled.");
 				return;
 			}
 		}

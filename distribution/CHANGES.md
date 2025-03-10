@@ -6,6 +6,14 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
+
+Version 10.1.3 (released Mar dd, 2025)
+--------------------------------------
+ - improvement: show asserted user ID (if any) in 'issue-token --inspect'
+ - fix: 'list-jobs' did not work
+ - fix: 'create-storage' did not work without explicit factory URL
+ - update to 10.1.3 base libs
+
 Version 10.1.2 (released Nov 22, 2024)
 --------------------------------------
  - new feature: 'run' in async mode has --wait-for option to define exit point

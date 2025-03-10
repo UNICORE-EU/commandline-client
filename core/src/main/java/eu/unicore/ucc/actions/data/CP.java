@@ -71,9 +71,9 @@ public class CP extends FileOperation {
 		}
 		Location targetDesc = createLocation(target);
 		recurse = getBooleanOption(OPT_RECURSIVE_LONG, OPT_RECURSIVE);
-		if(recurse)verbose("Recurse into subdirectories="+recurse);
+		if(recurse)console.verbose("Recurse into subdirectories = {}", recurse);
 		resume = getBooleanOption(OPT_RESUME_LONG, OPT_RESUME);
-		if(resume)verbose("Resume previous transfer(s)="+resume);
+		if(resume)console.verbose("Resume previous transfer(s) = {}", resume);
 		String scheduled = getOption(OPT_SCHEDULED_LONG, OPT_SCHEDULED);
 		boolean synchronous = !getBooleanOption(OPT_MODE_LONG, OPT_MODE);
 		for(String source: sources){

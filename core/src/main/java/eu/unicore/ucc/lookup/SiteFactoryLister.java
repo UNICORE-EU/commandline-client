@@ -19,6 +19,7 @@ import eu.unicore.client.lookup.Producer;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.restclient.IAuthCallback;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.Log;
 import eu.unicore.util.Pair;
@@ -33,7 +34,7 @@ public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 	private final UCCConfigurationProvider configurationProvider;
 
 	public SiteFactoryLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider, String[] tags){
-		this(null, registry, configurationProvider, new AcceptAllFilter());
+		this(UCC.executor, registry, configurationProvider, new AcceptAllFilter());
 	}
 
 	/**
@@ -55,10 +56,9 @@ public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 	 */
 	public SiteFactoryLister(ExecutorService executor, IRegistryClient registry, 
 			UCCConfigurationProvider configurationProvider, AddressFilter addressFilter){
-		super();
+		super(executor);
 		this.registry = registry;
 		this.configurationProvider = configurationProvider;
-		setExecutor(executor);
 		setAddressFilter(addressFilter);
 	}
 

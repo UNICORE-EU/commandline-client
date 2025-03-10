@@ -8,6 +8,7 @@ import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.client.lookup.CoreEndpointLister;
 import eu.unicore.uas.util.UnitParser;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.shell.URLCompleter;
 import eu.unicore.ucc.lookup.JobLister;
 
@@ -41,7 +42,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 		super.process();
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
 		CoreEndpointLister siteLister = new CoreEndpointLister(registry, configurationProvider,
-				configurationProvider.getRESTAuthN());
+				configurationProvider.getRESTAuthN(), UCC.executor);
 		if(detailed)printHeader();
 		for(CoreClient c: siteLister){
 			if(c==null){
@@ -64,7 +65,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 				}catch(Exception ex){
 					String msg="Error accessing TSS at "+siteURL;
 					logger.error(msg,ex);
-					verbose(msg);
+					console.verbose("{}", msg);
 				}
 			}
 		}
@@ -73,18 +74,18 @@ public class ListJobs extends ListActionBase<JobClient> {
 	protected void listJob(JobClient job) throws Exception {
 		properties.put(PROP_LAST_RESOURCE_URL, job.getEndpoint().getUrl());
 		if(detailed) {
-			message(getDetails(job));
+			console.info("{}", getDetails(job));
 		}
 		else {
-			message(job.getEndpoint().getUrl());
+			console.info("{}", job.getEndpoint().getUrl());
 		}
 		printProperties(job);
 	}
 
 	String format = " %16s | %10s | %s";
 	protected void printHeader() {
-		message(String.format(format, "Submitted", "Status", "URL"));
-		message(" -----------------|------------|----------------");
+		console.info(String.format(format, "Submitted", "Status", "URL"));
+		console.info(" -----------------|------------|----------------");
 	}
 
 	@Override

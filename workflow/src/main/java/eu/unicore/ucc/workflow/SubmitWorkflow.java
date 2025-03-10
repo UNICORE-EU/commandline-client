@@ -135,7 +135,7 @@ public class SubmitWorkflow extends ActionBase implements
 		submissionSite=getCommandLine().getOptionValue(OPT_SITENAME);
 
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
-		verbose("Dry run = "+dryRun);
+		console.verbose("Dry run = {}", dryRun);
 	
 		if (getCommandLine().hasOption(OPT_WAIT)) {
 			wait = true;
@@ -148,13 +148,13 @@ public class SubmitWorkflow extends ActionBase implements
 		}	
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
-			verbose("Workflow tags = " + Arrays.deepToString(tags));
+			console.verbose("Workflow tags = {}", Arrays.deepToString(tags));
 		}
 		findSite();
 		createBuilder();
 		createWorkflowDataStorage();
 		if(storageURL!=null) {
-			verbose("Using storage at <"+storageURL);
+			console.verbose("Using storage at <{}>", storageURL);
 		}
 		run();
 	}
@@ -162,11 +162,11 @@ public class SubmitWorkflow extends ActionBase implements
 	protected void createBuilder()throws Exception{
 		String uFile = getOption(OPT_UFILE_LONG, OPT_UFILE);
 		if (uFile != null) {
-			verbose("Reading stage-in and parameter definitions from <" + uFile + ">");
+			console.verbose("Reading stage-in and parameter definitions from <{}>", uFile);
 			builder = new UCCBuilder(new File(uFile),registry,configurationProvider);
 			//side effect: existence of local files will be checked
 			localFiles = builder.getImports().size();
-			verbose("Will upload <" + localFiles + "> files");
+			console.verbose("Will upload <{}> files", localFiles);
 		}
 	}
 	
@@ -177,8 +177,7 @@ public class SubmitWorkflow extends ActionBase implements
 			workflowFactories.setAddressFilter(new SiteNameFilter(submissionSite));
 		}
 		wsc = workflowFactories.iterator().next();
-		verbose("Selected workflow service at "
-				+ wsc.getEndpoint().getUrl());
+		console.verbose("Selected workflow service at {}", wsc.getEndpoint().getUrl());
 	}
 
 	protected void createWorkflowDataStorage() throws Exception {
@@ -209,7 +208,7 @@ public class SubmitWorkflow extends ActionBase implements
 			throw new UCCException("No suitable storage factory available!");
 		}
 		// create storage now
-		verbose("Creating new storage at <"+sfc.getEndpoint().getUrl());
+		console.verbose("Creating new storage at <{}>", sfc.getEndpoint().getUrl());
 		storageURL = sfc.createStorage().getEndpoint().getUrl();
 	}
 	
@@ -224,39 +223,35 @@ public class SubmitWorkflow extends ActionBase implements
 		for(String i: inputs.keySet()) {
 			inputSpec.put(i, inputs.get(i));
 		}
-
 		appendTags(workflow);
-		
 		if(dryRun){
-			message("Resulting workflow: ");
-			message(workflow.toString(2));
-			verbose("Dry run, not submitting.");
+			console.info("Resulting workflow: ");
+			console.info("{}", workflow.toString(2));
+			console.verbose("Dry run, not submitting.");
 			return;
 		}
-		
 		WorkflowClient wmc = wsc.submitWorkflow(workflow);
 		String wfURL = wmc.getEndpoint().getUrl();
 		lastAddress=wfURL;
-		message(wfURL);
+		console.info("{}", wfURL);
 		properties.put(PROP_LAST_RESOURCE_URL, wfURL);
-		
 		if (wait) {
 			waitForFinish(wmc);
 		}
 	}
 
 	protected void waitForFinish(WorkflowClient wmc) throws Exception {
-		verbose("Waiting for workflow to finish...");
+		console.verbose("Waiting for workflow to finish...");
 		do {
 			Thread.sleep(2000);
 			Status newStatus = wmc.getStatus();
 			if (newStatus == null) {
-				error("Can't get workflow status.", null);
+				console.error(null, "Can't get workflow status.");
 				break;
 			}
 			if (!newStatus.equals(status)) {
 				status = newStatus;
-				verbose(status.toString());
+				console.verbose("{}", status);
 			}
 		} while (Status.RUNNING.equals(status));
 	}
@@ -270,12 +265,12 @@ public class SubmitWorkflow extends ActionBase implements
 		for(FileUploader fu: builder.getImports()) {
 			String wfFile = fu.getTo();
 			if(wfFile.startsWith("wf:")) {
-				verbose("Uploading <"+fu.getFrom()+"> as workflow file <"+wfFile+"> ...");
+				console.verbose("Uploading <{}> as workflow file <{}> ...", fu.getFrom(), wfFile);
 				fu.setTo(StorageClient.normalize(baseDir+wfFile.substring(3)));
 				String url = storageURL+"/files"+fu.getTo();
 				inputs.put(wfFile, url);
 				if(dryRun){
-					verbose("Dry run, not uploading.");
+					console.verbose("Dry run, not uploading.");
 					continue;
 				}
 				fu.perform(sc);
@@ -305,7 +300,7 @@ public class SubmitWorkflow extends ActionBase implements
 				val = builder.getProperty(name, val);
 			}
 			if(val!=null){
-				verbose("Template parameter <"+name+">: using value: <"+val+">");
+				console.verbose("Template parameter <{}>: using value: <{}>", name, val);
 				wf = wf.replace("${"+name+"}", val);
 			}
 			else {
@@ -386,7 +381,7 @@ public class SubmitWorkflow extends ActionBase implements
 			serverDetails(sb, props.getJSONObject("server"));
 			clientDetails(sb, props.getJSONObject("client"));
 		}catch(Exception ex) {
-			error("Error accessing service at <"+url+">", ex);
+			console.error(ex, "Error accessing service at <{}>", url);
 		}
 		return sb.toString();
 	}
