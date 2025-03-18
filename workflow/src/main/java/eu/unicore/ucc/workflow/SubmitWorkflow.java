@@ -170,14 +170,19 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 	}
 	
-	protected void findSite() throws Exception {
+	protected void findSite() throws UCCException{
 		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry,
 				configurationProvider, true);
 		if(submissionSite!=null) {
 			workflowFactories.setAddressFilter(new SiteNameFilter(submissionSite));
 		}
 		wsc = workflowFactories.iterator().next();
-		console.verbose("Selected workflow service at {}", wsc.getEndpoint().getUrl());
+		if(wsc!=null) {
+			console.verbose("Selected workflow service at {}", wsc.getEndpoint().getUrl());
+		}
+		else {
+			throw new UCCException("No workflow submission endpoint found!");
+		}
 	}
 
 	protected void createWorkflowDataStorage() throws Exception {

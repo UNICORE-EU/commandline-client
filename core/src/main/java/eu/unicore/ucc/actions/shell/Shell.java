@@ -126,7 +126,7 @@ public class Shell extends ActionBase {
 				UCC.console.setPrefix("[ucc "+getName()+"]");
 				String s = null;
 				try {
-					s=commandFile!=null?is.readLine():is.readLine("ucc>");
+					s = commandFile!=null ? is.readLine() : is.readLine("ucc>");
 				}catch(Exception uie) {}
 				if(s==null){
 					s="exit";
@@ -167,7 +167,7 @@ public class Shell extends ActionBase {
 					printShellHelp();
 					continue;
 				}
-				//else it is a command
+				// it is a command
 				String[] args = parseCmdlineWithVars(s);
 				if(UCC.console.isVerbose()) {
 					StringBuilder sb = new StringBuilder();
@@ -175,7 +175,6 @@ public class Shell extends ActionBase {
 					console.verbose("{}", sb);
 				}
 				try{
-					//check if it is a special command
 					if(processSpecial(args)){
 						continue;
 					}
@@ -184,7 +183,6 @@ public class Shell extends ActionBase {
 						console.info("No such command: {}", args[0]);
 						continue;
 					}
-					// update properties
 					if(UCC.console.isVerbose())properties.put(OPT_VERBOSE_LONG,"true");
 					String authNMethod = getOption(OPT_AUTHN_METHOD_LONG, OPT_AUTHN_METHOD, UsernameAuthN.NAME);
 					properties.put(OPT_AUTHN_METHOD_LONG, authNMethod);
@@ -249,7 +247,7 @@ public class Shell extends ActionBase {
 
 	private void handleSet(String[] args) throws IOException {
 		if(args.length==1){
-			//print properties
+			// "set" alone: print properties
 			for(Object keyObj: properties.keySet()){
 				String key=String.valueOf(keyObj);
 				String val=properties.getProperty(key);
@@ -263,7 +261,7 @@ public class Shell extends ActionBase {
 			}
 		}
 		else {
-			//set property
+			// set property
 			String[] paramArgs = new String[args.length-1];
 			System.arraycopy(args, 1, paramArgs, 0, paramArgs.length);
 			properties.putAll(PropertyVariablesResolver.getParameters(paramArgs));
@@ -273,13 +271,11 @@ public class Shell extends ActionBase {
 			boolean debug = UCC.console.isDebug();
 			debug = UCCOptions.isTrue(properties.getProperty("UCC_DEBUG", String.valueOf(verbose)));
 			UCC.console.setDebug(debug);
-		
 		}
 	}
 
 	private void handleSystem(String[] args) throws Exception {
 		if(args.length<2)return;
-		
 		String[] paramArgs = new String[args.length-1];
 		System.arraycopy(args, 1, paramArgs, 0, paramArgs.length);
 		ProcessBuilder pb = new ProcessBuilder(Arrays.asList(paramArgs));

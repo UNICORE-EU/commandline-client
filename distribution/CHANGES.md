@@ -7,7 +7,7 @@ Report any issues via the
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
 
-Version 10.1.3 (released Mar dd, 2025)
+Version 10.1.3 (released Mar 18, 2025)
 --------------------------------------
  - improvement: show asserted user ID (if any) in 'issue-token --inspect'
  - fix: 'list-jobs' did not work
