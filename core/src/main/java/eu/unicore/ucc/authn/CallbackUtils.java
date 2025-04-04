@@ -84,13 +84,7 @@ public class CallbackUtils
 
 	private static String readLine(boolean hidden) {
 		LineReader cr = LineReaderBuilder.builder().build();
-		try{
-			return cr.readLine(hidden? '*' : null).trim();
-		}finally {
-			try{
-				cr.getTerminal().close();
-			}catch(Exception ex) {}
-		}
+		return cr.readLine(hidden? '*' : null).trim();
 	}
-	
+
 }

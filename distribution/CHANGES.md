@@ -7,6 +7,13 @@ Report any issues via the
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
 
+Version  10.1.4 (released Apr 04, 2025)
+---------------------------------------
+ - fix: OIDC server authentication should not send scope if not
+   configured in preferences
+ - fix: OIDC server authentication did not query for password and
+   OTP value
+
 Version 10.1.3 (released Mar 18, 2025)
 --------------------------------------
  - improvement: show asserted user ID (if any) in 'issue-token --inspect'
