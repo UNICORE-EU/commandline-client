@@ -32,7 +32,7 @@ public class UCCOIDCServerAuthN extends TokenBasedAuthN {
 	@Override
 	public void setProperties(Properties properties)
 	{
-		OIDCProperties oidcProperties = new OIDCProperties(properties);
+		OIDCProperties oidcProperties = new OIDCProperties(properties);	
 		super.setProperties(properties);
 		this.auth = new eu.unicore.services.restclient.oidc.OIDCServerAuthN(
 				oidcProperties,
@@ -41,13 +41,13 @@ public class UCCOIDCServerAuthN extends TokenBasedAuthN {
 					String password = oidcProperties.getValue(OIDCProperties.PASSWORD);
 					if(password==null){
 						password = new String(CallbackUtils.getPasswordFromUserCmd("OIDC server", null));
-						oidcProperties.setProperty(oidcProperties.PASSWORD, password);
+						oidcProperties.setProperty(OIDCProperties.PASSWORD, password);
 						properties.setProperty("oidc.password", password);
 					}
 					String otp = oidcProperties.getValue(OIDCProperties.OTP);
 					if(otp!=null && otp.equalsIgnoreCase("QUERY")){
-						oidcProperties.setProperty(oidcProperties.OTP, otp);
 						otp = new String(CallbackUtils.getPasswordFromUserCmd("OIDC server", "2FA one time "));
+						oidcProperties.setProperty(OIDCProperties.OTP, otp);
 					}
 					super.retrieveToken();
 				}

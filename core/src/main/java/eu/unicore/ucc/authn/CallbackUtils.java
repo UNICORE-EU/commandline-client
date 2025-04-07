@@ -2,12 +2,10 @@ package eu.unicore.ucc.authn;
 
 import java.io.IOException;
 
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-
 import eu.unicore.security.canl.CachingPasswordCallback;
 import eu.unicore.security.canl.PasswordCallback;
 import eu.unicore.security.wsutil.client.authn.UsernameCallback;
+import eu.unicore.ucc.UCC;
 
 public class CallbackUtils
 {
@@ -83,8 +81,7 @@ public class CallbackUtils
 	}
 
 	private static String readLine(boolean hidden) {
-		LineReader cr = LineReaderBuilder.builder().build();
-		return cr.readLine(hidden? '*' : null).trim();
+		return UCC.getLineReader().readLine(hidden? '*' : null).trim();
 	}
 
 }

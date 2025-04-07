@@ -40,6 +40,7 @@ public class Shell extends ActionBase {
 	public static final String OPT_FILE_LONG="file";
 
 	private File commandFile;
+	private History history = null;
 
 	@Override
 	public String getDescription() {
@@ -81,9 +82,11 @@ public class Shell extends ActionBase {
 		}
 		run();
 	}
-	
+
 	@Override
 	protected void testRegistryConnection() throws UCCException {
+		// setup linereader here, if we must query for passwords
+		setupLineReader();
 		super.testRegistryConnection();
 		try{
 			for(Endpoint ep: registry.listEntries()) {
@@ -98,25 +101,32 @@ public class Shell extends ActionBase {
 			"help", "help-auth", "version",
 			"exit", "quit" );
 
+	private void setupLineReader() throws UCCException {
+		UCCCompleter c = null;
+		if(commandFile==null){
+			Set<String> cmds = new HashSet<>();
+			cmds.addAll(UCC.cmds.keySet());
+			for(String s: internalCommands) {
+				cmds.add(s);
+			}
+			c = new UCCCompleter(cmds, this.configurationProvider);
+		}
+		LineReader is = LineReaderBuilder.builder().completer(c).build();
+		if(commandFile==null) {
+			history = getHistory(is);
+		}
+		UCC.setLineReader(is);
+	}
+
 	public void run(){
 		Command.quitAfterPrintingUsage=false;
-		LineReader is = null;
-		History history = null;
+		LineReader is = UCC.getLineReader();
 		try{
 			if(commandFile!=null){
-				is = LineReaderBuilder.builder().build();
 				is.addCommandsInBuffer(FileUtils.readLines(commandFile, "UTF-8"));
 				is.addCommandsInBuffer(Arrays.asList("exit"));
 			}
-			else{
-				Set<String> cmds = new HashSet<>();
-				cmds.addAll(UCC.cmds.keySet());
-				for(String s: internalCommands) {
-					cmds.add(s);
-				}
-				is = LineReaderBuilder.builder()
-						.completer(new UCCCompleter(cmds, this.configurationProvider))
-						.build();
+			else {
 				history = getHistory(is);
 			}
 			System.out.println(getHeader());
@@ -301,7 +311,7 @@ public class Shell extends ActionBase {
 		System.err.println(" system ...          - run a system command (also: '! ...'");
 		System.err.println(" version             - show version info");
 	}
-	
+
 	@Override
 	protected boolean requireRegistry() {
 		return false;
@@ -324,7 +334,7 @@ public class Shell extends ActionBase {
 	}
 
 	private static Pattern p = Pattern.compile("\"([^\"]*)\"|(\\S+)");
-		
+
 	private String[] parseCmdlineWithVars(String cmdArgs) throws IOException {
 		String[] args = parseCmdline(cmdArgs);
 		for(int i=0; i<args.length; i++) {
@@ -335,7 +345,7 @@ public class Shell extends ActionBase {
 		}
 		return args;
 	}
-	
+
 	private String expandVariables(String var){
 		for(String key: properties.stringPropertyNames()) {
 			if(!var.contains(key))continue;
@@ -348,13 +358,13 @@ public class Shell extends ActionBase {
 		}
 		return var;
 	}
-	
+
 	private int numberOfErrors = 0;
 
 	public int getNumberOfErrors(){
 		return numberOfErrors;
 	}
-	
+
 	static String[] parseCmdline(String cmdArgs) throws IOException {
 		List<String>result = new ArrayList<>();
 		Matcher m = p.matcher(cmdArgs);

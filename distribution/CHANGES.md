@@ -7,12 +7,13 @@ Report any issues via the
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
 
-Version  10.1.4 (released Apr 04, 2025)
+Version  10.1.4 (released Apr 07, 2025)
 ---------------------------------------
  - fix: OIDC server authentication should not send scope if not
    configured in preferences
  - fix: OIDC server authentication did not query for password and
    OTP value
+ - fix: shell history did not work after entering password interactively
 
 Version 10.1.3 (released Mar 18, 2025)
 --------------------------------------

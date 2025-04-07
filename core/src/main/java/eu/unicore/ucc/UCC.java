@@ -18,6 +18,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.helpers.JLineLogger;
@@ -346,4 +349,14 @@ public class UCC{
 		System.err.println("OS: "+System.getProperty("os.name")+" "+System.getProperty("os.version"));
 	}
 	
+	private static LineReader lr;
+	public static synchronized LineReader getLineReader() {
+		if(lr==null) {
+			lr = LineReaderBuilder.builder().build();
+		}
+		return lr;
+	}
+	public static void setLineReader(LineReader l) {
+		lr = l;
+	}
 }
