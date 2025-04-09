@@ -6,7 +6,9 @@
 if [ ! -e ${HOME}/.ucc/ ]; then
     mkdir -m 700 ${HOME}/.ucc/
 fi
-
+if [ ! -e ${HOME}/.ucc/trusted-certs ]; then
+    mkdir -m 700 ${HOME}/.ucc/trusted-certs
+fi
 
 for f in /etc/unicore/ucc/*; do
     if [ ! -e ${HOME}/.ucc/`basename $f` ]; then
@@ -17,7 +19,7 @@ done
 
 
 #
-# where the UCC jar files are
+# Directory containing the UCC jar files
 #
 UCC_LIB=/usr/share/unicore/ucc/lib
 
@@ -41,13 +43,8 @@ set_option(){
 	fi
 }
 
-
 #
-# Options to the Java VM
-#
-
-#
-#Memory for the VM
+#Memory for the Java VM
 #
 set_option "Xmx" "128m"
 
