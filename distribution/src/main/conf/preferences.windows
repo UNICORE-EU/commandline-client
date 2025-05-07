@@ -1,0 +1,30 @@
+#
+# User preferences for UCC
+#
+
+#
+# authentication settings
+# see 'ucc help-auth' for more
+
+authentication-method=USERNAME
+username=demouser
+password=test123
+
+# configure truststore containing trusted CA certs
+truststore.type=directory
+# if type is 'directory'
+truststore.directoryLocations.1=${HOMEPATH}\\.ucc\\trusted-certs\\*.pem
+
+# do not check the SSL cert contains correct hostname
+client.serverHostnameChecking=NONE
+
+#
+# The address(es) of the registries to contact
+# (space separated list)
+
+registry=https://localhost:8080/DEMO-SITE/rest/registries/default_registry
+
+#
+# default directory for output
+# 
+output=.
