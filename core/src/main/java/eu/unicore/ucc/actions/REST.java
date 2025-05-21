@@ -180,6 +180,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			Header l = res.getFirstHeader("Location");
 			if(l!=null) {
 				console.info("{}", l.getValue());
+				properties.put(PROP_LAST_RESOURCE_URL, l.getValue());
 			}
 			if (includeHeaders) for(Header h: res.getHeaders()) {
 				console.info("{}: {}", h.getName(), h.getValue());

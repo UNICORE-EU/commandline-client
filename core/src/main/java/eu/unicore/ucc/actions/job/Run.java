@@ -338,6 +338,7 @@ public class Run extends ActionBase {
 				}
 				try{
 					lastJobDirectory=runner.getJob().getLinkUrl("workingDirectory");
+					properties.put(PROP_LAST_JOBDIR_URL, lastJobDirectory);
 				}catch(Exception ex){}
 			}
 		}catch(Exception ex){

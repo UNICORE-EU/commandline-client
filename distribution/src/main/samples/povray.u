@@ -11,7 +11,7 @@
   
   "Imports": [
     { "From": "scenefile.pov",
-       To": "input.pov" }
+      "To": "input.pov" }
   ],
 
   "Exports": [

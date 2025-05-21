@@ -34,6 +34,7 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 		CoreEndpointLister coreLister = new CoreEndpointLister(registry,configurationProvider,
 				configurationProvider.getRESTAuthN(), UCC.executor);
 		coreLister.setAddressFilter(new Blacklist(blacklist));
+		if(detailed)printHeader();
 		for(CoreClient ep: coreLister){
 			if(ep==null){
 				if(!coreLister.isRunning()){
@@ -43,7 +44,6 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 			else{
 				String url = ep.getEndpoint().getUrl();
 				URLCompleter.registerSiteURL(url);
-				console.verbose("Site :{}", ep.getEndpoint().getUrl());	
 				try{
 					listFiletransfers(ep);
 				}catch(Exception ex){
@@ -70,7 +70,7 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 
 	protected void listFiletransfer(BaseServiceClient ftc) throws Exception {
 		try{
-			console.info("{}{}", ftc.getEndpoint().getUrl(), getDetails(ftc));
+			console.info("{}", getDetails(ftc));
 			properties.put(PROP_LAST_RESOURCE_URL, ftc.getEndpoint().getUrl());
 		}catch(Exception ex){
 			console.error(ex,"Error listing filetransfer at {}", ftc.getEndpoint().getUrl());
@@ -78,28 +78,33 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 		printProperties(ftc);
 	}
 
+	String format = " %10s | %11s | %s";
+	protected void printHeader() {
+		console.info(String.format(format, "Status", "Transmitted", "URL"));
+		console.info("  ----------|-------------|----------------");
+	}
+
 	@Override
 	protected String getDetails(BaseServiceClient ftc) {
 		if(!detailed)return "";
-		StringBuilder sb=new StringBuilder();
+		String url = ftc.getEndpoint().getUrl();
 		try{
 			JSONObject props = ftc.getProperties();
-			sb.append(" ");
-			sb.append(props.getString("status"));
-			sb.append(" ");
-			sb.append(unitParser.getHumanReadable(Long.parseLong(props.getString("transferredBytes"))));
-		}catch(Exception ex){sb.append(Log.createFaultMessage("Error", ex));}
-		return sb.toString();
+			String size = unitParser.getHumanReadable(Long.parseLong(String.valueOf(props.get("transferredBytes"))));
+			return String.format(format, props.getString("status"), size, url);
+		}catch(Exception ex){return Log.createFaultMessage("Error <"+url+"> ", ex);}
 	}
 
 	@Override
 	public String getDescription(){
 		return "list server-to-server transfers";
 	}
+
 	@Override
 	public String getArgumentList(){
 		return "";
 	}
+
 	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_DATA;
