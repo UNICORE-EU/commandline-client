@@ -2,6 +2,8 @@ package eu.unicore.ucc.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -171,8 +173,6 @@ public class UCCBuilder extends Builder {
 		return otherImports;
 	}
 
-	
-	@Override
 	protected Location createLocation(String descriptor) {
 		return Resolve.resolve(descriptor, registry, configurationProvider);
 	}
@@ -292,5 +292,8 @@ public class UCCBuilder extends Builder {
 		sb.append(lineSep);
 	}
 
+	public void writeTo(Writer writer)throws IOException{
+		writer.write(getJSON().toString(2));
+	}
 	
 }
