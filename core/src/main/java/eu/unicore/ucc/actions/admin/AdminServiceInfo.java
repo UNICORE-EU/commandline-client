@@ -112,18 +112,13 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 	}
 
 	@Override
-	public String getArgumentList() {
-		return "";
-	}
-
-	@Override
 	public String getSynopsis() {
-		return "Displays accessible AdminService instances and some information about them.";
+		return "Displays accessible admin service instances and some information about them.";
 	}
 
 	@Override
 	public String getDescription() {
-		return "show accessible admin service instances and optionally detailed information about services";
+		return "show accessible admin service instances";
 	}
 
 	@Override

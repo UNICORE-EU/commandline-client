@@ -18,8 +18,7 @@ public abstract class SMSOperation extends ActionBase {
 	 * @return File's path at the storage.
 	 */
 	protected String getPathAtStorage(String target) {
-		Location targetDesc = createLocation(target);
-		return targetDesc.getName();
+		return createLocation(target).getName();
 	}
 
 	/**
@@ -29,8 +28,7 @@ public abstract class SMSOperation extends ActionBase {
 	 * @return StorageClient for the target file 
 	 */
 	protected StorageClient getStorageClient(String target) throws Exception {
-		Location targetDesc = createLocation(target);
-		return getStorageClient(targetDesc);
+		return getStorageClient(createLocation(target));
 	}
 
 	/**
@@ -43,6 +41,11 @@ public abstract class SMSOperation extends ActionBase {
 		return new StorageClient(new Endpoint(targetDesc.getSmsEpr()), 
 				configurationProvider.getClientConfiguration(targetDesc.getSmsEpr()),
 				configurationProvider.getRESTAuthN());
+	}
+		
+	@Override
+	public String getArgumentList(){
+		return "<Storage-URL>/files/path or unicore://site/storage_name/path>";
 	}
 
 	@Override

@@ -250,14 +250,14 @@ public class Runner implements Runnable {
 	 * with the current state included in the property "state". 
 	 */
 	private void runAsync(){
-		String state=builder.getProperty("state",NEW);
-		State s=getState(state);
+		String state = builder.getState();
+		State s = getState(state);
 		do{
 			try{
 				mustSave=false;
 				s=s.process(this);
-				state=s.getName();
-				builder.setProperty("state", state);
+				state = s.getName();
+				builder.setState(state);
 			}catch(Exception e){
 				String reason = Log.createFaultMessage("Error occurred processing state <"+s.getName()+">",e);
 				throw new RuntimeException(reason, e);
@@ -272,14 +272,14 @@ public class Runner implements Runnable {
 	 * to the root exception
 	 */
 	private void runSync(){
-		String state=builder.getProperty("state",NEW);
+		String state = builder.getState();
 		do{
 			State s=getState(state);
 			msg.verbose("Job is "+state);
 			try{
 				s=s.process(this);
 				state=s.getName();
-				builder.setProperty("state", state);
+				builder.setState(state);
 			}catch(Exception e){
 				throw new RuntimeException(e);
 			}
@@ -291,7 +291,7 @@ public class Runner implements Runnable {
 	 * @throws RunnerException in case the job could not be submitted
 	 */
 	private void doSubmit() throws Exception {
-		JSONObject submit = builder.getJSON();
+		JSONObject submit = builder.getJob();
 		if(dryRun){
 			listCandidateSites();
 			msg.info("Dry-run, NOT submitting, effective JSON:");
@@ -330,8 +330,8 @@ public class Runner implements Runnable {
 			throw new RunnerException(ERR_SUBMIT_FAILED,"Could not submit job",e);
 		}
 		String url = jobClient.getEndpoint().getUrl();
-		builder.setProperty("epr", url);
-		builder.setProperty("type", "job");
+		builder.setProperty("_ucc_epr", url);
+		builder.setProperty("_ucc_type", "job");
 		msg.info(url);
 		properties.put(Constants.PROP_LAST_RESOURCE_URL, url);
 	}
@@ -342,7 +342,7 @@ public class Runner implements Runnable {
 	private void initJobClient(){
 		if(jobClient!=null)return;
 		try{
-			String url = builder.getProperty("epr");
+			String url = builder.getProperty("_ucc_epr");
 			jobClient=new JobClient(new Endpoint(url),
 					configurationProvider.getClientConfiguration(url),
 					configurationProvider.getRESTAuthN());
@@ -404,8 +404,7 @@ public class Runner implements Runnable {
 	}
 
 	private void setOutputLocation(){
-		String outputLoc=builder.getProperty("Output");
-		if(outputLoc==null)outputLoc=".";
+		String outputLoc=builder.getProperty("_ucc_Output", ".");
 		try{
 			output=new File(outputLoc);
 			if(!output.exists())output.mkdirs();
@@ -420,19 +419,19 @@ public class Runner implements Runnable {
 	 * job status should be retrieved from remote
 	 */
 	private boolean shouldUpdate(){
-		String updateInterval=builder.getProperty("Update interval","1");
+		String updateInterval=builder.getProperty("_ucc_Update interval","1");
 		int updateInMillis=Integer.parseInt(updateInterval)*1000;
 		if(updateInMillis<=0)return true;
-		String lastUpdate=builder.getProperty("lastStatusUpdate");
+		String lastUpdate=builder.getProperty("_ucc_lastStatusUpdate");
 		if(lastUpdate==null){
 			lastUpdate=String.valueOf(System.currentTimeMillis());
-			builder.setProperty("lastStatusUpdate", String.valueOf(lastUpdate));
+			builder.setProperty("_ucc_lastStatusUpdate", String.valueOf(lastUpdate));
 			mustSave=true;
 		}
 		long last=Long.parseLong(lastUpdate);
 		long now=System.currentTimeMillis();
 		if(now>last+updateInMillis){
-			builder.setProperty("lastStatusUpdate", String.valueOf(now));
+			builder.setProperty("_ucc_lastStatusUpdate", String.valueOf(now));
 			mustSave=true;
 			return true;
 		}
@@ -596,13 +595,13 @@ public class Runner implements Runnable {
 	private void writeJobIDFile(){
 		if(quietMode || !mustSave)return;
 		try	{
-			String dump=builder.getProperty("jobIdFile",null);
+			String dump=builder.getProperty("_ucc_jobIdFile",null);
 			File dumpFile=null;
 			if(dump==null){
-				String loc=builder.getProperty("IDLocation",output.getAbsolutePath());
+				String loc=builder.getProperty("_ucc_IDLocation",output.getAbsolutePath());
 				dumpFile=new File(loc,getJobID()+".job");
 				dump=dumpFile.getAbsolutePath();
-				builder.setProperty("jobIdFile",dumpFile.getAbsolutePath());
+				builder.setProperty("_ucc_jobIdFile",dumpFile.getAbsolutePath());
 			}
 			else{
 				dumpFile=new File(dump);
@@ -626,16 +625,15 @@ public class Runner implements Runnable {
 	private void createOutfileDirectory(){
 		if(!haveOutDir){
 			if(!briefOutputFiles){
-				StringBuilder sb=new StringBuilder();
-				String id=builder.getProperty("id");
+				StringBuilder sb = new StringBuilder();
+				String id = builder.getProperty("_ucc_id");
 				if(id!=null)sb.append(id);
-				String req=builder.getProperty("requestName");
+				String req = builder.getProperty("_ucc_requestName");
 				if(req!=null){
 					if(id!=null)sb.append('_');
 					sb.append(req);
 				}
-
-				output=new File(output,sb.toString());
+				output = new File(output,sb.toString());
 				output.mkdirs();
 			}
 			haveOutDir=true;
@@ -800,7 +798,7 @@ public class Runner implements Runnable {
 						Status status = r.status;
 						if(!Status.SUCCESSFUL.equals(status) &&
 								!Status.FAILED.equals(status)){
-							r.builder.setProperty("Update interval", "0");
+							r.builder.setProperty("_ucc_Update interval", "0");
 							return getState(STARTED);
 						}
 					}catch(Exception ex){
@@ -809,7 +807,7 @@ public class Runner implements Runnable {
 				}
 				else{
 					try{
-						if(!Boolean.parseBoolean(r.builder.getProperty("DetailedStatusDisplay", "false"))){
+						if(!Boolean.parseBoolean(r.builder.getProperty("_ucc_DetailedStatusDisplay", "false"))){
 							waitUntilDone(r.jobClient,0);
 						}
 						else{
@@ -867,7 +865,7 @@ public class Runner implements Runnable {
 		 */
 		states.put(DONE, new State(){
 			public State process(Runner r){
-				if(!Boolean.parseBoolean(r.builder.getProperty("KeepFinishedJob", "false"))){
+				if(!Boolean.parseBoolean(r.builder.getProperty("_ucc_KeepFinishedJob", "false"))){
 					try{
 						r.initJobClient();
 						r.mustSave=true;

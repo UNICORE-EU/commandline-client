@@ -19,7 +19,6 @@ import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.UCCException;
 
 /**
  * UCC specific extension of {@link ClientConfigurationProvider}.
@@ -102,7 +101,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 	 * assembled on demand. 
 	 * The base implementation adds the preferences given via {@link Constants#OPT_SECURITY_PREFERENCES}
 	 */
-	private Map<String, String[]> setupExtraAttributes() throws UCCException {
+	private Map<String, String[]> setupExtraAttributes() {
 		Map<String, String[]> securityPreferences = new HashMap<>();
 		String[] vals = command.getCommandLine().getOptionValues(Constants.OPT_SECURITY_PREFERENCES);
 		if (vals == null) {
@@ -117,8 +116,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		return securityPreferences;
 	}
 	
-	private void parseSecurityPreference(String pref, Map<String, String[]> securityPreferences) 
-	throws UCCException {
+	private void parseSecurityPreference(String pref, Map<String, String[]> securityPreferences) {
 		if (pref.startsWith(PREFERENCE_ARG_UID + ":")) {
 			String val = pref.substring(PREFERENCE_ARG_UID.length() + 1);
 			securityPreferences.put("uid", new String[]{val});
@@ -138,7 +136,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 				String msg = "Value of the " + PREFERENCE_ARG_ADD_OS_GIDS + 
 						" preference must be 'true' or 'false', but not '" + 
 						val + "'";
-				throw new UCCException(msg);
+				throw new IllegalArgumentException(msg);
 			}
 			securityPreferences.put("addDefaultGroups", new String[]{val});
 		} else if (pref.startsWith(PREFERENCE_ARG_VO + ":")) {
@@ -150,7 +148,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		} else {
 			String msg = "Wrong value '" + pref + "' of the option -" + Constants.OPT_SECURITY_PREFERENCES + 
 					", must have the following format: " + PREFERENCE_ARG_HELP;
-			throw new UCCException(msg);
+			throw new IllegalArgumentException(msg);
 		}
 	}
 	

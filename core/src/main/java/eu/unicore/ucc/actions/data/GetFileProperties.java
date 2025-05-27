@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.uas.util.UnitParser;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.util.JSONUtil;
 
 /**
@@ -48,17 +47,12 @@ public class GetFileProperties extends SMSOperation {
 
 	@Override
 	public String getSynopsis() {
-		return "Retrieves file status: permissions, ACL, owner and more.";
+		return "Retrieves information about a file: size, permissions, ACL, owner and more.";
 	}
 	
 	@Override
 	public String getDescription(){
 		return "show detailed file information";
-	}
-	
-	@Override
-	public String getArgumentList(){
-		return "<[Storage-URL#]/path or [u6://SITENAME/[JobId|StorageName]]/path>";
 	}
 
 	@Override
@@ -73,7 +67,7 @@ public class GetFileProperties extends SMSOperation {
 		
 		CommandLine cmdLine = getCommandLine(); 
 		if (cmdLine.getArgs().length != 2) {
-			throw new UCCException("Wrong number of arguments");
+			throw new IllegalArgumentException("Wrong number of arguments");
 		}
 		String target = cmdLine.getArgs()[1];
 		console.verbose("Getting file properties of <{}>", target);

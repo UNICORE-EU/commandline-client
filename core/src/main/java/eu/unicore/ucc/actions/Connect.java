@@ -2,7 +2,6 @@ package eu.unicore.ucc.actions;
 
 import org.apache.commons.cli.Option;
 
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.lookup.Connector;
 
 /**
@@ -35,14 +34,8 @@ public class Connect extends ActionBase {
 	}
 
 	@Override
-	public String getArgumentList(){
-		return "";
-	}
-
-	@Override
 	public String getSynopsis(){
-		return "Connects to UNICORE. " +
-		"If not yet done, target system services are initialised.";
+		return "Connects to UNICORE. If not yet done, target system services are initialised.";
 	}
 
 	@Override
@@ -69,7 +62,7 @@ public class Connect extends ActionBase {
 		console.info("You can access {} target system(s).", tssAvailable);
 		//it should be considered an error if no sites are available
 		if(tssAvailable==0) {
-			throw new UCCException("No sites available!");
+			throw new Exception("No sites available!");
 		}
 	}
 

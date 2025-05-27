@@ -90,7 +90,7 @@
       <dependency>
 	<groupId>eu.unicore</groupId>
 	<artifactId>uas-client</artifactId>
-	<version>${uas.version}</version>
+	<version>${uas.version}-1</version>
 	<exclusions>
 	  <exclusion>
 	    <groupId>com.sun.xml.ws</groupId>

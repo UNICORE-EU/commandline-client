@@ -23,7 +23,6 @@ import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.io.FileUploader;
@@ -142,7 +141,7 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 
 		if (getCommandLine().getArgs().length < 2) {
-			throw new UCCException("Please supply the name of the workflow file.");
+			throw new IllegalArgumentException("Please supply the name of the workflow file.");
 		} else {
 			workflowFileName = getCommandLine().getArgs()[1];
 		}	
@@ -170,7 +169,7 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 	}
 	
-	protected void findSite() throws UCCException{
+	protected void findSite() throws Exception {
 		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry,
 				configurationProvider, true);
 		if(submissionSite!=null) {
@@ -181,7 +180,7 @@ public class SubmitWorkflow extends ActionBase implements
 			console.verbose("Selected workflow service at {}", wsc.getEndpoint().getUrl());
 		}
 		else {
-			throw new UCCException("No workflow submission endpoint found!");
+			throw new Exception("No workflow submission endpoint found!");
 		}
 	}
 
@@ -210,7 +209,7 @@ public class SubmitWorkflow extends ActionBase implements
 			sfc = sfl.iterator().next();
 		}
 		if(sfc==null){
-			throw new UCCException("No suitable storage factory available!");
+			throw new Exception("No suitable storage factory available!");
 		}
 		// create storage now
 		console.verbose("Creating new storage at <{}>", sfc.getEndpoint().getUrl());
@@ -313,7 +312,7 @@ public class SubmitWorkflow extends ActionBase implements
 			}
 		}
 		if(unmatchedTemplateParameters.size()>0){
-			throw new UCCException("ERROR: No value defined for template parameters: "+unmatchedTemplateParameters);
+			throw new Exception("ERROR: No value defined for template parameters: "+unmatchedTemplateParameters);
 		}
 		workflow = new JSONObject(wf);
 	}

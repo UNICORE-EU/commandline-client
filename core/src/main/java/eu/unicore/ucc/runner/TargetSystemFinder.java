@@ -88,7 +88,7 @@ public class TargetSystemFinder implements Broker, Constants {
 		final ConsoleLogger msg=builder.getMessageWriter();
 		final List<SiteClient>available=Collections.synchronizedList(new ArrayList<>());
 
-		final String blackList=builder.getProperty("blacklist"); 
+		final String blackList = builder.getProperty("blacklist"); 
 		final boolean checkResources=true;
 
 		SiteLister tsfList = new SiteLister(UCC.executor,registry,configurationProvider);

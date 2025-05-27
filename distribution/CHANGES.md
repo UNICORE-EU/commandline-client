@@ -6,6 +6,16 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
+Version 10.2.0 (released May dd, 2025)
+--------------------------------------
+ - improvement: URL completion for storages in 'ucc shell' now includes
+   job directories
+ - improvement: 'list-transfers -l' uses table format 
+ - fix: 'list-storages -l' did not show free space
+ - fixes in example files and Windows ucc.bat script
+ - code cleanup
+ - update to 10.2.0 base libs
+
 
 Version  10.1.4 (released Apr 07, 2025)
 ---------------------------------------

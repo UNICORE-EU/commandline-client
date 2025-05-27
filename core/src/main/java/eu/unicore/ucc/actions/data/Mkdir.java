@@ -36,10 +36,6 @@ public class Mkdir extends SMSOperation {
 	public String getDescription(){
 		return "create a directory remotely";
 	}
-	
-	@Override
-	public String getArgumentList(){
-		return "<Storage-URL>/files/dir or <unicore://site/storage_name/dir";
-	}
+
 
 }

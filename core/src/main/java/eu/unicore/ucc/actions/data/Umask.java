@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 
 /**
@@ -15,10 +14,10 @@ import eu.unicore.ucc.actions.ActionBase;
  * @author K. Benedyczak
  */
 public class Umask extends ActionBase {
-	
-	public static final String OPT_SET_LONG = "set";
-	public static final String OPT_SET = "s";
-	
+
+	private static final String OPT_SET_LONG = "set";
+	private static final String OPT_SET = "s";
+
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -42,12 +41,12 @@ public class Umask extends ActionBase {
 				" server side to control permissions of newly created files." +
 				" Without the '" + OPT_SET_LONG + "' parameter the current umask is printed.";
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "get or set a file creation umask";
 	}
-	
+
 	@Override
 	public String getArgumentList(){
 		return "<Storage-URL | TargetSystem-URL>";
@@ -63,7 +62,7 @@ public class Umask extends ActionBase {
 		super.process();
 		CommandLine cmdLine = getCommandLine(); 
 		if (cmdLine.getArgs().length != 2) {
-			throw new UCCException("Wrong number of arguments");
+			throw new IllegalArgumentException("Wrong number of arguments");
 		}
 		String url = cmdLine.getArgs()[1];
 		String set = getOption(OPT_SET_LONG, OPT_SET);
@@ -74,7 +73,7 @@ public class Umask extends ActionBase {
 		try{
 			umaskS = client.getProperties().getString("umask");
 		} catch(Exception ex) {
-			throw new UCCException("Error getting umask property. It seems that the selected service doesn't " +
+			throw new Exception("Error getting umask property. It seems that the selected service doesn't " +
 					"support umask setting", ex);
 		}
 		if (set == null)

@@ -97,21 +97,15 @@ public abstract class Command implements Constants {
 		return false;
 	}
 
-	public String getName(){
-		return "<command>";
-	}
+	public abstract String getName();
 
 	public String getArgumentList(){
-		return "[ARGS]";
-	}
-
-	public String getSynopsis(){
 		return "";
 	}
 
-	public String getDescription(){
-		return "";
-	}
+	public abstract String getSynopsis();
+
+	public abstract String getDescription();
 
 	public String getCommandGroup(){
 		return CMD_GRP_OTHER;
@@ -270,7 +264,7 @@ public abstract class Command implements Constants {
 		}
 		else{
 			if(userSpecified){
-				throw new UCCException("Properties file <"+props+"> does not exist.");
+				throw new Exception("Properties file <"+props+"> does not exist.");
 			}
 			else{
 				console.verbose("No properties file found at <{}>", props);	

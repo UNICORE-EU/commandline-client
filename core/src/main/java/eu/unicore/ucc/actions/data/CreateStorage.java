@@ -16,7 +16,6 @@ import eu.unicore.client.core.StorageFactoryClient;
 import eu.unicore.client.lookup.AddressFilter;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.lookup.StorageFactoryLister;
@@ -165,7 +164,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		while(iter.hasNext()){
 			sfc = iter.next();
 			if(sfc==null){
-				throw new UCCException("No suitable storage factory available!");
+				throw new Exception("No suitable storage factory available!");
 			}
 			factoryURL = sfc.getEndpoint().getUrl();
 			console.verbose("Using factory at <{}>", factoryURL);
@@ -180,7 +179,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		}
 		if(!haveValidFactory){
 			// nothing found
-			throw new UCCException("No suitable storage factory available!");
+			throw new Exception("No suitable storage factory available!");
 		}
 	}
 

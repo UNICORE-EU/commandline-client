@@ -3,8 +3,10 @@ package eu.unicore.ucc.actions.shell;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +29,7 @@ import eu.unicore.ucc.authn.UCCConfigurationProvider;
 public class URLCompleter {
 
 	private final UCCConfigurationProvider configurationProvider;
-	
+
 	public URLCompleter(UCCConfigurationProvider configurationProvider){
 		this.configurationProvider = configurationProvider;
 	}
@@ -40,6 +42,11 @@ public class URLCompleter {
 
 	static final Set<String> sites = new HashSet<>();
 
+	static final Map<String,String>all = new HashMap<>();
+	static{
+		all.put("filter", "all");
+	}
+	
 	public static void registerSiteURL(String siteURL) {
 		if(siteURL!=null && siteURL.contains("/rest/")) {
 			sites.add(siteURL.substring(0, siteURL.indexOf("/rest/")+6));
@@ -90,7 +97,7 @@ public class URLCompleter {
 			var bsc = new BaseServiceClient(new Endpoint(base),
 					configurationProvider.getClientConfiguration(current),
 					configurationProvider.getRESTAuthN());
-			var j = bsc.getProperties();
+			var j = bsc.getProperties(all);
 			var js = j.toString();
 			if(fileMode) {
 				JSONObject files = j.getJSONObject("content");

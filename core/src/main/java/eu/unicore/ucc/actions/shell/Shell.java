@@ -21,7 +21,6 @@ import org.jline.reader.impl.history.DefaultHistory;
 import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.UCCOptions;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UsernameAuthN;
@@ -54,8 +53,9 @@ public class Shell extends ActionBase {
 
 	@Override
 	public String getSynopsis() {
-		return "Starts an interactive UCC session that allows you to " +
-				"multiple run UCC commands.";
+		return "Starts an interactive UCC session that allows you to "
+				+ "run multiple UCC commands, and offers convenient features "
+				+ "such as URL completion, shell history and more.";
 	}
 
 	/**
@@ -84,16 +84,12 @@ public class Shell extends ActionBase {
 	}
 
 	@Override
-	protected void testRegistryConnection() throws UCCException {
+	protected void testRegistryConnection() throws Exception {
 		// setup linereader here, if we must query for passwords
 		setupLineReader();
 		super.testRegistryConnection();
-		try{
-			for(Endpoint ep: registry.listEntries()) {
-				URLCompleter.registerSiteURL(ep.getUrl());
-			}
-		}catch(Exception ex) {
-			throw UCCException.wrapped(ex);
+		for(Endpoint ep: registry.listEntries()) {
+			URLCompleter.registerSiteURL(ep.getUrl());
 		}
 	}
 
@@ -101,7 +97,7 @@ public class Shell extends ActionBase {
 			"help", "help-auth", "version",
 			"exit", "quit" );
 
-	private void setupLineReader() throws UCCException {
+	private void setupLineReader() {
 		UCCCompleter c = null;
 		if(commandFile==null){
 			Set<String> cmds = new HashSet<>();

@@ -72,8 +72,4 @@ public class RM extends SMSOperation {
 		return "remove a remote file or directory";
 	}
 
-	@Override
-	public String getArgumentList(){
-		return "[unicore6://SITENAME/[JobId|StorageName]]";
-	}
 }

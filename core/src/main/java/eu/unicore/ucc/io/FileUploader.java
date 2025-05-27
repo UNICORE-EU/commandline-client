@@ -55,7 +55,7 @@ public class FileUploader extends FileTransferBase {
 		}
 
 		chosenProtocol = determineProtocol(preferredProtocol, sms);
-		Map<String,String>extraParameters = makeExtraParameters(chosenProtocol);
+		Map<String,String>extraParameters = getExtraParameters(chosenProtocol);
 
 		if(!hasWildCards && !isDirectory){
 			//single regular file

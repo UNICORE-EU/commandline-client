@@ -17,7 +17,6 @@ import eu.unicore.client.core.AllocationClient;
 import eu.unicore.client.core.JobClient.Status;
 import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.runner.Runner;
 import eu.unicore.ucc.util.UCCBuilder;
@@ -145,7 +144,7 @@ public class Run extends ActionBase {
 
 	@Override
 	public String getArgumentList(){
-		return "[<jobfile>]";
+		return "[<jobfile(s)>]";
 	}
 
 	@Override
@@ -162,9 +161,10 @@ public class Run extends ActionBase {
 	public String getDescription(){
 		return "run a job through UNICORE";
 	}
+
 	@Override
 	public String getCommandGroup(){
-		return "Job execution";
+		return CMD_GRP_JOBS;
 	}
 
 	@Override
@@ -265,7 +265,7 @@ public class Run extends ActionBase {
 			for(String s: errors) {
 				console.verbose("{}", s);
 			}
-			throw new UCCException("Job(s) failed.");
+			throw new Exception("Job(s) failed.");
 		}
 	}
 
@@ -291,13 +291,11 @@ public class Run extends ActionBase {
 	}
 
 	protected void configureBuilder(UCCBuilder builder){
-		builder.setProperty("Output",output.getAbsolutePath());
-		builder.setProperty("KeepFinishedJob", "true");
-		builder.setProperty("DetailedStatusDisplay", "true");
+		builder.setProperty("_ucc_Output",output.getAbsolutePath());
+		builder.setProperty("_ucc_KeepFinishedJob", "true");
+		builder.setProperty("_ucc_DetailedStatusDisplay", "true");
 		if(scheduled!=null)builder.setProperty("Not before", scheduled);
-		if(siteName!=null){
-			builder.setProperty("Site", siteName);
-		}
+		builder.setSite(siteName);
 		if(tags!=null&&tags.length>0) {
 			builder.addTags(tags);
 		}
@@ -330,7 +328,7 @@ public class Run extends ActionBase {
 			if(!dryRun){
 				lastJobAddress=runner.getJob().getEndpoint().getUrl();
 				if(!synchronous) {
-					lastJobFile=builder.getProperty("jobIdFile");
+					lastJobFile=builder.getProperty("_ucc_jobIdFile");
 					if(waitFor!=null) {
 						console.verbose("Waiting for job to be {} ...", waitFor);
 						runner.getJob().poll(waitFor);

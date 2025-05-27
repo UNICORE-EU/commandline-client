@@ -67,10 +67,10 @@ public class GetOutcome extends JobOperationBase {
 
 	protected void getOutput(UCCBuilder builder){
 		try{
-			builder.setProperty("state", Runner.STARTED);
-			builder.setProperty("Output",output.getAbsolutePath());
-			builder.setProperty("KeepFinishedJob","true");
-			Runner runner=new Runner(registry,configurationProvider,builder);
+			builder.setState(Runner.STARTED);
+			builder.setProperty("_ucc_Output",output.getAbsolutePath());
+			builder.setProperty("_ucc_KeepFinishedJob","true");
+			Runner runner = new Runner(registry,configurationProvider,builder);
 			runner.setBriefOutfileNames(brief);
 			runner.setQuietMode(quiet);
 			runner.setProperties(properties);

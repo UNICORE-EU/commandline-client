@@ -79,7 +79,9 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 
 	@Override
 	public String getSynopsis(){
-		return "Low-level REST API operations";
+		return "Perform low-level REST API operations on endpoints given via https URLs. "
+				+ "Use the GET operation to show the 'state' of the endpoint, use 'PUT' or 'POST' to trigger changes, "
+				+ "use 'DELETE' to remove things (e.g. jobs).";
 	}
 
 	@Override

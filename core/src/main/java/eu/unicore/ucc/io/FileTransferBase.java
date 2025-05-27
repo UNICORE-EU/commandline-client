@@ -22,6 +22,8 @@ public abstract class FileTransferBase {
 
 	protected Properties extraParameterSource;
 
+	protected final Map<String,String>extraParameters = new HashMap<>();
+
 	protected boolean timing=false;
 
 	protected boolean recurse=false;
@@ -51,15 +53,12 @@ public abstract class FileTransferBase {
 
 	public abstract void perform(StorageClient sms)throws Exception;
 	
-	protected Map<String,String>makeExtraParameters(String protocol){
-		Map<String, String> res;
-		if(extraParameterSource==null){
-			res=new HashMap<>();
-		}
-		else{
+	protected Map<String,String> getExtraParameters(String protocol){
+		Map<String,String> res = new HashMap<>();
+		if(extraParameterSource!=null){
 			String p=String.valueOf(protocol);
 			PropertyHelper ph=new PropertyHelper(extraParameterSource, new String[]{p,p.toLowerCase()});
-			res= ph.getFilteredMap();
+			res.putAll(ph.getFilteredMap());
 		}
 		ServiceLoader<FiletransferParameterProvider> ppLoader = ServiceLoader.load(FiletransferParameterProvider.class);
 		Iterator<FiletransferParameterProvider> ppIter = ppLoader.iterator();
@@ -67,8 +66,9 @@ public abstract class FileTransferBase {
 			FiletransferParameterProvider pp = ppIter.next();
 			pp.provideParameters(res, protocol);
 		}
+		res.putAll(extraParameters);
 		if(res.size()>0){
-			UCC.console.verbose("Have {} extra parameters for protocol {}", res.size(), protocol);
+			UCC.console.verbose("Have {} extra parameters for protocol {}", extraParameters.size(), protocol);
 		}
 		return res;
 	}
@@ -131,6 +131,10 @@ public abstract class FileTransferBase {
 
 	public void setExtraParameterSource(Properties properties){
 		this.extraParameterSource=properties;
+	}
+
+	public void setExtraParameters(Map<String,String>params){
+		this.extraParameters.putAll(params);
 	}
 
 	public void setRecurse(boolean recurse) {

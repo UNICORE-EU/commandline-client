@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.utils.TaskClient;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.util.JSONUtil;
@@ -118,7 +117,7 @@ public class Metadata extends ActionBase {
 		}
 		sms = createStorageClient(storage);
 		if (sms == null) {
-			throw new UCCException("Cannot find the requested storage service!");
+			throw new IllegalArgumentException("Cannot find the requested storage service!");
 		}
 		console.verbose("Accessing metadata for storage {}", sms.getEndpoint().getUrl());
 		String fName = getOption(OPT_FILE_LONG, OPT_FILE);
@@ -127,7 +126,7 @@ public class Metadata extends ActionBase {
 		}
 		if ("search".startsWith(command)) {
 			if (query == null) {
-				throw new UCCException("Please provide a query string!");
+				throw new IllegalArgumentException("'search' requires a query string!");
 			}
 			doSearch();
 		} else {
@@ -146,7 +145,7 @@ public class Metadata extends ActionBase {
 				// TODO depth
 				doStartExtract();
 			} else {
-				throw new UCCException("Unknown command : " + command, null);
+				throw new IllegalArgumentException("Unknown command : " + command, null);
 			}
 		}
 	}
@@ -256,7 +255,7 @@ public class Metadata extends ActionBase {
 				configurationProvider.getRESTAuthN());
 		console.verbose("Storage {}", td.getSmsEpr());
 		if (!sms.supportsMetadata()) {
-			throw new UCCException ("Storage does not support metadata.");
+			throw new Exception("Storage does not support metadata.");
 		}
 		return sms;
 	}

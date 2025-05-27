@@ -23,6 +23,7 @@ import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase.Mode;
+import eu.unicore.ucc.runner.Runner;
 import eu.unicore.ucc.io.FileUploader;
 import eu.unicore.ucc.io.Location;
 
@@ -86,6 +87,22 @@ public class UCCBuilder extends Builder {
 		return msg;
 	}
 	
+	static String[] _remove = {"blacklist", "Blacklist", "User", "Group"};
+
+	/**
+	 * get a clean JSON for submission - this will filter out any UCC specific stuff
+	 */
+	public JSONObject getJob() {
+		JSONObject filtered = new JSONObject();
+		JSONObject j = getJSON();
+		for(String k: j.keySet()) {
+			if(k.startsWith("_ucc_"))continue;
+			filtered.put(k, j.get(k));
+		}
+		for(String k: _remove)filtered.remove(k);
+		return filtered;
+	}
+
 	@Override
 	public JSONObject getJSON() {
 		build();
@@ -102,9 +119,19 @@ public class UCCBuilder extends Builder {
 		super.build();
 		try{
 			JSONArray nonLocalImports = createLocalImports(json.optJSONArray("Imports"));
-			json.put("Imports", nonLocalImports);
+			if(nonLocalImports.length()>0) {
+				json.put("Imports", nonLocalImports);
+			}
+			else {
+				json.remove("Imports");
+			}
 			JSONArray nonLocalExports = createLocalExports(json.optJSONArray("Exports"));
-			json.put("Exports", nonLocalExports);
+			if(nonLocalExports.length()>0) {
+				json.put("Exports", nonLocalExports);
+			}
+			else {
+				json.remove("Exports");
+			}
 			resolveLocations(json.optJSONArray("Imports"), "From");
 			resolveLocations(json.optJSONArray("Exports"), "To");
 		}catch(Exception ex){
@@ -239,7 +266,19 @@ public class UCCBuilder extends Builder {
 	}
 	
 	public String getSite(){
-		return JSONUtil.getString(json, "Site", null);
+		return JSONUtil.getString(json, "_ucc_Site", null);
+	}
+
+	public void setSite(String site){
+		if(site!=null)json.put("_ucc_Site", site);
+	}
+
+	public String getState(){
+		return JSONUtil.getString(json, "_ucc_state", Runner.NEW);
+	}
+	
+	public void setState(String state){
+		json.put("_ucc_state", state);
 	}
 	
 	/**

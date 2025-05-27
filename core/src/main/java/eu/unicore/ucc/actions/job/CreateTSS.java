@@ -18,7 +18,6 @@ import eu.unicore.client.core.SiteFactoryClient;
 import eu.unicore.client.lookup.SiteNameFilter;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.lookup.SiteFactoryLister;
@@ -127,7 +126,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 					configurationProvider.getRESTAuthN());
 		}
 		if(tsf==null){
-			throw new UCCException("No suitable target system factory available!",null);
+			throw new Exception("No suitable target system factory available!",null);
 		}
 		else{
 			factoryURL = tsf.getEndpoint().getUrl();

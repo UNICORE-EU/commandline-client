@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.cli.Option;
 
@@ -58,6 +60,12 @@ public class CP extends FileOperation {
 				.desc("Recurse into subdirectories")
 				.required(false)
 				.build());
+		getOptions().addOption(Option.builder(OPT_EXTRA_PARAMETERS)
+				.longOpt(OPT_EXTRA_PARAMETERS_LONG)
+				.desc("Additional settings for the transfer (key1=val1,key2=val2).")
+				.required(false)
+				.hasArg()
+				.build());
 	}
 
 	@Override
@@ -100,6 +108,7 @@ public class CP extends FileOperation {
 		transfer.setScheduled(scheduled);
 		transfer.setSynchronous(synchronous);
 		transfer.setPreferredProtocol(preferredProtocol);
+		transfer.setExtraParameters(getExtraParameters());
 		transfer.setExtraParameterSource(properties);
 		transfer.process();
 		if(transfer.getTransferAddress()!=null) {
@@ -133,6 +142,7 @@ public class CP extends FileOperation {
 		fd.setEndByte(endByte);
 		fd.setPreferredProtocol(selectedProtocol);
 		fd.setRecurse(recurse);
+		fd.setExtraParameters(getExtraParameters());
 		fd.setExtraParameterSource(properties);
 		StorageClient sms=new StorageClient(new Endpoint(url),
 				configurationProvider.getClientConfiguration(url),
@@ -157,6 +167,25 @@ public class CP extends FileOperation {
 	@Override
 	public String getArgumentList(){
 		return "<sources(s)> <target>";
+	}
+
+	private Map<String,String>getExtraParameters(){
+		Map<String,String> params = new HashMap<>();
+		if(getCommandLine().hasOption(OPT_EXTRA_PARAMETERS)) {
+			try{
+				String ep = getOption(OPT_EXTRA_PARAMETERS_LONG, OPT_EXTRA_PARAMETERS).trim();
+				String[] tok = ep.split(",");
+				for(String t: tok) {
+					String[]kv = t.split("=",2);
+					if(kv.length==2) {
+						params.put(kv[0], kv[1]);
+					}
+				}
+			}catch(Exception e) {
+				throw new IllegalArgumentException("Cannot parse extra parameters!");
+			}
+		}
+		return params;
 	}
 
 	// for unit-testing

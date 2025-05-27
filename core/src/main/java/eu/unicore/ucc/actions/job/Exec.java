@@ -163,16 +163,14 @@ public class Exec extends ActionBase {
 
 	protected void initBuilder(String[] args) throws Exception {
 		builder = new UCCBuilder(registry, configurationProvider);
-		builder.setProperty("Output",output.getAbsolutePath());
-		builder.setProperty("KeepFinishedJob", String.valueOf(keep));
-		builder.setProperty("DetailedStatusDisplay", "true");
+		builder.setProperty("_ucc_Output",output.getAbsolutePath());
+		builder.setProperty("_ucc_KeepFinishedJob", String.valueOf(keep));
+		builder.setProperty("_ucc_DetailedStatusDisplay", "true");
 		if(tags!=null&&tags.length>0) {
 			builder.addTags(tags);
 		}
-		if(siteName!=null){
-			builder.setProperty("Site", siteName);
-		}
-		Job job = new Job(builder.getJSON());
+		builder.setSite(siteName);
+		Job job = new Job(builder.getJob());
 		if(args.length == 1)throw new IllegalArgumentException("Must specify a command");
 		// first arg is command
 		job.executable(args[1]);

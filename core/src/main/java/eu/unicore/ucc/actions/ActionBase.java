@@ -9,7 +9,6 @@ import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.Command;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.UCCOptions;
 import eu.unicore.ucc.actions.data.Resolve;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
@@ -179,7 +178,7 @@ public abstract class ActionBase extends Command {
 		if(registryURL==null || registryURL.trim().length()==0){
 			console.verbose("No registry is configured.");
 			if(requireRegistry()){
-				throw new UCCException("A registry is required: please use the '-r' option " +
+				throw new Exception("A registry is required: please use the '-r' option " +
 						"or configuration entry to define the registry to be used.");
 			}
 			return;
@@ -212,10 +211,10 @@ public abstract class ActionBase extends Command {
 		return new RegistryClient(url, sec, auth);
 	}
 	
-	protected void testRegistryConnection() throws UCCException {
+	protected void testRegistryConnection() throws Exception {
 		if (registry == null)
 		{
-			throw new UCCException("Registry access is not initialized");
+			throw new Exception("Registry access is not initialized");
 		}
 		try{
 			console.verbose("Checking registry connection.");
@@ -225,7 +224,7 @@ public abstract class ActionBase extends Command {
 				throw new Exception(status);
 			}
 		}catch(Exception e){
-			throw new UCCException("Cannot contact registry (set 'contact-registry=false' to ignore this error) ",e);
+			throw new Exception("Cannot contact registry (set 'contact-registry=false' to ignore this error) ",e);
 		}
 	}
 

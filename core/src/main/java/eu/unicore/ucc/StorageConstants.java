@@ -19,5 +19,8 @@ public interface StorageConstants {
 	
 	public static final String OPT_RESUME_LONG="resume";
 	public static final String OPT_RESUME="X";
-	
+
+	public static final String OPT_EXTRA_PARAMETERS_LONG="extra-parameters";
+	public static final String OPT_EXTRA_PARAMETERS="E";
+
 }

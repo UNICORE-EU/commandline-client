@@ -129,10 +129,6 @@ public class ListSites extends ListActionBase<SiteClient> {
 	}
 
 	@Override
-	public String getArgumentList(){
-		return "";
-	}
-	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_JOBS;
 	}

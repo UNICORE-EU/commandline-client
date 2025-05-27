@@ -15,18 +15,18 @@ import eu.unicore.ucc.lookup.StorageLister;
 
 public class ListStorages extends ListActionBase<StorageClient> {
 
-	public String getName(){
-		return "list-storages";
-	}
-
-	protected UnitParser unitParser=UnitParser.getCapacitiesParser(1);
+	private final UnitParser unitParser=UnitParser.getCapacitiesParser(1);
 
 	private boolean showAll = false;
 
 	@Override
+	public String getName(){
+		return "list-storages";
+	}
+
+	@Override
 	protected void createOptions() {
 		super.createOptions();
-
 		getOptions().addOption(Option.builder(OPT_ALL)
 				.longOpt(OPT_ALL_LONG)
 				.desc("Show all storages including job directories")
@@ -41,33 +41,29 @@ public class ListStorages extends ListActionBase<StorageClient> {
 		console.verbose("Listing job directories = {}", showAll);
 		// do we have a list of storages
 		if(getCommandLine().getArgList().size()>1){
-			boolean first = true;
-			for(Object arg : getCommandLine().getArgList()){
-				if(first){
-					first=false;
-					continue;
-				}
-				try{
-					listStorage(makeClient(String.valueOf(arg)));
-				}catch(Exception ex){
-					console.error(ex, "Error listing storage at {}", arg);
-				}
-			}
+			getCommandLine().getArgList().listIterator(1).forEachRemaining(
+				(url)-> {
+					try{
+						listStorage(makeClient(String.valueOf(url)));
+					}catch(Exception ex){
+						console.error(ex, "Error listing storage at {}", url);
+					}
+				});
 		}
 		else{
 			listAll();
 		}
 	}
-	
-	protected StorageClient makeClient(String url) throws Exception {
+
+	private StorageClient makeClient(String url) throws Exception {
 		Endpoint epr = new Endpoint(url);
 		properties.put(PROP_LAST_RESOURCE_URL, url);
 		return new StorageClient(epr, 
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
 	}
-	
-	protected void listAll(){
+
+	private void listAll(){
 		StorageLister storageLister=new StorageLister(UCC.executor, registry, configurationProvider, tags);
 		storageLister.showAll(showAll);
 		for(StorageClient sms: storageLister){
@@ -89,7 +85,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 		}
 	}
 
-	protected void listStorage(StorageClient storage) throws Exception {
+	private void listStorage(StorageClient storage) throws Exception {
 		String url = storage.getEndpoint().getUrl();
 		try{
 			console.info("{}{}{}", url, System.getProperty("line.separator"), getDetails(storage));
@@ -103,21 +99,16 @@ public class ListStorages extends ListActionBase<StorageClient> {
 
 	@Override
 	protected String getDetails(StorageClient sms) throws Exception  {
-		return detailed? doGetDetails(sms) : "";
-	}
-	
-	protected String doGetDetails(StorageClient sms) throws Exception {
+		if(!detailed)return "";
 		String sep=System.getProperty("line.separator");
 		StringBuilder sb=new StringBuilder();
 		JSONObject props = sms.getProperties();
-		
 		sb.append("  Description: ").append(props.optString("description"));
-		
 		long free = -1;
 		long use = -1;
 		try{
-			free = Long.parseLong(props.getString("freeSpace"));
-			use = Long.parseLong(props.getString("usableSpace"));
+			free = Long.parseLong(String.valueOf(props.get("freeSpace")));
+			use  = Long.parseLong(String.valueOf(props.get("usableSpace")));
 		}catch(Exception ex) {}
 		try{
 			sb.append(sep).append("  Free space:   ").append(unitParser.getHumanReadable(free));
@@ -134,10 +125,14 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	public String getDescription(){
 		return "list the available remote storages";
 	}
+
 	@Override
-	public String getArgumentList(){
-		return "";
+	public String getSynopsis(){
+		return "Prints a list  of the available remote storages. "
+				+ "With the '-l' option, some additional information is displayed. "
+				+ "Use the '-a' option to also list job directories.";
 	}
+
 	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_DATA;

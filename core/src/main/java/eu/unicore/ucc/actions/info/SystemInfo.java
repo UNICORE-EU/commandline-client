@@ -18,15 +18,15 @@ import eu.unicore.ucc.actions.shell.URLCompleter;
 public class SystemInfo extends ActionBase {
 
 	private boolean details=false;
-	
+
 	private String pattern;
-	
+
 	private static final String OPT_PATTERN_LONG = "url-pattern";
 	private static final String OPT_PATTERN = "P";
-	
+
 	private static final String OPT_RAW_LONG = "raw";
 	private static final String OPT_RAW = "R";
-	
+
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -63,13 +63,13 @@ public class SystemInfo extends ActionBase {
 	public String getCommandGroup(){
 		return CMD_GRP_UTILITY;
 	}
-	
+
 	@Override
 	public String getSynopsis() {
-		return "Checks the registry for the availability of UNICORE endpoints. " +
-				"If the '-l' option is used, the address of the found endpoints is printed";
+		return "Checks the registry for the availability of UNICORE endpoints. "
+				+ "If the '-l' option is used, the address of the found endpoints and "
+				+ "some information about them is shown";
 	}
-
 
 	@Override
 	public void process() throws Exception {
@@ -83,7 +83,7 @@ public class SystemInfo extends ActionBase {
 			getInfo();
 		}
 	}
-	
+
 	protected void getInfo(){
 		for(Command c: UCC.getAllCommands()){
 			if(c instanceof IServiceInfoProvider){
@@ -91,7 +91,7 @@ public class SystemInfo extends ActionBase {
 			}
 		}
 	}
-	
+
 	protected void getInfo(IServiceInfoProvider info){
 		String type = info.getType();
 		String name = info.getServiceName();
@@ -121,7 +121,6 @@ public class SystemInfo extends ActionBase {
 		}catch(Exception e){
 			console.error(e, "... FAILED.");
 		}
-
 	}	
 
 	protected void printRawContent() {

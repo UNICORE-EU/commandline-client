@@ -8,7 +8,6 @@ import java.util.List;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.JobClient;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Pair;
@@ -31,9 +30,9 @@ public abstract class JobOperationBase extends ActionBase {
 		
 		UCCBuilder builder = createBuilder(jobDescriptor);
 		res.setM2(builder);
-		String url = builder.getProperty("epr");
+		String url = builder.getProperty("_ucc_epr");
 		if(url==null){
-			throw new UCCException("Job address not found! Maybe <"+jobDescriptor+"> has not been produced by ucc.");
+			throw new Exception("Job address not found! Maybe <"+jobDescriptor+"> has not been produced by ucc.");
 		}
 		res.setM1(new JobClient(new Endpoint(url),
 					configurationProvider.getClientConfiguration(url),
@@ -51,19 +50,19 @@ public abstract class JobOperationBase extends ActionBase {
 			File job = new File(arg);
 			if(job.exists())
 			{
-				builder=new UCCBuilder(job, registry, configurationProvider);
+				builder = new UCCBuilder(job, registry, configurationProvider);
 				builder.setCheckLocalFiles(false);
 				console.verbose("Read job info from <{}>", arg);
 			}
 			else{
 				console.verbose("Accessing job at <{}>", arg);
-				builder=new UCCBuilder(registry, configurationProvider);
+				builder = new UCCBuilder(registry, configurationProvider);
 				builder.setCheckLocalFiles(false);
-				builder.setProperty("epr", arg);
+				builder.setProperty("_ucc_epr", arg);
 			}
 			return builder;
 		}catch(Exception e){
-			throw new UCCException("Can't use <"+arg+">.", e);
+			throw new Exception("Can't use <"+arg+">.", e);
 		}
 	}
 
@@ -78,7 +77,7 @@ public abstract class JobOperationBase extends ActionBase {
 				String arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
 				args.add(arg);
 			}catch(Exception e){
-				throw new UCCException("Can't read job descriptor from stdin.",e);
+				throw new Exception("Can't read job descriptor from stdin.",e);
 			}	
 		}
 		else{
@@ -94,7 +93,7 @@ public abstract class JobOperationBase extends ActionBase {
 	}
 
 	protected void processAdditionalOptions(){}
-	
+
 	@Override
 	public String getArgumentList(){
 		return "[<jobfile_1>|<job_url_1>] [<jobfile_2>|<job_url_2>] ...";
@@ -110,7 +109,7 @@ public abstract class JobOperationBase extends ActionBase {
 		return "The job(s) are referenced either by job files as written " +
 				"by the 'run' command or as URLs.";
 	}
-	
+
 	protected abstract void performCommand(List<Pair<JobClient,UCCBuilder>>jobClients);
 
 }

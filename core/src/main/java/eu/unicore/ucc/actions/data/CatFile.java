@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.StorageConstants;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase.Mode;
 import eu.unicore.ucc.io.Location;
@@ -24,7 +23,6 @@ public class CatFile extends FileOperation implements StorageConstants {
 	@Override
 	public void process() throws Exception {
 		super.process();
-
 		if(getCommandLine().getArgs().length>1){
 			for(int i=1; i<getCommandLine().getArgs().length;i++){
 				String source=getCommandLine().getArgs()[1];
@@ -41,7 +39,7 @@ public class CatFile extends FileOperation implements StorageConstants {
 			}
 		}
 		else{
-			throw new UCCException("Please specify a remote file!");
+			throw new IllegalArgumentException("Please specify a remote file!");
 		}
 	}
 

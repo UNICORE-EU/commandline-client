@@ -190,10 +190,6 @@ public class Batch extends ActionBase {
 	}
 
 	@Override
-	public String getArgumentList() {
-		return "";
-	}
-	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_JOBS;
 	}
@@ -324,55 +320,45 @@ public class Batch extends ActionBase {
 
 	protected void createRequest(String nextReq){
 		try{
-			final UCCBuilder b;
+			final UCCBuilder builder;
 			File f=new File(nextReq);
-			b=new UCCBuilder(f, registry, configurationProvider);
-			b.setProperty("source", nextReq);
+			builder = new UCCBuilder(f, registry, configurationProvider);
+			builder.setProperty("_ucc_source", nextReq);
 			String requestName=f.getName();
 			//split off extension
 			int i=requestName.lastIndexOf('.');
 			if(i>0)requestName=requestName.substring(0, i);
-			b.setProperty("requestName", requestName);
-			b.setProperty("state", "NEW");
-
-			if(siteName!=null) {
-				b.setProperty("Site", siteName);
-			}
+			builder.setProperty("_ucc_requestName", requestName);
+			builder.setState(Runner.NEW);
+			builder.setSite(siteName);
 			f.delete();
-
-			executor.execute(new Runnable(){
-				public void run(){
-					processRequest(b);
-				}});
+			executor.execute(()->processRequest(builder));
 		}catch(Exception e){
 			console.error(e, "");
 		}
 	}
 
-
-	protected void processRequest(UCCBuilder b){
+	protected void processRequest(UCCBuilder builder){
 		try{
 			if(isShutdown)return;
-			b.setProperty("Output",output.getAbsolutePath());
-			b.setProperty("IDLocation",running.getRequestDir().getAbsolutePath());
-			Runner r = new Runner(registry, configurationProvider, b);
+			builder.setProperty("_ucc_Output",output.getAbsolutePath());
+			builder.setProperty("_ucc_IDLocation",running.getRequestDir().getAbsolutePath());
+			Runner r = new Runner(registry, configurationProvider, builder);
 			r.setAsyncMode(true);
 			r.setQuietMode(false);
 			// TODO r.setCheckResources(!noResourceCheck);
 			r.setNoFetchOutCome(noFetchOutcome);
 			r.setSiteSelectionStrategy(siteSelectionStragegy);
 			r.setProperties(properties);
-			if(siteName!=null){
-				b.setProperty("Site", siteName);
-				r.setSiteName(siteName);
-			}
+			builder.setSite(siteName);
+			r.setSiteName(siteName);
 			r.run();
 			if(!submitOnly){
-				console.verbose("Job ID = {}", r.getBuilder().getProperty("jobIdFile"));
+				console.verbose("Job ID = {}", r.getBuilder().getProperty("_ucc_jobIdFile"));
 				activeJobs.incrementAndGet();
 			}
 		}catch(Exception e){
-			throw new RuntimeException("Error processing request <"+b.getProperty("source")+">",e);
+			throw new RuntimeException("Error processing request <"+builder.getProperty("_ucc_source")+">",e);
 			//TODO move to 'failed' location?
 		}finally{
 			activeRequests.decrementAndGet();
@@ -382,24 +368,21 @@ public class Batch extends ActionBase {
 	protected void handleRunningJob(String nextRunning){
 		try{
 			if(isShutdown)return;
-			final File f=new File(nextRunning);
-			final UCCBuilder b=new UCCBuilder(f, registry, configurationProvider);
-			b.setProperty("Output",output.getAbsolutePath());
-			b.setProperty("IDLocation",running.getRequestDir().getAbsolutePath());
-			b.setProperty("KeepFinishedJob", String.valueOf(keepJobs));
-			b.setProperty("source", nextRunning);
+			final File f = new File(nextRunning);
+			final UCCBuilder b = new UCCBuilder(f, registry, configurationProvider);
+			b.setProperty("_ucc_Output",output.getAbsolutePath());
+			b.setProperty("_ucc_IDLocation",running.getRequestDir().getAbsolutePath());
+			b.setProperty("_ucc_KeepFinishedJob", String.valueOf(keepJobs));
+			b.setProperty("_ucc_source", nextRunning);
 			f.delete();
-			executor.execute(new Runnable(){
-				public void run(){
-					processRunning(b);
-				}});
+			executor.execute(()->processRunning(b));
 		}
 		catch(Exception e){}
 	}
 
 	protected void processRunning(UCCBuilder b){
 		if(isShutdown)return;
-		String req=b.getProperty("source");
+		String req=b.getProperty("_ucc_source");
 		try{
 			Runner r = new Runner(registry, configurationProvider, b);
 			r.setAsyncMode(true);
@@ -407,7 +390,7 @@ public class Batch extends ActionBase {
 			r.setNoFetchOutCome(noFetchOutcome);
 			r.setProperties(properties);
 			r.run();
-			String state=r.getBuilder().getProperty("state");
+			String state = r.getBuilder().getState();
 			if (Runner.FINISHED.equals(state)){
 				activeJobs.decrementAndGet();
 			}

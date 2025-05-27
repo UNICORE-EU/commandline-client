@@ -1,7 +1,11 @@
 package eu.unicore.ucc.io;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 import org.json.JSONObject;
 
@@ -9,6 +13,8 @@ import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.TransferControllerClient;
+import eu.unicore.uas.FiletransferParameterProvider;
+import eu.unicore.uas.util.PropertyHelper;
 import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
@@ -53,6 +59,8 @@ public class ServerToServer implements Constants {
 
 	protected Properties extraParameterSource;
 
+	protected Map<String,String> extraParameters;
+
 	public ServerToServer(Location sourceDesc, Location targetDesc, UCCConfigurationProvider configurationProvider){
 		this.sourceDesc = sourceDesc;
 		this.targetDesc = targetDesc;
@@ -61,18 +69,44 @@ public class ServerToServer implements Constants {
 		this.msg = UCC.console;
 	}
 
+	public void setExtraParameters(Map<String,String>params){
+		this.extraParameters = params;
+	}
+
 	public void setExtraParameterSource(Properties properties){
 		this.extraParameterSource = properties;
 	}
 
+	protected Map<String,String> getExtraParameters(String protocol){
+		Map<String,String> res = new HashMap<>();
+		if(protocol!=null && extraParameterSource!=null){
+			String p=String.valueOf(protocol);
+			PropertyHelper ph=new PropertyHelper(extraParameterSource, new String[]{p,p.toLowerCase()});
+			res.putAll(ph.getFilteredMap());
+		}
+		ServiceLoader<FiletransferParameterProvider> ppLoader = ServiceLoader.load(FiletransferParameterProvider.class);
+		Iterator<FiletransferParameterProvider> ppIter = ppLoader.iterator();
+		while(ppIter.hasNext()) {
+			FiletransferParameterProvider pp = ppIter.next();
+			pp.provideParameters(res, protocol);
+		}
+		res.putAll(extraParameters);
+		if(res.size()>0){
+			UCC.console.verbose("Have <{}> extra parameters for the transfer.", extraParameters.size(), protocol);
+		}
+		return res;
+	}
+
+	/**
+	 * @return the URL of the transfer or null if not applicable
+	 */
 	public void process() throws Exception {
 		if(scheduled!=null){
 			scheduled=UnitParser.convertDateToISO8601(scheduled);
-			msg.verbose("Will schedule transfer for "+scheduled);
+			msg.verbose("Will schedule transfer for {}", scheduled);
 			synchronous = false;
 		}
-		msg.verbose("Synchronous transfer = "+synchronous);
-
+		msg.verbose("Synchronous transfer = {}", synchronous);
 		bothSidesUNICORE = !sourceDesc.isRaw && !targetDesc.isRaw();
 		if(bothSidesUNICORE  && sourceDesc.getSmsEpr().equalsIgnoreCase(targetDesc.getSmsEpr())) {
 			Endpoint target = new Endpoint(targetDesc.getSmsEpr());
@@ -113,9 +147,11 @@ public class ServerToServer implements Constants {
 						configurationProvider.getClientConfiguration(target.getUrl()),
 						configurationProvider.getRESTAuthN());
 				String protocol = bothSidesUNICORE? checkProtocols(sms):null;
-				msg.verbose("Initiating fetch-file on storage <"+sms.getEndpoint().getUrl()+">," +
-						"receiving file <"+sourceDesc.getUnicoreURI()+">, writing to '"+targetDesc.getName()+"'");
-				tcc = sms.fetchFile(sourceDesc.getResolvedURL(), targetDesc.getName(), protocol);
+				String s = sourceDesc.isRaw()?sourceDesc.originalDescriptor:sourceDesc.getUnicoreURI();
+				msg.verbose("Initiating fetch-file on storage <{}>, receiving file <{}>, writing to '{}'",
+						sms.getEndpoint().getUrl(), s, targetDesc.getName());
+				Map<String,String> params = getExtraParameters(protocol);
+				tcc = sms.fetchFile(sourceDesc.getResolvedURL(), targetDesc.getName(), params, protocol);
 			}
 			else {
 				// source sends
@@ -125,20 +161,20 @@ public class ServerToServer implements Constants {
 						configurationProvider.getRESTAuthN());
 				msg.verbose("Initiating send-file on storage <{}>, sending file <{}>, writing to '{}'",
 						sms.getEndpoint().getUrl(),	sourceDesc.getName(), targetDesc.getResolvedURL());
-				tcc = sms.sendFile(sourceDesc.getName(), targetDesc.getResolvedURL(), null);
+				Map<String,String> params = getExtraParameters(null);
+				tcc = sms.sendFile(sourceDesc.getName(), targetDesc.getResolvedURL(), params, null);
 			}
 			transferAddress = tcc.getEndpoint().getUrl();
 			msg.verbose("Have filetransfer instance: {}", transferAddress);
-			if(!synchronous){
-				return;
+			if(synchronous) {
+				msg.verbose("Waiting for transfer to complete...");
+				waitForCompletion();
+				msg.verbose("Transfer done.");
 			}
-			waitForCompletion();
 		} finally{
 			if(synchronous && tcc!=null){
 				try{ tcc.delete(); }
-				catch(Exception e1){
-					msg.error(e1, "Could not destroy the filetransfer client");
-				}
+				catch(Exception e1){}
 			}
 		}
 	}
@@ -167,7 +203,7 @@ public class ServerToServer implements Constants {
 	}
 
 	protected void smsCopyFile(StorageClient sms) throws Exception {
-		msg.verbose("Copy on remote storage: "+sourceDesc.getName()+"->"+targetDesc.getName());
+		msg.verbose("Copy on remote storage: {}->{}", sourceDesc.getName(), targetDesc.getName());
 		JSONObject params = new JSONObject();
 		params.put("from", sourceDesc.getName());
 		params.put("to", targetDesc.getName());
@@ -178,7 +214,7 @@ public class ServerToServer implements Constants {
 		if(!"BFT".equals(preferredProtocol)){
 			List<String> supported = JSONUtil.asList(sms.getProperties().getJSONArray("protocols"));
 			if(supported.contains(preferredProtocol)) {
-				msg.verbose("Using preferred protocol: "+preferredProtocol);
+				msg.verbose("Using preferred protocol: {}", preferredProtocol);
 				return preferredProtocol;
 			}
 		}

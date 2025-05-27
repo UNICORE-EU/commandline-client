@@ -163,7 +163,7 @@ public class FileDownloader extends FileTransferBase {
 			}
 
 			chosenProtocol = determineProtocol(preferredProtocol, sms);
-			Map<String,String>extraParameters = makeExtraParameters(chosenProtocol);
+			Map<String,String>extraParameters = getExtraParameters(chosenProtocol);
 			ftc = sms.createExport(path, chosenProtocol, extraParameters);
 			configure(ftc, extraParameters);
 			UCC.console.verbose("File transfer URL: {}", ftc.getEndpoint().getUrl());

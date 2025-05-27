@@ -101,8 +101,9 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 	}
 
 	@Override
-	public String getArgumentList(){
-		return "";
+	public String getSynopsis(){
+		return "Prints a list  of all your server-to-server transfers. "
+				+"Use the -l option to show details.";
 	}
 
 	@Override

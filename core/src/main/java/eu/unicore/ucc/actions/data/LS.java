@@ -9,7 +9,6 @@ import eu.unicore.client.core.FileList;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.uas.util.UnitParser;
-import eu.unicore.ucc.UCCException;
 
 /**
  * lists a storage
@@ -77,7 +76,7 @@ public class LS extends SMSOperation {
 
 	protected void doProcess() throws Exception {
 		if(getCommandLine().getArgs().length<2){
-			throw new UCCException("Please provide a storage address!");
+			throw new IllegalArgumentException("Please provide a storage address!");
 		}
 		String address=getCommandLine().getArgs()[1];
 		sms = getStorageClient(address);
@@ -147,12 +146,7 @@ public class LS extends SMSOperation {
 	@Override
 	public String getSynopsis(){
 		return "Lists files on a storage. " +
-		"The storage can be given by EPR or using the unicore6:// URL notation.";
-	}
-
-	@Override
-	public String getArgumentList(){
-		return "<EPR or u6://...> [path]";
+		"The storage can be given by full https:// URL or using the unicore:// notation.";
 	}
 
 	public String format(Calendar c){

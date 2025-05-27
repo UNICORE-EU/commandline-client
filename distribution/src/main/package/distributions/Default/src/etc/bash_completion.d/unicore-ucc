@@ -40,7 +40,7 @@ _ucc()
     opts="$global_opts "
     ;;
     cp)
-    opts="$global_opts --asynchronous --bytes --protocol --recursive --resume --schedule"
+    opts="$global_opts --asynchronous --bytes --extra-parameters --protocol --recursive --resume --schedule"
     ;;
     create-storage)
     opts="$global_opts --factory-url --info --lifetime --sitename --type"

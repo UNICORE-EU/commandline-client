@@ -112,10 +112,6 @@ public class ListJobs extends ListActionBase<JobClient> {
 	}
 
 	@Override
-	public String getArgumentList(){
-		return "";
-	}
-	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_JOBS;
 	}

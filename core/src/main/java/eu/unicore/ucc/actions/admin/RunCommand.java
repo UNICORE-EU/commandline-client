@@ -11,7 +11,6 @@ import eu.unicore.client.admin.AdminServiceClient;
 import eu.unicore.client.admin.AdminServiceClient.AdminCommand;
 import eu.unicore.client.admin.AdminServiceClient.Result;
 import eu.unicore.client.registry.RegistryClient;
-import eu.unicore.ucc.UCCException;
 import eu.unicore.ucc.actions.ActionBase;
 
 public class RunCommand extends ActionBase {
@@ -30,8 +29,8 @@ public class RunCommand extends ActionBase {
 		super.createOptions();
 		getOptions().addOption(Option.builder(OPT_SITENAME)
 				.longOpt(OPT_SITENAME_LONG)
-				.desc("Site Name")
-				.argName("Vsite")
+				.desc("Site name")
+				.argName("Site")
 				.hasArg()
 				.required(false)
 				.build());
@@ -76,11 +75,11 @@ public class RunCommand extends ActionBase {
 				}catch(Exception ex){}
 			}
 			if(url==null){
-				throw new UCCException("Either URL or site name must be given!");
+				throw new IllegalArgumentException("Either URL or site name must be given!");
 			}
 		}
 		if(siteName!=null && url!=null){
-			throw new UCCException("URL and site name cannot both be given!");
+			throw new IllegalArgumentException("URL and site name cannot both be given!");
 		}
 		AdminServiceClient asc=null;
 		List<AdminCommand>availableCmds = null;
@@ -96,7 +95,7 @@ public class RunCommand extends ActionBase {
 			}
 		}
 		if(!haveCmd) {
-			throw new UCCException("No such command: <"+cmd+">");
+			throw new IllegalArgumentException("No such command: <"+cmd+">");
 		}
 		Result result = asc.runCommand(cmd, params);
 		if(result.successful){

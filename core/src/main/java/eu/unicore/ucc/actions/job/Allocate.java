@@ -110,7 +110,9 @@ public class Allocate extends ActionBase {
 
 	@Override
 	public String getSynopsis(){
-		return "Allocates resources through UNICORE. ";
+		return "This will create a batch system allocation, if the system supports that."
+				+ "Once the allocation is running, use the allocation ID to submit jobs more "
+				+ "'interactively', without having to wait for them to get scheduled.";
 	}
 
 	@Override
@@ -141,15 +143,13 @@ public class Allocate extends ActionBase {
 
 	protected void initBuilder() throws Exception {
 		builder = new UCCBuilder(registry, configurationProvider);
-		builder.setProperty("Output",output.getAbsolutePath());
-		builder.setProperty("DetailedStatusDisplay", "true");
+		builder.setProperty("_ucc_Output",output.getAbsolutePath());
+		builder.setProperty("_ucc_DetailedStatusDisplay", "true");
 		if(tags!=null&&tags.length>0) {
 			builder.addTags(tags);
 		}
-		if(siteName!=null){
-			builder.setProperty("Site", siteName);
-		}
-		Job job = new Job(builder.getJSON());
+		builder.setSite(siteName);
+		Job job = new Job(builder.getJob());
 		job.type(Type.ALLOCATE);
 		for(String rName: resourceRequests.keySet()) {
 			job.resources().other(rName, resourceRequests.get(rName));

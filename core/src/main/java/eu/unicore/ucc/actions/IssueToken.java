@@ -13,7 +13,6 @@ import eu.unicore.client.lookup.SiteNameFilter;
 import eu.unicore.services.restclient.BaseClient;
 import eu.unicore.services.restclient.jwt.JWTUtils;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.UCCException;
 
 /**
  * Call a /rest/token endpoint to issue a JWT token 
@@ -79,8 +78,9 @@ public class IssueToken extends ActionBase {
 
 	@Override
 	public String getSynopsis(){
-		return "Gets a JWT authentication token from a UNICORE token endpoint. " +
-		"Lifetime and other properties can be configured.";
+		return "Gets a JWT authentication token from a UNICORE token endpoint. "
+				+" This token can be used to authenticate to UNICORE instead of the original credentials. "
+				+ "Lifetime and other properties can be configured.";
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class IssueToken extends ActionBase {
 		String url;
 		if(getCommandLine().getArgs().length>1) {
 			if(siteName!=null) {
-				throw new UCCException("Please give only one of --sitename or token endpoint URL!");
+				throw new IllegalArgumentException("Please give only one of --sitename or token endpoint URL!");
 			}
 			url = getCommandLine().getArgs()[1];
 		}else {
@@ -110,7 +110,6 @@ public class IssueToken extends ActionBase {
 		limited = getBooleanOption("limited", "L");
 		renewable = getBooleanOption("renewable", "R");
 		inspect = getBooleanOption("inspect", "I");
-
 		URIBuilder b = new URIBuilder(url);
 		if(lifetime>0)b.addParameter("lifetime", String.valueOf(lifetime));
 		if(renewable)b.addParameter("renewable", "true");
@@ -136,7 +135,7 @@ public class IssueToken extends ActionBase {
 		if(siteName!=null)cl.setAddressFilter(new SiteNameFilter(siteName));
 		CoreClient cc = cl.iterator().next();
 		if(cc==null) {
-			throw new UCCException("No site found! Please use --sitename, or give a token endpoint URL.");
+			throw new Exception("No site found! Please use --sitename, or give a token endpoint URL.");
 		}
 		return cc.getEndpoint().getUrl()+"/token";
 	}
