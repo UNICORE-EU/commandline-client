@@ -136,32 +136,11 @@
 	<artifactId>workflow-client</artifactId>
 	<version>${wf.version}</version>
       </dependency>
- 
-      <!-- test -->
-      <dependency>
-	<groupId>org.junit.jupiter</groupId>
-	<artifactId>junit-jupiter</artifactId>
-	<version>${junit.version}</version>
-	<scope>test</scope>
-      </dependency>
-      <dependency>
-	<groupId>org.junit.platform</groupId>
-	<artifactId>junit-platform-launcher</artifactId>
-	<version>${junit.p.version}</version>
-	<scope>test</scope>
-      </dependency>
-
       <dependency>
 	<groupId>eu.unicore</groupId>
 	<artifactId>uas-core</artifactId>
 	<version>${uas.version}</version>
 	<scope>test</scope>
-	<exclusions>
-	  <exclusion>
-	    <groupId>com.fasterxml.woodstox</groupId>
-	    <artifactId>woodstox-core</artifactId>
-	  </exclusion>
-	</exclusions>
       </dependency>
       <dependency>
 	<groupId>eu.unicore.workflow</groupId>
@@ -169,9 +148,7 @@
 	<version>${wf.version}</version>
 	<scope>test</scope>
       </dependency>
-
     </dependencies>
-
   </dependencyManagement>
 
   <dependencies>
@@ -186,6 +163,18 @@
       <artifactId>junit-platform-launcher</artifactId>
       <version>${junit.p.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+      <version>5.3.0</version>
+      <scope>test</scope>
+      <exclusions>
+	<exclusion>
+	  <groupId>org.apache.logging.log4j</groupId>
+	  <artifactId>log4j-api</artifactId>
+	</exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
