@@ -38,7 +38,7 @@
     <connection>scm:git:https://www.github.com/UNICORE-EU/commandline-client</connection>
     <developerConnection>scm:git:https://www.github.com/UNICORE-EU/commandline-client</developerConnection>
     <url>https://github.com/UNICORE-EU/commandline-client</url>
-    <tag>HEAD</tag>
+    <tag>10.2.0</tag>
   </scm>
 
   <issueManagement>
