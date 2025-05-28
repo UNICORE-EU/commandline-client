@@ -35,8 +35,6 @@ public class UCC{
 
 	public static boolean unitTesting = false;
 
-	public static boolean mute = false;
-
 	public static final Map<String, Class<? extends Command>> cmds = new HashMap<>();
 
 	public static final Map<String, AuthenticationProvider> authNMethods = 

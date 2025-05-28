@@ -202,10 +202,6 @@ public class Runner implements Runnable {
 		this.properties = properties;
 	}
 
-	public Status getStatus() {
-		return status;
-	}
-
 	/**
 	 * get the number of currently executing Runner instances
 	 */
@@ -475,23 +471,11 @@ public class Runner implements Runnable {
 	}
 
 	/**
-	 * do the imports, including a retry using BFT in case of failure
+	 * do the imports
 	 */
-	private void doImport(List<FileUploader>fu)throws RunnerException{
-		for(FileUploader e: fu){
-			try{
-				performImportFromLocal(e);
-			}catch(RunnerException re){
-				//attempt to recover or fail (and abort / destroy job)?
-				if(!"BFT".equals(e.getChosenProtocol())){
-					//retry with BFT
-					msg.info("ERROR performing file import: {}",
-							Log.createFaultMessage(re.getErrorReason(), re.getCause()));
-					msg.info("Re-trying import using BFT protocol");
-					// e.setPreferredProtocols(...);
-					performImportFromLocal(e);
-				}
-			}
+	private void doImport(List<FileUploader>uploads)throws RunnerException{
+		for(FileUploader up: uploads){
+			performImportFromLocal(up);
 		}
 	}
 
@@ -506,21 +490,9 @@ public class Runner implements Runnable {
 	/**
 	 * do exports, including a retry using BFT in case of error
 	 */
-	private void doExport(List<FileDownloader>fd)throws Exception{
-		for(FileDownloader e: fd){
-			try{
-				performExportToLocal(e);
-			}catch(RunnerException re){
-				//attempt to recover or fail (and abort / destroy job)?
-				if(!"BFT".equals(e.getChosenProtocol())){
-					//retry with BFT
-					UCC.console.info("ERROR performing file export: {}",
-							Log.createFaultMessage(re.getErrorReason(), re.getCause()));
-					UCC.console.info("Re-trying import using BFT protocol");
-					// e.setPreferredProtocols(...);
-					performExportToLocal(e);
-				}
-			}
+	private void doExport(List<FileDownloader>downloads)throws Exception{
+		for(FileDownloader d: downloads){
+			performExportToLocal(d);
 		}
 	}
 
@@ -528,17 +500,16 @@ public class Runner implements Runnable {
 		try{
 			imp.setExtraParameterSource(properties);
 			if(imp.getChosenProtocol()==null){
-				//imp.setPreferredProtocols(preferredProtocols);
+				imp.setPreferredProtocol(preferredProtocol);
 			}
 			imp.perform(jobClient.getWorkingDirectory());
 		}
 		catch(Exception ex){
-			if(!imp.isFailOnError()){
-				String m=Log.createFaultMessage("Could not perform import of local file <"+imp.getFrom()+">, ignoring.", ex);
-				msg.verbose(m);
+			if(imp.isFailOnError()){
+				throw new RunnerException(ERR_LOCAL_IMPORT_FAILED,"Import of local file <"+imp.getFrom()+"> failed",ex);
 			}
 			else {
-				throw new RunnerException(ERR_LOCAL_IMPORT_FAILED,"Import of local file <"+imp.getFrom()+"> failed",ex);
+				msg.verbose("Could not perform import of local file <{}>: {}", imp.getFrom(), ex.getMessage());
 			}
 		}
 	}
@@ -571,12 +542,11 @@ public class Runner implements Runnable {
 			e.perform(sms);
 		}
 		catch(Exception ex){
-			if(!e.isFailOnError()){
-				String m=Log.createFaultMessage("Could not export file <"+e.getFrom()+">", ex);
-				msg.verbose(m);
+			if(e.isFailOnError()){
+				throw ex;
 			}
 			else{
-				throw ex;
+				msg.verbose("Could not export file <{}>: {}", e.getFrom(), ex.getMessage());
 			}
 		}
 	}
@@ -689,18 +659,29 @@ public class Runner implements Runnable {
 
 	// Runner states
 
-	public interface State {
+	public static abstract class State {
+
+		private final String name;
+
+		public State(String name) {
+			this.name = name;
+		}
+
+		public final String getName() {
+			return name;
+		}
+
 		/**
 		 * perform actions for this state
 		 * @return the next state
 		 */
-		public State process(Runner r)throws Exception;
-
-		/** the name of this state **/
-		public String getName();
+		public State process(Runner r)throws Exception
+		{
+			return this;
+		}
 
 		/** whether to proceed to the next state (in async mode) **/
-		public default boolean autoProceedToNextState() {
+		public boolean autoProceedToNextState() {
 			return true;
 		}
 	}
@@ -714,15 +695,11 @@ public class Runner implements Runnable {
 		 * The next state is STAGEIN. In dryRun mode, the next state
 		 * is EXITING
 		 */
-		states.put(NEW, new State(){
+		states.put(NEW, new State(NEW){
 			public State process(Runner r)throws Exception{
 				r.doSubmit();
 				r.mustSave=true;
 				return r.dryRun? getState(EXITING) : getState(STAGEIN);
-			}
-
-			public String getName(){
-				return NEW;
 			}
 		});
 
@@ -731,20 +708,10 @@ public class Runner implements Runnable {
 		 * uploaded to the job working directory. 
 		 * The next state is READY.
 		 */
-		states.put(STAGEIN, new State(){
+		states.put(STAGEIN, new State(STAGEIN){
 			public State process(Runner r)throws RunnerException{
 				r.initJobClient();
-				try{
-					r.doImport();
-				}catch(RunnerException re){
-					r.msg.error(re, "Data import failed, removing the job.");
-					try{
-						r.jobClient.delete();
-					}catch(Exception ex){
-						r.msg.error(ex, "Could not cleanup job.");
-					}
-					throw re;
-				}
+				r.doImport();
 				r.mustSave=true;
 				if(r.needManualJobStart){
 					return Runner.getState(READY);
@@ -752,10 +719,6 @@ public class Runner implements Runnable {
 				else{
 					return Runner.getState(STARTED);
 				}
-			}
-
-			public String getName(){
-				return STAGEIN;
 			}
 		});
 
@@ -765,16 +728,12 @@ public class Runner implements Runnable {
 		 * no data uploads, and the server supports the autostart feature.
 		 * The next state is STARTED.
 		 */
-		states.put(READY, new State(){
+		states.put(READY, new State(READY){
 			public State process(Runner r)throws RunnerException{
 				r.initJobClient();
 				r.startJob();
 				r.mustSave=true;
 				return Runner.getState(STARTED);
-			}
-
-			public String getName(){
-				return READY;
 			}
 		});
 
@@ -785,7 +744,7 @@ public class Runner implements Runnable {
 		 * If the job has failed, a RuntimeException is thrown from the process() 
 		 * method.
 		 */
-		states.put(STARTED, new State(){
+		states.put(STARTED, new State(STARTED){
 			public State process(Runner r)throws RunnerException{
 				r.initJobClient();
 				if(r.asyncMode){
@@ -824,10 +783,6 @@ public class Runner implements Runnable {
 				r.mustSave=true;
 				return getState(STAGEOUT);
 			}
-			public String getName(){
-				return STARTED;
-			}
-
 			public boolean autoProceedToNextState(){
 				return false;
 			}
@@ -837,7 +792,7 @@ public class Runner implements Runnable {
 		 * in state STAGEOUT, the declared export files are retrieved and written to
 		 * the local machine. The next state is DONE. 
 		 */
-		states.put(STAGEOUT, new State(){
+		states.put(STAGEOUT, new State(STAGEOUT){
 			public State process(Runner r)throws Exception{
 				r.initJobClient();
 				if(r.getBuilder().isSweepJob()){
@@ -854,16 +809,13 @@ public class Runner implements Runnable {
 				r.mustSave=true;
 				return getState(DONE);
 			}
-			public String getName(){
-				return STAGEOUT;
-			}
 		});
 
 		/**
 		 * in state DONE, any cleanup is performed.
 		 * The next and final state is FINISHED.
 		 */
-		states.put(DONE, new State(){
+		states.put(DONE, new State(DONE){
 			public State process(Runner r){
 				if(!Boolean.parseBoolean(r.builder.getProperty("_ucc_KeepFinishedJob", "false"))){
 					try{
@@ -877,34 +829,15 @@ public class Runner implements Runnable {
 				}		
 				return getState(FINISHED);
 			}
-			public String getName(){
-				return DONE;
-			}
 		});
 
-		states.put(FINISHED, new State(){
-			public State process(Runner r){
-				r.msg.verbose("Job already finished.");
-				return getState(FINISHED);
-			}
-			public String getName(){
-				return FINISHED;
-			}
-
+		states.put(FINISHED, new State(FINISHED){
 			public boolean autoProceedToNextState(){
 				return false;
 			}
 		});
 
-		states.put(EXITING, new State(){
-			public State process(Runner r){
-				r.msg.verbose("Dry-run mode, stopping processing.");
-				return getState(EXITING);
-			}
-			public String getName(){
-				return EXITING;
-			}
-
+		states.put(EXITING, new State(EXITING){
 			public boolean autoProceedToNextState(){
 				return false;
 			}

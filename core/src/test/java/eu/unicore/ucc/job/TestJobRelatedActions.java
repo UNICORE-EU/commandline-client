@@ -279,6 +279,19 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	}
 
 	@Test
+	public void test_Exec_with_fake_allocation(){
+		connect();
+		String[] args=new String[]{"exec", "-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				// this will serve as a fake allocation we can submit into
+				"--allocation", "https://localhost:65322/rest/core/jobs",
+				"/bin/date",
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
+	
+	@Test
 	public void test_Allocate(){
 		connect();
 		String[] args=new String[]{"allocate", "-v", "--dry-run",

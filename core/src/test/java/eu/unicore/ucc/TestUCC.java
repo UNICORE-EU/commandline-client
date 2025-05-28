@@ -1,7 +1,6 @@
 package eu.unicore.ucc;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,34 +18,25 @@ public class TestUCC {
 	}
 
 	@Test
-	public void test_ShowHelp(){
-		UCC.unitTesting = true;
-		UCC.mute=true;
+	public void test_ShowHelp() throws Exception {
 		String[]args=new String []{"-h"};
-		try{
-			for(Command cmd: UCC.getAllCommands()){
-				try{
-					cmd.init(args);
-				}catch(Exception epe){}
-			};
-		}catch(Exception ex){
-			ex.printStackTrace();
-			fail();
-		}
+		for(Command cmd: UCC.getAllCommands()){
+			try{
+				cmd.init(args);
+			}catch(Exception epe){}
+		};
 		args=new String []{"help-auth"};
 		UCC.main(args);
-
 		for(AuthenticationProvider p: UCC.authNMethods.values()) {
 			args=new String []{"help-auth", p.getName()};
 			UCC.main(args);
 		}
-		UCC.mute=false;
 	}
-	
+
 	@Test
 	public void test_LoadAuthNMethods(){
 		assertNotNull(UCC.getAuthNMethod("X509"));
 		assertNotNull(UCC.getAuthNMethod("x509"));
 	}
-	
+
 }

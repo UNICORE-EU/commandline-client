@@ -31,8 +31,7 @@ public abstract class Command implements Constants {
 
 	private CommandLine line;
 
-	protected long startTime;
-	protected long endTime;
+	protected long startTime, endTime;
 
 	protected boolean timing;
 
@@ -182,32 +181,24 @@ public abstract class Command implements Constants {
 		HelpFormatter formatter = new HelpFormatter();
 		String syntax="ucc "+getName()+" [OPTIONS] "+getArgumentList()+"\n"+getSynopsis()+"\n";
 		String newLine=System.getProperty("line.separator");
-		if(!UCC.mute){
-			Options def=options.getDefaultOptions();
-			if(def!=null){
-				formatter.printHelp(syntax, def);
-			}
-			else{
-				formatter.printHelp(syntax, new Options());
-			}
-			Options general=options.getGeneralOptions();
-			if(general!=null){
-				System.out.println();
-				formatter.setSyntaxPrefix("General options:");
-				formatter.printHelp(" "+newLine, general);
-			}
-			Options security=options.getSecurityOptions();
-			if(security!=null){
-				System.out.println();
-				formatter.setSyntaxPrefix("Security options:");
-				formatter.printHelp(" "+newLine, security);
-			}
-			Options vo=options.getVOOptions();
-			if(vo!=null){
-				System.out.println();
-				formatter.setSyntaxPrefix("VO-related options:");
-				formatter.printHelp(" "+newLine, vo);
-			}
+		Options def=options.getDefaultOptions();
+		if(def!=null){
+			formatter.printHelp(syntax, def);
+		}
+		else{
+			formatter.printHelp(syntax, new Options());
+		}
+		Options general=options.getGeneralOptions();
+		if(general!=null){
+			System.out.println();
+			formatter.setSyntaxPrefix("General options:");
+			formatter.printHelp(" "+newLine, general);
+		}
+		Options security=options.getSecurityOptions();
+		if(security!=null){
+			System.out.println();
+			formatter.setSyntaxPrefix("Security options:");
+			formatter.printHelp(" "+newLine, security);
 		}
 	}
 

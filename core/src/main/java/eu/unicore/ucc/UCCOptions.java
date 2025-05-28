@@ -24,19 +24,17 @@ import org.apache.commons.cli.Options;
  */
 public class UCCOptions extends Options {
 	private static final long serialVersionUID = 1L;
-	
+
 	private final Set<String> usedOptionNames=new HashSet<String>();
 
 	public static final String GRP_DEFAULT="__DEFAULT__";
-	
+
 	public static final String GRP_GENERAL="__GENERAL__";
-	
+
 	public static final String GRP_SECURITY="__SECURITY__";
-	
-	public static final String GRP_VO="__VO__";
-	
-	private final Map<String,List<Option>> optionGroups=new HashMap<String,List<Option>>();
-	
+
+	private final Map<String,List<Option>> optionGroups=new HashMap<>();
+
 	private void markAsUsed(String optionName) {
 		if(usedOptionNames.contains(optionName)) {
 			throw new IllegalArgumentException("The option \'"+optionName+
@@ -44,13 +42,21 @@ public class UCCOptions extends Options {
 		}
 		usedOptionNames.add(optionName);
 	}
-	
+
+	/**
+	 * add option to the default option group
+	 */
 	@Override
 	public Options addOption(Option option){
-		//add to default option group
 		return addOption(option, GRP_DEFAULT);
 	}
-	
+
+	/**
+	 * add option to the given option group
+	 * @param option
+	 * @param optionGroup
+	 * @return
+	 */
 	public Options addOption(Option option, String optionGroup){
 		markAsUsed(option.getLongOpt());
 		markAsUsed(option.getOpt());
@@ -63,11 +69,11 @@ public class UCCOptions extends Options {
 		grp.add(option);
 		return result;
 	}
-	
+
 	private List<Option>getOptionsGroup(String name){
 		return optionGroups.get(name);
 	}
-	
+
 	public Options getDefaultOptions(){
 		List<Option> defOpts=getOptionsGroup(GRP_DEFAULT);
 		if(defOpts==null)return null;
@@ -77,7 +83,7 @@ public class UCCOptions extends Options {
 		}
 		return res;
 	}
-	
+
 	public Options getGeneralOptions(){
 		List<Option> secOpts=getOptionsGroup(GRP_GENERAL);
 		if(secOpts==null)return null;
@@ -87,7 +93,7 @@ public class UCCOptions extends Options {
 		}
 		return res;
 	}
-	
+
 	public Options getSecurityOptions(){
 		List<Option> secOpts=getOptionsGroup(GRP_SECURITY);
 		if(secOpts==null)return null;
@@ -97,18 +103,7 @@ public class UCCOptions extends Options {
 		}
 		return res;
 	}
-	
-	public Options getVOOptions(){
-		List<Option> voOpts=getOptionsGroup(GRP_VO);
-		if(voOpts==null)return null;
-		Options res=new Options();
-		for(Option o: voOpts){
-			res.addOption(o);
-		}
-		return res;
-	}
-	
-	
+
 	public static boolean isTrue(String var) {
 		return var!=null && Arrays.asList( "1", "true", "yes" ).contains(var.toLowerCase());
 	}
