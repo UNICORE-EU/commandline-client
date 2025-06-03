@@ -170,7 +170,7 @@ public class Exec extends ActionBase {
 			builder.addTags(tags);
 		}
 		builder.setSite(siteName);
-		Job job = new Job(builder.getJob());
+		Job job = new Job(builder.getJSON());
 		if(args.length == 1)throw new IllegalArgumentException("Must specify a command");
 		// first arg is command
 		job.executable(args[1]);
