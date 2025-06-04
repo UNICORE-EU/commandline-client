@@ -23,6 +23,7 @@ public interface IResolve {
 	 * @return a {@link Location} object or <code>null</code>
 	 */
 	public Location resolve(String uri, IRegistryClient registry, UCCConfigurationProvider configurationProvider);
-	
+
 	public String synopsis();
+
 }

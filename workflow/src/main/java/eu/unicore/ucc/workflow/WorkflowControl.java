@@ -15,25 +15,25 @@ import eu.unicore.workflow.WorkflowClient;
  * @author schuller
  */
 public class WorkflowControl extends ActionBase {
-	
+
 	private String workflowURL;
-	
+
 	private WorkflowClient workflow;
-	
+
 	private String cmd;
-	
-	final Map<String,String>parameters=new HashMap<>();
-	
+
+	private final Map<String,String>parameters = new HashMap<>();
+
 	@Override
 	public String getName() {
 		return "workflow-control";
 	}
-	
+
 	@Override
 	public String getArgumentList(){
 		return "abort <workflow-address> | resume <workflow-address> [key1=value1 key2=value2 ...]";
 	}
-	
+
 	@Override
 	public String getSynopsis(){
 		return "Allows to abort or resume (if held) a workflow ";
@@ -44,14 +44,6 @@ public class WorkflowControl extends ActionBase {
 		return "offers workflow control functions";
 	}
 
-	
-	
-	@Override
-	@SuppressWarnings("all")
-	protected void createOptions() {
-		super.createOptions();
-	}
-
 	@Override
 	public void process() throws Exception {
 		super.process();
@@ -59,7 +51,7 @@ public class WorkflowControl extends ActionBase {
 	}
 
 	//read the workflow address and the command to perform
-	protected void getBasicCmdlineParams()throws Exception {
+	private void getBasicCmdlineParams()throws Exception {
 		cmd=getCommandLine().getArgs()[1];
 		String arg=null;
 		if(getCommandLine().getArgs().length>2) {
@@ -75,15 +67,15 @@ public class WorkflowControl extends ActionBase {
 				configurationProvider.getRESTAuthN());
 		properties.put(PROP_LAST_RESOURCE_URL, workflowURL);
 	}
-	
-	protected void run() throws Exception{
+
+	private void run() throws Exception{
 		getBasicCmdlineParams();
 		readExtraParameters();
 		if("abort".equalsIgnoreCase(cmd))doAbort();
 		if("resume".equalsIgnoreCase(cmd))doResume();
 	}
-	
-	protected void readExtraParameters(){
+
+	private void readExtraParameters(){
 		parameters.clear();
 		int length=getCommandLine().getArgs().length;
 		if(length<3)return;
@@ -98,22 +90,22 @@ public class WorkflowControl extends ActionBase {
 		//unit testing use
 		lastParams=parameters;
 	}
-	
-	protected void doAbort()throws Exception{
+
+	private void doAbort()throws Exception{
 		console.verbose("Aborting workflow {}", workflowURL);
 		workflow.abort();
 	}
-	
-	protected void doResume()throws Exception{
+
+	private void doResume()throws Exception{
 		console.verbose("Resuming workflow {}", workflowURL);
 		workflow.resume(parameters);
 	}
-	
+
 	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_WORKFLOW;
 	}
-	
+
 	static Map<String,String>lastParams;
-	
+
 }

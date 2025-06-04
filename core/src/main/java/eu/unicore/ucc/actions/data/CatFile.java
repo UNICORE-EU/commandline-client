@@ -16,16 +16,16 @@ import eu.unicore.ucc.io.Location;
  */
 public class CatFile extends FileOperation implements StorageConstants {
 
-	protected Location sourceDesc;
+	private Location sourceDesc;
 
-	protected StorageClient sms;
+	private StorageClient sms;
 
 	@Override
 	public void process() throws Exception {
 		super.process();
 		if(getCommandLine().getArgs().length>1){
 			for(int i=1; i<getCommandLine().getArgs().length;i++){
-				String source=getCommandLine().getArgs()[1];
+				String source=getCommandLine().getArgs()[i];
 				sourceDesc = createLocation(source);
 				if(sourceDesc.isRaw()){
 					console.verbose("Source file URL {}", sourceDesc.getSmsEpr());
@@ -85,6 +85,6 @@ public class CatFile extends FileOperation implements StorageConstants {
 
 	@Override
 	public String getArgumentList(){
-		return "<file_url>";
+		return "<file_url(s)>";
 	}
 }

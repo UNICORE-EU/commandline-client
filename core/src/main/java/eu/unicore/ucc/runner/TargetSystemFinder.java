@@ -29,9 +29,6 @@ import eu.unicore.util.Log;
  */
 public class TargetSystemFinder implements Broker, Constants {
 
-	public TargetSystemFinder(){
-
-	}
 	@Override
 	public int getPriority(){
 		return 1;
@@ -80,7 +77,7 @@ public class TargetSystemFinder implements Broker, Constants {
 		return result;
 	}
 	
-	protected List<SiteClient> listSites(final IRegistryClient registry, 
+	private List<SiteClient> listSites(final IRegistryClient registry, 
 			final UCCConfigurationProvider configurationProvider, UCCBuilder builder)
 					throws Exception{
 		final Collection<Requirement> requirements = builder.getRequirements();
@@ -128,7 +125,7 @@ public class TargetSystemFinder implements Broker, Constants {
 	/**
 	 * check resource requirements
 	 */
-	public boolean matches(SiteClient tssClient, Collection<Requirement> requirements, ErrorHolder error, boolean checkResources, ConsoleLogger msg){
+	private boolean matches(SiteClient tssClient, Collection<Requirement> requirements, ErrorHolder error, boolean checkResources, ConsoleLogger msg){
 		try{
 			if(!checkResources || requirements==null || requirements.size()==0){
 				return true;

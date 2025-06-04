@@ -97,7 +97,7 @@ public class OpenTunnel extends ActionBase {
 		doProcess();
 	}
 
-	protected void doProcess() throws Exception {
+	private void doProcess() throws Exception {
 		BaseClient bc = makeClient(endpoint);
 		ForwardingHelper fh = new ForwardingHelper(bc);
 		console.verbose("Opening listening socket on <{}:{}>, waiting for local client connection...", authNMethod, localPort);
@@ -127,7 +127,7 @@ public class OpenTunnel extends ActionBase {
 		}
 	}
 
-	protected BaseClient makeClient(String url) throws Exception {
+	private BaseClient makeClient(String url) throws Exception {
 		return new BaseClient(url,
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());

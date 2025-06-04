@@ -11,8 +11,8 @@ import eu.unicore.client.core.StorageClient;
  */
 public class Rename extends SMSOperation {
 
-	protected String target;
-	protected String source;
+	private String target;
+	private String source;
 
 	@Override
 	public void process() throws Exception {

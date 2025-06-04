@@ -21,10 +21,10 @@ public class ProgressBar implements ProgressListener<Long> {
 	private long startedAt=0;
 	private final UnitParser rateParser=UnitParser.getCapacitiesParser(1);
 	private String sizeDisplay;
-	
+
 	//bytes per second
 	private double rate=0;
-	
+
 	private final String identifier;
 
 	//for displaying spinning thingy if size is unknown
@@ -57,7 +57,7 @@ public class ProgressBar implements ProgressListener<Long> {
 		this.size=size;
 		this.sizeDisplay=rateParser.getHumanReadable(size);
 	}
-	
+
 	public void updateTotal(long total){
 		if(terminal==null || total<0)return;
 		updateRate();
@@ -76,11 +76,11 @@ public class ProgressBar implements ProgressListener<Long> {
 	 * update transfer rate in bytes/s
 	 * @param amount - transfer amount in bytes
 	 */
-	protected void updateRate(){
+	private void updateRate(){
 		rate=1000*(double)have/(System.currentTimeMillis()-startedAt);
 	}
-	
-	protected void output(){
+
+	private void output(){
 		StringBuilder sb=new StringBuilder();
 		if(size>0){
 			long progress=have*100/size;
@@ -92,16 +92,13 @@ public class ProgressBar implements ProgressListener<Long> {
 			index++;
 			if(index==x.length)index=0;
 		}
-		
 		//append rate
 		if(rate>0){
 			sb.append(String.format("%sB/s", rateParser.getHumanReadable(rate)));
 		}
-		
 		//compute maximum with of identifier printout
 		int max = getTerminalWidth()-5-sb.length();
 		sb.insert(0, String.format("%-"+max+"s ", identifier));
-		
 		try {
 			terminal.puts(Capability.carriage_return);
 			terminal.writer().write(sb.toString());
@@ -114,14 +111,14 @@ public class ProgressBar implements ProgressListener<Long> {
 	}
 
 	private int width=0;
-	
+
 	private int getTerminalWidth(){
 		if(width==0){
 			width = Math.max(80, terminal.getWidth());
 		}
 		return width;
 	}
-	
+
 	public void notifyProgress(Long amount) {
 		if(amount!=null){
 			update(amount);
@@ -145,6 +142,5 @@ public class ProgressBar implements ProgressListener<Long> {
 			terminal.close();
 		}catch(Exception ex) {}
 	}
-
 
 }

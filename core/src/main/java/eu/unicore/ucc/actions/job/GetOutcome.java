@@ -11,15 +11,11 @@ import eu.unicore.util.Pair;
 
 public class GetOutcome extends JobOperationBase {
 
-	/**
-	 * do not add job id prefixes to output file names 
-	 */
-	protected boolean brief;
+	// do not add job id prefixes to output file names 
+	private boolean brief;
 
-	/**
-	 * quiet mode (e.g. don't write job id files)
-	 */
-	protected boolean quiet = false;
+	// don't write job id files
+	private boolean quiet;
 
 	@Override
 	protected void createOptions() {
@@ -61,11 +57,12 @@ public class GetOutcome extends JobOperationBase {
 		return "get output files";
 	}
 
+	@Override
 	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
 		jobs.forEach( x -> getOutput(x.getM2()));
 	}
 
-	protected void getOutput(UCCBuilder builder){
+	private void getOutput(UCCBuilder builder){
 		try{
 			builder.setState(Runner.STARTED);
 			builder.setProperty("_ucc_Output",output.getAbsolutePath());

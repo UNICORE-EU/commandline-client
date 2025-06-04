@@ -34,7 +34,7 @@ public class MultiRegistryClient implements IRegistryClient {
 	public void addRegistry(IRegistryClient registry){
 		clients.add(registry);
 	}
-	
+
 	@Override
 	public List<Endpoint> listEntries(ServiceListFilter acceptFilter) throws Exception {
 		List<Endpoint>result=new ArrayList<>();
@@ -75,6 +75,7 @@ public class MultiRegistryClient implements IRegistryClient {
 	public List<Endpoint> listEntries(String type) throws Exception {
 		return listEntries(new RegistryClient.ServiceTypeFilter(type));
 	}
+
 	public String getConnectionStatus(){
 		checkConnection();
 		return connectionStatus;		

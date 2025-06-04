@@ -14,9 +14,9 @@ import eu.unicore.client.core.SiteClient;
 public class RandomSelection implements SiteSelectionStrategy{
 
 	private static Random random=new Random();
-	
+
 	private final Map<String, AtomicInteger>selected = new HashMap<>();
-	
+
 	public SiteClient select(List<SiteClient> available) {
 		SiteClient selectedTSS = available.get(random.nextInt(available.size()));
 		try{
@@ -33,7 +33,7 @@ public class RandomSelection implements SiteSelectionStrategy{
 		catch(Exception ex){}
 		return selectedTSS;
 	}
-	
+
 	public Map<String,AtomicInteger>getSelectionStatistics(){
 		return selected;
 	}

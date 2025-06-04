@@ -151,7 +151,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		}
 	}
 
-	protected void doProcess(String cmd, String url, JSONObject content) throws Exception {
+	private void doProcess(String cmd, String url, JSONObject content) throws Exception {
 		console.verbose("{} {}", cmd, url);
 		BaseClient bc = makeClient(url);
 		ContentType ct = ContentType.create(contentType);
@@ -175,28 +175,28 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		}
 	}
 
-	protected void handleResponse(ClassicHttpResponse res, BaseClient bc) throws Exception {
+	private void handleResponse(ClassicHttpResponse res, BaseClient bc) throws Exception {
 		bc.checkError(res);
-		try {
+		if(includeHeaders) {
 			console.info("{}", new StatusLine(res).toString());
-			Header l = res.getFirstHeader("Location");
-			if(l!=null) {
-				console.info("{}", l.getValue());
-				properties.put(PROP_LAST_RESOURCE_URL, l.getValue());
-			}
-			if (includeHeaders) for(Header h: res.getHeaders()) {
+			for(Header h: res.getHeaders()) {
 				console.info("{}: {}", h.getName(), h.getValue());
 			}
-			if("application/json".equalsIgnoreCase(accept)) {
-				console.info("{}", bc.asJSON(res).toString(2));
-			}
-			else {
-				console.info("{}", EntityUtils.toString(res.getEntity(), "UTF-8"));
-			}
-		}catch(Exception ex) {}
+		}
+		Header l = res.getFirstHeader("Location");
+		if(l!=null) {
+			console.info("{}", l.getValue());
+			properties.put(PROP_LAST_RESOURCE_URL, l.getValue());
+		}
+		if("application/json".equalsIgnoreCase(accept)) {
+			console.info("{}", bc.asJSON(res).toString(2));
+		}
+		else {
+			console.info("{}", EntityUtils.toString(res.getEntity(), "UTF-8"));
+		}
 	}
 
-	protected BaseClient makeClient(String url) throws Exception {
+	private BaseClient makeClient(String url) throws Exception {
 		return new BaseClient(url,
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());

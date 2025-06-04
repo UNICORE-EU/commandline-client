@@ -109,7 +109,7 @@ public class Runner implements Runnable {
 	private String preferredProtocol = "BFT";
 
 	private SiteSelectionStrategy selectionStrategy;
-	
+
 	// state names
 
 	public static final String NEW="NEW";

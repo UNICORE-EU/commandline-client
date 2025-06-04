@@ -12,14 +12,19 @@ import eu.unicore.ucc.io.Location;
  */
 public class Mkdir extends SMSOperation {
 
-	protected Location targetDesc;
-
 	@Override
 	public void process() throws Exception {
 		super.process();
-		String target = getCommandLine().getArgs()[1];;
-		StorageClient sms = getStorageClient(target);
-		sms.mkdir(getPathAtStorage(target));
+		if(getCommandLine().getArgs().length>1){
+			for(int i=1; i<getCommandLine().getArgs().length;i++){
+				String target = getCommandLine().getArgs()[1];
+				StorageClient sms = getStorageClient(target);
+				sms.mkdir(getPathAtStorage(target));
+			}
+		}
+		else{
+			throw new IllegalArgumentException("Please specify remote directory!");
+		}
 	}
 	
 	@Override
@@ -34,7 +39,7 @@ public class Mkdir extends SMSOperation {
 	
 	@Override
 	public String getDescription(){
-		return "create a directory remotely";
+		return "create directories remotely";
 	}
 
 

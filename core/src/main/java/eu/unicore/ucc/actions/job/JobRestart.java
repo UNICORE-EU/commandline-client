@@ -34,7 +34,7 @@ public class JobRestart extends JobOperationBase {
 		jobs.forEach( x -> restart(x.getM1()));
 	}
 
-	protected void restart(JobClient job){
+	private void restart(JobClient job){
 		try{
 			job.restart();
 		}catch(Exception e){

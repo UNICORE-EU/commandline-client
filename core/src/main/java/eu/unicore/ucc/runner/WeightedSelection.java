@@ -23,15 +23,15 @@ import eu.unicore.ucc.helpers.ConsoleLogger;
 public class WeightedSelection implements SiteSelectionStrategy {
 
 	private final File weightsFile;
-	
+
 	private long lastAccess=0;
-	
-	private final Map<String, Integer>weights=new HashMap<>();
-	
-	private final Map<String, AtomicInteger>selected=new HashMap<>();
+
+	private final Map<String, Integer>weights = new HashMap<>();
+
+	private final Map<String, AtomicInteger>selected = new HashMap<>();
 
 	public static final String DEFAULT_WEIGHT="UCC_DEFAULT_SITE_WEIGHT";
-	
+
 	public WeightedSelection(File weightsFile){
 		this.weightsFile=weightsFile;
 	}
@@ -50,7 +50,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 		}
 		return map.get(select(map.keySet()));
 	}
-	
+
 	public String select(Set<String>available){
 		checkUpdate();
 		String selectedTSS=null;
@@ -76,13 +76,13 @@ public class WeightedSelection implements SiteSelectionStrategy {
 		storeSelection(selectedTSS);
 		return selectedTSS;
 	}
-	
+
 	/**
 	 * returns the current ratio of submitted jobs to site weight
 	 * @param name - the site name
 	 * @return the ratio or <code>-1</code> if no jobs should be submitted to this site
 	 */
-	protected float getRatio(String name){
+	private float getRatio(String name){
 		Integer w=weights.get(name);
 		if(w==null){
 			w=weights.get(DEFAULT_WEIGHT);
@@ -92,7 +92,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 		}
 		return ((float)get(name).get())/(float)w;
 	}
-	
+
 	private synchronized AtomicInteger get(String key) {
 		AtomicInteger s = selected.get(key);
 		if(s==null) {
@@ -101,14 +101,14 @@ public class WeightedSelection implements SiteSelectionStrategy {
 		}
 		return s;
 	}
-	
+
 	protected synchronized void storeSelection(String name){
 		AtomicInteger val = selected.get(name);
 		val.incrementAndGet();
 	}
-	
+
 	//check if file was modified, and read the weights if it was
-	protected void checkUpdate(){
+	private void checkUpdate(){
 		ConsoleLogger msg = UCC.console;
 		if(lastAccess<weightsFile.lastModified()){
 			lastAccess=weightsFile.lastModified();
@@ -141,7 +141,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 			}
 		}
 	}
-	
+
 	public Map<String,AtomicInteger>getSelectionStatistics(){
 		return selected;
 	}
@@ -149,5 +149,5 @@ public class WeightedSelection implements SiteSelectionStrategy {
 	public File getWeightsFile() {
 		return weightsFile;
 	}
-	
+
 }

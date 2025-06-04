@@ -19,7 +19,7 @@ import eu.unicore.ucc.lookup.JobLister;
  */
 public class ListJobs extends ListActionBase<JobClient> {
 
-	protected String siteName;
+	private String siteName;
 
 	public String getName(){
 		return "list-jobs";
@@ -71,7 +71,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 		}
 	}
 
-	protected void listJob(JobClient job) throws Exception {
+	private void listJob(JobClient job) throws Exception {
 		properties.put(PROP_LAST_RESOURCE_URL, job.getEndpoint().getUrl());
 		if(detailed) {
 			console.info("{}", getDetails(job));
@@ -82,8 +82,9 @@ public class ListJobs extends ListActionBase<JobClient> {
 		printProperties(job);
 	}
 
-	String format = " %16s | %10s | %s";
-	protected void printHeader() {
+	final String format = " %16s | %10s | %s";
+
+	private void printHeader() {
 		console.info(String.format(format, "Submitted", "Status", "URL"));
 		console.info(" -----------------|------------|----------------");
 	}

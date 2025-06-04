@@ -7,8 +7,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.Logger;
-
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.SiteClient;
@@ -26,8 +24,6 @@ import eu.unicore.util.Pair;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
 public class SiteFactoryLister extends Lister<SiteFactoryClient>{
-
-	final static Logger log = Log.getLogger(Log.CLIENT, SiteFactoryLister.class);
 
 	private final IRegistryClient registry;
 
@@ -73,7 +69,7 @@ public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 		return super.iterator();
 	}
 
-	protected void setupProducers()throws Exception {
+	private void setupProducers()throws Exception {
 		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
 		for(final Endpoint site: sites){
 			addProducer(new SiteFactoryProducer(site,
@@ -103,7 +99,6 @@ public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 		@Override
 		public void run() {
 			try{
-				log.debug("Processing site at {}", ep.getUrl());
 				handleEndpoint();
 			}
 			catch(Exception ex){
@@ -135,5 +130,5 @@ public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 			this.runCounter = runCount;
 		}
 	}
-	
+
 }

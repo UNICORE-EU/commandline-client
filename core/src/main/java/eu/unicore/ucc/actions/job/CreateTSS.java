@@ -32,19 +32,10 @@ import eu.unicore.util.httpclient.IClientConfiguration;
  */
 public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 
-	/**
-	 * the initial lifetime (in days) for newly created TSSs
-	 */
 	private int initialLifeTime;
 
-	/**
-	 * factory URL to use
-	 */
-	private String factoryURL;
+	private String siteFactoryURL;
 
-	/**
-	 * site where to create the TSS
-	 */
 	private String siteName;
 
 	@Override
@@ -105,9 +96,9 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 		}else{
 			console.verbose("Using site default for TSS lifetime.");
 		}
-		factoryURL = getOption(OPT_FACTORY_LONG, OPT_FACTORY);
+		siteFactoryURL = getOption(OPT_FACTORY_LONG, OPT_FACTORY);
 		SiteFactoryClient tsf;
-		if(factoryURL==null){
+		if(siteFactoryURL==null){
 			SiteFactoryLister tsfl = new SiteFactoryLister(UCC.executor, registry, configurationProvider);
 			siteName = getOption(OPT_SITENAME_LONG, OPT_SITENAME);
 			if(siteName!=null){
@@ -120,17 +111,17 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 			tsf = tsfl.iterator().next();
 		}
 		else{
-			console.verbose("Using factory at <{}>", factoryURL);
-			tsf = new SiteFactoryClient(new Endpoint(factoryURL), 
-					configurationProvider.getClientConfiguration(factoryURL), 
+			console.verbose("Using factory at <{}>", siteFactoryURL);
+			tsf = new SiteFactoryClient(new Endpoint(siteFactoryURL), 
+					configurationProvider.getClientConfiguration(siteFactoryURL), 
 					configurationProvider.getRESTAuthN());
 		}
 		if(tsf==null){
 			throw new Exception("No suitable target system factory available!",null);
 		}
 		else{
-			factoryURL = tsf.getEndpoint().getUrl();
-			console.verbose("Using factory at <{}>", factoryURL);
+			siteFactoryURL = tsf.getEndpoint().getUrl();
+			console.verbose("Using factory at <{}>", siteFactoryURL);
 		}
 		SiteClient tss = tsf.createSite(getCreationParameters(), getTermTime());
 		String addr = tss.getEndpoint().getUrl();
@@ -139,7 +130,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 		setLastTSSAddress(addr);
 	}
 
-	protected Map<String,String> getCreationParameters() throws IOException {
+	private Map<String,String> getCreationParameters() throws IOException {
 		String[]args = getCommandLine().getArgs();
 		if(args.length>1){
 			//other parameters from the cmdline as key=value
@@ -151,7 +142,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 		else return new HashMap<>();
 	}
 
-	protected Calendar getTermTime(){
+	private Calendar getTermTime(){
 		if(initialLifeTime<=0)return null;
 
 		Calendar c = Calendar.getInstance();
@@ -185,7 +176,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 		}
 	}
 
-	protected String getDescription(SiteFactoryClient sfc) throws Exception {
+	private String getDescription(SiteFactoryClient sfc) throws Exception {
 		JSONObject pr=sfc.getProperties();
 		StringBuilder sb=new StringBuilder();
 		String cr = System.getProperty("line.separator");
@@ -209,7 +200,6 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 
 		return sb.toString();
 	}
-
 
 	private static String lastTargetSystemAddress;
 

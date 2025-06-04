@@ -22,32 +22,19 @@ import eu.unicore.ucc.util.UCCBuilder;
  */
 public class Allocate extends ActionBase {
 
-	protected Runner runner;
+	private Runner runner;
 
-	protected UCCBuilder builder;
+	private UCCBuilder builder;
 
-	/**
-	 * site to use
-	 */
-	protected String siteName=null;
+	private String siteName;
 
-	/**
-	 * whether to actually submit the job - if <code>false</code>, brokering etc will
-	 * be performed but no job will be submitted 
-	 */
-	protected boolean dryRun=false;
+	private boolean dryRun = false;
 
-	protected String[] tags;
+	private String[] tags;
 
-	/**
-	 * asynchronous mode
-	 */
-	protected boolean asynchronous;
+	private boolean asynchronous;
 
-	/**
-	 * resources name / value pairs
-	 */
-	private final Map<String,String>resourceRequests=new HashMap<>();
+	private final Map<String,String>resourceRequests = new HashMap<>();
 
 	@Override
 	protected void createOptions() {
@@ -83,7 +70,7 @@ public class Allocate extends ActionBase {
 				.build());
 	}
 
-	protected void readResources(){
+	private void readResources(){
 		resourceRequests.clear();
 		int length=getCommandLine().getArgs().length;
 		if(length<1)return;
@@ -95,9 +82,9 @@ public class Allocate extends ActionBase {
 			console.verbose("Have resource request: {}={}", key, value);
 			resourceRequests.put(key, value);
 		}
-		//unit testing use
-		lastParams=resourceRequests;
+		lastParams = resourceRequests;
 	}
+
 	@Override
 	public String getName() {
 		return "allocate";
@@ -119,9 +106,10 @@ public class Allocate extends ActionBase {
 	public String getDescription(){
 		return "allocate resources through UNICORE";
 	}
+
 	@Override
 	public String getCommandGroup(){
-		return "Job execution";
+		return CMD_GRP_JOBS;
 	}
 
 	@Override
@@ -141,7 +129,7 @@ public class Allocate extends ActionBase {
 		run();
 	}
 
-	protected void initBuilder() throws Exception {
+	private void initBuilder() throws Exception {
 		builder = new UCCBuilder(registry, configurationProvider);
 		builder.setProperty("_ucc_Output",output.getAbsolutePath());
 		builder.setProperty("_ucc_DetailedStatusDisplay", "true");
@@ -156,7 +144,7 @@ public class Allocate extends ActionBase {
 		}
 	}
 
-	protected void run() throws Exception {
+	private void run() throws Exception {
 		runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(true);
 		runner.setBriefOutfileNames(true);

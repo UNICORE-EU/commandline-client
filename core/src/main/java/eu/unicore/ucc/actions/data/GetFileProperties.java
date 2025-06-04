@@ -20,10 +20,10 @@ import eu.unicore.ucc.util.JSONUtil;
  */
 public class GetFileProperties extends SMSOperation {
 	
-	protected DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-	protected UnitParser unitParser = UnitParser.getCapacitiesParser(1);
-	
+	private final UnitParser unitParser = UnitParser.getCapacitiesParser(1);
+
 	@Override
 	protected void createOptions(){
 		super.createOptions();

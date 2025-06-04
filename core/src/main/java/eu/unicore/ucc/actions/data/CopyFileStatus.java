@@ -16,7 +16,7 @@ import eu.unicore.ucc.actions.ActionBase;
  */
 public class CopyFileStatus extends ActionBase {
 
-	protected UnitParser up = UnitParser.getCapacitiesParser(3);
+	private final UnitParser up = UnitParser.getCapacitiesParser(3);
 
 	@Override
 	public void process() throws Exception {
@@ -36,7 +36,7 @@ public class CopyFileStatus extends ActionBase {
 		}
 	}
 
-	protected void doCheck(String url)throws Exception{
+	private void doCheck(String url)throws Exception{
 		TransferControllerClient tcc = new TransferControllerClient(new Endpoint(url),
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());

@@ -6,10 +6,7 @@ import java.io.IOException;
  * @author schuller
  */
 public class RunningQueue extends RequestQueue {
-	
-	/**
-	 * constructs a new RunningQueue 
-	 */
+
 	public RunningQueue(String requestDirname) throws IOException{	
 		super(requestDirname,true);
 		if(!getRequestDir().canWrite()) 

@@ -48,11 +48,11 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 	public String getDescription(){
 		return "lists info on workflows.";
 	}
+
 	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_WORKFLOW;
 	}
-
 
 	@Override
 	protected void createOptions() {
@@ -86,7 +86,7 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 		run();
 	}
 	
-	protected void run() throws Exception{
+	private void run() throws Exception{
 		if(getCommandLine().getArgs().length>=2) {
 			for(int i=1; i<getCommandLine().getArgs().length; i++) {
 				listOne(getCommandLine().getArgs()[i]);
@@ -117,7 +117,7 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 		}
 	}
 
-	protected void listOne(String url) throws Exception{
+	private void listOne(String url) throws Exception{
 		WorkflowClient wf = new WorkflowClient(new Endpoint(url), 
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
@@ -161,7 +161,7 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 		return details.toString();
 	}
 
-	protected void listFiles(WorkflowClient workflow, StringBuilder details) throws Exception {
+	private void listFiles(WorkflowClient workflow, StringBuilder details) throws Exception {
 		details.append(sep).append("  Files: ");
 		BaseServiceClient fileListClient = workflow.getFileList();
 		JSONObject props = fileListClient.getProperties();
@@ -173,7 +173,7 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 		}
 	}
 
-	protected void listParameters(JSONObject props, StringBuilder details) {
+	private void listParameters(JSONObject props, StringBuilder details) {
 		for(Map.Entry<String,String>e: JSONUtil.asMap(props.getJSONObject("parameters")).entrySet()){
 			details.append(sep).append("  Parameter: ").append(e.getKey()).append("=").append(e.getValue());
 		}

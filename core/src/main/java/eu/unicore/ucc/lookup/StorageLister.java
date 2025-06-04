@@ -7,8 +7,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.Logger;
-
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.EnumerationClient;
@@ -26,8 +24,6 @@ import eu.unicore.util.httpclient.IClientConfiguration;
 
 public class StorageLister extends Lister<StorageClient>{
 
-	final static Logger log = Log.getLogger(Log.CLIENT, StorageLister.class);
-	
 	private final IRegistryClient registry;
 
 	private final UCCConfigurationProvider configurationProvider;
@@ -123,7 +119,6 @@ public class StorageLister extends Lister<StorageClient>{
 		@Override
 		public void run() {
 			try{
-				log.debug("Processing site at {}", epr.getUrl());
 				handleEndpoint(epr);
 			}
 			catch(Exception ex){
@@ -134,7 +129,7 @@ public class StorageLister extends Lister<StorageClient>{
 			}
 		}
 
-		public void handleEndpoint(Endpoint epr) throws Exception{
+		private void handleEndpoint(Endpoint epr) throws Exception{
 			CoreClient core = new CoreClient(epr, securityProperties, auth);
 			String storagesUrl = core.getLinkUrl("storages");
 			EnumerationClient ec = new EnumerationClient(epr.cloneTo(storagesUrl), securityProperties, auth);

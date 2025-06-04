@@ -34,14 +34,6 @@ public class FileUploader extends FileTransferBase {
 		checkOK();
 	}
 
-	public String getFrom() {
-		return from;
-	}
-
-	public String getTo() {
-		return to;
-	}
-
 	@Override
 	public void perform(StorageClient sms)throws Exception {
 		assertReady(sms);

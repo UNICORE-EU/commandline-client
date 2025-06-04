@@ -12,23 +12,24 @@ public class AbortJob extends JobOperationBase {
 	public String getName(){
 		return "job-abort";
 	}
-	
+
 	@Override
 	public String getSynopsis(){
 		return "Aborts UNICORE job(s). " +
 				super.getSynopsis();
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "abort job(s)";
 	}
 
+	@Override
 	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs) {
 		jobs.forEach( x -> abort(x.getM1()));
 	}
 
-	protected void abort(JobClient job) {
+	private void abort(JobClient job) {
 		console.verbose("Job id: {}", job.getEndpoint().getUrl());
 		try{
 			job.abort();

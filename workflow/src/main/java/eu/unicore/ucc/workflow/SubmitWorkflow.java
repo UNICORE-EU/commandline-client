@@ -41,8 +41,8 @@ import eu.unicore.workflow.WorkflowFactoryClient;
 public class SubmitWorkflow extends ActionBase implements
 		IServiceInfoProvider {
 
-	public static final String OPT_UFILE_LONG = "ucc-input";
-	public static final String OPT_UFILE = "u";
+	private static final String OPT_UFILE_LONG = "ucc-input";
+	private static final String OPT_UFILE = "u";
 
 	public static final String OPT_WAIT = "w";
 	public static final String OPT_WAIT_LONG = "wait";
@@ -50,33 +50,33 @@ public class SubmitWorkflow extends ActionBase implements
 	public static final String OPT_STORAGEURL_LONG="storage-url";
 	public static final String OPT_STORAGEURL="S";
 
-	protected String submissionSite;
+	private String submissionSite;
 
-	protected UCCBuilder builder;
+	private UCCBuilder builder;
 
-	protected boolean dryRun = false;
+	private boolean dryRun = false;
 
-	protected WorkflowFactoryClient wsc;
+	private WorkflowFactoryClient wsc;
 
-	protected JSONObject workflow;
+	private JSONObject workflow;
 
-	protected WorkflowClient.Status status;
+	private WorkflowClient.Status status;
 
-	protected String workflowFileName;
+	private String workflowFileName;
 
-	protected boolean wait = false;
+	private boolean wait = false;
 
-	protected int localFiles = 0;
+	private int localFiles = 0;
 
-	protected Map<String,String> inputs = new HashMap<>();
+	private final Map<String,String> inputs = new HashMap<>();
 	
 	// e.g. "https://host:port/SITE/rest/core/storages/STORAGENAME"
-	protected String storageURL;
+	private String storageURL;
 	
 	// base directory in the storage
-	protected String baseDir = "/";
+	private String baseDir = "/";
 
-	protected String[] tags;
+	private String[] tags;
 
 	@Override
 	protected void createOptions() {
@@ -158,7 +158,7 @@ public class SubmitWorkflow extends ActionBase implements
 		run();
 	}
 
-	protected void createBuilder()throws Exception{
+	private void createBuilder()throws Exception{
 		String uFile = getOption(OPT_UFILE_LONG, OPT_UFILE);
 		if (uFile != null) {
 			console.verbose("Reading stage-in and parameter definitions from <{}>", uFile);
@@ -169,7 +169,7 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 	}
 	
-	protected void findSite() throws Exception {
+	private void findSite() throws Exception {
 		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry,
 				configurationProvider, true);
 		if(submissionSite!=null) {
@@ -184,7 +184,7 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 	}
 
-	protected void createWorkflowDataStorage() throws Exception {
+	private void createWorkflowDataStorage() throws Exception {
 		if(localFiles<1) {
 			return;
 		}
@@ -216,7 +216,7 @@ public class SubmitWorkflow extends ActionBase implements
 		storageURL = sfc.createStorage().getEndpoint().getUrl();
 	}
 	
-	protected void run() throws Exception {
+	private void run() throws Exception {
 		loadWorkflow();
 		uploadLocalData();
 		JSONObject inputSpec = workflow.optJSONObject("inputs");
@@ -244,7 +244,7 @@ public class SubmitWorkflow extends ActionBase implements
 		}
 	}
 
-	protected void waitForFinish(WorkflowClient wmc) throws Exception {
+	private void waitForFinish(WorkflowClient wmc) throws Exception {
 		console.verbose("Waiting for workflow to finish...");
 		do {
 			Thread.sleep(2000);
@@ -260,7 +260,7 @@ public class SubmitWorkflow extends ActionBase implements
 		} while (Status.RUNNING.equals(status));
 	}
 
-	protected void uploadLocalData() throws Exception {
+	private void uploadLocalData() throws Exception {
 		if(localFiles==0)return;
 		if(!baseDir.endsWith("/"))baseDir = baseDir+"/";
 		StorageClient sc = new StorageClient(new Endpoint(storageURL),
@@ -288,7 +288,7 @@ public class SubmitWorkflow extends ActionBase implements
 	 * and if yes replaces any parameters using the spec in 
 	 * the .u file / builder 
 	 */
-	protected void loadWorkflow() throws Exception {
+	private void loadWorkflow() throws Exception {
 		String wf = FileUtils.readFileToString(new File(workflowFileName), "UTF-8");
 		workflow = new JSONObject(wf);
 		JSONObject templateArguments = workflow.optJSONObject("Template parameters");
@@ -317,7 +317,7 @@ public class SubmitWorkflow extends ActionBase implements
 		workflow = new JSONObject(wf);
 	}
 
-	protected void appendTags(JSONObject wf) {
+	private void appendTags(JSONObject wf) {
 		if(tags!=null&&tags.length>0) {
 			JSONArray existingTags = wf.optJSONArray("Tags");
 			if(existingTags==null)existingTags = wf.optJSONArray("tags");

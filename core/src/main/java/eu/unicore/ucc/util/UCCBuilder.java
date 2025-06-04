@@ -37,12 +37,12 @@ public class UCCBuilder extends Builder {
 	private File baseDirectory;
 	private final List<FileUploader> imports;
 	private final List<FileDownloader> exports;
-	
+
 	private ConsoleLogger msg = new ConsoleLogger();
 	private final UCCConfigurationProvider configurationProvider;
 	private final IRegistryClient registry;
 	private boolean checkLocalFiles=true;
-	
+
 	/**
 	 * reads a JSON string from the supplied File
 	 * and creates the builder from it
@@ -70,7 +70,6 @@ public class UCCBuilder extends Builder {
 		this.registry = registry;
 	}
 
-
 	/**
 	 * Creates an empty builder. All content has to be set via the API
 	 * @throws Exception
@@ -86,7 +85,7 @@ public class UCCBuilder extends Builder {
 	public ConsoleLogger getMessageWriter(){
 		return msg;
 	}
-	
+
 	static String[] _remove = {"blacklist", "Blacklist", "User", "Group"};
 
 	/**
@@ -139,7 +138,7 @@ public class UCCBuilder extends Builder {
 			throw new RuntimeException(ex);
 		}
 	}
-	
+
 	private void resolveLocations(JSONArray stages, String key) {
 		if(stages==null || stages.length()==0)return;
 		
@@ -157,7 +156,7 @@ public class UCCBuilder extends Builder {
 			}
 		}
 	}
-	
+
 	private JSONArray createLocalImports(JSONArray j)throws IllegalArgumentException, FileNotFoundException{
 		JSONArray otherImports = new JSONArray();
 		if(j!=null){
@@ -252,7 +251,7 @@ public class UCCBuilder extends Builder {
 		build();
 		return imports;
 	}
-	
+
 	public void setCheckLocalFiles(boolean checkLocalFiles){
 		this.checkLocalFiles=checkLocalFiles;
 	}
@@ -264,7 +263,7 @@ public class UCCBuilder extends Builder {
 	public String getApplicationVersion(){
 		return JSONUtil.getString(json, "ApplicationVersion");
 	}
-	
+
 	public String getSite(){
 		return JSONUtil.getString(json, "_ucc_Site", null);
 	}
@@ -276,11 +275,11 @@ public class UCCBuilder extends Builder {
 	public String getState(){
 		return JSONUtil.getString(json, "_ucc_state", Runner.NEW);
 	}
-	
+
 	public void setState(String state){
 		json.put("_ucc_state", state);
 	}
-	
+
 	/**
 	 * get the preferred file transfer protocols (if defined)
 	 */
@@ -297,7 +296,7 @@ public class UCCBuilder extends Builder {
 		build();
 		return requirements;
 	}
-	
+
 	public int getLifetime(){
 		String lifetime =JSONUtil.getString(json,"Lifetime");
 		if(lifetime!=null && lifetime.length()>0){
@@ -305,7 +304,7 @@ public class UCCBuilder extends Builder {
 		}
 		else return -1;
 	}
-	
+
 	public void addTags(String[]tags) {
 		JSONArray existingTags = json.optJSONArray("Tags");
 		if(existingTags==null)existingTags = json.optJSONArray("tags");
@@ -323,7 +322,7 @@ public class UCCBuilder extends Builder {
 			}
 		}catch(JSONException je) {}
 	}
-	
+
 	static final String lineSep=System.getProperty("line.separator");
 
 	static void writeLine(String line,StringBuilder sb){
@@ -334,5 +333,5 @@ public class UCCBuilder extends Builder {
 	public void writeTo(Writer writer)throws IOException{
 		writer.write(getJSON().toString(2));
 	}
-	
+
 }

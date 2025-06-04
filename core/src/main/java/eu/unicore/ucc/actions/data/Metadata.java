@@ -39,18 +39,15 @@ public class Metadata extends ActionBase {
 	public static String OPT_FILE = "f";
 	public static String OPT_QUERY_LONG = "query";
 	public static String OPT_QUERY = "q";
-	public static String OPT_QUERYADV_LONG = "advanced-query";
-	public static String OPT_QUERYADV = "a";
 	public static String OPT_WAIT_LONG = "wait";
 	public static String OPT_WAIT = "w";
-	protected String storageURL;
-	protected StorageClient sms;
-	protected String command;
-	protected String path;
-	protected File file;
-	protected String query;
-	boolean advanced;
-	boolean wait;
+
+	private StorageClient sms;
+	private String command;
+	private String path;
+	private File file;
+	private String query;
+	private boolean wait;
 
 	public String getName() {
 		return "metadata";
@@ -92,11 +89,6 @@ public class Metadata extends ActionBase {
 				.desc("Wait for long-running tasks to finish")
 				.required(false)
 				.build());
-		getOptions().addOption(Option.builder(OPT_QUERYADV)
-				.longOpt(OPT_QUERYADV_LONG)
-				.desc("Advanced query")
-				.required(false)
-				.build());
 	}
 
 	@Override
@@ -104,7 +96,6 @@ public class Metadata extends ActionBase {
 		super.process();
 		command = getOption(OPT_COMMAND_LONG, OPT_COMMAND);
 		console.verbose("Operation = {}", command);
-		advanced = getBooleanOption(OPT_QUERYADV_LONG, OPT_QUERYADV);
 		wait = getBooleanOption(OPT_WAIT_LONG, OPT_WAIT);
 		query = getOption(OPT_QUERY_LONG, OPT_QUERY);
 		String storage = getOption(OPT_STORAGE_LONG, OPT_STORAGE);
@@ -150,7 +141,7 @@ public class Metadata extends ActionBase {
 		}
 	}
 
-	protected void doGet() throws Exception {
+	private void doGet() throws Exception {
 		Map<String, String> result = sms.stat(path).metadata;
 		String json = JSONUtil.asJSON(result).toString(2);
 		console.info("{}", json);
@@ -161,17 +152,17 @@ public class Metadata extends ActionBase {
 		lastMeta.putAll(result);
 	}
 
-	protected void doWrite() throws Exception {
+	private void doWrite() throws Exception {
 		doSet(readData());
 	}
 
-	protected void doUpdate() throws Exception {
+	private void doUpdate() throws Exception {
 		Map<String, String> data = sms.stat(path).metadata;
 		data.putAll(readData());
 		doSet(data);
 	}
 
-	protected void doSet(Map<String, String> data) throws Exception {
+	private void doSet(Map<String, String> data) throws Exception {
 		JSONObject update = new JSONObject();
 		update.put("metadata", data);
 		JSONObject reply = sms.getFileClient(path).setProperties(update);
@@ -180,7 +171,7 @@ public class Metadata extends ActionBase {
 		lastMeta.putAll(data);
 	}
 
-	protected void doSearch() throws Exception {
+	private void doSearch() throws Exception {
 		lastSearchResults.clear();
 		List<String> files = sms.searchMetadata(query);
 		console.verbose("Have <{}> results.", files.size());
@@ -190,7 +181,7 @@ public class Metadata extends ActionBase {
 		}
 	}
 
-	protected void doDelete() throws Exception {
+	private void doDelete() throws Exception {
 		doSet(new HashMap<>());
 	}
 
@@ -201,7 +192,7 @@ public class Metadata extends ActionBase {
 		return path;
 	}
 
-	protected void doStartExtract() throws Exception {
+	private void doStartExtract() throws Exception {
 		path = normalize(path);
 		TaskClient tc = sms.getFileClient(path).startMetadataExtraction(10, new String[0]);
 		if(tc!=null) {
@@ -222,7 +213,7 @@ public class Metadata extends ActionBase {
 	 * read metadata from file or stdin
 	 * @throws Exception
 	 */
-	protected Map<String, String> readData() throws Exception {
+	private Map<String, String> readData() throws Exception {
 		String json = null;
 		if (file != null) {
 			console.verbose("Reading data from file: <{}>", file.getName());
@@ -247,7 +238,7 @@ public class Metadata extends ActionBase {
 		return JSONUtil.asMap(j);
 	}
 
-	protected StorageClient createStorageClient(String storage) throws Exception {
+	private StorageClient createStorageClient(String storage) throws Exception {
 		Location td = createLocation(storage);
 		Endpoint epr = new Endpoint(td.getSmsEpr());
 		StorageClient sms = new StorageClient(epr,

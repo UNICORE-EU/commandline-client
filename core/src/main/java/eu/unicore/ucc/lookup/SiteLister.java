@@ -7,8 +7,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.Logger;
-
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.SiteClient;
@@ -26,16 +24,14 @@ import eu.unicore.util.httpclient.IClientConfiguration;
 
 public class SiteLister extends Lister<SiteClient>{
 
-	final static Logger log = Log.getLogger(Log.CLIENT, SiteLister.class);
-	
 	private final IRegistryClient registry;
 
 	private final UCCConfigurationProvider configurationProvider;
-	
+
 	public SiteLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider){
 		this(null,registry,configurationProvider,new AcceptAllFilter());
 	}
-	
+
 	/**
 	 * @param executor
 	 * @param registry
@@ -44,7 +40,7 @@ public class SiteLister extends Lister<SiteClient>{
 	public SiteLister(ExecutorService executor, IRegistryClient registry, UCCConfigurationProvider configurationProvider){
 		this(executor,registry,configurationProvider,new AcceptAllFilter());
 	}
-	
+
 	/**
 	 * 
 	 * @param executor
@@ -58,7 +54,7 @@ public class SiteLister extends Lister<SiteClient>{
 		this.registry = registry;
 		this.configurationProvider = configurationProvider;
 	}
-	
+
 	@Override
 	public Iterator<SiteClient> iterator() {
 		try{
@@ -92,7 +88,7 @@ public class SiteLister extends Lister<SiteClient>{
 
 		private AtomicInteger runCount;
 		private BlockingQueue<SiteClient> target;
-		
+
 		public SiteProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter) {
 			this.epr = epr;
 			this.securityProperties = securityProperties;
@@ -103,7 +99,6 @@ public class SiteLister extends Lister<SiteClient>{
 		@Override
 		public void run() {
 			try{
-				log.debug("Processing site at {}", epr.getUrl());
 				handleEndpoint(epr);
 			}
 			catch(Exception ex){
@@ -114,7 +109,7 @@ public class SiteLister extends Lister<SiteClient>{
 			}
 		}
 
-		public void handleEndpoint(Endpoint epr) throws Exception{
+		private void handleEndpoint(Endpoint epr) throws Exception{
 			SiteFactoryClient factory = new SiteFactoryClient(epr, securityProperties, auth);
 			EnumerationClient sites = factory.getSiteList();
 			for(String url: sites){

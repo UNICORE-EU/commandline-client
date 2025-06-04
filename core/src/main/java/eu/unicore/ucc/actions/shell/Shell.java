@@ -33,13 +33,13 @@ import eu.unicore.ucc.util.PropertyVariablesResolver;
  */
 public class Shell extends ActionBase {
 
-	public static final String HISTORY_FILEKEY = "ucc-shell-history";
-
-	public static final String OPT_FILE="f";
-	public static final String OPT_FILE_LONG="file";
+	private static final String HISTORY_FILEKEY = "ucc-shell-history";
+	private static final String OPT_FILE="f";
+	private static final String OPT_FILE_LONG="file";
 
 	private File commandFile;
-	private History history = null;
+
+	private History history;
 
 	@Override
 	public String getDescription() {
@@ -58,9 +58,6 @@ public class Shell extends ActionBase {
 				+ "such as URL completion, shell history and more.";
 	}
 
-	/**
-	 *  creates options for the shell command
-	 */
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -114,7 +111,7 @@ public class Shell extends ActionBase {
 		UCC.setLineReader(is);
 	}
 
-	public void run(){
+	private void run(){
 		Command.quitAfterPrintingUsage=false;
 		LineReader is = UCC.getLineReader();
 		try{

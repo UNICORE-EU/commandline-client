@@ -11,7 +11,7 @@ import eu.unicore.ucc.UCC;
  * @author schuller
  */
 public class PropertyFilter implements Filter {
-	
+
 	private String modifier;
 	private String value;
 	private String property;
@@ -28,14 +28,14 @@ public class PropertyFilter implements Filter {
 	private static final String MOD_CONTAINS_SHORT="c";
 	private static final String MOD_NOTCONTAINS="notcontains";
 	private static final String MOD_NOTCONTAINS_SHORT="nc";
-	
+
 	private PropertyFilter(String property, String modifier, String value){
 		this.modifier=modifier;
 		this.property=property;
 		this.value=value;
 	}
-	
 
+	@Override
 	public boolean accept(BaseServiceClient resource) {
 		try{
 			JSONObject props = resource.getProperties();
@@ -48,7 +48,7 @@ public class PropertyFilter implements Filter {
 		return false;
 	}
 
-	protected boolean compare(String expected, String actual){
+	private boolean compare(String expected, String actual){
 		if(modifier.equalsIgnoreCase(MOD_EQUAL)||modifier.equalsIgnoreCase(MOD_EQUAL_SHORT))return expected.equalsIgnoreCase(actual);
 		if(modifier.equalsIgnoreCase(MOD_NOTEQUAL))return !expected.equalsIgnoreCase(actual);
 		if(modifier.equalsIgnoreCase(MOD_CONTAINS)||modifier.equalsIgnoreCase(MOD_CONTAINS_SHORT))return actual.contains(expected);
@@ -56,12 +56,6 @@ public class PropertyFilter implements Filter {
 		if(modifier.equalsIgnoreCase(MOD_LT)||modifier.equalsIgnoreCase(MOD_LT_SHORT))return actual.compareTo(expected)<0;
 		if(modifier.equalsIgnoreCase(MOD_GT)||modifier.equalsIgnoreCase(MOD_GT_SHORT))return actual.compareTo(expected)>0;
 		UCC.console.error(null, "Can't compare <{}> to <{}>", expected, actual);
-		return false;
-	}
-	
-	protected boolean compareNumbers(Long expected, Long actual){
-		if(modifier.equalsIgnoreCase(MOD_LT))return actual<expected;
-		if(modifier.equalsIgnoreCase(MOD_GT))return actual>expected;
 		return false;
 	}
 
@@ -92,12 +86,10 @@ public class PropertyFilter implements Filter {
 		return null;
 	}
 
-
 	private static boolean acceptModifier(String modifier) {
 		for(String s: modifiers){
 			if(s.equalsIgnoreCase(modifier))return true;
 		}
 		return false;
 	}
-	
 }

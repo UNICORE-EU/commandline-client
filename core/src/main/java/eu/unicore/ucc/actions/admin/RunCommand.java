@@ -20,9 +20,9 @@ public class RunCommand extends ActionBase {
 
 	private String siteName;
 	private String url;
-
 	private String cmd;
-	private final Map<String,String>params=new HashMap<>();
+
+	private final Map<String,String>params = new HashMap<>();
 
 	@Override
 	protected void createOptions() {

@@ -17,16 +17,16 @@ import eu.unicore.util.Log;
 public class JobLister implements Iterable<JobClient>{
 
 	private static final Logger logger = Log.getLogger("UCC", JobLister.class);
-	
+
 	private final CoreClient site;
-	
+
 	private final String[] tags;
-	
+
 	public JobLister(CoreClient site, String[] tags){
 		this.site = site;
 		this.tags = tags;
 	}
-	
+
 	/**
 	 * returns an iterator over the available jobs, providing a
 	 * pre-initialised JobClient per job

@@ -40,12 +40,12 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 		}
 	}
 
-	protected void list(AdminServiceClient asc)throws Exception{
+	private void list(AdminServiceClient asc)throws Exception{
 		console.info("{} {}", asc.getEndpoint().getUrl(), getDetails(asc));
 		printProperties(asc);
 	}
 
-	protected String getDetails(AdminServiceClient asc)throws Exception{
+	private String getDetails(AdminServiceClient asc)throws Exception{
 		if(!detailed)return "";
 		StringBuilder details=new StringBuilder();
 		String sep=System.getProperty("line.separator");

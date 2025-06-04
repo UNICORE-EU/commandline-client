@@ -28,12 +28,11 @@ import eu.unicore.ucc.util.ProgressBar;
  */
 public class CP extends FileOperation {
 
-	protected String target;
-	protected final List<String>sources = new ArrayList<>();
-	
-	protected boolean append;
-	protected boolean recurse;
-	protected boolean resume;
+	private String target;
+	private final List<String>sources = new ArrayList<>();
+
+	private boolean recurse;
+	private boolean resume;
 	
 	@Override
 	protected void createOptions() {
@@ -99,7 +98,7 @@ public class CP extends FileOperation {
 		}
 	}
 
-	protected void handleServerServer(Location sourceDesc, Location targetDesc, String scheduled, boolean synchronous) 
+	private void handleServerServer(Location sourceDesc, Location targetDesc, String scheduled, boolean synchronous) 
 	throws Exception {
 		if(sourceDesc.isRaw() && targetDesc.isRaw()) {
 			throw new IllegalArgumentException("One of source or target must be a UNICORE storage!");
@@ -117,7 +116,7 @@ public class CP extends FileOperation {
 		lastTransferAddress = transfer.getTransferAddress();
 	}
 	
-	protected void handleClientServer(String source, Location sourceDesc, Location targetDesc) 
+	private void handleClientServer(String source, Location sourceDesc, Location targetDesc) 
 	throws Exception {
 		boolean isDownload = targetDesc.isLocal();
 		FileTransferBase fd = null;

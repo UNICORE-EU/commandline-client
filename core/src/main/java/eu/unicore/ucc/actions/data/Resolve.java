@@ -21,9 +21,9 @@ import eu.unicore.ucc.lookup.IResolve;
  */
 public class Resolve extends ActionBase {
 
-	protected Location targetDesc;
+	private Location targetDesc;
 
-	protected boolean full;
+	private boolean full;
 
 	private final static List<IResolve>resolvers = new ArrayList<>();
 
@@ -92,14 +92,14 @@ public class Resolve extends ActionBase {
 		}
 	}
 
-	protected void doList() {
+	private void doList() {
 		console.info("Configured resolvers");
 		for(IResolve r: resolvers) {
 			console.info(" * {}", r.synopsis());
 		}
 	}
 
-	protected void doResolve() throws Exception {
+	private void doResolve() throws Exception {
 		String target = getCommandLine().getArgs()[1];;
 		targetDesc = resolve(target,registry,configurationProvider);
 		full = getBooleanOption("full", "f");

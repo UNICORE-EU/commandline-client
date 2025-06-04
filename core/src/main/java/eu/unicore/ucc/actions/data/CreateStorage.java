@@ -183,7 +183,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		}
 	}
 
-	protected void doCreate(StorageFactoryClient sfc) throws Exception{
+	private void doCreate(StorageFactoryClient sfc) throws Exception{
 		Calendar tt = null;
 		if(initialLifeTime>0){
 			tt = Calendar.getInstance();
@@ -196,7 +196,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		setLastStorageAddress(addr);
 	}
 
-	protected Map<String,String> getParams() throws IOException {
+	private Map<String,String> getParams() throws IOException {
 		String[]args = getCommandLine().getArgs();
 		if(args.length>1){
 			// other parameters from the cmdline
@@ -207,7 +207,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		else return null;
 	}
 
-	protected Calendar getTermTime(){
+	private Calendar getTermTime(){
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DATE, initialLifeTime);
 		return c;
@@ -239,7 +239,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		}
 	}
 
-	protected String getDescription(StorageFactoryClient sfc) throws Exception {
+	private String getDescription(StorageFactoryClient sfc) throws Exception {
 		JSONObject pr=sfc.getProperties().getJSONObject("storageDescriptions");
 		StringBuilder sb=new StringBuilder();
 		boolean first=true;
@@ -256,7 +256,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		return sb.toString();
 	}
 
-	protected String getBriefDescription(String type, JSONObject desc){
+	private String getBriefDescription(String type, JSONObject desc){
 		StringBuilder sb=new StringBuilder();
 		sb.append(type);
 		try{
@@ -268,7 +268,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		return sb.toString();
 	}
 
-	protected String getParameterDescription(JSONObject desc) throws JSONException {
+	private String getParameterDescription(JSONObject desc) throws JSONException {
 		StringBuilder sb=new StringBuilder();
 		sb.append("  Parameters:");
 		JSONObject parameterDesc = desc.optJSONObject("parameters", new JSONObject());

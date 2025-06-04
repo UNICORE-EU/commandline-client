@@ -19,43 +19,24 @@ import eu.unicore.ucc.util.UCCBuilder;
  */
 public class Exec extends ActionBase {
 
-	protected Runner runner;
+	private Runner runner;
 
-	protected UCCBuilder builder;
+	private UCCBuilder builder;
 
-	/**
-	 * site to use
-	 */
-	protected String siteName=null;
+	private String siteName;
 
-	/**
-	 * request a particular login node
-	 */
-	protected String loginNode=null;
+	private String loginNode;
 
-	/**
-	 * whether to actually submit the job - if <code>false</code>, brokering etc will
-	 * be performed but no job will be submitted 
-	 */
-	protected boolean dryRun=false;
+	private boolean dryRun = false;
 
-	/**
-	 * whether to keep the finished job - if <code>false</code>, 
-	 * the job will be deleted when done
-	 */
-	protected boolean keep=false;
+	private boolean keepFinishedJob = false;
 
-	protected String[] tags;
+	private String[] tags;
 
-	/**
-	 * asynchronous mode
-	 */
-	protected boolean asynchronous;
+	private boolean asynchronous;
 
-	/**
-	 * Allocation job URL
-	 */
-	protected String allocation=null;
+	// Allocation job URL
+	private String allocation = null;
 
 	@Override
 	protected void createOptions() {
@@ -149,8 +130,8 @@ public class Exec extends ActionBase {
 		loginNode=getCommandLine().getOptionValue(OPT_LOGIN_NODE);
 		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
 		console.verbose("Dry run = {}", dryRun);
-		keep=getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
-		console.verbose("Delete job when done = {}", !keep);
+		keepFinishedJob=getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
+		console.verbose("Delete job when done = {}", !keepFinishedJob);
 		asynchronous=getBooleanOption(OPT_MODE_LONG, OPT_MODE);
 		console.verbose("Asynchronous processing = {}", asynchronous);
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
@@ -161,10 +142,10 @@ public class Exec extends ActionBase {
 		run();
 	}
 
-	protected void initBuilder(String[] args) throws Exception {
+	private void initBuilder(String[] args) throws Exception {
 		builder = new UCCBuilder(registry, configurationProvider);
 		builder.setProperty("_ucc_Output",output.getAbsolutePath());
-		builder.setProperty("_ucc_KeepFinishedJob", String.valueOf(keep));
+		builder.setProperty("_ucc_KeepFinishedJob", String.valueOf(keepFinishedJob));
 		builder.setProperty("_ucc_DetailedStatusDisplay", "true");
 		if(tags!=null&&tags.length>0) {
 			builder.addTags(tags);
@@ -182,7 +163,7 @@ public class Exec extends ActionBase {
 		}
 	}
 
-	protected void run(){
+	private void run(){
 		runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(asynchronous);
 		runner.setBriefOutfileNames(true);

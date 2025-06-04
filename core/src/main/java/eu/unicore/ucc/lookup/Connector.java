@@ -65,7 +65,7 @@ public class Connector implements Runnable {
 		}
 	}
 	
-	protected void handleTSF(SiteFactoryClient tsf) throws Exception {
+	private void handleTSF(SiteFactoryClient tsf) throws Exception {
 		try {
 			SiteClient tss = tsf.getOrCreateSite();
 			UCC.console.verbose("TSS at address {}", tss.getEndpoint().getUrl());

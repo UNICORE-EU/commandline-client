@@ -56,22 +56,22 @@ public class Batch extends ActionBase {
 	/**
 	 * default update interval
 	 */
-	public static final int DEFAULT_UPDATE=1000;
+	private static final int DEFAULT_UPDATE=1000;
 
 	/**
 	 * default limit on number of running jobs
 	 */
-	public static final int DEFAULT_LIMIT=100;
+	private static final int DEFAULT_LIMIT=100;
 
 	/**
 	 * default limit on number of jobs submitted in one go
 	 */
-	public static final int DEFAULT_REQUEST_LIMIT=100;
+	private static final int DEFAULT_REQUEST_LIMIT=100;
 
 	/**
 	 * default number of executor threads
 	 */
-	public static final int DEFAULT_THREADS=4;
+	private static final int DEFAULT_THREADS=4;
 
 	//update interval for checking running jobs (in milliseconds)
 	private int updateInterval;
@@ -318,7 +318,7 @@ public class Batch extends ActionBase {
 		console.verbose("Exiting, {} requests were processed.", numRequests);
 	}
 
-	protected void createRequest(String nextReq){
+	private void createRequest(String nextReq){
 		try{
 			final UCCBuilder builder;
 			File f=new File(nextReq);
@@ -338,7 +338,7 @@ public class Batch extends ActionBase {
 		}
 	}
 
-	protected void processRequest(UCCBuilder builder){
+	private void processRequest(UCCBuilder builder){
 		try{
 			if(isShutdown)return;
 			builder.setProperty("_ucc_Output",output.getAbsolutePath());
@@ -365,7 +365,7 @@ public class Batch extends ActionBase {
 		}
 	}
 
-	protected void handleRunningJob(String nextRunning){
+	private void handleRunningJob(String nextRunning){
 		try{
 			if(isShutdown)return;
 			final File f = new File(nextRunning);
@@ -380,7 +380,7 @@ public class Batch extends ActionBase {
 		catch(Exception e){}
 	}
 
-	protected void processRunning(UCCBuilder b){
+	private void processRunning(UCCBuilder b){
 		if(isShutdown)return;
 		String req=b.getProperty("_ucc_source");
 		try{
@@ -404,7 +404,7 @@ public class Batch extends ActionBase {
 		}
 	}
 
-	public String printSelectionStatistics(Map<String,AtomicInteger>stats){
+	private String printSelectionStatistics(Map<String,AtomicInteger>stats){
 		StringBuilder sb=new StringBuilder();
 		String newline=System.getProperty("line.separator");
 		sb.append(newline);

@@ -21,7 +21,7 @@ import groovy.lang.GroovyShell;
  */
 public class Groovy extends ActionBase{
 
-	protected String expression;
+	private String expression;
 
 	@Override
 	protected void createOptions() {
@@ -65,18 +65,9 @@ public class Groovy extends ActionBase{
 			expression=readFile(getCommandLine().getOptionValue(OPT_GROOVYSCRIPT));
 		}
 		else{
-			getFallbackGroovyExpression();
+			printUsage();
 		}
 		shell.evaluate(expression);
-	}
-
-	/**
-	 * if no expression or file is given on the commandline, this method should 
-	 * return an expression to execute. The default implementation does not do this, but
-	 * prints usage info
-	 */
-	public void getFallbackGroovyExpression(){
-		printUsage();
 	}
 
 	private String readFile(String name)throws Exception{

@@ -118,7 +118,7 @@ public class JobStatus extends JobOperationBase {
 		});
 	}
 
-	protected void getStatus(JobClient job) {
+	private void getStatus(JobClient job) {
 		try{
 			Status status=job.getStatus();
 			String url=job.getEndpoint().getUrl();
@@ -151,7 +151,7 @@ public class JobStatus extends JobOperationBase {
 	 * gives some more details about the job /apart from
 	 * the overall status and exit code.
 	 */
-	protected String getDetails(JobClient job){
+	private String getDetails(JobClient job){
 		StringBuilder sb = new StringBuilder();
 		String lineBreak = System.getProperty("line.separator");
 		try	{

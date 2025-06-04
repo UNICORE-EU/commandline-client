@@ -22,11 +22,12 @@ import eu.unicore.util.Log;
  */
 public class ListTransfers extends ListActionBase<BaseServiceClient> {
 
+	@Override
 	public String getName(){
 		return "list-transfers";
 	}
 
-	protected UnitParser unitParser=UnitParser.getCapacitiesParser(0);
+	private final UnitParser unitParser=UnitParser.getCapacitiesParser(0);
 
 	@Override
 	public void process() throws Exception {
@@ -53,7 +54,7 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 		};
 	}
 
-	protected void listFiletransfers(CoreClient ep)throws Exception{
+	private void listFiletransfers(CoreClient ep)throws Exception{
 		Endpoint ftEp = ep.getEndpoint().cloneTo(ep.getLinkUrl("transfers")); 
 		EnumerationClient ftEnumeration = new EnumerationClient(ftEp, ep.getSecurityConfiguration(), ep.getAuth());
 		Iterator<String> fts = ftEnumeration.iterator();
@@ -68,7 +69,7 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 		}
 	}
 
-	protected void listFiletransfer(BaseServiceClient ftc) throws Exception {
+	private void listFiletransfer(BaseServiceClient ftc) throws Exception {
 		try{
 			console.info("{}", getDetails(ftc));
 			properties.put(PROP_LAST_RESOURCE_URL, ftc.getEndpoint().getUrl());
@@ -79,7 +80,8 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 	}
 
 	String format = " %10s | %11s | %s";
-	protected void printHeader() {
+
+	private void printHeader() {
 		console.info(String.format(format, "Status", "Transmitted", "URL"));
 		console.info("  ----------|-------------|----------------");
 	}

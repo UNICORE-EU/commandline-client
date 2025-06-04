@@ -7,8 +7,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.Logger;
-
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.SiteClient;
@@ -26,8 +24,6 @@ import eu.unicore.util.httpclient.IClientConfiguration;
 
 public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 
-	final static Logger log = Log.getLogger(Log.CLIENT, StorageFactoryLister.class);
-	
 	private final IRegistryClient registry;
 
 	private final UCCConfigurationProvider configurationProvider;
@@ -35,7 +31,7 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 	public StorageFactoryLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider, String[] tags){
 		this(null, registry, configurationProvider, new AcceptAllFilter());
 	}
-	
+
 	/**
 	 * @param executor
 	 * @param registry
@@ -45,7 +41,7 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 			UCCConfigurationProvider configurationProvider){
 		this(executor,registry,configurationProvider,new AcceptAllFilter());
 	}
-	
+
 	/**
 	 * 
 	 * @param executor
@@ -60,7 +56,7 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 		this.configurationProvider = configurationProvider;
 		setAddressFilter(addressFilter);
 	}
-	
+
 	@Override
 	public Iterator<StorageFactoryClient> iterator() {
 		try{
@@ -102,7 +98,6 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 		@Override
 		public void run() {
 			try{
-				log.debug("Processing site at {}", ep.getUrl());
 				handleEndpoint();
 			}
 			catch(Exception ex){
@@ -112,7 +107,7 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 				runCounter.decrementAndGet();
 			}
 		}
-		
+
 		private void handleEndpoint() throws Exception {
 			SiteClient c = new SiteClient(ep, securityProperties, auth);
 			Endpoint factoriesEp = ep.cloneTo(c.getLinkUrl("storagefactories"));

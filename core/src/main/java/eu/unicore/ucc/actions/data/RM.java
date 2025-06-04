@@ -5,6 +5,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 
 import eu.unicore.client.core.StorageClient;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.io.Location;
 
 /**
@@ -15,8 +16,6 @@ import eu.unicore.ucc.io.Location;
  * @author schuller
  */
 public class RM extends SMSOperation {
-
-	protected Location targetDesc;
 
 	@Override
 	protected void createOptions() {
@@ -45,18 +44,12 @@ public class RM extends SMSOperation {
 		sms.getFileClient(dir).delete();
 	}
 
-	protected boolean confirm(){
-		LineReader r = null;
-		try{
-			r = LineReaderBuilder.builder().build();
-			String line = r.readLine("This will delete a remote file/directory, are you sure? [Y]");
-			return line.length()==0  || line.startsWith("y") || line.startsWith("Y");
-		}finally{
-			try{
-				if(r!=null) r.getTerminal().close();
-			}catch(Exception e) {}
-		}
+	private boolean confirm(){
+		String line = UCC.getLineReader().readLine("This will delete a remote file/directory, "
+				+ "are you sure? [Y]");
+		return line.length()==0  || line.startsWith("y") || line.startsWith("Y");
 	}
+
 	@Override
 	public String getName() {
 		return "rm";

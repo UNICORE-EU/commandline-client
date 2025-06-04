@@ -128,7 +128,7 @@ public class IssueToken extends ActionBase {
 		}
 	}
 
-	public String resolveSite() throws Exception {
+	private String resolveSite() throws Exception {
 		CoreEndpointLister cl = new CoreEndpointLister(registry,
 				configurationProvider, configurationProvider.getRESTAuthN(),
 				UCC.executor);
@@ -140,7 +140,7 @@ public class IssueToken extends ActionBase {
 		return cc.getEndpoint().getUrl()+"/token";
 	}
 
-	public void showDetails(String token) throws Exception {
+	private void showDetails(String token) throws Exception {
 		JSONObject o = JWTUtils.getPayload(token);
 		String sub = o.getString("sub");
 		String uid = o.optString("uid", null);

@@ -14,7 +14,7 @@ import eu.unicore.ucc.util.JSONUtil;
 
 public class ListSites extends ListActionBase<SiteClient> {
 
-	protected String siteName;
+	private String siteName;
 
 	public String getName(){
 		return "list-sites";
@@ -51,7 +51,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 					String url = c.getEndpoint().getUrl();
 					URLCompleter.registerSiteURL(url);
 					if(!siteNameMatches(siteName, url))continue;
-					listTSS(c);
+					listSite(c);
 					properties.put(PROP_LAST_RESOURCE_URL, url);
 					lastNumberOfResults++;
 				}
@@ -64,15 +64,15 @@ public class ListSites extends ListActionBase<SiteClient> {
 		}
 	}
 
-	protected void listTSS(SiteClient tss)throws Exception{
-		properties.put(PROP_LAST_RESOURCE_URL, tss.getEndpoint().getUrl());
-				console.info("{} {} {}", 
-						tss.getProperties().getString("siteName"), tss.getEndpoint().getUrl(), getDetails(tss));
-		printProperties(tss);
+	private void listSite(SiteClient site)throws Exception{
+		properties.put(PROP_LAST_RESOURCE_URL, site.getEndpoint().getUrl());
+		console.info("{} {} {}", site.getProperties().getString("siteName"),
+				site.getEndpoint().getUrl(), getDetails(site));
+		printProperties(site);
 	}
-	
+
 	public static final String appSeparator = "---v";
-			
+
 	@Override
 	protected String getDetails(SiteClient tss)throws Exception{
 		if(!detailed)return "";
@@ -80,7 +80,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 		String sep=System.getProperty("line.separator");
 		JSONObject props = tss.getProperties();
 		details.append(sep).append("  Number of jobs: ").append(props.get("numberOfJobs"));
-		
+
 		boolean first=true;
 		for(String a: JSONUtil.asList(props.getJSONArray("applications"))){
 			if(!first){
@@ -94,10 +94,8 @@ public class ListSites extends ListActionBase<SiteClient> {
 			String version = a.split(appSeparator)[1];
 			details.append(name).append(" ").append(version);
 		}
-		
 		details.append(sep).append("  Resources: ");
 		listResources(props.getJSONObject("resources"), details);
-		
 		try {
 			Map<String,String> budget = JSONUtil.asMap(props.getJSONObject("remainingComputeTime"));
 			details.append(sep).append("  Compute time:");
@@ -109,7 +107,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 		return details.toString();
 	}
 
-	protected void listResources(JSONObject resources, StringBuilder details){
+	private void listResources(JSONObject resources, StringBuilder details){
 		String sep=System.getProperty("line.separator");
 		try{
 			Iterator<String> resIterator = resources.keys();
@@ -122,7 +120,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 		}
 		catch(Exception ex){}
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "list remote job execution sites";
@@ -132,7 +130,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 	public String getCommandGroup(){
 		return CMD_GRP_JOBS;
 	}
-	
+
 	@Override
 	public String getSynopsis() {
 		return "List the UNICORE job execution sites available to you, together " +

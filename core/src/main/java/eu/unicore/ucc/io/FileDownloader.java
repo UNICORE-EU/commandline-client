@@ -72,7 +72,7 @@ public class FileDownloader extends FileTransferBase {
 		}	
 	}
 	
-	protected void performDirectoryExport(FileListEntry directory, File targetDirectory, StorageClient sms)
+	private void performDirectoryExport(FileListEntry directory, File targetDirectory, StorageClient sms)
 			throws Exception {
 		if(!targetDirectory.exists()|| !targetDirectory.canWrite()){
 			throw new IOException("Target directory <"+to+"> does not exist or is not writable!");
@@ -99,7 +99,7 @@ public class FileDownloader extends FileTransferBase {
 		}
 	}
 	
-	protected void performWildCardExport(StorageClient sms)throws Exception{
+	private void performWildCardExport(StorageClient sms)throws Exception{
 		String dir = getDir(from);
 		Pattern p = createPattern(getName(from));
 		if(dir==null)dir="/";

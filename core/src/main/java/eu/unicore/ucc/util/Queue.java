@@ -9,30 +9,31 @@ import java.util.concurrent.TimeUnit;
  * @author schuller
 */
 public abstract class Queue {
-	
+
 	protected final java.util.concurrent.DelayQueue<QueueEntry<String>> elements;
-	
+
 	protected int limit=-1;
-	
+
 	protected int queued=0;
-	
+
 	protected long delay;
-	
+
 	/**
 	 * create a new queue without any delay
 	 */
 	public Queue(){
 		this(0);
 	}
-	
+
 	public Queue(long delay){
 		elements=new DelayQueue<QueueEntry<String>>();
 		this.delay=delay; //ms.
 	}
-	
+
 	public void setDelay(long delay){
 		this.delay=delay;
 	}
+
 	/**
 	 * limit the size of this queue (-1 means no limit)
 	 * 
@@ -41,6 +42,7 @@ public abstract class Queue {
 	public void setLimit(int lim){
 		limit=lim;
 	}
+
 	/**
 	 * return the limit on this queue
 	 * @return limit is -1 if no limit
@@ -48,6 +50,7 @@ public abstract class Queue {
 	public int getLimit(){
 		return limit;
 	}
+
 	/**
 	 * ask whether another item can be added into the queue 
 	 * @return true if there still is some space left
@@ -56,40 +59,36 @@ public abstract class Queue {
 		if(limit!=-1 && getSize()>=limit) return false;
 		else return true;
 	}
-	
+
 	/**
 	 * return the current number of things scheduled in this queue
 	 */
 	protected int getSize(){
 		return elements.size(); 
 	}
-	
+
 	/**
 	 * update the number of queued things
 	 */
 	protected abstract void update();
-	
+
 	/**
 	 * add an element
 	 */ 
 	public void add(String o) throws Exception{
-		
 		if(limit!=-1 && getSize()>=limit){
 			throw (new Exception("Queue limit reached!"));
 		}
-		
 		elements.add(new QueueEntry<String>(o,System.currentTimeMillis(),delay));
 	}
-	
+
 	public void add(String o, long lastAccessed) throws Exception{
-		
 		if(limit!=-1 && getSize()>=limit){
 			throw (new Exception("Queue limit reached!"));
 		}
-		
 		elements.add(new QueueEntry<String>(o,lastAccessed,delay));
 	}
-	
+
 	/**
 	 * get the next in line, which is removed from the queue
 	 * 
@@ -100,7 +99,7 @@ public abstract class Queue {
 		QueueEntry<String>e=elements.poll();
 		return e!=null? e.entry : null;
 	}
-	
+
 	/**
 	 * get the next element, waiting if necessary for an element
 	 * 
@@ -113,17 +112,17 @@ public abstract class Queue {
 		QueueEntry<String>e=elements.poll(timeout, unit);
 		return e!=null? e.entry : null;
 	}
-	
+
 	public int length(){
 		return elements.size();
 	}
-	
+
 	public static class QueueEntry<T>implements Delayed{
 
 		final long lastAccessed;
 		final long queueDelay;
 		final T entry;
-		
+
 		public QueueEntry(T entry, long lastAccessed, long queueDelay){
 			this.entry=entry;
 			this.lastAccessed=lastAccessed;
@@ -137,7 +136,7 @@ public abstract class Queue {
 		@SuppressWarnings("rawtypes")
 		public int compareTo(Delayed o) {
 			return (int)(lastAccessed-((QueueEntry)o).lastAccessed);
-		}		
-	} 
-	
+		}
+	}
+
 }

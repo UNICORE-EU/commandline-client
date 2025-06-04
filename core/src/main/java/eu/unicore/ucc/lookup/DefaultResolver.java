@@ -22,7 +22,7 @@ public class DefaultResolver implements IResolve {
 	public String synopsis() {
 		return "unicore://SITE-NAME/storage_id/file_path";
 	}
-	
+
 	@Override
 	public Location resolve(String uri, IRegistryClient registry, UCCConfigurationProvider configurationProvider) {
 		if(!uri.startsWith("unicore://"))return null;
@@ -72,5 +72,5 @@ public class DefaultResolver implements IResolve {
 		}catch(Exception ex) {}
 		return null;
 	}
-	
+
 }

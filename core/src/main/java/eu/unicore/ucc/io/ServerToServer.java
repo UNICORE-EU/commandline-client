@@ -40,7 +40,7 @@ public class ServerToServer implements Constants {
 
 	private String preferredProtocol;
 
-	protected TransferControllerClient tcc;
+	private TransferControllerClient tcc;
 
 	private boolean synchronous = true;
 
@@ -77,7 +77,7 @@ public class ServerToServer implements Constants {
 		this.extraParameterSource = properties;
 	}
 
-	protected Map<String,String> getExtraParameters(String protocol){
+	private Map<String,String> getExtraParameters(String protocol){
 		Map<String,String> res = new HashMap<>();
 		if(protocol!=null && extraParameterSource!=null){
 			String p=String.valueOf(protocol);
@@ -120,7 +120,7 @@ public class ServerToServer implements Constants {
 		}
 	}
 
-	protected boolean assertSourceExists(Location remote) throws Exception {
+	private boolean assertSourceExists(Location remote) throws Exception {
 		if(hasWildCards(remote.getName()))return true;
 		StorageClient source = new StorageClient(new Endpoint(remote.getSmsEpr()),
 				configurationProvider.getClientConfiguration(remote.getSmsEpr()),
@@ -130,14 +130,14 @@ public class ServerToServer implements Constants {
 		return true;
 	}
 
-	public boolean hasWildCards(String name){
+	private boolean hasWildCards(String name){
 		return name.contains("*") || name.contains("?");
 	}
 
 	/**
 	 * perform the remote copy, and cleanup the file transfer resource (if not in async mode)
 	 */
-	protected void copyFile() throws Exception {
+	private void copyFile() throws Exception {
 		if(!sourceDesc.isRaw())assertSourceExists(sourceDesc);
 		UNICOREReceives = sourceDesc.isRaw();
 		try {
@@ -183,7 +183,7 @@ public class ServerToServer implements Constants {
 	 * wait until complete or failed
 	 * @throws Exception
 	 */
-	protected void waitForCompletion()throws Exception{
+	private void waitForCompletion()throws Exception{
 		long transferred=-1;
 		ProgressBar p=new ProgressBar(sourceDesc.getName(),remoteSize);
 		tcc.setUpdateInterval(-1);
@@ -202,7 +202,7 @@ public class ServerToServer implements Constants {
 		}
 	}
 
-	protected void smsCopyFile(StorageClient sms) throws Exception {
+	private void smsCopyFile(StorageClient sms) throws Exception {
 		msg.verbose("Copy on remote storage: {}->{}", sourceDesc.getName(), targetDesc.getName());
 		JSONObject params = new JSONObject();
 		params.put("from", sourceDesc.getName());
@@ -210,7 +210,7 @@ public class ServerToServer implements Constants {
 		sms.executeAction("copy", params);
 	}
 
-	protected String checkProtocols(StorageClient sms)throws Exception{
+	private String checkProtocols(StorageClient sms)throws Exception{
 		if(!"BFT".equals(preferredProtocol)){
 			List<String> supported = JSONUtil.asList(sms.getProperties().getJSONArray("protocols"));
 			if(supported.contains(preferredProtocol)) {

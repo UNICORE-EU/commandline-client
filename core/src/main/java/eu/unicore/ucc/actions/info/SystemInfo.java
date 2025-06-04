@@ -84,7 +84,7 @@ public class SystemInfo extends ActionBase {
 		}
 	}
 
-	protected void getInfo(){
+	private void getInfo(){
 		for(Command c: UCC.getAllCommands()){
 			if(c instanceof IServiceInfoProvider){
 				getInfo((IServiceInfoProvider)c);
@@ -92,7 +92,7 @@ public class SystemInfo extends ActionBase {
 		}
 	}
 
-	protected void getInfo(IServiceInfoProvider info){
+	private void getInfo(IServiceInfoProvider info){
 		String type = info.getType();
 		String name = info.getServiceName();
 		console.info("");
@@ -123,7 +123,7 @@ public class SystemInfo extends ActionBase {
 		}
 	}	
 
-	protected void printRawContent() {
+	private void printRawContent() {
 		try{
 			for(Endpoint e: registry.listEntries()){
 				console.info("Entry:           {}", e.getUrl());

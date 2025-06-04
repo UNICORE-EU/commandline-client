@@ -17,18 +17,19 @@ import eu.unicore.uas.util.UnitParser;
  */
 public class LS extends SMSOperation {
 
-	protected boolean detailed;
+	private boolean detailed;
 
-	protected boolean recurse;
+	private boolean recurse;
 
-	protected boolean human;
+	private boolean human;
 
-	protected boolean showMetadata;
+	private boolean showMetadata;
 
-	protected UnitParser unitParser=UnitParser.getCapacitiesParser(1);
+	private StorageClient sms;
 
-	protected StorageClient sms;
+	private final UnitParser unitParser = UnitParser.getCapacitiesParser(1);
 
+	@Override
 	public String getName(){
 		return "ls";
 	}
@@ -90,7 +91,7 @@ public class LS extends SMSOperation {
 		doListing(path);
 	}
 
-	protected void doListing(String path) throws Exception {
+	private void doListing(String path) throws Exception {
 		FileListEntry listing = sms.stat(path);
 		if(listing.isDirectory){
 			listDirectory(path);
@@ -100,7 +101,7 @@ public class LS extends SMSOperation {
 		}
 	}
 
-	protected void listDirectory(String path) throws Exception {
+	private void listDirectory(String path) throws Exception {
 		FileList listing = sms.ls(path);
 		for(FileListEntry f: listing.list(0, 1000)){
 			listSingleFile(f);
@@ -110,7 +111,7 @@ public class LS extends SMSOperation {
 		}
 	}
 
-	protected void listSingleFile(FileListEntry file) throws Exception {
+	private void listSingleFile(FileListEntry file) throws Exception {
 		lastLS=file;
 		console.info("{}", detailed? detailedListing(file):normalListing(file));
 		if(!file.isDirectory && showMetadata){
@@ -118,7 +119,7 @@ public class LS extends SMSOperation {
 		}
 	}
 
-	protected void printMetadata(FileListEntry meta)throws Exception{
+	private void printMetadata(FileListEntry meta)throws Exception{
 		JSONObject metadata = sms.getFileClient(meta.path).getProperties().optJSONObject("metadata");
 		if(metadata!=null) {
 			console.info("{}", metadata.toString(2));
@@ -127,7 +128,7 @@ public class LS extends SMSOperation {
 		}
 	}
 
-	protected String normalListing(FileListEntry f){
+	private String normalListing(FileListEntry f){
 		return f.path;
 	}
 

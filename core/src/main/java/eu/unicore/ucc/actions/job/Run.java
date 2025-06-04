@@ -30,43 +30,23 @@ import eu.unicore.util.Pair;
  */
 public class Run extends ActionBase {
 
-	/**
-	 * site to use
-	 */
-	protected String siteName=null;
+	private String siteName;
 
-	/**
-	 * Allocation job URL
-	 */
-	protected String allocation=null;
+	private String allocationJobURL;
 
-	/**
-	 * synchronous mode
-	 */
-	protected boolean synchronous;
+	private boolean synchronous;
 
 	Status waitFor = null;
 
-	/**
-	 * do not add job id prefixes to output file names 
-	 */
-	protected boolean brief;
+	private boolean brief;
 
-	/**
-	 * whether job submission to the batch system (server-side) should be
-	 * scheduled for a certain time 
-	 */
-	protected String scheduled=null;
+	private String scheduled;
 
-	/**
-	 * whether to actually submit the job - if <code>false</code>, brokering etc will
-	 * be performed but no job will be submitted 
-	 */
-	protected boolean dryRun=false;
+	private boolean dryRun;
 
-	protected boolean multiThreaded=false;
+	private boolean multiThreaded;
 
-	protected String[] tags;
+	private String[] tags;
 
 	@Override
 	protected void createOptions() {
@@ -183,8 +163,8 @@ public class Run extends ActionBase {
 			return;
 		}
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
-		allocation = getCommandLine().getOptionValue(OPT_ALLOCATION);
-		if(allocation!=null && siteName!=null) {
+		allocationJobURL = getCommandLine().getOptionValue(OPT_ALLOCATION);
+		if(allocationJobURL!=null && siteName!=null) {
 			throw new IllegalArgumentException("Cannot have both '--"
 					+OPT_ALLOCATION_LONG+"' and '--"+OPT_SITENAME_LONG+"' arguments.");
 		}
@@ -269,7 +249,7 @@ public class Run extends ActionBase {
 		}
 	}
 
-	protected UCCBuilder readJob(String jobFileName) throws Exception {
+	private UCCBuilder readJob(String jobFileName) throws Exception {
 		File jobFile = new File(jobFileName);
 		UCCBuilder builder = new UCCBuilder(jobFile, registry, configurationProvider);
 		console.verbose("Read job from <{}>", jobFileName);
@@ -277,7 +257,7 @@ public class Run extends ActionBase {
 		return builder;
 	}
 
-	protected UCCBuilder readJob() throws Exception {
+	private UCCBuilder readJob() throws Exception {
 		console.info("Reading job from stdin:");
 		console.info("");
 		ByteArrayOutputStream bos=new ByteArrayOutputStream();
@@ -290,7 +270,7 @@ public class Run extends ActionBase {
 		return builder;
 	}
 
-	protected void configureBuilder(UCCBuilder builder){
+	private void configureBuilder(UCCBuilder builder){
 		builder.setProperty("_ucc_Output",output.getAbsolutePath());
 		builder.setProperty("_ucc_KeepFinishedJob", "true");
 		builder.setProperty("_ucc_DetailedStatusDisplay", "true");
@@ -301,7 +281,7 @@ public class Run extends ActionBase {
 		}
 	}
 
-	protected Pair<Integer, String> run(UCCBuilder builder){
+	private Pair<Integer, String> run(UCCBuilder builder){
 		Runner runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(!synchronous);
 		runner.setQuietMode(true);
@@ -313,10 +293,10 @@ public class Run extends ActionBase {
 			brokerName = "LOCAL";
 		}
 		runner.setBroker(UCC.getBroker(brokerName));
-		if(allocation!=null) {
+		if(allocationJobURL!=null) {
 			try {
-				AllocationClient ac = new AllocationClient(new Endpoint(allocation),
-						configurationProvider.getClientConfiguration(allocation),
+				AllocationClient ac = new AllocationClient(new Endpoint(allocationJobURL),
+						configurationProvider.getClientConfiguration(allocationJobURL),
 						configurationProvider.getRESTAuthN());
 				runner.setSubmissionService(ac);
 			}catch(Exception ex) {
