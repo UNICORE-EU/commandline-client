@@ -81,6 +81,7 @@ public class CallbackUtils
 	}
 
 	private static String readLine(boolean hidden) {
+		if(UCC.unitTesting)return "test123";
 		return UCC.getLineReader().readLine(hidden? '*' : null).trim();
 	}
 

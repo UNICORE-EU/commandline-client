@@ -11,7 +11,7 @@ public class RunningQueue extends RequestQueue {
 		super(requestDirname,true);
 		if(!getRequestDir().canWrite()) 
 			{
-				throw new IOException("Fatal: directory "+requestDirname+
+				throw new IOException("Directory "+requestDirname+
 					"must be writable.");
 			}
 	}
@@ -23,7 +23,7 @@ public class RunningQueue extends RequestQueue {
 		if(limit!=-1 && length()>=limit) return false;
 		else return true;
 	}
-	
+
 	/** 
 	 * this will add a "running" request (in the form of a filename of a
 	 * job id file)
@@ -34,17 +34,12 @@ public class RunningQueue extends RequestQueue {
 
 	@Override
 	public int length(){
-		File[] files=requestDir.listFiles(getFilter());
-		queued=files.length; //update the number of queued things
+		queued = requestDir.listFiles(getFilter()).length;
 		return queued;
 	}
-	
+
 	@Override
 	protected FileFilter getFilter(){
-		return new FileFilter(){
-			public boolean accept (File file){
-				return file.getName().endsWith(".job");
-			}
-		};
+		return (file)->file.getName().endsWith(".job");
 	}
 }

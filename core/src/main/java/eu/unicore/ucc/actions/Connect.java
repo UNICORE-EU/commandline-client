@@ -2,6 +2,8 @@ package eu.unicore.ucc.actions;
 
 import org.apache.commons.cli.Option;
 
+import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.lookup.Connector;
 
 /**
@@ -73,5 +75,13 @@ public class Connect extends ActionBase {
 
 	static String getLastReqistryURL(){
 		return lastRegistryURL;
+	}
+	
+	public IRegistryClient getRegistry(){
+		return registry;
+	}
+
+	public UCCConfigurationProvider getConfigProvider(){
+		return configurationProvider;
 	}
 }

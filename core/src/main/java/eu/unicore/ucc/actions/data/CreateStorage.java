@@ -120,17 +120,14 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	public void process() throws Exception {
 		lastStorageAddress = null;
 		super.process();
-
 		initialLifeTime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(initialLifeTime>0){
 			console.verbose("New SMSs will have a lifetime of <{}> days.", initialLifeTime);
 		}else{
 			console.verbose("Using site default for SMS lifetime.");
 		}
-		
 		factoryURL=getOption(OPT_FACTORY_LONG, OPT_FACTORY);
 		StorageFactoryClient sfc=null;
-
 		if(factoryURL==null){
 			siteName=getOption(OPT_SITENAME_LONG, OPT_SITENAME);
 			if(siteName!=null){
@@ -140,7 +137,6 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 				console.verbose("No factory specified, will choose one.");
 			}
 		}
-
 		storageType=getOption(OPT_TYPE_LONG, OPT_TYPE);
 		if(storageType!=null){
 			console.verbose("Will create storage of type <{}>", storageType);
@@ -148,9 +144,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		else{
 			console.verbose("No storage type specified, will use factory's default.");
 		}
-		
 		boolean infoOnly = getBooleanOption(OPT_INFO_LONG, OPT_INFO);
-
 		//resolve
 		boolean byFactoryURL = factoryURL!=null;
 		boolean byType = storageType!=null ;
@@ -184,13 +178,8 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	}
 
 	private void doCreate(StorageFactoryClient sfc) throws Exception{
-		Calendar tt = null;
-		if(initialLifeTime>0){
-			tt = Calendar.getInstance();
-			tt.add(Calendar.DATE, initialLifeTime);
-		}
-		StorageClient sc = sfc.createStorage(storageType, null, getParams(), tt);
-		String addr=sc.getEndpoint().getUrl();
+		StorageClient sc = sfc.createStorage(storageType, null, getParams(), getTermTime());
+		String addr = sc.getEndpoint().getUrl();
 		console.info("{}", addr);
 		properties.put(PROP_LAST_RESOURCE_URL, addr);
 		setLastStorageAddress(addr);
@@ -208,9 +197,12 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	}
 
 	private Calendar getTermTime(){
-		Calendar c = Calendar.getInstance();
-		c.add(Calendar.DATE, initialLifeTime);
-		return c;
+		Calendar tt = null;
+		if(initialLifeTime>0){
+			tt = Calendar.getInstance();
+			tt.add(Calendar.DATE, initialLifeTime);
+		}
+		return tt;
 	}
 
 	@Override

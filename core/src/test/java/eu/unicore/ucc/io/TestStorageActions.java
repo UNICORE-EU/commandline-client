@@ -74,20 +74,38 @@ public class TestStorageActions extends EmbeddedTestBase {
 	@Test
 	public void test_Mkdir_RM(){
 		connect();
-
-		String storage=createNewUspace();
-
-		String dir="/test"+System.currentTimeMillis();
+		String storage = createNewUspace();
+		String dir1="/test1"+System.currentTimeMillis();
 		String[] args=new String[]{"mkdir", "-v", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
-				storage+"/files"+dir,
+				storage+"/files"+dir1,
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+
+		// multiple args
+		String dir2="/test2"+System.currentTimeMillis();
+		String dir3="/test3"+System.currentTimeMillis();
+		args=new String[]{"mkdir", "-v", 
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				storage+"/files"+dir2,
+				storage+"/files"+dir3,
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
 		args=new String[]{"rm", "-v", "-q",
 				"-c", "src/test/resources/conf/userprefs.embedded",
-				storage+"/files"+dir,
+				storage+"/files"+dir1,
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+
+		// multiple args
+		args=new String[]{"rm", "-v", "-q",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				storage+"/files"+dir2,
+				storage+"/files"+dir3,
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
@@ -96,12 +114,18 @@ public class TestStorageActions extends EmbeddedTestBase {
 	@Test
 	public void test_Stat()throws Exception{
 		connect();
-		String storage=createNewUspace();
-
+		String storage = createNewUspace();
 		String[] args=new String[]{"stat",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				storage+"/files/stdout",
-
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		// multiple args
+		args=new String[]{"stat",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				storage+"/files/stdout",
+				storage+"/files/stderr",
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);

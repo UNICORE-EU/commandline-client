@@ -17,7 +17,7 @@ public class Mkdir extends SMSOperation {
 		super.process();
 		if(getCommandLine().getArgs().length>1){
 			for(int i=1; i<getCommandLine().getArgs().length;i++){
-				String target = getCommandLine().getArgs()[1];
+				String target = getCommandLine().getArgs()[i];
 				StorageClient sms = getStorageClient(target);
 				sms.mkdir(getPathAtStorage(target));
 			}

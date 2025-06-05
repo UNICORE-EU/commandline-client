@@ -20,14 +20,13 @@ public class TestREST extends EmbeddedTestBase {
 	@Test
 	public void testREST() throws Exception {
 		connect();
-		
 		String[] args=new String[]{"run", "-a",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/empty.u",
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		
+
 		args=new String[]{"rest", "get", "-i",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				Run.getLastJobAddress(),

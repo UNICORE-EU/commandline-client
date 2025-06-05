@@ -1,8 +1,6 @@
 package eu.unicore.ucc.actions.data;
 
 import org.apache.commons.cli.Option;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
 
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.UCC;
@@ -31,21 +29,26 @@ public class RM extends SMSOperation {
 	public void process() throws Exception {
 		super.process();
 		boolean quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
-		String target = getCommandLine().getArgs()[1];
-		StorageClient sms = getStorageClient(target);
-		String dir = getPathAtStorage(target); 
-		if(!quiet){
-			boolean confirmed = confirm();
-			if(!confirmed){
-				console.verbose("Cancelled.");
-				return;
-			}
+		if (getCommandLine().getArgs().length < 2) {
+			throw new IllegalArgumentException("Wrong number of arguments");
 		}
-		sms.getFileClient(dir).delete();
+		for(int i=1; i<getCommandLine().getArgs().length;i++){
+			String target = getCommandLine().getArgs()[i];
+			StorageClient sms = getStorageClient(target);
+			String dir = getPathAtStorage(target); 
+			if(!quiet){
+				boolean confirmed = confirm(target);
+				if(!confirmed){
+					console.verbose("Cancelled.");
+					continue;
+				}
+			}
+			sms.getFileClient(dir).delete();
+		}
 	}
 
-	private boolean confirm(){
-		String line = UCC.getLineReader().readLine("This will delete a remote file/directory, "
+	private boolean confirm(String t){
+		String line = UCC.getLineReader().readLine("This will delete remote file <"+t+">, "
 				+ "are you sure? [Y]");
 		return line.length()==0  || line.startsWith("y") || line.startsWith("Y");
 	}

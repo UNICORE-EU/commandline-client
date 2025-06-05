@@ -1,6 +1,8 @@
 package eu.unicore.ucc.actions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,10 +11,12 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.services.restclient.jwt.JWTUtils;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.lookup.Connector;
 import eu.unicore.ucc.util.EmbeddedTestBase;
+import eu.unicore.ucc.util.MultiRegistryClient;
 
 public class TestGeneralActions extends EmbeddedTestBase {
 
@@ -65,11 +69,15 @@ public class TestGeneralActions extends EmbeddedTestBase {
 	}
 
 	@Test
-	public void test_MultiRegistry() throws IOException {
+	public void test_MultiRegistry() throws Exception {
 		File sessions=new File("target","ucc-session-ids");
 		FileUtils.deleteQuietly(sessions);
 		this.prefsFile = "src/test/resources/conf/userprefs.multiregistry";
 		connect();
+		IRegistryClient reg = ((Connect)UCC.lastCommand).getRegistry();
+		assertTrue(reg instanceof MultiRegistryClient);
+		assertNotNull(reg.listEntries());
+		assertNotNull(reg.listEntries("CoreServices"));
 		String[] args=new String[]{"system-info", "-l", "-v",
 				"-c", prefsFile
 		};

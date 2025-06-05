@@ -6,6 +6,10 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
+Version 10.2.1 (released MMM dd, 2025)
+--------------------------------------
+ - improvement: mkdir, stat, rm commands accept multiple targets
+
 Version 10.2.0 (released May 28, 2025)
 --------------------------------------
  - improvement: URL completion for storages in 'ucc shell' now includes

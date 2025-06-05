@@ -52,18 +52,17 @@ public class TargetSystemFinder implements Broker, Constants {
 		}
 		else{
 			if(msg.isVerbose()){
-				msg.verbose("Have <"+available.size()+"> candidate resource(s)");
+				msg.verbose("Have <{}> candidate resource(s)", available.size());
 				for(SiteClient tsc: available){
-					msg.verbose("  "+tsc.getEndpoint().getUrl());
+					msg.verbose("  {}", tsc.getEndpoint().getUrl());
 				}
 			}
 			//select one
 			tss=selectionStrategy.select(available);
 		}
-		msg.verbose("Selected TSS at "+tss.getEndpoint().getUrl());
+		msg.verbose("Selected TSS at {}", tss.getEndpoint().getUrl());
 		return tss.getEndpoint();
 	}
-
 
 	@Override
 	public Collection<Endpoint>listCandidates(IRegistryClient registry, 
@@ -76,7 +75,7 @@ public class TargetSystemFinder implements Broker, Constants {
 		}
 		return result;
 	}
-	
+
 	private List<SiteClient> listSites(final IRegistryClient registry, 
 			final UCCConfigurationProvider configurationProvider, UCCBuilder builder)
 					throws Exception{
@@ -109,7 +108,7 @@ public class TargetSystemFinder implements Broker, Constants {
 				try{
 					ErrorHolder err = new ErrorHolder();
 					if(!matches(tsf, requirements, err, checkResources, msg)) {
-						msg.verbose("Skipped "+current+" "+err.code+":"+err.message);
+						msg.verbose("Skipped {} {}:{}", current, err.code, err.message);
 					}
 					else {
 						available.add(tsf);

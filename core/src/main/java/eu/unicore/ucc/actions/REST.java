@@ -188,11 +188,13 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			console.info("{}", l.getValue());
 			properties.put(PROP_LAST_RESOURCE_URL, l.getValue());
 		}
-		if("application/json".equalsIgnoreCase(accept)) {
-			console.info("{}", bc.asJSON(res).toString(2));
-		}
-		else {
-			console.info("{}", EntityUtils.toString(res.getEntity(), "UTF-8"));
+		if(res.getEntity()!=null) {
+			if("application/json".equalsIgnoreCase(accept)) {
+				console.info("{}", bc.asJSON(res).toString(2));
+			}
+			else {
+				console.info("{}", EntityUtils.toString(res.getEntity(), "UTF-8"));
+			}
 		}
 	}
 

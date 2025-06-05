@@ -203,7 +203,6 @@ public class UCC{
 		return ok? cmd : null;
 	}
 
-
 	public static Command getCommand(String name){
 		Class<? extends Command> cmdClass = cmds.get(name);
 		if(cmdClass==null)return null;
@@ -266,7 +265,7 @@ public class UCC{
 		}
 		return broker;
 	}
-	
+
 	public static String getBrokerList() {
 		StringBuilder sb = new StringBuilder();
 		Iterator<Broker>iter = ServiceLoader.load(Broker.class).iterator();
@@ -340,13 +339,13 @@ public class UCC{
 		}
 		return false;
 	}
-	
+
 	public static void printVersion() {
 		System.err.println("UNICORE Commandline Client " + getVersion());
 		System.err.println(System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
 		System.err.println("OS: "+System.getProperty("os.name")+" "+System.getProperty("os.version"));
 	}
-	
+
 	private static LineReader lr;
 	public static synchronized LineReader getLineReader() {
 		if(lr==null) {

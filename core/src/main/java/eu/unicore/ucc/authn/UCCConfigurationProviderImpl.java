@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
 
 import eu.emi.security.authn.x509.ValidationError;
 import eu.emi.security.authn.x509.impl.X500NameUtils;
@@ -84,7 +83,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		setSecurityPreferences(setupExtraAttributes());
 	}
 
-	protected String getSessionStorageFile() {
+	private String getSessionStorageFile() {
 		return userProperties!=null? userProperties.getProperty(Constants.SESSION_ID_FILEKEY) : null;
 	}
 	
@@ -154,18 +153,18 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 	
 	private static boolean acceptAll = false;
 	
-	private static ArrayList<String>acceptedCAs = new ArrayList<>();
+	private static final ArrayList<String>acceptedCAs = new ArrayList<>();
 	
 	private boolean queryValidity(ValidationError err) {
 		if(acceptAll)return true;
-		
+
 		String issuer = err.getChain()[0].getIssuerX500Principal().getName();
 		String cmp = X500NameUtils.getComparableForm(issuer);
 		if(acceptedCAs.contains(cmp))return true;
-		
+
 		System.err.println("VALIDATION ERROR : "+err.getMessage());
 		try{
-			LineReader cr = LineReaderBuilder.builder().build();
+			LineReader cr = UCC.getLineReader();
 			String line = cr.readLine("Accept issuer <"+issuer+"> [Y/n/a]");
 			boolean accept = line.length()==0  || line.startsWith("y") || line.startsWith("Y");
 			acceptAll =  line.startsWith("a") || line.startsWith("A");
