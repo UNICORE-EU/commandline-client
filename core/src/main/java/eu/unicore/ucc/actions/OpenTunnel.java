@@ -20,8 +20,8 @@ import eu.unicore.services.restclient.ForwardingHelper;
  */
 public class OpenTunnel extends ActionBase {
 
-	public static final String OPT_LOCAL_ADDRESS_LONG = "local-address";
-	public static final String OPT_LOCAL_ADDRESS = "L";
+	private static final String OPT_LOCAL_ADDRESS_LONG = "local-address";
+	private static final String OPT_LOCAL_ADDRESS = "L";
 
 	private String endpoint;
 
@@ -69,17 +69,20 @@ public class OpenTunnel extends ActionBase {
 		return "open a port forwarding session";
 	}
 
+	@Override
 	protected boolean requireRegistry(){
 		return false;
 	}
 
+	@Override
 	protected boolean skipConnectingToRegistry() {
 		return true;
 	}
 
-	AtomicInteger numClients = new AtomicInteger(0);
+	final AtomicInteger numClients = new AtomicInteger(0);
+
 	int maxConnections = 0;
-		
+
 	@Override
 	public void process() throws Exception {
 		super.process();
@@ -100,7 +103,8 @@ public class OpenTunnel extends ActionBase {
 	private void doProcess() throws Exception {
 		BaseClient bc = makeClient(endpoint);
 		ForwardingHelper fh = new ForwardingHelper(bc);
-		console.verbose("Opening listening socket on <{}:{}>, waiting for local client connection...", authNMethod, localPort);
+		console.verbose("Opening listening socket on <{}:{}>, waiting for local client connection...",
+				localInterface, localPort);
 		try(ServerSocketChannel sc = ServerSocketChannel.open()){
 			sc.configureBlocking(false);
 			sc.bind(new InetSocketAddress(localInterface, localPort), 1);
