@@ -52,10 +52,10 @@ public abstract class JobOperationBase extends ActionBase {
 			{
 				builder = new UCCBuilder(job, registry, configurationProvider);
 				builder.setCheckLocalFiles(false);
-				console.verbose("Read job info from <{}>", arg);
+				console.debug("Read job info from <{}>", arg);
 			}
 			else{
-				console.verbose("Accessing job at <{}>", arg);
+				console.debug("Accessing job at <{}>", arg);
 				builder = new UCCBuilder(registry, configurationProvider);
 				builder.setCheckLocalFiles(false);
 				builder.setProperty("_ucc_epr", arg);

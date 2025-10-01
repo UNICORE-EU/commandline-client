@@ -55,66 +55,66 @@ public class Run extends ActionBase {
 				.longOpt(OPT_MODE_LONG)
 				.desc("Run asynchronous, writing a job ID file for use with other ucc commands")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SITENAME)
 				.longOpt(OPT_SITENAME_LONG)
 				.desc("Site Name")
 				.required(false)
 				.argName("Site")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_ALLOCATION)
 				.longOpt(OPT_ALLOCATION_LONG)
 				.desc("Allocation URL")
 				.required(false)
 				.argName("Allocation")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_NOPREFIX)
 				.longOpt(OPT_NOPREFIX_LONG)
 				.desc("Short output file names")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SAMPLE)
 				.longOpt(OPT_SAMPLE_LONG)
 				.desc("Print an example job and quit")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SCHEDULED)
 				.longOpt(OPT_SCHEDULED_LONG)
 				.desc("Schedule the job for a specific time (in ISO8601 format)")
 				.required(false)
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_BROKER)
 				.longOpt(OPT_BROKER_LONG)
 				.desc("Use the specific named broker implementation (available: "+UCC.getBrokerList()+")")
 				.required(false)
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_TAGS)
 				.longOpt(OPT_TAGS_LONG)
 				.desc("Tag the job with the given tag(s) (comma-separated)")
 				.required(false)
 				.hasArgs()
 				.valueSeparator(',')
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_DRYRUN)
 				.longOpt(OPT_DRYRUN_LONG)
 				.desc("Dry run, don't submit anything")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder("J")
 				.longOpt("multi-threaded")
 				.desc("Launch a thread for each job file to run.")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_WAIT)
 				.longOpt(OPT_WAIT_LONG)
 				.desc("(Async mode) wait for the given job status ("+waitableJobStatuses+") before exiting.")
 				.hasArg(true)
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
@@ -162,28 +162,28 @@ public class Run extends ActionBase {
 			printSampleJob();
 			return;
 		}
-		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
+		siteName = getCommandLine().getOptionValue(OPT_SITENAME);
 		allocationJobURL = getCommandLine().getOptionValue(OPT_ALLOCATION);
 		if(allocationJobURL!=null && siteName!=null) {
 			throw new IllegalArgumentException("Cannot have both '--"
 					+OPT_ALLOCATION_LONG+"' and '--"+OPT_SITENAME_LONG+"' arguments.");
 		}
-		synchronous=!getBooleanOption(OPT_MODE_LONG, OPT_MODE);
-		console.verbose("Synchronous processing = {}", synchronous);
-		brief=getBooleanOption(OPT_NOPREFIX_LONG, OPT_NOPREFIX);
-		console.verbose("Adding job id to output file names = {}", !brief);
-		scheduled=getOption(OPT_SCHEDULED_LONG, OPT_SCHEDULED);
+		synchronous = !getBooleanOption(OPT_MODE_LONG, OPT_MODE);
+		console.debug("Synchronous processing = {}", synchronous);
+		brief = getBooleanOption(OPT_NOPREFIX_LONG, OPT_NOPREFIX);
+		console.debug("Adding job id to output file names = {}", !brief);
+		scheduled = getOption(OPT_SCHEDULED_LONG, OPT_SCHEDULED);
 		if(scheduled!=null){
 			scheduled=UnitParser.convertDateToISO8601(scheduled);
-			console.verbose("Will schedule job submission for {}", scheduled);
+			console.debug("Will schedule job submission for {}", scheduled);
 		}
-		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
-		console.verbose("Dry run = "+dryRun);
+		dryRun = getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
+		console.debug("Dry run = "+dryRun);
 		multiThreaded = getBooleanOption("multi-threaded", "J");
-		console.verbose("Multi threaded = {}", multiThreaded);
+		console.debug("Multi threaded = {}", multiThreaded);
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
-			console.verbose("Job tags = {}", Arrays.deepToString(tags));
+			console.debug("Job tags = {}", Arrays.deepToString(tags));
 		}
 		String waitForSpec = getOption(OPT_WAIT_LONG, OPT_WAIT);
 		if(waitForSpec!=null) {
@@ -252,7 +252,7 @@ public class Run extends ActionBase {
 	private UCCBuilder readJob(String jobFileName) throws Exception {
 		File jobFile = new File(jobFileName);
 		UCCBuilder builder = new UCCBuilder(jobFile, registry, configurationProvider);
-		console.verbose("Read job from <{}>", jobFileName);
+		console.debug("Read job from <{}>", jobFileName);
 		configureBuilder(builder);
 		return builder;
 	}
@@ -306,7 +306,7 @@ public class Run extends ActionBase {
 		try{
 			runner.run();
 			if(!dryRun){
-				lastJobAddress=runner.getJob().getEndpoint().getUrl();
+				lastJobAddress = runner.getJob().getEndpoint().getUrl();
 				if(!synchronous) {
 					lastJobFile=builder.getProperty("_ucc_jobIdFile");
 					if(waitFor!=null) {

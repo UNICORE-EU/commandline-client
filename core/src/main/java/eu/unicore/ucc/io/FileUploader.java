@@ -142,7 +142,7 @@ public class FileUploader extends FileTransferBase {
 					throw new Exception("Append is not supported by protocol <"+protocol+">");
 				}	
 			}
-			String url=ftc.getEndpoint().getUrl();
+			String url = ftc.getEndpoint().getUrl();
 			UCC.console.verbose("File transfer URL: {}", url);
 			ProgressBar p=null;
 			if(ftc instanceof IMonitorable){
@@ -177,11 +177,6 @@ public class FileUploader extends FileTransferBase {
 		}finally{
 			if(ftc!=null){
 				try{
-					// try to get some more error info
-					// JSONObject props = ftc.getProperties();
-					// String description = props.getString("description");
-					// if("FAILED".equals(finalStatus)){
-					//	msg.error("Filetransfer error: "+description, null);
 					ftc.delete();
 				}catch(Exception e1){}
 			}

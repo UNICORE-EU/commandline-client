@@ -47,21 +47,21 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 				.argName("Lifetime")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SITENAME)
 				.longOpt(OPT_SITENAME_LONG)
 				.desc("Name of the site")
 				.argName("Site")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_FACTORY)
 				.longOpt(OPT_FACTORY_LONG)
 				.desc("Factory URL")
 				.argName("Factory")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
@@ -92,9 +92,9 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 
 		initialLifeTime = getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(initialLifeTime>0){
-			console.verbose("New TSSs will have a lifetime of <{}> days.", initialLifeTime);
+			console.debug("New TSSs will have a lifetime of <{}> days.", initialLifeTime);
 		}else{
-			console.verbose("Using site default for TSS lifetime.");
+			console.debug("Using site default for TSS lifetime.");
 		}
 		siteFactoryURL = getOption(OPT_FACTORY_LONG, OPT_FACTORY);
 		SiteFactoryClient tsf;
@@ -102,16 +102,16 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 			SiteFactoryLister tsfl = new SiteFactoryLister(UCC.executor, registry, configurationProvider);
 			siteName = getOption(OPT_SITENAME_LONG, OPT_SITENAME);
 			if(siteName!=null){
-				console.verbose("Looking for factory at site <{}>", siteName);
+				console.debug("Looking for factory at site <{}>", siteName);
 				tsfl.setAddressFilter(new SiteNameFilter(siteName));
 			}
 			else{
-				console.verbose("No factory specified, will choose one from registry.");
+				console.debug("No factory specified, will choose one from registry.");
 			}
 			tsf = tsfl.iterator().next();
 		}
 		else{
-			console.verbose("Using factory at <{}>", siteFactoryURL);
+			console.debug("Using factory at <{}>", siteFactoryURL);
 			tsf = new SiteFactoryClient(new Endpoint(siteFactoryURL), 
 					configurationProvider.getClientConfiguration(siteFactoryURL), 
 					configurationProvider.getRESTAuthN());
@@ -177,10 +177,9 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 	}
 
 	private String getDescription(SiteFactoryClient sfc) throws Exception {
-		JSONObject pr=sfc.getProperties();
-		StringBuilder sb=new StringBuilder();
-		String cr = System.getProperty("line.separator");
-		sb.append("* Partitions").append(cr);
+		JSONObject pr = sfc.getProperties();
+		StringBuilder sb = new StringBuilder();
+		sb.append("* Partitions").append(_newline);
 		JSONObject resources = pr.getJSONObject("resources");
 		Iterator<String>qIter = resources.keys();
 		while(qIter.hasNext()) {
@@ -195,7 +194,7 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 				sb.append("[").append(r);
 				sb.append(": ").append(rVal);
 				sb.append("] ");
-			}sb.append(cr);
+			}sb.append(_newline);
 		}
 
 		return sb.toString();

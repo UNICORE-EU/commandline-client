@@ -31,14 +31,14 @@ public class ListStorages extends ListActionBase<StorageClient> {
 				.longOpt(OPT_ALL_LONG)
 				.desc("Show all storages including job directories")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
 	public void process() throws Exception {
 		super.process();
 		this.showAll = getCommandLine().hasOption(OPT_ALL);
-		console.verbose("Listing job directories = {}", showAll);
+		console.debug("Listing job directories = {}", showAll);
 		// do we have a list of storages
 		if(getCommandLine().getArgList().size()>1){
 			getCommandLine().getArgList().listIterator(1).forEachRemaining(
@@ -88,7 +88,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	private void listStorage(StorageClient storage) throws Exception {
 		String url = storage.getEndpoint().getUrl();
 		try{
-			console.info("{}{}{}", url, System.getProperty("line.separator"), getDetails(storage));
+			console.info("{}{}{}", url, _newline, getDetails(storage));
 			properties.put(PROP_LAST_RESOURCE_URL, url);
 			URLCompleter.registerSiteURL(url);
 		}catch(Exception ex){
@@ -100,8 +100,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	@Override
 	protected String getDetails(StorageClient sms) throws Exception  {
 		if(!detailed)return "";
-		String sep=System.getProperty("line.separator");
-		StringBuilder sb=new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		JSONObject props = sms.getProperties();
 		sb.append("  Description: ").append(props.optString("description"));
 		long free = -1;
@@ -111,12 +110,12 @@ public class ListStorages extends ListActionBase<StorageClient> {
 			use  = Long.parseLong(String.valueOf(props.get("usableSpace")));
 		}catch(Exception ex) {}
 		try{
-			sb.append(sep).append("  Free space:   ").append(unitParser.getHumanReadable(free));
-			sb.append(sep).append("  Usable space: ").append(unitParser.getHumanReadable(use));
-			sb.append(sep).append("  Mount point:  ").append(props.getString("mountPoint"));
-			sb.append(sep).append("  Protocols:    ");
+			sb.append(_newline).append("  Free space:   ").append(unitParser.getHumanReadable(free));
+			sb.append(_newline).append("  Usable space: ").append(unitParser.getHumanReadable(use));
+			sb.append(_newline).append("  Mount point:  ").append(props.getString("mountPoint"));
+			sb.append(_newline).append("  Protocols:    ");
 			sb.append(Arrays.asList(JSONUtil.toArray(props.getJSONArray("protocols"))));
-			sb.append(sep).append("  Metadata:     ").append(sms.supportsMetadata()?"yes":"no");
+			sb.append(_newline).append("  Metadata:     ").append(sms.supportsMetadata()?"yes":"no");
 		}catch(Exception ex){}
 		return sb.toString();
 	}

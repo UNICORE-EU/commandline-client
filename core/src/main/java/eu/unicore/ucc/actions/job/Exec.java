@@ -47,48 +47,48 @@ public class Exec extends ActionBase {
 				.argName("Site")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_LOGIN_NODE)
 				.longOpt(OPT_LOGIN_NODE_LONG)
 				.desc("Login node to use")
 				.argName("LoginNode")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_ALLOCATION)
 				.longOpt(OPT_ALLOCATION_LONG)
 				.desc("Allocation URL")
 				.required(false)
 				.argName("Allocation")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_BROKER)
 				.longOpt(OPT_BROKER_LONG)
 				.desc("Use the specific named broker implementation (available: "+UCC.getBrokerList()+")")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_DRYRUN)
 				.longOpt(OPT_DRYRUN_LONG)
 				.desc("Dry run, do not submit the job")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_KEEP)
 				.longOpt(OPT_KEEP_LONG)
 				.desc("Don't remove finished job")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_MODE)
 				.longOpt(OPT_MODE_LONG)
 				.desc("Run asynchronous, don't wait for finish, don't get results.")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_TAGS)
 				.longOpt(OPT_TAGS_LONG)
 				.desc("Tag the job with the given tag(s) (comma-separated)")
 				.required(false)
 				.hasArgs()
 				.valueSeparator(',')
-				.build());
+				.get());
 	}
 
 	@Override
@@ -122,21 +122,21 @@ public class Exec extends ActionBase {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
+		siteName = getCommandLine().getOptionValue(OPT_SITENAME);
 		allocation = getCommandLine().getOptionValue(OPT_ALLOCATION);
 		if(allocation!=null && siteName!=null) {
 			throw new IllegalArgumentException("Cannot have both 'allocation' and 'sitename' arguments.");
 		}
-		loginNode=getCommandLine().getOptionValue(OPT_LOGIN_NODE);
-		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
-		console.verbose("Dry run = {}", dryRun);
-		keepFinishedJob=getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
-		console.verbose("Delete job when done = {}", !keepFinishedJob);
-		asynchronous=getBooleanOption(OPT_MODE_LONG, OPT_MODE);
-		console.verbose("Asynchronous processing = {}", asynchronous);
+		loginNode = getCommandLine().getOptionValue(OPT_LOGIN_NODE);
+		dryRun = getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
+		console.debug("Dry run = {}", dryRun);
+		keepFinishedJob = getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
+		console.debug("Delete job when done = {}", !keepFinishedJob);
+		asynchronous = getBooleanOption(OPT_MODE_LONG, OPT_MODE);
+		console.debug("Asynchronous processing = {}", asynchronous);
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
-			console.verbose("Job tags = {}", Arrays.deepToString(tags));
+			console.debug("Job tags = {}", Arrays.deepToString(tags));
 		}
 		initBuilder(getCommandLine().getArgs());
 		run();
@@ -166,6 +166,7 @@ public class Exec extends ActionBase {
 	private void run(){
 		runner = new Runner(registry,configurationProvider,builder);
 		runner.setAsyncMode(asynchronous);
+		runner.setQuietMode(true);
 		runner.setBriefOutfileNames(true);
 		runner.setOutputToConsole(true);
 		runner.setDryRun(dryRun);

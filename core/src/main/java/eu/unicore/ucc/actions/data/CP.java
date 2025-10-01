@@ -42,29 +42,29 @@ public class CP extends FileOperation {
 				.longOpt(OPT_MODE_LONG)
 				.desc("(server-server only) Asynchronous mode, writes the transfer ID to a file.")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SCHEDULED)
 				.longOpt(OPT_SCHEDULED_LONG)
 				.desc("(server-server only) Schedule the transfer for a specific time (in HH:mm or ISO8601 format)")
 				.required(false)
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_RESUME)
 				.longOpt(OPT_RESUME_LONG)
 				.desc("(client-server only) Resume previous transfer, appending only missing data.")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_RECURSIVE)
 				.longOpt(OPT_RECURSIVE_LONG)
 				.desc("Recurse into subdirectories")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_EXTRA_PARAMETERS)
 				.longOpt(OPT_EXTRA_PARAMETERS_LONG)
 				.desc("Additional settings for the transfer (key1=val1,key2=val2).")
 				.required(false)
 				.hasArg()
-				.build());
+				.get());
 	}
 
 	@Override
@@ -78,9 +78,9 @@ public class CP extends FileOperation {
 		}
 		Location targetDesc = createLocation(target);
 		recurse = getBooleanOption(OPT_RECURSIVE_LONG, OPT_RECURSIVE);
-		if(recurse)console.verbose("Recurse into subdirectories = {}", recurse);
+		if(recurse)console.debug("Recurse into subdirectories = {}", recurse);
 		resume = getBooleanOption(OPT_RESUME_LONG, OPT_RESUME);
-		if(resume)console.verbose("Resume previous transfer(s) = {}", resume);
+		if(resume)console.debug("Resume previous transfer(s) = {}", resume);
 		String scheduled = getOption(OPT_SCHEDULED_LONG, OPT_SCHEDULED);
 		boolean synchronous = !getBooleanOption(OPT_MODE_LONG, OPT_MODE);
 		for(String source: sources){

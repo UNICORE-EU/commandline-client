@@ -18,6 +18,7 @@ import eu.unicore.uas.json.Builder;
 import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.uas.json.Requirement;
 import eu.unicore.uas.util.UnitParser;
+import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.actions.data.Resolve;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.helpers.ConsoleLogger;
@@ -41,7 +42,8 @@ public class UCCBuilder extends Builder {
 	private ConsoleLogger msg = new ConsoleLogger();
 	private final UCCConfigurationProvider configurationProvider;
 	private final IRegistryClient registry;
-	private boolean checkLocalFiles=true;
+	private boolean checkLocalFiles = true;
+	private boolean isSweepJob = false;
 
 	/**
 	 * reads a JSON string from the supplied File
@@ -68,6 +70,7 @@ public class UCCBuilder extends Builder {
 		imports = new ArrayList<>();
 		this.configurationProvider = configurationProvider;
 		this.registry = registry;
+		this.isSweepJob = json.optBoolean("isSweepJob", false); // TODO
 	}
 
 	/**
@@ -323,11 +326,13 @@ public class UCCBuilder extends Builder {
 		}catch(JSONException je) {}
 	}
 
-	static final String lineSep=System.getProperty("line.separator");
+	public boolean isSweepJob(){
+		return isSweepJob;
+	}
 
 	static void writeLine(String line,StringBuilder sb){
 		sb.append(line);
-		sb.append(lineSep);
+		sb.append(Constants._newline);
 	}
 
 	public void writeTo(Writer writer)throws IOException{

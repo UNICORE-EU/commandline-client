@@ -49,11 +49,11 @@ public class ServerToServer implements Constants {
 	// one side is UNICORE AND is the receiver
 	private boolean UNICOREReceives = true;
 
-	protected long remoteSize=-1;
+	protected long remoteSize = -1;
 
-	private String scheduled=null;
+	private String scheduled = null;
 
-	private final ConsoleLogger msg;
+	private final ConsoleLogger console = UCC.console;
 
 	private String transferAddress;
 
@@ -66,7 +66,6 @@ public class ServerToServer implements Constants {
 		this.targetDesc = targetDesc;
 		this.configurationProvider = configurationProvider;
 		this.preferredProtocol = "BFT";
-		this.msg = UCC.console;
 	}
 
 	public void setExtraParameters(Map<String,String>params){
@@ -92,21 +91,18 @@ public class ServerToServer implements Constants {
 		}
 		res.putAll(extraParameters);
 		if(res.size()>0){
-			UCC.console.verbose("Have <{}> extra parameters for the transfer.", extraParameters.size(), protocol);
+			console.debug("Have <{}> extra parameters for the transfer.", extraParameters.size(), protocol);
 		}
 		return res;
 	}
 
-	/**
-	 * @return the URL of the transfer or null if not applicable
-	 */
 	public void process() throws Exception {
 		if(scheduled!=null){
-			scheduled=UnitParser.convertDateToISO8601(scheduled);
-			msg.verbose("Will schedule transfer for {}", scheduled);
+			scheduled = UnitParser.convertDateToISO8601(scheduled);
+			console.debug("Will schedule transfer for {}", scheduled);
 			synchronous = false;
 		}
-		msg.verbose("Synchronous transfer = {}", synchronous);
+		console.debug("Synchronous transfer = {}", synchronous);
 		bothSidesUNICORE = !sourceDesc.isRaw && !targetDesc.isRaw();
 		if(bothSidesUNICORE  && sourceDesc.getSmsEpr().equalsIgnoreCase(targetDesc.getSmsEpr())) {
 			Endpoint target = new Endpoint(targetDesc.getSmsEpr());
@@ -148,7 +144,7 @@ public class ServerToServer implements Constants {
 						configurationProvider.getRESTAuthN());
 				String protocol = bothSidesUNICORE? checkProtocols(sms):null;
 				String s = sourceDesc.isRaw()?sourceDesc.originalDescriptor:sourceDesc.getUnicoreURI();
-				msg.verbose("Initiating fetch-file on storage <{}>, receiving file <{}>, writing to '{}'",
+				console.verbose("Initiating fetch-file on storage <{}>, receiving file <{}>, writing to '{}'",
 						sms.getEndpoint().getUrl(), s, targetDesc.getName());
 				Map<String,String> params = getExtraParameters(protocol);
 				tcc = sms.fetchFile(sourceDesc.getResolvedURL(), targetDesc.getName(), params, protocol);
@@ -159,17 +155,17 @@ public class ServerToServer implements Constants {
 				StorageClient sms = new StorageClient(source,
 						configurationProvider.getClientConfiguration(source.getUrl()),
 						configurationProvider.getRESTAuthN());
-				msg.verbose("Initiating send-file on storage <{}>, sending file <{}>, writing to '{}'",
+				console.verbose("Initiating send-file on storage <{}>, sending file <{}>, writing to '{}'",
 						sms.getEndpoint().getUrl(),	sourceDesc.getName(), targetDesc.getResolvedURL());
 				Map<String,String> params = getExtraParameters(null);
 				tcc = sms.sendFile(sourceDesc.getName(), targetDesc.getResolvedURL(), params, null);
 			}
 			transferAddress = tcc.getEndpoint().getUrl();
-			msg.verbose("Have filetransfer instance: {}", transferAddress);
+			console.debug("Have filetransfer instance: {}", transferAddress);
 			if(synchronous) {
-				msg.verbose("Waiting for transfer to complete...");
+				console.verbose("Waiting for transfer to complete...");
 				waitForCompletion();
-				msg.verbose("Transfer done.");
+				console.verbose("Transfer done.");
 			}
 		} finally{
 			if(synchronous && tcc!=null){
@@ -203,7 +199,7 @@ public class ServerToServer implements Constants {
 	}
 
 	private void smsCopyFile(StorageClient sms) throws Exception {
-		msg.verbose("Copy on remote storage: {}->{}", sourceDesc.getName(), targetDesc.getName());
+		console.verbose("Copy on remote storage: {}->{}", sourceDesc.getName(), targetDesc.getName());
 		JSONObject params = new JSONObject();
 		params.put("from", sourceDesc.getName());
 		params.put("to", targetDesc.getName());
@@ -214,7 +210,7 @@ public class ServerToServer implements Constants {
 		if(!"BFT".equals(preferredProtocol)){
 			List<String> supported = JSONUtil.asList(sms.getProperties().getJSONArray("protocols"));
 			if(supported.contains(preferredProtocol)) {
-				msg.verbose("Using preferred protocol: {}", preferredProtocol);
+				console.debug("Using preferred protocol: {}", preferredProtocol);
 				return preferredProtocol;
 			}
 		}

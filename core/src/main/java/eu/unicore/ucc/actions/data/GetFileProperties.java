@@ -31,12 +31,12 @@ public class GetFileProperties extends SMSOperation {
 				.longOpt(OPT_HUMAN_LONG)
 				.desc("human-friendly format")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SHOW_META)
 				.longOpt(OPT_SHOW_META_LONG)
 				.desc("Show metadata")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
@@ -59,17 +59,17 @@ public class GetFileProperties extends SMSOperation {
 		super.process();
 		boolean human = getBooleanOption(OPT_HUMAN_LONG, OPT_HUMAN);
 		if (human)
-			console.verbose("Human friendly number format.");
+			console.debug("Human friendly number format.");
 		boolean showMetadata = getBooleanOption(OPT_SHOW_META_LONG, OPT_SHOW_META);
 		if (showMetadata)
-			console.verbose("Showing metadata.");
+			console.debug("Showing metadata.");
 		CommandLine cmdLine = getCommandLine(); 
 		if (cmdLine.getArgs().length < 2) {
 			throw new IllegalArgumentException("Wrong number of arguments");
 		}
 		for(int i=1; i<getCommandLine().getArgs().length;i++){
 			String target = cmdLine.getArgs()[i];	
-			console.verbose("Getting file properties of <{}>", target);
+			console.debug("Getting file properties of <{}>", target);
 			StorageClient sms = getStorageClient(target);
 			FileListEntry gridFile = sms.stat(getPathAtStorage(target));
 			console.info("{}", formatStat(gridFile, human, showMetadata));

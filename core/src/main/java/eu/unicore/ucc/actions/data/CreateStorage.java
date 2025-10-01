@@ -2,8 +2,13 @@ package eu.unicore.ucc.actions.data;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.cli.Option;
 import org.json.JSONException;
@@ -11,9 +16,14 @@ import org.json.JSONObject;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
+import eu.unicore.client.core.CoreClient;
+import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.core.StorageFactoryClient;
 import eu.unicore.client.lookup.AddressFilter;
+import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.client.registry.RegistryClient;
+import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.ActionBase;
@@ -65,33 +75,35 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 				.argName("Lifetime")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SITENAME)
 				.longOpt(OPT_SITENAME_LONG)
 				.desc("Name of the site")
 				.argName("Site")
 				.hasArg()
 				.required(false)
-				.build());
+				.deprecated()
+				.get());
 		getOptions().addOption(Option.builder(OPT_FACTORY)
 				.longOpt(OPT_FACTORY_LONG)
-				.desc("Factory URL")
+				.desc("Factory URL to use")
 				.argName("Factory")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_TYPE)
 				.longOpt(OPT_TYPE_LONG)
 				.desc("Storage type")
+				.deprecated()
 				.argName("Type")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_INFO)
 				.longOpt(OPT_INFO_LONG)
 				.desc("Only show info, do not create anything")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
@@ -120,32 +132,15 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	public void process() throws Exception {
 		lastStorageAddress = null;
 		super.process();
-		initialLifeTime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
-		if(initialLifeTime>0){
-			console.verbose("New SMSs will have a lifetime of <{}> days.", initialLifeTime);
-		}else{
-			console.verbose("Using site default for SMS lifetime.");
-		}
-		factoryURL=getOption(OPT_FACTORY_LONG, OPT_FACTORY);
-		StorageFactoryClient sfc=null;
+		initialLifeTime = getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
+		factoryURL = getOption(OPT_FACTORY_LONG, OPT_FACTORY);
+		StorageFactoryClient sfc = null;
 		if(factoryURL==null){
-			siteName=getOption(OPT_SITENAME_LONG, OPT_SITENAME);
-			if(siteName!=null){
-				console.verbose("Looking for factory at site <{}>", siteName);
-			}
-			else{
-				console.verbose("No factory specified, will choose one.");
-			}
+			siteName = getOption(OPT_SITENAME_LONG, OPT_SITENAME);
 		}
-		storageType=getOption(OPT_TYPE_LONG, OPT_TYPE);
-		if(storageType!=null){
-			console.verbose("Will create storage of type <{}>", storageType);
-		}
-		else{
-			console.verbose("No storage type specified, will use factory's default.");
-		}
+		storageType = getOption(OPT_TYPE_LONG, OPT_TYPE);
 		boolean infoOnly = getBooleanOption(OPT_INFO_LONG, OPT_INFO);
-		//resolve
+		// resolve
 		boolean byFactoryURL = factoryURL!=null;
 		boolean byType = storageType!=null ;
 		boolean bySiteName = siteName!=null ;
@@ -172,13 +167,16 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 			break;
 		}
 		if(!haveValidFactory){
-			// nothing found
 			throw new Exception("No suitable storage factory available!");
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private void doCreate(StorageFactoryClient sfc) throws Exception{
-		StorageClient sc = sfc.createStorage(storageType, null, getParams(), getTermTime());
+		boolean u10Mode = sfc.getEndpoint().getUrl().contains("default_storage_factory");
+		StorageClient sc = u10Mode ?
+				sfc.createStorage(storageType, null, getParams(), getTermTime()) :
+				sfc.createStorage(siteName, getParams(), getTermTime());
 		String addr = sc.getEndpoint().getUrl();
 		console.info("{}", addr);
 		properties.put(PROP_LAST_RESOURCE_URL, addr);
@@ -224,7 +222,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	public String getServiceDetails(Endpoint epr, UCCConfigurationProvider configurationProvider){
 		try{
 			IClientConfiguration securityProperties = configurationProvider.getClientConfiguration(epr.getUrl());
-			StorageFactoryClient smf=new StorageFactoryClient(epr, securityProperties, configurationProvider.getRESTAuthN());
+			StorageFactoryClient smf = new StorageFactoryClient(epr, securityProperties, configurationProvider.getRESTAuthN());
 			return getDescription(smf);
 		}catch(Exception ex){
 			return "N/A ["+Log.getDetailMessage(ex)+"]";
@@ -232,24 +230,36 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	}
 
 	private String getDescription(StorageFactoryClient sfc) throws Exception {
-		JSONObject pr=sfc.getProperties().getJSONObject("storageDescriptions");
-		StringBuilder sb=new StringBuilder();
-		boolean first=true;
-		String newline = System.getProperty("line.separator");
-		Iterator<String>types = pr.keys();
-		while(types.hasNext()){
-			if(!first)sb.append(newline).append("  ");
-			String type = types.next();
-			JSONObject desc = pr.getJSONObject(type);
-			sb.append(getBriefDescription(type, desc));
-			sb.append(newline).append(getParameterDescription(desc));
-			first=false;
+		boolean u11mode = true;
+		JSONObject pr = sfc.getProperties().optJSONObject("storageDescriptions");
+		if(pr==null) {
+			u11mode = false;
+			pr = new JSONObject();
+			pr.put("description", sfc.getProperties().optString("description", "n/a"));
+			pr.put("parameters", sfc.getProperties().optJSONObject("parameters", new JSONObject()));
+		}
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		if(u11mode) {
+			sb.append(": ").append(pr.getString("description"));
+			sb.append(_newline).append(getParameterDescription(pr));
+		}
+		else {
+			Iterator<String>types = pr.keys();
+			while(types.hasNext()){
+				if(!first)sb.append(_newline).append("  ");
+				String type = types.next();
+				JSONObject desc = pr.getJSONObject(type);
+				sb.append(getBriefDescription(type, desc));
+				sb.append(_newline).append(getParameterDescription(desc));
+				first=false;
+			}
 		}
 		return sb.toString();
 	}
 
 	private String getBriefDescription(String type, JSONObject desc){
-		StringBuilder sb=new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		sb.append(type);
 		try{
 			String description = desc.optString("description", null);
@@ -261,13 +271,12 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	}
 
 	private String getParameterDescription(JSONObject desc) throws JSONException {
-		StringBuilder sb=new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		sb.append("  Parameters:");
 		JSONObject parameterDesc = desc.optJSONObject("parameters", new JSONObject());
-		String newline = System.getProperty("line.separator");
 		Iterator<String> params = parameterDesc.keys();
 		while(params.hasNext()){
-			sb.append(newline).append("    ");
+			sb.append(_newline).append("    ");
 			String p = params.next();
 			String pDesc = parameterDesc.optString(p, "n/a");
 			sb.append(p).append(": ").append(pDesc);
@@ -291,7 +300,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		private boolean byFactoryURL;
 		private boolean bySiteName;
 		private boolean byType;
-		
+
 		public Filter(boolean byFactoryURL, boolean bySiteName, boolean byType){
 			this.byFactoryURL = byFactoryURL;
 			this.bySiteName = bySiteName;
@@ -332,5 +341,33 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 			}
 			return false;
 		}
+	}
+	
+	@Override
+	public Collection<Endpoint> listEndpoints(IRegistryClient registry, UCCConfigurationProvider configurationProvider) throws Exception {
+		Set<Endpoint> ep = new HashSet<>();
+		ep.addAll(registry.listEntries(new RegistryClient.ServiceTypeFilter(getType())));
+		List<Endpoint> coreEps = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
+		IAuthCallback auth = configurationProvider.getRESTAuthN();
+		for(Endpoint c: coreEps) {
+			IClientConfiguration sec = configurationProvider.getClientConfiguration(factoryURL);
+			CoreClient cc = new CoreClient(c, sec, auth);
+			String url = cc.getLinkUrl("storagefactories");
+			EnumerationClient ec = new EnumerationClient(c.cloneTo(url), sec, auth);
+			ec.forEach((smf)->{
+				if(!contains(ep,smf))ep.add(c.cloneTo(smf));
+			});
+		}
+		return ep;
+	}
+
+	private boolean contains(Collection<Endpoint>eps, String url) {
+		final AtomicBoolean found = new AtomicBoolean();
+		eps.forEach( (e)-> {
+				if(url.equals(e.getUrl())) {
+					found.set(true);
+				}
+			});
+		return found.get();
 	}
 }

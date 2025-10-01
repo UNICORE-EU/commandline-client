@@ -26,8 +26,6 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 
 	private boolean listJobs;
 
-	private String sep=System.getProperty("line.separator");
-
 	@Override
 	public String getName() {
 		return "list-workflows";
@@ -61,17 +59,17 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 				.longOpt("no-files")
 				.desc("Do not list workflow files (in detailed mode)")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder("j")
 				.longOpt("no-jobs")
 				.desc("Do not list jobs (in detailed mode)")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder("n")
 				.longOpt("no-internal")
 				.desc("Skip UNICORE/X-internal workflow engine(s)")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
@@ -80,12 +78,12 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 		listFiles=detailed && !getBooleanOption("nofiles", "N");
 		listJobs=detailed && !getBooleanOption("nojobs", "j");
 		if(detailed){
-			console.verbose("Listing jobs = {}", listJobs);
-			console.verbose("Listing names of files = {}", listFiles);
+			console.debug("Listing jobs = {}", listJobs);
+			console.debug("Listing names of files = {}", listFiles);
 		}
 		run();
 	}
-	
+
 	private void run() throws Exception{
 		if(getCommandLine().getArgs().length>=2) {
 			for(int i=1; i<getCommandLine().getArgs().length; i++) {
@@ -162,20 +160,20 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 	}
 
 	private void listFiles(WorkflowClient workflow, StringBuilder details) throws Exception {
-		details.append(sep).append("  Files: ");
+		details.append(_newline).append("  Files: ");
 		BaseServiceClient fileListClient = workflow.getFileList();
 		JSONObject props = fileListClient.getProperties();
 		Iterator<String> iter = props.keys();
 		while(iter.hasNext()){
 			String wf = iter.next();
 			String url = props.getString(wf);
-			details.append(sep).append("    ").append(wf).append(" : ").append(url);
+			details.append(_newline).append("    ").append(wf).append(" : ").append(url);
 		}
 	}
 
 	private void listParameters(JSONObject props, StringBuilder details) {
 		for(Map.Entry<String,String>e: JSONUtil.asMap(props.getJSONObject("parameters")).entrySet()){
-			details.append(sep).append("  Parameter: ").append(e.getKey()).append("=").append(e.getValue());
+			details.append(_newline).append("  Parameter: ").append(e.getKey()).append("=").append(e.getValue());
 		}
 	}
 }

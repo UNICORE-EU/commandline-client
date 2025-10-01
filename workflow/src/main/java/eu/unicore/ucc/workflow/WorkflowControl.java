@@ -52,10 +52,10 @@ public class WorkflowControl extends ActionBase {
 
 	//read the workflow address and the command to perform
 	private void getBasicCmdlineParams()throws Exception {
-		cmd=getCommandLine().getArgs()[1];
-		String arg=null;
+		cmd = getCommandLine().getArgs()[1];
+		String arg = null;
 		if(getCommandLine().getArgs().length>2) {
-			arg=getCommandLine().getArgs()[2];
+			arg = getCommandLine().getArgs()[2];
 		}
 		if(arg==null){
 			arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
@@ -84,10 +84,10 @@ public class WorkflowControl extends ActionBase {
 			String[]split=p.split("=");
 			String key=split[0];
 			String value=split[1];
-			console.verbose("Have parameter: {}={}", key, value);
+			console.debug("Have parameter: {}={}", key, value);
 			parameters.put(key, value);
 		}
-		//unit testing use
+		// unit testing
 		lastParams=parameters;
 	}
 

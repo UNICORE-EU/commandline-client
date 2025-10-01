@@ -16,22 +16,22 @@ import eu.unicore.ucc.lookup.PropertyFilter;
  * @author schuller
  */
 public abstract class ListActionBase<T extends BaseServiceClient> extends ActionBase {
-	
+
 	protected boolean detailed;
-	
+
 	protected boolean raw;
-	
+
 	protected boolean doFilter;
-	
+
 	protected Filter filter;
-	
+
 	protected String[] tags;
-	
+
 	protected String[] fields;
-	
+
 	//for unit testing
 	protected static int lastNumberOfResults;
-	
+
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -41,56 +41,54 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 				.desc("Filter the list")
 				.required(false)
 				.hasArgs()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_DETAILED)
 				.longOpt(OPT_DETAILED_LONG)
 				.desc("Detailed output")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_RAW)
 				.longOpt(OPT_RAW_LONG)
 				.desc("Print all properties in JSON format")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_FIELDS)
 				.longOpt(OPT_FIELDS_LONG)
 				.desc("Print only the named fields")
 				.required(false)
 				.hasArgs()
-				.build());	
+				.get());	
 		getOptions().addOption(Option.builder(OPT_TAGS)
 				.longOpt(OPT_TAGS_LONG)
 				.desc("Only list items with the given tags")
 				.required(false)
 				.hasArgs()
 				.valueSeparator(',')
-				.build());
+				.get());
 	}
 
 	@Override
 	public void process() throws Exception {
 		super.process();
-		lastNumberOfResults=0;
-		doFilter=getCommandLine().hasOption(OPT_FILTER);
-		console.verbose("Filtering = {}", doFilter);
-		detailed=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
-		console.verbose("Detailed listing = {}", detailed);
-		raw=getBooleanOption(OPT_RAW_LONG, OPT_RAW);
-		
+		lastNumberOfResults = 0;
+		doFilter = getCommandLine().hasOption(OPT_FILTER);
+		console.debug("Filtering = {}", doFilter);
+		detailed = getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
+		console.debug("Detailed listing = {}", detailed);
+		raw = getBooleanOption(OPT_RAW_LONG, OPT_RAW);
 		if(doFilter){
 			filter=createFilter(getCommandLine().getOptionValues(OPT_FILTER));
 		}
 		if(getCommandLine().hasOption(OPT_TAGS)){
 			tags = getCommandLine().getOptionValues(OPT_TAGS);
-			console.verbose("Tags = {}", Arrays.deepToString(tags));
+			console.debug("Tags = {}", Arrays.deepToString(tags));
 		}
 		if(getCommandLine().hasOption(OPT_FIELDS)){
 			fields = getCommandLine().getOptionValues(OPT_FIELDS);
-			console.verbose("Fields = {}", Arrays.asList(fields));
+			console.debug("Fields = {}", Arrays.asList(fields));
 		}
 	}
 
-	
 	/**
 	 * Print details about a list entry.</br> 
 	 * The default implementation returns an empty string
@@ -101,7 +99,6 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		return "";
 	}
 
-	
 	/**
 	 * print the properties of a list entry
 	 * 
@@ -112,7 +109,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 			console.info("{}", entry.getProperties(fields).toString(2));
 		}
 	}
-	
+
 	protected Filter createFilter(String[] args){
 		filter = PropertyFilter.create(args);
 		if(filter==null){
@@ -120,7 +117,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		}
 		return filter;
 	}
-	
+
 	/**
 	 * if filtering is enabled, the given resource is checked. 
 	 * 
@@ -132,11 +129,11 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		if(!doFilter)return true;
 		return filter.accept(resource);
 	}
-	
+
 	protected boolean siteNameMatches(String name, String url) {
 		return name==null || (url!=null && url.contains("/"+name+"/"));
 	}
-	
+
 	//for unit testing
 	public static int getLastNumberOfResults(){
 		return lastNumberOfResults;

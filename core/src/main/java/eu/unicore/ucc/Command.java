@@ -2,16 +2,17 @@ package eu.unicore.ucc;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.logging.log4j.Logger;
 
 import eu.unicore.ucc.helpers.ConsoleLogger;
@@ -75,17 +76,16 @@ public abstract class Command implements Constants {
 	}
 
 	protected void setOutputLocation() throws Exception {
-		console.verbose("Current directory is <{}>", new File("").getAbsolutePath());
-		String outputLoc=getCommandLine().getOptionValue(OPT_OUTPUT, properties.getProperty(OPT_OUTPUT_LONG));
-		if(outputLoc==null)outputLoc=".";
-		output=new File(outputLoc);
+		console.debug("Current directory is <{}>", new File("").getAbsolutePath());
+		String outputLoc = getCommandLine().getOptionValue(OPT_OUTPUT, properties.getProperty(OPT_OUTPUT_LONG));
+		if(outputLoc==null)outputLoc = ".";
+		output = new File(outputLoc);
 		if(!output.exists())output.mkdirs();
 		if(!output.isDirectory())throw new IllegalArgumentException("<"+outputLoc+"> is not a directory.");
-		console.verbose("Output goes to <{}>", outputLoc);
+		console.debug("Output goes to <{}>", outputLoc);
 	}
 
-
-	//handle special case of requesting help (-h or --help option given)
+	// handle special case of requesting help (-h or --help option given)
 	private boolean handleHelp(String[] args){
 		String help="-"+OPT_HELP;
 		String help_long="--"+OPT_HELP_LONG;
@@ -129,17 +129,16 @@ public abstract class Command implements Constants {
 				.desc("Verbose mode")
 				.argName("Verbose")
 				.required(false)
-				.build(),
+				.get(),
 				UCCOptions.GRP_GENERAL);
 		if(isTimeable()){
 			getOptions().addOption(Option.builder(OPT_TIMING)
 					.longOpt(OPT_TIMING_LONG)
 					.desc("Timing mode")
 					.required(false)
-					.build()
+					.get()
 					,UCCOptions.GRP_GENERAL);
 		}
-		
 		if(producesOutput()){
 			getOptions().addOption(Option.builder(OPT_OUTPUT)
 					.longOpt(OPT_OUTPUT_LONG)
@@ -147,7 +146,7 @@ public abstract class Command implements Constants {
 					.argName("Output")
 					.hasArg()
 					.required(false)
-					.build()
+					.get()
 					,UCCOptions.GRP_GENERAL);
 		}
 	}
@@ -177,29 +176,19 @@ public abstract class Command implements Constants {
 		return true;
 	}
 
-	public void printUsage(){
-		HelpFormatter formatter = new HelpFormatter();
+	public void printUsage() throws IOException {
+		HelpFormatter.Builder b = HelpFormatter.builder();
+		b.setShowSince(false);
+		HelpFormatter formatter = b.get();
 		String syntax="ucc "+getName()+" [OPTIONS] "+getArgumentList()+"\n"+getSynopsis()+"\n";
-		String newLine=System.getProperty("line.separator");
-		Options def=options.getDefaultOptions();
-		if(def!=null){
-			formatter.printHelp(syntax, def);
-		}
-		else{
-			formatter.printHelp(syntax, new Options());
-		}
-		Options general=options.getGeneralOptions();
-		if(general!=null){
-			System.out.println();
-			formatter.setSyntaxPrefix("General options:");
-			formatter.printHelp(" "+newLine, general);
-		}
-		Options security=options.getSecurityOptions();
-		if(security!=null){
-			System.out.println();
-			formatter.setSyntaxPrefix("Security options:");
-			formatter.printHelp(" "+newLine, security);
-		}
+		List<Option> def = options.getDefaultOptions();
+		formatter.printHelp(syntax, "", def, "", false);
+		List<Option> general = options.getGeneralOptions();
+		formatter.setSyntaxPrefix("General options:");
+		formatter.printHelp(" "+_newline, "", general, "", false);
+		List<Option> security = options.getSecurityOptions();
+		formatter.setSyntaxPrefix("Security options:");
+		formatter.printHelp(" "+_newline, "", security, "", false);
 	}
 
 	/**
@@ -211,7 +200,7 @@ public abstract class Command implements Constants {
 		timing = getBooleanOption(OPT_TIMING_LONG, OPT_TIMING);
 		if(timing){
 			startTime=System.currentTimeMillis();
-			console.verbose("Timing mode.");
+			console.debug("Timing mode.");
 		}
 		setOutputLocation();
 	}
@@ -233,7 +222,6 @@ public abstract class Command implements Constants {
 	 */
 	protected void loadUserProperties() throws Exception {
 		if(properties!=null)return;
-		console.verbose("UCC {}", UCC.getVersion());
 		properties=new Properties();
 		boolean userSpecified=false;
 		CommandLine line=getCommandLine();
@@ -242,13 +230,13 @@ public abstract class Command implements Constants {
 		if(propertiesFile==null){
 			if(line.hasOption(OPT_PROPERTIES)){
 				props=line.getOptionValue(OPT_PROPERTIES);
-				console.verbose("Properties file: <{}>", props);
+				console.debug("Properties file: <{}>", props);
 				userSpecified=true;
 			}
 			propertiesFile=new File(props);
 		}
 		if(propertiesFile.exists()){
-			console.verbose("Reading properties file: <{}>", props);
+			console.debug("Reading properties file: <{}>", props);
 			try(FileInputStream fis = new FileInputStream(propertiesFile)){
 				properties.load(fis);
 			}
@@ -258,7 +246,7 @@ public abstract class Command implements Constants {
 				throw new Exception("Properties file <"+props+"> does not exist.");
 			}
 			else{
-				console.verbose("No properties file found at <{}>", props);	
+				console.debug("No properties file found at <{}>", props);	
 			}
 		}
 		// set default session ID file, if not set
@@ -275,7 +263,7 @@ public abstract class Command implements Constants {
 		if(properties==null)throw new IllegalStateException();
 		String authMethod = properties.getProperty("authenticationMethod");
 		if(authMethod!=null && properties.getProperty(OPT_AUTHN_METHOD_LONG)==null) {
-			console.verbose("WARN: deprecated config file property 'authenticationMethod', "
+			console.debug("WARN: deprecated config file property 'authenticationMethod', "
 					+ "updating to '{}'", OPT_AUTHN_METHOD_LONG);
 			properties.setProperty(OPT_AUTHN_METHOD_LONG, authMethod);
 			properties.remove("authenticationMethod");
@@ -289,11 +277,11 @@ public abstract class Command implements Constants {
 	public void setPropertiesFile(File propertiesFile){
 		this.propertiesFile=propertiesFile;
 	}
-	
+
 	public Properties getProperties(){
 		return properties;
 	}
-	
+
 	/**
 	 * gets a numeric option value
 	 * 

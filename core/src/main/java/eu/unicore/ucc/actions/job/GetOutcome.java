@@ -24,20 +24,20 @@ public class GetOutcome extends JobOperationBase {
 				.longOpt(OPT_NOPREFIX_LONG)
 				.desc("Short output file names")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_QUIET)
 				.longOpt(OPT_QUIET_LONG)
 				.desc("Quiet mode, don't ask for confirmation")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
 	protected void processAdditionalOptions(){
-		brief=getBooleanOption(OPT_NOPREFIX_LONG, OPT_NOPREFIX);
-		console.verbose("Adding job id to output file names = {}", !brief);
+		brief = getBooleanOption(OPT_NOPREFIX_LONG, OPT_NOPREFIX);
+		console.debug("Adding job id to output file names = {}", !brief);
 		quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
-		console.verbose("Quiet mode = {}", quiet);
+		console.debug("Quiet mode = {}", quiet);
 
 	}
 

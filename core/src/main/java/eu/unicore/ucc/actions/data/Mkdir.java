@@ -26,7 +26,7 @@ public class Mkdir extends SMSOperation {
 			throw new IllegalArgumentException("Please specify remote directory!");
 		}
 	}
-	
+
 	@Override
 	public String getName() {
 		return "mkdir";
@@ -36,11 +36,10 @@ public class Mkdir extends SMSOperation {
 	public String getSynopsis() {
 		return "Creates a directory on a remote storage.";
 	}
-	
+
 	@Override
 	public String getDescription(){
 		return "create directories remotely";
 	}
-
 
 }

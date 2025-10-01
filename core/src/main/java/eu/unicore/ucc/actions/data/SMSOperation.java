@@ -42,7 +42,7 @@ public abstract class SMSOperation extends ActionBase {
 				configurationProvider.getClientConfiguration(targetDesc.getSmsEpr()),
 				configurationProvider.getRESTAuthN());
 	}
-		
+
 	@Override
 	public String getArgumentList(){
 		return "<Storage-URL>/files/path or unicore://site/storage_name/path>";

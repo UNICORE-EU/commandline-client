@@ -258,7 +258,7 @@ public class UCC{
 			}
 		}
 		if(broker!=null && "LOCAL"!=broker.getName()){
-			console.verbose("Using broker {}", broker.getName());
+			console.debug("Using broker {}", broker.getName());
 		}	
 		if(broker == null){
 			throw new IllegalArgumentException("Broker '"+brokerName+"' cannot be found");

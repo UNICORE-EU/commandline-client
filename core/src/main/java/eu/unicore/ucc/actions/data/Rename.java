@@ -38,6 +38,7 @@ public class Rename extends SMSOperation {
 	public String getSynopsis() {
 		return "Rename/move a remote file, on the same storage.";
 	}
+
 	@Override
 	public String getDescription(){
 		return "rename a remote file.";

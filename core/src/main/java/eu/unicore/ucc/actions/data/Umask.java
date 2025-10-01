@@ -26,7 +26,7 @@ public class Umask extends ActionBase {
 				.desc("Set a umask to the provided value.")
 				.required(false)
 				.hasArg()
-				.build());
+				.get());
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class Umask extends ActionBase {
 		}
 		String url = cmdLine.getArgs()[1];
 		String set = getOption(OPT_SET_LONG, OPT_SET);
-		console.verbose("Will "+(set!=null?" set umask to <"+set+">" : "get umask")+" for service: {}", url);
+		console.debug("Will "+(set!=null?" set umask to <"+set+">" : "get umask")+" for service: {}", url);
 		BaseServiceClient client = createClient(url);
 		properties.put(PROP_LAST_RESOURCE_URL, url);
 		String umaskS = null;

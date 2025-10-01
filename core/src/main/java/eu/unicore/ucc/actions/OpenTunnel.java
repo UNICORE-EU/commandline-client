@@ -39,12 +39,12 @@ public class OpenTunnel extends ActionBase {
 				.desc("Local address <[interface:]port> to listen on (port=0 to let system choose)")
 				.hasArg()
 				.required(true)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_KEEP)
 				.longOpt(OPT_KEEP_LONG)
 				.desc("Keep the local listening port open (default: true). If 'false', only one client is accepted.")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override

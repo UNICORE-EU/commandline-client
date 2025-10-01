@@ -24,7 +24,7 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 		List<AdminServiceClient>clients = createClients();
 		for(AdminServiceClient asc: clients){
 			try{
-				console.verbose("Contacting admin service at <{}>", asc.getEndpoint().getUrl());
+				console.debug("Contacting admin service at <{}>", asc.getEndpoint().getUrl());
 			}catch(Exception ex){
 				console.error(ex, "Can't access <{}>", asc.getEndpoint().getUrl());
 				continue;
@@ -47,38 +47,31 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 
 	private String getDetails(AdminServiceClient asc)throws Exception{
 		if(!detailed)return "";
-		StringBuilder details=new StringBuilder();
-		String sep=System.getProperty("line.separator");
-		boolean first=true;
-
+		StringBuilder details = new StringBuilder();
+		boolean first = true;
 		Map<String,String> allMetrics = asc.getMetrics();
-
-		first=true;
 		for(String m: allMetrics.keySet()){
 			if(first){
-				details.append(sep).append("  Metrics: ");
+				details.append(_newline).append("  Metrics: ");
 				first=false;
 			}
-			details.append(sep).append("    ");
+			details.append(_newline).append("    ");
 			details.append(m);
 			details.append(": ").append(allMetrics.get(m));
 		}
 		first=true;
 		for(AdminCommand ac: asc.getCommands()) {
 			if(first){
-				details.append(sep).append("  Commands: ");
+				details.append(_newline).append("  Commands: ");
 				first=false;
 			}
-			details.append(sep).append("    ");
+			details.append(_newline).append("    ");
 			details.append(ac.name);
 			details.append(" : ").append(ac.description);
 		}
 
 		return details.toString();
 	}
-
-
-
 
 	private List<AdminServiceClient> createClients()throws Exception{
 		List<AdminServiceClient>clients = new ArrayList<>();

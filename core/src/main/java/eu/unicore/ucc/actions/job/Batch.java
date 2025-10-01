@@ -99,79 +99,78 @@ public class Batch extends ActionBase {
 				.longOpt(OPT_FOLLOW)
 				.desc("Follow mode: wait for new job files")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_INPUTDIR)
 				.longOpt(OPT_INPUTDIR_LONG)
 				.desc("Input directory")
 				.required(false)
 				.argName("InputDir")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_KEEP)
 				.longOpt(OPT_KEEP_LONG)
 				.desc("Don't remove finished jobs")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_UPDATEINTERVAL)
 				.longOpt(OPT_UPDATEINTERVAL_LONG)
 				.desc("Minimum update interval (millis)")
 				.required(false)
 				.argName("UpdateInterval")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_MAXRUNNING)
 				.longOpt(OPT_MAXRUNNING_LONG)
 				.desc("Maximum number of jobs running at a time")
 				.required(false)
 				.argName("MaxRunningJobs")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_MAXREQUESTS)
 				.longOpt(OPT_MAXREQUESTS_LONG)
 				.desc("Maximum number of jobs submitted at a time")
 				.required(false)
 				.argName("MaxNewJobs")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_NUMTHREADS)
 				.longOpt(OPT_NUMTHREADS_LONG)
 				.desc("Number of concurrent client threads")
 				.required(false)
 				.argName("NumberOfThreads")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_NOCHECKRESOURCES)
 				.longOpt(OPT_NOCHECKRESOURCES_LONG)
 				.desc("Do not check if required resources are available")
 				.required(false)
-				.build());
+				.get());
 
 		getOptions().addOption(Option.builder(OPT_NOFETCHOUTCOME)
 				.longOpt(OPT_NOFETCHOUTCOME_LONG)
 				.desc("Do not download stdout/stderr")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SITENAME)
 				.longOpt(OPT_SITENAME_LONG)
 				.desc("Site Name")
 				.required(false)
 				.argName("Site")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_WEIGHTS)
 				.longOpt(OPT_WEIGHTS_LONG)
 				.desc("File containing site weights")
 				.required(false)
 				.argName("fileName")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SUBMIT_ONLY)
 				.longOpt(OPT_SUBMIT_ONLY_LONG)
 				.desc("Only submit jobs, do not wait for completion")
 				.required(false)
-				.build());
+				.get());
 	}
-
 
 	@Override
 	public String getName() {
@@ -211,35 +210,35 @@ public class Batch extends ActionBase {
 			console.verbose("Created request directory <{}>", inDir);
 		}
 
-		follow=getBooleanOption(OPT_FOLLOW_LONG, OPT_FOLLOW);
-		console.verbose("Follow mode = {}", follow);
+		follow = getBooleanOption(OPT_FOLLOW_LONG, OPT_FOLLOW);
+		console.debug("Follow mode = {}", follow);
 
-		keepJobs=getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
-		console.verbose("Cleaning up done jobs = {}", !keepJobs);
+		keepJobs = getBooleanOption(OPT_KEEP_LONG, OPT_KEEP);
+		console.debug("Cleaning up done jobs = {}", !keepJobs);
 
-		runningJobLimit=getNumericOption(OPT_MAXRUNNING_LONG, OPT_MAXRUNNING, DEFAULT_LIMIT);
-		console.verbose("Limit on number of running jobs = {}", runningJobLimit);
+		runningJobLimit = getNumericOption(OPT_MAXRUNNING_LONG, OPT_MAXRUNNING, DEFAULT_LIMIT);
+		console.debug("Limit on number of running jobs = {}", runningJobLimit);
 
-		requestLimit=getNumericOption(OPT_MAXREQUESTS_LONG, OPT_MAXREQUESTS, DEFAULT_REQUEST_LIMIT);
-		console.verbose("Limit on number of new job submissions = {}", requestLimit);
+		requestLimit = getNumericOption(OPT_MAXREQUESTS_LONG, OPT_MAXREQUESTS, DEFAULT_REQUEST_LIMIT);
+		console.debug("Limit on number of new job submissions = {}", requestLimit);
 
-		updateInterval=getNumericOption(OPT_UPDATEINTERVAL_LONG, OPT_UPDATEINTERVAL, DEFAULT_UPDATE);
-		console.verbose("Update interval = {} ms.", updateInterval);
+		updateInterval = getNumericOption(OPT_UPDATEINTERVAL_LONG, OPT_UPDATEINTERVAL, DEFAULT_UPDATE);
+		console.debug("Update interval = {} ms.", updateInterval);
 
-		numThreads=getNumericOption(OPT_NUMTHREADS_LONG, OPT_NUMTHREADS, DEFAULT_THREADS);
-		console.verbose("Number of executor threads = {}", numThreads);
+		numThreads = getNumericOption(OPT_NUMTHREADS_LONG, OPT_NUMTHREADS, DEFAULT_THREADS);
+		console.debug("Number of executor threads = {}", numThreads);
 
-		noResourceCheck=getBooleanOption(OPT_NOCHECKRESOURCES_LONG, OPT_NOCHECKRESOURCES);
-		console.verbose("Checking available resources = {}", !noResourceCheck);
+		noResourceCheck = getBooleanOption(OPT_NOCHECKRESOURCES_LONG, OPT_NOCHECKRESOURCES);
+		console.debug("Checking available resources = {}", !noResourceCheck);
 
-		noFetchOutcome=getBooleanOption(OPT_NOFETCHOUTCOME_LONG, OPT_NOFETCHOUTCOME);
-		console.verbose("Getting standard output and standard error = {}", !noFetchOutcome);
+		noFetchOutcome = getBooleanOption(OPT_NOFETCHOUTCOME_LONG, OPT_NOFETCHOUTCOME);
+		console.debug("Getting standard output and standard error = {}", !noFetchOutcome);
 
-		submitOnly=getBooleanOption(OPT_SUBMIT_ONLY_LONG, OPT_SUBMIT_ONLY);
-		console.verbose("'Submit only' mode = {}", submitOnly);
+		submitOnly = getBooleanOption(OPT_SUBMIT_ONLY_LONG, OPT_SUBMIT_ONLY);
+		console.debug("'Submit only' mode = {}", submitOnly);
 
-		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
-		if(siteName!=null)console.verbose("Using site = {}", siteName);
+		siteName = getCommandLine().getOptionValue(OPT_SITENAME);
+		if(siteName!=null)console.debug("Using site = {}", siteName);
 
 		String siteWeightFile=getCommandLine().getOptionValue(OPT_WEIGHTS);
 		if(siteWeightFile!=null){
@@ -249,9 +248,8 @@ public class Batch extends ActionBase {
 			}
 			else{
 				siteSelectionStragegy = new WeightedSelection(swf);
-				console.verbose("Using site selection weights from {}", swf.getAbsolutePath());
+				console.debug("Using site selection weights from {}", swf.getAbsolutePath());
 			}
-
 		}
 		executor=new ThreadPoolExecutor(numThreads, numThreads,
 				500L, TimeUnit.MILLISECONDS,
@@ -264,8 +262,7 @@ public class Batch extends ActionBase {
 	}
 
 	private void doShutdown(){
-		if(isShutdown)return;
-		isShutdown=true;
+		isShutdown = true;
 		console.info("UCC batch mode exiting.");
 		while(Runner.getCounter()>0){
 			console.info("... waiting for tasks to finish.");
@@ -279,15 +276,14 @@ public class Batch extends ActionBase {
 	}
 
 	protected void doBatch() throws IOException, InterruptedException{
-		requests=new RequestQueue(inputDir.getAbsolutePath(),follow);
-		running=new RunningQueue(inputDir.getAbsolutePath()+File.separator+"RUNNING_JOBS");
+		requests = new RequestQueue(inputDir.getAbsolutePath(),follow);
+		running = new RunningQueue(inputDir.getAbsolutePath()+File.separator+"RUNNING_JOBS");
 		running.setLimit(runningJobLimit);
 		running.setDelay(updateInterval);
-		//initialise to correct value in case batch mode is re-started 
 		activeJobs.set(running.length());
 		console.verbose("Starting batch processing...");
 		do{
-			//submit as many new jobs as allowed and possible
+			// submit as many new jobs as allowed and possible
 			while(activeJobs.get()<runningJobLimit && activeRequests.get()<requestLimit){
 				String nextReq=(String)requests.next();
 				if (nextReq!=null){
@@ -300,7 +296,6 @@ public class Batch extends ActionBase {
 					break;
 				}
 			}
-
 			if(!submitOnly){
 				//now process the running jobs 
 				String nextRunning=(String)running.next(100,TimeUnit.MILLISECONDS);
@@ -313,7 +308,6 @@ public class Batch extends ActionBase {
 			}
 
 		}while(follow || activeRequests.get()>0 || activeJobs.get()>0 || requests.length()>0);
-
 		executor.shutdown();
 		console.verbose("Exiting, {} requests were processed.", numRequests);
 	}
@@ -382,7 +376,7 @@ public class Batch extends ActionBase {
 
 	private void processRunning(UCCBuilder b){
 		if(isShutdown)return;
-		String req=b.getProperty("_ucc_source");
+		String req = b.getProperty("_ucc_source");
 		try{
 			Runner r = new Runner(registry, configurationProvider, b);
 			r.setAsyncMode(true);
@@ -405,16 +399,15 @@ public class Batch extends ActionBase {
 	}
 
 	private String printSelectionStatistics(Map<String,AtomicInteger>stats){
-		StringBuilder sb=new StringBuilder();
-		String newline=System.getProperty("line.separator");
-		sb.append(newline);
+		StringBuilder sb = new StringBuilder();
+		sb.append(_newline);
 		sb.append(String.format("  %-52s | %8s", "Site URL", "Jobs run"));
-		sb.append(newline);
+		sb.append(_newline);
 		sb.append("  ---------------------------------------");
-		sb.append(newline);
+		sb.append(_newline);
 		for(String site: stats.keySet()){
 			sb.append(String.format("  %-52s | %8d", site, stats.get(site).get()));
-			sb.append(newline);
+			sb.append(_newline);
 		}
 		return sb.toString();
 	}

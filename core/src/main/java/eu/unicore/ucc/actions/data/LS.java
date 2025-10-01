@@ -42,38 +42,37 @@ public class LS extends SMSOperation {
 				.longOpt(OPT_DETAILED_LONG)
 				.desc("detailed listing")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_RECURSIVE)
 				.longOpt(OPT_RECURSIVE_LONG)
 				.desc("recurse into subdirectories")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_HUMAN)
 				.longOpt(OPT_HUMAN_LONG)
 				.desc("human-friendly format")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SHOW_META)
 				.longOpt(OPT_SHOW_META_LONG)
 				.desc("Show metadata")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
 	public void process() throws Exception {
 		super.process();
-		detailed=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
-		if(detailed)console.verbose("Detailed listing.");
-		recurse=getBooleanOption(OPT_RECURSIVE_LONG, OPT_RECURSIVE);
-		if(recurse)console.verbose("Listing subdirectories.");
-		human=getBooleanOption(OPT_HUMAN_LONG, OPT_HUMAN);
-		if(human)console.verbose("Human friendly number format.");
-		showMetadata=getBooleanOption(OPT_SHOW_META_LONG, OPT_SHOW_META);
-		if(showMetadata)console.verbose("Showing metadata.");
+		detailed = getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
+		if(detailed)console.debug("Detailed listing.");
+		recurse = getBooleanOption(OPT_RECURSIVE_LONG, OPT_RECURSIVE);
+		if(recurse)console.debug("Listing subdirectories.");
+		human = getBooleanOption(OPT_HUMAN_LONG, OPT_HUMAN);
+		if(human)console.debug("Human friendly number format.");
+		showMetadata = getBooleanOption(OPT_SHOW_META_LONG, OPT_SHOW_META);
+		if(showMetadata)console.debug("Showing metadata.");
 		doProcess();
 	}
-
 
 	protected void doProcess() throws Exception {
 		if(getCommandLine().getArgs().length<2){

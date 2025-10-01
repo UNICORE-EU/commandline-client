@@ -45,7 +45,7 @@ public class Connector implements Runnable {
 	public void run() {
 		SiteFactoryLister lister=new SiteFactoryLister(UCC.executor,registry,cfgProvider);
 		if(blacklist!=null && blacklist.length>0){
-			UCC.console.verbose("Using blacklist <{}>", Arrays.asList(blacklist));
+			UCC.console.debug("Using blacklist <{}>", Arrays.asList(blacklist));
 			lister.setAddressFilter(new Blacklist(blacklist));
 		}
 		for(SiteFactoryClient tsf: lister){

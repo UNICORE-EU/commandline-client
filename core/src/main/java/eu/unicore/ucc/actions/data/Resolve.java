@@ -33,6 +33,7 @@ public class Resolve extends ActionBase {
 			addResolver(p);
 		}
 	}
+
 	/**
 	 * manually register a resolver
 	 * @param resolver - the resolver
@@ -50,14 +51,15 @@ public class Resolve extends ActionBase {
 				.longOpt("full")
 				.desc("Print full file URI")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder("l")
 				.longOpt("list")
 				.desc("List all available resolvers / URL schemes")
 				.required(false)
-				.build());
+				.get());
 
 	}
+
 	/**
 	 * resolve the given URI using the registered resolvers
 	 *

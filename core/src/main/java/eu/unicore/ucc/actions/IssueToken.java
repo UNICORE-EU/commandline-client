@@ -41,29 +41,29 @@ public class IssueToken extends ActionBase {
 				.argName("Lifetime")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder("L")
 				.longOpt("limited")
 				.desc("Token should be limited to the issuing server")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder("R")
 				.longOpt("renewable")
 				.desc("Token can be used to get a fresh token.")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder("I")
 				.longOpt("inspect")
 				.desc("Inspect the issued token")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_SITENAME)
 				.longOpt(OPT_SITENAME_LONG)
 				.desc("Site name")
 				.required(false)
 				.argName("Site")
 				.hasArg()
-				.build());
+				.get());
 	}
 
 	@Override
@@ -103,9 +103,9 @@ public class IssueToken extends ActionBase {
 		}
 		lifetime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(lifetime>0){
-			console.verbose("Requesting lifetime of <{}> seconds.", lifetime);
+			console.debug("Requesting lifetime of <{}> seconds.", lifetime);
 		}else{
-			console.verbose("Using site default for token lifetime.");
+			console.debug("Using site default for token lifetime.");
 		}
 		limited = getBooleanOption("limited", "L");
 		renewable = getBooleanOption("renewable", "R");

@@ -41,14 +41,14 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 				.argName("Protocol")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_BYTES)
 				.longOpt(OPT_BYTES_LONG)
 				.desc("Byte range")
 				.argName("ByteRange")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 	}
 
 	protected void runRawTransfer(String url, OutputStream out, ProgressBar p)throws Exception {
-		//TODO nicer way to find and configure protocol handlers
+		// TODO nicer way to find and configure protocol handlers
 		if(url.startsWith("http")){
 			JSONObject props = new JSONObject();
 			props.put("accessURL", url);
@@ -105,7 +105,7 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 			HttpFileTransferClient hc = new HttpFileTransferClient(ep, props, configurationProvider.getAnonymousClientConfiguration(), null);
 			hc.setProgressListener(p);
 			if(startByte!=null){
-				console.verbose("Byte range: {}-{}", startByte, endByte);
+				console.debug("Byte range: {}-{}", startByte, endByte);
 				SupportsPartialRead pReader=(SupportsPartialRead)hc;
 				pReader.readPartial(startByte, endByte-startByte, out);
 			}
@@ -116,7 +116,7 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 		}
 		else throw new Exception("No protocol handler for "+url);
 	}
-	
+
 	protected String getEffectiveProtocol(Location ... locations) {
 		String selectedProtocol = preferredProtocol;
 		for(Location l: locations) {

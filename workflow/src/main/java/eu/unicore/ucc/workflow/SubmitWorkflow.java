@@ -38,15 +38,14 @@ import eu.unicore.workflow.WorkflowFactoryClient;
  * 
  * @author schuller
  */
-public class SubmitWorkflow extends ActionBase implements
-		IServiceInfoProvider {
+public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 
 	private static final String OPT_UFILE_LONG = "ucc-input";
 	private static final String OPT_UFILE = "u";
 
 	public static final String OPT_WAIT = "w";
 	public static final String OPT_WAIT_LONG = "wait";
-	
+
 	public static final String OPT_STORAGEURL_LONG="storage-url";
 	public static final String OPT_STORAGEURL="S";
 
@@ -69,11 +68,9 @@ public class SubmitWorkflow extends ActionBase implements
 	private int localFiles = 0;
 
 	private final Map<String,String> inputs = new HashMap<>();
-	
-	// e.g. "https://host:port/SITE/rest/core/storages/STORAGENAME"
+
 	private String storageURL;
-	
-	// base directory in the storage
+
 	private String baseDir = "/";
 
 	private String[] tags;
@@ -87,67 +84,62 @@ public class SubmitWorkflow extends ActionBase implements
 				.required(false)
 				.argName("Site")
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_FACTORY)
 				.longOpt(OPT_FACTORY_LONG)
 				.desc("URL or site name of storage factory to use")
 				.argName("StorageFactory")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_STORAGEURL)
 				.longOpt(OPT_STORAGEURL_LONG)
 				.desc("Storage URL to upload local files to")
 				.argName("StorageURL")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_DRYRUN)
 				.longOpt(OPT_DRYRUN_LONG)
 				.desc("Dry run, do not submit anything")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_TAGS)
 				.longOpt(OPT_TAGS_LONG)
 				.desc("Tag the workflow with the given tag(s) (comma-separated)")
 				.required(false)
 				.hasArgs()
 				.valueSeparator(',')
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_UFILE)
 				.longOpt(OPT_UFILE_LONG)
 				.desc("UCC .u file with stage-in definitions")
 				.argName("UCCInputFile")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_WAIT)
 				.longOpt(OPT_WAIT_LONG)
 				.desc("Wait for workflow completion")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
 	public void process() throws Exception {
 		super.process();
-		submissionSite=getCommandLine().getOptionValue(OPT_SITENAME);
-
-		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
-		console.verbose("Dry run = {}", dryRun);
-	
-		if (getCommandLine().hasOption(OPT_WAIT)) {
-			wait = true;
-		}
-
+		submissionSite = getCommandLine().getOptionValue(OPT_SITENAME);
+		dryRun = getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
+		console.debug("Dry run = {}", dryRun);
+		wait =  getCommandLine().hasOption(OPT_WAIT);
 		if (getCommandLine().getArgs().length < 2) {
 			throw new IllegalArgumentException("Please supply the name of the workflow file.");
 		} else {
 			workflowFileName = getCommandLine().getArgs()[1];
-		}	
+		}
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
-			console.verbose("Workflow tags = {}", Arrays.deepToString(tags));
+			console.debug("Workflow tags = {}", Arrays.deepToString(tags));
 		}
 		findSite();
 		createBuilder();
@@ -161,14 +153,14 @@ public class SubmitWorkflow extends ActionBase implements
 	private void createBuilder()throws Exception{
 		String uFile = getOption(OPT_UFILE_LONG, OPT_UFILE);
 		if (uFile != null) {
-			console.verbose("Reading stage-in and parameter definitions from <{}>", uFile);
+			console.debug("Reading stage-in and parameter definitions from <{}>", uFile);
 			builder = new UCCBuilder(new File(uFile),registry,configurationProvider);
 			//side effect: existence of local files will be checked
 			localFiles = builder.getImports().size();
 			console.verbose("Will upload <{}> files", localFiles);
 		}
 	}
-	
+
 	private void findSite() throws Exception {
 		WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry,
 				configurationProvider, true);
@@ -211,11 +203,9 @@ public class SubmitWorkflow extends ActionBase implements
 		if(sfc==null){
 			throw new Exception("No suitable storage factory available!");
 		}
-		// create storage now
 		console.verbose("Creating new storage at <{}>", sfc.getEndpoint().getUrl());
 		storageURL = sfc.createStorage().getEndpoint().getUrl();
 	}
-	
 	private void run() throws Exception {
 		loadWorkflow();
 		uploadLocalData();
@@ -231,12 +221,12 @@ public class SubmitWorkflow extends ActionBase implements
 		if(dryRun){
 			console.info("Resulting workflow: ");
 			console.info("{}", workflow.toString(2));
-			console.verbose("Dry run, not submitting.");
+			console.info("Dry run, not submitting.");
 			return;
 		}
 		WorkflowClient wmc = wsc.submitWorkflow(workflow);
 		String wfURL = wmc.getEndpoint().getUrl();
-		lastAddress=wfURL;
+		lastAddress = wfURL;
 		console.info("{}", wfURL);
 		properties.put(PROP_LAST_RESOURCE_URL, wfURL);
 		if (wait) {
@@ -391,17 +381,15 @@ public class SubmitWorkflow extends ActionBase implements
 	}
 
 	private void clientDetails(StringBuilder sb, JSONObject client) throws JSONException {
-		String cr = System.getProperty("line.separator");
 		String role = client.getJSONObject("role").getString("selected");
 		sb.append("  * authenticated as: '").append(client.getString("dn")).append("' role='").append(role).append("'");
-		sb.append(cr);
+		sb.append(_newline);
 	}
 
 	private void serverDetails(StringBuilder sb, JSONObject server) throws JSONException {
-		String cr = System.getProperty("line.separator");
 		sb.append("* server v").append(server.optString("version", "n/a"));
 		String dn = server.getJSONObject("credential").getString("dn");
-		sb.append(" ").append(dn).append(cr);
+		sb.append(" ").append(dn).append(_newline);
 	}
 
 	static String lastAddress;

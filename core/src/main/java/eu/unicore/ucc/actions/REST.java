@@ -53,18 +53,18 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 				.desc("Value for the 'Accept' HTTP header (default: 'application/json')")
 				.required(false)
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_CONTENT)
 				.longOpt(OPT_CONTENT_LONG)
 				.desc("Value for the 'Content-Type' HTTP header (default: 'application/json')")
 				.required(false)
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_INCLUDE)
 				.longOpt(OPT_INCLUDE_LONG)
 				.desc("Include the response HTTP headers in the output")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
@@ -232,12 +232,11 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	}
 
 	private void clientDetails(StringBuilder sb, JSONObject client) throws JSONException {
-		String cr = System.getProperty("line.separator");
 		String role = client.getJSONObject("role").getString("selected");
 		String uid = client.getJSONObject("xlogin").optString("UID","n/a");
 		try(Formatter f = new Formatter(sb)){
 			f.format("  * authenticated as: '%s' role='%s' uid='%s'%s",
-					client.getString("dn"), role, uid, cr);
+					client.getString("dn"), role, uid, _newline);
 		}
 		try(Formatter f = new Formatter(sb)){
 			JSONArray groups = client.getJSONObject("xlogin").optJSONArray("availableGroups");
@@ -253,7 +252,6 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	}
 
 	private void serverDetails(StringBuilder sb, JSONObject server) throws JSONException {
-		String cr = System.getProperty("line.separator");
 		String dn = null;
 		try{
 			dn = server.getJSONObject("credential").getString("dn");
@@ -261,7 +259,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			dn = server.getString("dn");
 		}
 		try(Formatter f = new Formatter(sb)){
-			f.format("* server v%s %s %s", server.optString("version", "n/a"), dn, cr);
+			f.format("* server v%s %s %s", server.optString("version", "n/a"), dn, _newline);
 		}
 	}
 

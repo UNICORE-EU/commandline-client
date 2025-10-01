@@ -34,12 +34,12 @@ public class Share extends ActionBase {
 				.longOpt(OPT_CLEAN_LONG)
 				.desc("Prior to applying all other ACEs (if any are present) the ACL of the resource is cleared.")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_DELETE)
 				.longOpt(OPT_DELETE_LONG)
 				.desc("Specified ACEs are deleted from the resource's ACL (if this option is not specified then ACEs are added).")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
@@ -77,9 +77,9 @@ public class Share extends ActionBase {
 	public void process() throws Exception {
 		super.process();
 		boolean clean = getBooleanOption(OPT_CLEAN_LONG, OPT_CLEAN);
-		console.verbose("Remove all ACL entries = {}", clean);
+		console.debug("Remove all ACL entries = {}", clean);
 		boolean delete = getBooleanOption(OPT_DELETE_LONG, OPT_DELETE);
-		console.verbose("Delete given ACL entries = {}", delete);
+		console.debug("Delete given ACL entries = {}", delete);
 
 		int length=getCommandLine().getArgs().length;
 		boolean onlyShow = !clean && length<3;
@@ -89,10 +89,10 @@ public class Share extends ActionBase {
 			printUsage();
 			return;
 		}
-		//URL is last argument
-		String url=getCommandLine().getArgs()[length-1];
+		// URL is last argument
+		String url = getCommandLine().getArgs()[length-1];
 		Endpoint epr = new Endpoint(url);
-		console.verbose("Modifying ACLs of: {}", url);
+		console.debug("Modifying ACLs of: {}", url);
 		BaseServiceClient client = new BaseServiceClient(epr,
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());

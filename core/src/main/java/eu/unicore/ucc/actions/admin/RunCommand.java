@@ -33,34 +33,34 @@ public class RunCommand extends ActionBase {
 				.argName("Site")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_URL)
 				.longOpt(OPT_URL_LONG)
 				.desc("Admin service URL")
 				.argName("URL")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
 	public void process() throws Exception {
 		super.process();
-		int length=getCommandLine().getArgs().length;
+		int length = getCommandLine().getArgs().length;
 		if(length<2){
 			throw new IllegalArgumentException("You must provide at least a command name as argument.");
 		}
 		params.clear();
-		cmd=getCommandLine().getArgs()[1];
+		cmd = getCommandLine().getArgs()[1];
 		for(int i=2; i<length; i++){
-			String p=getCommandLine().getArgs()[i];
-			String[]split=p.split("=", 2);
+			String p = getCommandLine().getArgs()[i];
+			String[]split = p.split("=", 2);
 			if(split.length<2) {
 				throw new IllegalArgumentException("'"+p+"': format must be key=value");
 			}
-			String key=split[0];
-			String value=split[1];
-			console.verbose("Have parameter: {}={}", key, value);
+			String key = split[0];
+			String value = split[1];
+			console.debug("Have parameter: {}={}", key, value);
 			params.put(key, value);
 		}
 		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
@@ -71,7 +71,7 @@ public class RunCommand extends ActionBase {
 				try{
 					String regurl = ((RegistryClient)registry).getEndpoint().getUrl();
 					url = regurl.replace("registries/default_registry", "admin");
-					console.verbose("Will try fallback admin service URL: <{}>", url);
+					console.debug("Will try fallback admin service URL: <{}>", url);
 				}catch(Exception ex){}
 			}
 			if(url==null){
@@ -81,11 +81,9 @@ public class RunCommand extends ActionBase {
 		if(siteName!=null && url!=null){
 			throw new IllegalArgumentException("URL and site name cannot both be given!");
 		}
-		AdminServiceClient asc=null;
-		List<AdminCommand>availableCmds = null;
-		asc = createClient();
+		AdminServiceClient asc = createClient();
 		console.verbose("Contacted admin service at <{}>", url);
-		availableCmds = asc.getCommands();
+		List<AdminCommand>availableCmds = asc.getCommands();
 		//check command availability
 		boolean haveCmd = false;
 		for(AdminCommand c: availableCmds){

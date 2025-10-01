@@ -45,29 +45,29 @@ public class Allocate extends ActionBase {
 				.argName("Site")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_BROKER)
 				.longOpt(OPT_BROKER_LONG)
 				.desc("Use the specific named broker implementation (available: "+UCC.getBrokerList()+")")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_DRYRUN)
 				.longOpt(OPT_DRYRUN_LONG)
 				.desc("Dry run, do not submit the job")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_MODE)
 				.longOpt(OPT_MODE_LONG)
 				.desc("Only submit, don't wait for the allocation to start running.")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_TAGS)
 				.longOpt(OPT_TAGS_LONG)
 				.desc("Tag the job with the given tag(s) (comma-separated)")
 				.required(false)
 				.hasArgs()
 				.valueSeparator(',')
-				.build());
+				.get());
 	}
 
 	private void readResources(){
@@ -79,7 +79,7 @@ public class Allocate extends ActionBase {
 			String[]split=p.split("=");
 			String key=split[0];
 			String value=split[1];
-			console.verbose("Have resource request: {}={}", key, value);
+			console.debug("Have resource request: {}={}", key, value);
 			resourceRequests.put(key, value);
 		}
 		lastParams = resourceRequests;
@@ -115,14 +115,14 @@ public class Allocate extends ActionBase {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
-		dryRun=getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
-		console.verbose("Dry run = {}", dryRun);
-		asynchronous=getBooleanOption(OPT_MODE_LONG, OPT_MODE);
-		console.verbose("Asynchronous processing = {}", asynchronous);
+		siteName = getCommandLine().getOptionValue(OPT_SITENAME);
+		dryRun = getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
+		console.debug("Dry run = {}", dryRun);
+		asynchronous = getBooleanOption(OPT_MODE_LONG, OPT_MODE);
+		console.debug("Asynchronous processing = {}", asynchronous);
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
-			console.verbose("Job tags = {}", Arrays.deepToString(tags));
+			console.debug("Job tags = {}", Arrays.deepToString(tags));
 		}
 		readResources();
 		initBuilder();
@@ -158,7 +158,6 @@ public class Allocate extends ActionBase {
 		runner.setBroker(UCC.getBroker(brokerName));
 		runner.run();
 		if(!asynchronous && !dryRun) {
-			// make sure job is "RUNNING"
 			JobClient job = runner.getJob();
 			console.verbose("Waiting for allocation job to be RUNNING...");
 			job.poll(Status.RUNNING);

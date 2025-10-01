@@ -16,11 +16,12 @@ public class ListSites extends ListActionBase<SiteClient> {
 
 	private String siteName;
 
+	@Override
 	public String getName(){
 		return "list-sites";
 	}
+
 	@Override
-	@SuppressWarnings("all")
 	protected void createOptions() {
 		super.createOptions();
 		getOptions().addOption(Option.builder(OPT_SITENAME)
@@ -29,13 +30,13 @@ public class ListSites extends ListActionBase<SiteClient> {
 				.required(false)
 				.argName("Site")
 				.hasArg()
-				.build());
+				.get());
 	}
-	
+
 	@Override
 	public void process() throws Exception {
 		super.process();
-		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
+		siteName = getCommandLine().getOptionValue(OPT_SITENAME);
 		SiteLister tssLister = new SiteLister(UCC.executor,registry,configurationProvider);
 		for(SiteClient c: tssLister){
 			try{
@@ -77,9 +78,8 @@ public class ListSites extends ListActionBase<SiteClient> {
 	protected String getDetails(SiteClient tss)throws Exception{
 		if(!detailed)return "";
 		StringBuilder details=new StringBuilder();
-		String sep=System.getProperty("line.separator");
 		JSONObject props = tss.getProperties();
-		details.append(sep).append("  Number of jobs: ").append(props.get("numberOfJobs"));
+		details.append(_newline).append("  Number of jobs: ").append(props.get("numberOfJobs"));
 
 		boolean first=true;
 		for(String a: JSONUtil.asList(props.getJSONArray("applications"))){
@@ -87,33 +87,32 @@ public class ListSites extends ListActionBase<SiteClient> {
 				details.append(", ");
 			}
 			else {
-				details.append(sep).append("  Applications: ");
+				details.append(_newline).append("  Applications: ");
 				first=false;
 			}
 			String name = a.split(appSeparator)[0];
 			String version = a.split(appSeparator)[1];
 			details.append(name).append(" ").append(version);
 		}
-		details.append(sep).append("  Resources: ");
+		details.append(_newline).append("  Resources: ");
 		listResources(props.getJSONObject("resources"), details);
 		try {
 			Map<String,String> budget = JSONUtil.asMap(props.getJSONObject("remainingComputeTime"));
-			details.append(sep).append("  Compute time:");
-			if(budget.isEmpty())details.append(": n/a").append(sep);
+			details.append(_newline).append("  Compute time:");
+			if(budget.isEmpty())details.append(": n/a").append(_newline);
 			for(String project: budget.keySet()) {
-				details.append(sep).append("     "+project).append(": ").append("...");
+				details.append(_newline).append("     "+project).append(": ").append("...");
 			}
 		}catch(Exception ex) {}
 		return details.toString();
 	}
 
 	private void listResources(JSONObject resources, StringBuilder details){
-		String sep=System.getProperty("line.separator");
 		try{
 			Iterator<String> resIterator = resources.keys();
 			while(resIterator.hasNext()) {
 				String name = resIterator.next();
-				details.append(sep).append("     ").
+				details.append(_newline).append("     ").
 				    append(name).append(": ").
 				    append(resources.getString(name));
 			}

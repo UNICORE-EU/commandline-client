@@ -77,12 +77,12 @@ public class PropertyFilter implements Filter {
 			String propName=args[0];
 			String mod=args[1];
 			String val=args[2];
-			UCC.console.verbose("Filtering on property '{}'", propName);
+			UCC.console.debug("Filtering on property '{}'", propName);
 			if(acceptModifier(mod)){
 				return new PropertyFilter(propName,mod,val);
 			}
 		}
-		UCC.console.verbose("Could not create filter.");
+		UCC.console.debug("Could not create filter.");
 		return null;
 	}
 

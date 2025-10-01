@@ -49,6 +49,7 @@ public class Metadata extends ActionBase {
 	private String query;
 	private boolean wait;
 
+	@Override
 	public String getName() {
 		return "metadata";
 	}
@@ -62,40 +63,40 @@ public class Metadata extends ActionBase {
 				.desc("Metadata command ("+commands+")")
 				.required(true)
 				.hasArg()
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_STORAGE)
 				.longOpt(OPT_STORAGE_LONG)
 				.desc("Storage address")
 				.required(false)
 				.hasArg()
 				.argName("Storage")
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_FILE)
 				.longOpt(OPT_FILE_LONG)
 				.desc("File containing metadata")
 				.required(false)
 				.hasArg()
 				.argName("Filename")
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_QUERY)
 				.longOpt(OPT_QUERY_LONG)
 				.desc("Query string for search")
 				.required(false)
 				.hasArg()
 				.argName("Query")
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_WAIT)
 				.longOpt(OPT_WAIT_LONG)
 				.desc("Wait for long-running tasks to finish")
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
 	public void process() throws Exception {
 		super.process();
 		command = getOption(OPT_COMMAND_LONG, OPT_COMMAND);
-		console.verbose("Operation = {}", command);
+		console.debug("Operation = {}", command);
 		wait = getBooleanOption(OPT_WAIT_LONG, OPT_WAIT);
 		query = getOption(OPT_QUERY_LONG, OPT_QUERY);
 		String storage = getOption(OPT_STORAGE_LONG, OPT_STORAGE);
@@ -107,9 +108,6 @@ public class Metadata extends ActionBase {
 			path=loc.getName();
 		}
 		sms = createStorageClient(storage);
-		if (sms == null) {
-			throw new IllegalArgumentException("Cannot find the requested storage service!");
-		}
 		console.verbose("Accessing metadata for storage {}", sms.getEndpoint().getUrl());
 		String fName = getOption(OPT_FILE_LONG, OPT_FILE);
 		if (fName != null) {
@@ -216,11 +214,11 @@ public class Metadata extends ActionBase {
 	private Map<String, String> readData() throws Exception {
 		String json = null;
 		if (file != null) {
-			console.verbose("Reading data from file: <{}>", file.getName());
+			console.debug("Reading data from file: <{}>", file.getName());
 			json = FileUtils.readFileToString(file, "UTF-8");
 		} else {
 			//read from stdin
-			console.verbose("Reading from stdin (it does not work from within the shell)");
+			console.debug("Reading from stdin (it does not work from within the shell)");
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			String str = "";
 			StringBuilder buffer = new StringBuilder();

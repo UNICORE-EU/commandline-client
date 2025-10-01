@@ -38,5 +38,5 @@ public class AbortJob extends JobOperationBase {
 		}
 		console.info("Job aborted.");
 	}
-	
+
 }

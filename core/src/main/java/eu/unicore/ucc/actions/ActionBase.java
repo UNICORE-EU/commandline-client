@@ -60,14 +60,14 @@ public abstract class ActionBase extends Command {
 				.argName("Method")
 				.hasArg()
 				.required(false)
-				.build()
+				.get()
 				,UCCOptions.GRP_SECURITY);
 
 		getOptions().addOption(Option.builder(OPT_AUTHN_ACCEPT_ALL)
 				.longOpt(OPT_AUTHN_ACCEPT_ALL_LONG)
 				.desc("Accept issuers not in the trust store")
 				.required(false)
-				.build()
+				.get()
 				,UCCOptions.GRP_SECURITY);
 		
 		getOptions().addOption(Option.builder(OPT_SECURITY_PREFERENCES)
@@ -79,7 +79,7 @@ public abstract class ActionBase extends Command {
 						.argName(UCCConfigurationProviderImpl.PREFERENCE_ARG)
 						.hasArgs()
 						.required(false)
-						.build()
+						.get()
 						,UCCOptions.GRP_SECURITY);
 	}
 
@@ -94,7 +94,7 @@ public abstract class ActionBase extends Command {
 				.argName("File")
 				.hasArg()
 				.required(false)
-				.build()
+				.get()
 				,UCCOptions.GRP_GENERAL);
 
 		getOptions().addOption(Option.builder(OPT_REGISTRY)
@@ -103,7 +103,7 @@ public abstract class ActionBase extends Command {
 				.argName("Registry")
 				.hasArg()
 				.required(false)
-				.build()
+				.get()
 				,UCCOptions.GRP_GENERAL);
 	}
 
@@ -118,7 +118,7 @@ public abstract class ActionBase extends Command {
 			blacklist = blacklistP.split("[ ,]+");
 		}else blacklist = new String[0];
 		if(blacklist.length>0) {
-			console.verbose("Blacklist = {}", Arrays.asList(blacklist));
+			console.debug("Blacklist = {}", Arrays.asList(blacklist));
 		}
 	}
 
@@ -163,7 +163,7 @@ public abstract class ActionBase extends Command {
 		authNMethod = getOption(OPT_AUTHN_METHOD_LONG, OPT_AUTHN_METHOD, UsernameAuthN.NAME);
 		acceptAllIssuers = getBooleanOption(OPT_AUTHN_ACCEPT_ALL_LONG, OPT_AUTHN_ACCEPT_ALL);
 		if(acceptAllIssuers){
-			console.verbose("Accepting all server CA certificates.");
+			console.debug("Accepting all server CA certificates.");
 		}
 		configurationProvider = new UCCConfigurationProviderImpl(authNMethod, properties, this, acceptAllIssuers);
 	}
@@ -176,7 +176,7 @@ public abstract class ActionBase extends Command {
 	protected void initRegistryClient() throws Exception {
 		registryURL=getCommandLine().getOptionValue(OPT_REGISTRY, properties.getProperty(OPT_REGISTRY_LONG));
 		if(registryURL==null || registryURL.trim().length()==0){
-			console.verbose("No registry is configured.");
+			console.debug("No registry is configured.");
 			if(requireRegistry()){
 				throw new Exception("A registry is required: please use the '-r' option " +
 						"or configuration entry to define the registry to be used.");
@@ -184,7 +184,7 @@ public abstract class ActionBase extends Command {
 			return;
 		}
 		if(skipConnectingToRegistry() && !requireRegistry()){
-			console.verbose("Registry connection will be skipped.");
+			console.debug("Registry connection will be skipped.");
 			return;
 		}
 		//accept list of registries either comma- or space-separated
@@ -193,13 +193,13 @@ public abstract class ActionBase extends Command {
 			MultiRegistryClient erc = new MultiRegistryClient();
 			for(String url: urls){
 				if(url.trim().length()==0)continue;
-				console.verbose("Registry = {}", url);
+				console.debug("Registry = {}", url);
 				erc.addRegistry(makeRegistry(url));
 			}
 			registry=erc;
 		}
 		else{
-			console.verbose("Registry = {}", registryURL);
+			console.debug("Registry = {}", registryURL);
 			registry = makeRegistry(registryURL);
 		}
 		testRegistryConnection();
@@ -217,9 +217,9 @@ public abstract class ActionBase extends Command {
 			throw new Exception("Registry access is not initialized");
 		}
 		try{
-			console.verbose("Checking registry connection.");
+			console.debug("Checking registry connection.");
 			String status = registry.getConnectionStatus();
-			console.verbose("Registry connection status: {}", status);
+			console.debug("Registry connection status: {}", status);
 			if(!status.startsWith("OK") && !skipConnectingToRegistry()) {
 				throw new Exception(status);
 			}

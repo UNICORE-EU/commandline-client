@@ -21,6 +21,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 
 	private String siteName;
 
+	@Override
 	public String getName(){
 		return "list-jobs";
 	}
@@ -34,13 +35,13 @@ public class ListJobs extends ListActionBase<JobClient> {
 				.required(false)
 				.argName("Site")
 				.hasArg()
-				.build());
+				.get());
 	}
 
 	@Override
 	public void process() throws Exception {
 		super.process();
-		siteName=getCommandLine().getOptionValue(OPT_SITENAME);
+		siteName = getCommandLine().getOptionValue(OPT_SITENAME);
 		CoreEndpointLister siteLister = new CoreEndpointLister(registry, configurationProvider,
 				configurationProvider.getRESTAuthN(), UCC.executor);
 		if(detailed)printHeader();

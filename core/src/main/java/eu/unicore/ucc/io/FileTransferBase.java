@@ -68,7 +68,7 @@ public abstract class FileTransferBase {
 		}
 		res.putAll(extraParameters);
 		if(res.size()>0){
-			UCC.console.verbose("Have {} extra parameters for protocol {}", extraParameters.size(), protocol);
+			UCC.console.debug("Have {} extra parameters for protocol {}", extraParameters.size(), protocol);
 		}
 		return res;
 	}

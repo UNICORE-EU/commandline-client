@@ -167,4 +167,5 @@ public interface Constants {
 	public static final Collection<String> waitableJobStatuses = Arrays.asList(
 			"STAGINGIN", "QUEUED", "RUNNING", "STAGINGOUT", "SUCCESSFUL");
 
+	public static final String _newline = System.getProperty("line.separator");  
 }

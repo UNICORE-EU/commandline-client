@@ -44,24 +44,24 @@ public class JobStatus extends JobOperationBase {
 				.longOpt(OPT_DETAILED_LONG)
 				.desc("More detailed job status")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_ALL)
 				.longOpt(OPT_ALL_LONG)
 				.desc("Full job status including log")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_WAIT)
 				.longOpt(OPT_WAIT_LONG)
 				.desc("Wait for the given job status ("+waitableJobStatuses+")")
 				.hasArg(true)
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_TIMEOUT)
 				.longOpt(OPT_TIMEOUT_LONG)
 				.desc("Timeout for job status polling")
 				.hasArg(true)
 				.required(false)
-				.build());
+				.get());
 	}
 	
 	@Override
@@ -75,9 +75,9 @@ public class JobStatus extends JobOperationBase {
 	@Override
 	protected void processAdditionalOptions(){
 		full = getBooleanOption(OPT_ALL_LONG, OPT_ALL);
-		console.verbose("Showing full job details = {}", full);
+		console.debug("Showing full job details = {}", full);
 		detailed = getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED) || full;
-		console.verbose("Showing detailed job status = {}", detailed);
+		console.debug("Showing detailed job status = {}", detailed);
 		String waitForSpec = getOption(OPT_WAIT_LONG, OPT_WAIT);
 		if(waitForSpec!=null) {
 			try{
@@ -91,7 +91,7 @@ public class JobStatus extends JobOperationBase {
 			String timeoutSpec = getCommandLine().getOptionValue(OPT_TIMEOUT);
 			if(timeoutSpec!=null) {
 				timeout = (int)UnitParser.getTimeParser(0).getDoubleValue(timeoutSpec);
-				console.verbose("Status polling (--wait-for) timeout = {} sec.", timeout); 
+				console.debug("Status polling (--wait-for) timeout = {} sec.", timeout); 
 			}
 			console.verbose("Waiting for job to be {} ...", waitFor);
 		}
@@ -153,14 +153,13 @@ public class JobStatus extends JobOperationBase {
 	 */
 	private String getDetails(JobClient job){
 		StringBuilder sb = new StringBuilder();
-		String lineBreak = System.getProperty("line.separator");
 		try	{
 			if(job.getStatus().equals(Status.FAILED)){
 				sb.append(" Error message: ").append(job.getStatusMessage());
-				sb.append(lineBreak);
+				sb.append(_newline);
 			}
 			sb.append(" Working directory: ").append(job.getWorkingDirectory().getEndpoint().getUrl());
-			sb.append(lineBreak);
+			sb.append(_newline);
 			String t = job.getProperties().optString("jobType","N/A");
 			sb.append(" Job type: ").append(t);
 			if(!"ON_LOGIN_NODE".equals(t)) {
@@ -168,7 +167,7 @@ public class JobStatus extends JobOperationBase {
 			}
 			if(full){
 				for(String line: job.getLog()){
-					sb.append(lineBreak).append(" Log: ").append(line);
+					sb.append(_newline).append(" Log: ").append(line);
 				}
 			}
 		}catch(Exception ex){
@@ -176,8 +175,8 @@ public class JobStatus extends JobOperationBase {
 		}
 		return sb.toString();
 	}
-	
-	// - unit testing
+
+	// unit testing
 	public static String lastStatus;
 	public static boolean allSuccessful;
 

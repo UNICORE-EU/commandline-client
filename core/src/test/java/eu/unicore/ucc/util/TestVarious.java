@@ -128,7 +128,7 @@ public class TestVarious {
 				.argName("ByteRange")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		CommandLineParser p = new DefaultParser();
 		CommandLine cl = p.parse(options, new String [] {"-B", "0-9"});
 		assertEquals("0-9", cl.getOptionValue("B"));

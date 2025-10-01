@@ -74,38 +74,20 @@ public class UCCOptions extends Options {
 		return optionGroups.get(name);
 	}
 
-	public Options getDefaultOptions(){
-		List<Option> defOpts=getOptionsGroup(GRP_DEFAULT);
-		if(defOpts==null)return null;
-		Options res=new Options();
-		for(Option o: defOpts){
-			res.addOption(o);
-		}
-		return res;
+	public List<Option> getDefaultOptions(){
+		return getOptionsGroup(GRP_DEFAULT);
 	}
 
-	public Options getGeneralOptions(){
-		List<Option> secOpts=getOptionsGroup(GRP_GENERAL);
-		if(secOpts==null)return null;
-		Options res=new Options();
-		for(Option o: secOpts){
-			res.addOption(o);
-		}
-		return res;
+	public List<Option> getGeneralOptions(){
+		return getOptionsGroup(GRP_GENERAL);
 	}
 
-	public Options getSecurityOptions(){
-		List<Option> secOpts=getOptionsGroup(GRP_SECURITY);
-		if(secOpts==null)return null;
-		Options res=new Options();
-		for(Option o: secOpts){
-			res.addOption(o);
-		}
-		return res;
+	public List<Option> getSecurityOptions(){
+		return getOptionsGroup(GRP_SECURITY);
 	}
 
 	public static boolean isTrue(String var) {
 		return var!=null && Arrays.asList( "1", "true", "yes" ).contains(var.toLowerCase());
 	}
-	
+
 }

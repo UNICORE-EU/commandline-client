@@ -28,11 +28,11 @@ public class CatFile extends FileOperation implements StorageConstants {
 				String source=getCommandLine().getArgs()[i];
 				sourceDesc = createLocation(source);
 				if(sourceDesc.isRaw()){
-					console.verbose("Source file URL {}", sourceDesc.getSmsEpr());
+					console.debug("Source file URL {}", sourceDesc.getSmsEpr());
 					runRawTransfer(sourceDesc.getSmsEpr(), getStdout(), null);
 				}
 				else{
-					console.verbose("Source file URL {}", sourceDesc.getUnicoreURI());
+					console.debug("Source file URL {}", sourceDesc.getUnicoreURI());
 					runFileDownloader();
 				}
 				System.out.println();

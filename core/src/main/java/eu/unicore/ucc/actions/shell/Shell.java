@@ -67,7 +67,7 @@ public class Shell extends ActionBase {
 				.required(false)
 				.argName("CommandsFile")
 				.hasArg()
-				.build());
+				.get());
 	}
 
 	@Override
@@ -321,7 +321,7 @@ public class Shell extends ActionBase {
 			return new DefaultHistory(lineReader);
 		}
 		catch(Exception e){
-			UCC.console.verbose("Cannot setup history");
+			console.verbose("Cannot setup history");
 			return null;
 		}
 	}
@@ -374,13 +374,12 @@ public class Shell extends ActionBase {
 	}
 
 	private String getHeader() {
-		String lineSep = System.getProperty("line.separator");
-		String s = lineSep
-				+ " _    _ _   _ _____ _____ ____  _____  ______" + lineSep
-				+ "| |  | | \\ | |_   _/ ____/ __ \\|  __ \\|  ____|" + lineSep
-				+ "| |  | |  \\| | | || |   | |  | | |__) | |__"+ lineSep
-				+ "| |  | | . ` | | || |   | |  | |  _  /|  __|"+ lineSep
-				+ "| |__| | |\\  |_| |_ |____ |__| | | \\ \\| |____"+ lineSep
+		String s = _newline
+				+ " _    _ _   _ _____ _____ ____  _____  ______" + _newline
+				+ "| |  | | \\ | |_   _/ ____/ __ \\|  __ \\|  ____|" + _newline
+				+ "| |  | |  \\| | | || |   | |  | | |__) | |__"+ _newline
+				+ "| |  | | . ` | | || |   | |  | |  _  /|  __|"+ _newline
+				+ "| |__| | |\\  |_| |_ |____ |__| | | \\ \\| |____"+ _newline
 				+ " \\____/|_| \\_|_____\\_____\\____/|_|  \\_\\______|";
 		return s;
 	}

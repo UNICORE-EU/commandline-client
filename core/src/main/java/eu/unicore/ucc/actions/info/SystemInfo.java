@@ -1,11 +1,10 @@
 package eu.unicore.ucc.actions.info;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.commons.cli.Option;
 
 import eu.unicore.client.Endpoint;
-import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
@@ -34,19 +33,19 @@ public class SystemInfo extends ActionBase {
 				.longOpt(OPT_DETAILED_LONG)
 				.desc("Detailed output")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_RAW)
 				.longOpt(OPT_RAW_LONG)
 				.desc("Show raw registry content")
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_PATTERN)
 				.longOpt(OPT_PATTERN_LONG)
 				.desc("Only show details for endpoint URLs matching "
 						+ "the given regexp (e.g. \".*/storage.*\"")
 				.required(false)
 				.hasArg()
-				.build());
+				.get());
 	}
 
 	@Override
@@ -93,13 +92,12 @@ public class SystemInfo extends ActionBase {
 	}
 
 	private void getInfo(IServiceInfoProvider info){
-		String type = info.getType();
 		String name = info.getServiceName();
 		console.info("");
 		console.info("Checking for <{}> endpoint ...", name);
 		try{
-			List<Endpoint> list = registry.listEntries(new RegistryClient.ServiceTypeFilter(type));
-			int n=list.size();
+			Collection<Endpoint> list = info.listEndpoints(registry, configurationProvider);
+			int n = list.size();
 			if(n==0){
 				console.info("... no endpoints available");
 			}

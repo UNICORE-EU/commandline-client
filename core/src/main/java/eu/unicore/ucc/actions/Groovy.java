@@ -1,12 +1,9 @@
 package eu.unicore.ucc.actions;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 
 import org.apache.commons.cli.Option;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
 import eu.unicore.ucc.UCC;
@@ -32,24 +29,24 @@ public class Groovy extends ActionBase{
 				.argName("Script")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		getOptions().addOption(Option.builder(OPT_GROOVYEXPRESSION)
 				.longOpt(OPT_GROOVYEXPRESSION_LONG)
 				.desc("the Groovy expression")
 				.argName("Expression")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 		
 	}
 
 	@Override
 	public void process() throws Exception {
 		super.process();
-		CompilerConfiguration conf=new CompilerConfiguration();
+		CompilerConfiguration conf = new CompilerConfiguration();
 		conf.setScriptBaseClass(Base.class.getName());
 		//inject context for the script
-		GroovyShell shell=new GroovyShell(conf);
+		GroovyShell shell = new GroovyShell(conf);
 		Binding binding = shell.getContext();
 		binding.setVariable("registry", registry);
 		binding.setVariable("configurationProvider", configurationProvider);
@@ -60,9 +57,9 @@ public class Groovy extends ActionBase{
 		binding.setVariable("commandLine", getCommandLine());
 		binding.setVariable("console", UCC.console);
 		if(getCommandLine().hasOption(OPT_GROOVYEXPRESSION)){
-			expression=getCommandLine().getOptionValue(OPT_GROOVYEXPRESSION);
+			expression = getCommandLine().getOptionValue(OPT_GROOVYEXPRESSION);
 		}else if (getCommandLine().hasOption(OPT_GROOVYSCRIPT)){
-			expression=readFile(getCommandLine().getOptionValue(OPT_GROOVYSCRIPT));
+			expression = readFile(getCommandLine().getOptionValue(OPT_GROOVYSCRIPT));
 		}
 		else{
 			printUsage();
@@ -71,14 +68,7 @@ public class Groovy extends ActionBase{
 	}
 
 	private String readFile(String name)throws Exception{
-		ByteArrayOutputStream bos=new ByteArrayOutputStream();
-		try(InputStream fis=new BufferedInputStream(new FileInputStream(new File(name).getAbsolutePath()))){
-			int b=0;
-			while((b=fis.read())!=-1){
-				bos.write(b);
-			}
-			return bos.toString();
-		}
+		return FileUtils.readFileToString(new File(name), "UTF-8");
 	}
 
 	@Override

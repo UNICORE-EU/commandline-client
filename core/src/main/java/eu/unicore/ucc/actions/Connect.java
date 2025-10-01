@@ -27,7 +27,7 @@ public class Connect extends ActionBase {
 				.argName("Lifetime")
 				.hasArg()
 				.required(false)
-				.build());
+				.get());
 	}
 
 	@Override
@@ -48,12 +48,12 @@ public class Connect extends ActionBase {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		lastRegistryURL=registryURL;
-		initialLifeTime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
+		lastRegistryURL = registryURL;
+		initialLifeTime = getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(initialLifeTime>0){
-			console.verbose("New TSSs will have a lifetime of <{}> days.", initialLifeTime);
+			console.debug("New TSSs will have a lifetime of <{}> days.", initialLifeTime);
 		}else{
-			console.verbose("Using site default for TSS lifetime.");
+			console.debug("Using site default for TSS lifetime.");
 		}
 		Connector c = new Connector(registry, configurationProvider);
 		c.setBlacklist(blacklist);

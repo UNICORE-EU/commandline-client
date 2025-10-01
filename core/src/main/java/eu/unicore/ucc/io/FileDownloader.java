@@ -32,23 +32,23 @@ import eu.unicore.ucc.util.ProgressBar;
  */
 public class FileDownloader extends FileTransferBase {
 
-	private boolean showProgress=true;
-	
-	private boolean forceFileOnly=false;
-	
-	private OutputStream targetStream=null;
-	
+	private boolean showProgress = true;
+
+	private boolean forceFileOnly = false;
+
+	private OutputStream targetStream = null;
+
 	public FileDownloader(String from, String to, Mode mode){
 		this(from, to, mode, true);
 	}
-	
+
 	public FileDownloader(String from, String to, Mode mode, boolean failOnError){
 		this.to = to;
 		this.from = from;
 		this.mode = mode;
 		this.failOnError = failOnError;
 	}
-	
+
 	@Override
 	public void perform(StorageClient sms)throws Exception{
 		assertReady(sms);
@@ -71,7 +71,7 @@ public class FileDownloader extends FileTransferBase {
 			}
 		}	
 	}
-	
+
 	private void performDirectoryExport(FileListEntry directory, File targetDirectory, StorageClient sms)
 			throws Exception {
 		if(!targetDirectory.exists()|| !targetDirectory.canWrite()){
@@ -98,7 +98,7 @@ public class FileDownloader extends FileTransferBase {
 			download(file, new File(targetDirectory,getName(file.path)), sms);
 		}
 	}
-	
+
 	private void performWildCardExport(StorageClient sms)throws Exception{
 		String dir = getDir(from);
 		Pattern p = createPattern(getName(from));
@@ -113,7 +113,7 @@ public class FileDownloader extends FileTransferBase {
 				download(f, targetDir, sms);
 			}
 		}
-	}	
+	}
 
 	private String getDir(String path){
 		return new File(path).getParent();
@@ -136,16 +136,12 @@ public class FileDownloader extends FileTransferBase {
 		if(source==null || source.isDirectory){
 			throw new IllegalStateException("Source="+source); 
 		}
-		
-		OutputStream os=targetStream!=null?targetStream:null;
+		OutputStream os = targetStream;
 		FiletransferClient ftc=null;
-		
 		boolean resume = false;
-		
 		boolean append = Mode.APPEND.equals(mode) || resume;
-		
 		try{
-			String path=source.path;
+			String path = source.path;
 			if(os==null){
 				if(localFile.isDirectory()){
 					localFile=new File(localFile,getName(path));
@@ -161,7 +157,6 @@ public class FileDownloader extends FileTransferBase {
 				}
 				os = new FileOutputStream(localFile.getAbsolutePath(), append);
 			}
-
 			chosenProtocol = determineProtocol(preferredProtocol, sms);
 			Map<String,String>extraParameters = getExtraParameters(chosenProtocol);
 			ftc = sms.createExport(path, chosenProtocol, extraParameters);
@@ -240,7 +235,7 @@ public class FileDownloader extends FileTransferBase {
 			UCC.console.error(ex, "Can't set 'executable' flag for {}", localFile.getName());
 		}
 	}
-	
+
 	private void configure(FiletransferClient ftc, Map<String,String>params){
 		if(ftc instanceof UFTPFileTransferClient){
 			UFTPFileTransferClient u=(UFTPFileTransferClient)ftc;
@@ -260,7 +255,7 @@ public class FileDownloader extends FileTransferBase {
 	public void setTargetStream(OutputStream targetStream) {
 		this.targetStream = targetStream;
 	}
-	
+
 	private void setupOffsetForResume(File localFile) throws Exception {
 		if(localFile.exists()){
 			startByte = localFile.length();
@@ -268,4 +263,3 @@ public class FileDownloader extends FileTransferBase {
 		}
 	}
 }
-

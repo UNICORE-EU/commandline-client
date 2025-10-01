@@ -22,9 +22,9 @@ public class RM extends SMSOperation {
 				.longOpt(OPT_QUIET_LONG)
 				.desc("Quiet mode, don't ask for confirmation")
 				.required(false)
-				.build());
+				.get());
 	}
-	
+
 	@Override
 	public void process() throws Exception {
 		super.process();
