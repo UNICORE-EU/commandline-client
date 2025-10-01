@@ -11,6 +11,7 @@ public class TestUCC {
 
 	@Test
 	public void test_PrintUsage(){
+		UCC.unitTesting = true;
 		UCC.printUsage(false);
 		System.err.println("\n");
 		UCC.printAuthNUsage();
@@ -19,6 +20,7 @@ public class TestUCC {
 
 	@Test
 	public void test_ShowHelp() throws Exception {
+		UCC.unitTesting = true;
 		String[]args=new String []{"-h"};
 		for(Command cmd: UCC.getAllCommands()){
 			try{
@@ -35,6 +37,7 @@ public class TestUCC {
 
 	@Test
 	public void test_LoadAuthNMethods(){
+		UCC.unitTesting = true;
 		assertNotNull(UCC.getAuthNMethod("X509"));
 		assertNotNull(UCC.getAuthNMethod("x509"));
 	}
