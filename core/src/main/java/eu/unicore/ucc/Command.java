@@ -48,7 +48,7 @@ public abstract class Command implements Constants {
 	protected File output;
 
 	public Command(){
-		options=new UCCOptions();
+		options = new UCCOptions();
 		createOptions();
 	}
 

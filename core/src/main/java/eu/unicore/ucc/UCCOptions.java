@@ -2,6 +2,7 @@ package eu.unicore.ucc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.apache.commons.cli.Options;
  * @author schuller
  */
 public class UCCOptions extends Options {
+
 	private static final long serialVersionUID = 1L;
 
 	private final Set<String> usedOptionNames=new HashSet<String>();
@@ -61,7 +63,7 @@ public class UCCOptions extends Options {
 		markAsUsed(option.getLongOpt());
 		markAsUsed(option.getOpt());
 		Options result = super.addOption(option);
-		List<Option>grp=optionGroups.get(optionGroup);
+		List<Option>grp = optionGroups.get(optionGroup);
 		if(grp==null){
 			grp = new ArrayList<>();
 			optionGroups.put(optionGroup, grp);
@@ -71,7 +73,8 @@ public class UCCOptions extends Options {
 	}
 
 	private List<Option>getOptionsGroup(String name){
-		return optionGroups.get(name);
+		var res = optionGroups.get(name);
+		return res!=null? res : Collections.emptyList();
 	}
 
 	public List<Option> getDefaultOptions(){
