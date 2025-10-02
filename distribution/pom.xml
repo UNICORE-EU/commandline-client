@@ -72,4 +72,29 @@
     </plugins>
   </build>
 
+  <profiles>
+    <!-- Generate aggregated code coverage -->
+    <profile>
+      <id>code-coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.12</version>
+            <executions>
+              <execution>
+                <id>aggregate-report</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>report-aggregate</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
