@@ -55,7 +55,7 @@ public class CoreCommands implements ProvidedCommands {
 				new JobRestart(),
 				new Exec(),
 				new Allocate(),
-				
+
 				// data management
 				new CreateStorage(),
 				new CopyFileStatus(),
@@ -69,7 +69,7 @@ public class CoreCommands implements ProvidedCommands {
 				new CP(),
 				new Rename(),
 				new Resolve(),
-				
+
 				// informational
 				new ListSites(),
 				new ListJobs(),
@@ -86,11 +86,9 @@ public class CoreCommands implements ProvidedCommands {
 				new OpenTunnel(),
 				new IssueToken(),
 
-				//admin
+				// admin
 				new RunCommand(),
 				new AdminServiceInfo(),
 		};
-
 	}
-
 }

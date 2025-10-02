@@ -267,7 +267,8 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 					console.verbose("Dry run, not uploading.");
 					continue;
 				}
-				fu.perform(sc);
+				fu.setStorageClient(sc);
+				fu.call();
 			}
 		}
 	}

@@ -64,9 +64,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 						}
 					}
 				}catch(Exception ex){
-					String msg="Error accessing TSS at "+siteURL;
-					logger.error(msg,ex);
-					console.verbose("{}", msg);
+					console.verbose("Error accessing TSS at {}", siteURL);
 				}
 			}
 		}

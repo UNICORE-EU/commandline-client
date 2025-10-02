@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
 import eu.unicore.client.data.UFTPConstants;
@@ -35,30 +37,26 @@ public class FileUploader extends FileTransferBase {
 	}
 
 	@Override
-	public void perform(StorageClient sms)throws Exception {
-		assertReady(sms);
+	public JSONObject call()throws Exception {
+		assertReady();
 		File fileSpec = new File(from);
 		boolean hasWildCards = false;
 		boolean isDirectory = fileSpec.isDirectory();
 		File[] fileset = null;
-
 		if(!isDirectory){
 			hasWildCards = hasWildCards(fileSpec);
 		}
-
-		chosenProtocol = determineProtocol(preferredProtocol, sms);
+		chosenProtocol = determineProtocol(preferredProtocol);
 		Map<String,String>extraParameters = getExtraParameters(chosenProtocol);
-
 		if(!hasWildCards && !isDirectory){
 			//single regular file
 			if(to==null)to = "/";
-			if(isValidDirectory(to, sms)){
+			if(isValidDirectory(to)){
 				to = to+"/"+fileSpec.getName();
 			}
 			uploadFile(fileSpec, to, sms, chosenProtocol, extraParameters);
-			return;
+			return new JSONObject();
 		}
-
 		//handle wildcards or directory
 		if(hasWildCards){
 			fileset=resolveWildCards(fileSpec);
@@ -67,12 +65,13 @@ public class FileUploader extends FileTransferBase {
 			fileset=fileSpec.listFiles();
 		}
 		if(to==null)to = "/";
-		if(!isValidDirectory(to, sms)){
+		if(!isValidDirectory(to)){
 			throw new IOException("The specified remote target '"+to+"' is not a directory");
 		}
 		String target=isDirectory?to+fileSpec.getName():to;
 		sms.mkdir(target);
 		uploadFiles(fileset,target,sms,chosenProtocol,extraParameters);
+		return new JSONObject();
 	}
 
 	/**
@@ -234,7 +233,7 @@ public class FileUploader extends FileTransferBase {
 			u.setSecret(secret);
 		}
 	}
-	
+
 	private void setupOffsetForResume(String remotePath, StorageClient sms) throws Exception {
 		try{
 			startByte = sms.stat(remotePath).size;
@@ -243,5 +242,5 @@ public class FileUploader extends FileTransferBase {
 			// new file - resume is ignored
 		}
 	}
-	
+
 }

@@ -128,7 +128,7 @@
       <dependency>
 	<groupId>eu.unicore</groupId>
 	<artifactId>uas-core</artifactId>
-	<version>${uas.version}</version>
+	<version>${uas.version}-1</version>
 	<scope>test</scope>
       </dependency>
       <dependency>

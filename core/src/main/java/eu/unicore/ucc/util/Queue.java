@@ -44,14 +44,6 @@ public abstract class Queue {
 	}
 
 	/**
-	 * return the limit on this queue
-	 * @return limit is -1 if no limit
-	 */
-	public int getLimit(){
-		return limit;
-	}
-
-	/**
 	 * ask whether another item can be added into the queue 
 	 * @return true if there still is some space left
 	 */
@@ -133,9 +125,8 @@ public abstract class Queue {
 			return unit.convert(queueDelay-System.currentTimeMillis()+lastAccessed, TimeUnit.MILLISECONDS);
 		}
 
-		@SuppressWarnings("rawtypes")
 		public int compareTo(Delayed o) {
-			return (int)(lastAccessed-((QueueEntry)o).lastAccessed);
+			return (int)(lastAccessed-((QueueEntry<?>)o).lastAccessed);
 		}
 	}
 

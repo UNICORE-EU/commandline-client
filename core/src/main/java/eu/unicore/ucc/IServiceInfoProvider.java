@@ -16,7 +16,7 @@ public interface IServiceInfoProvider {
 	 * the service type (as published via the registry)
 	 */
 	public String getType();
-	
+
 	/**
 	 * the service name (for the user)
 	 */

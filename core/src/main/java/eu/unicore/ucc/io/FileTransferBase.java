@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 import org.json.JSONObject;
@@ -18,7 +19,9 @@ import eu.unicore.uas.util.PropertyHelper;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.util.JSONUtil;
 
-public abstract class FileTransferBase {
+public abstract class FileTransferBase implements Callable<JSONObject>{
+
+	protected StorageClient sms;
 
 	protected Properties extraParameterSource;
 
@@ -32,10 +35,10 @@ public abstract class FileTransferBase {
 
 	protected String to;
 
-	//index of first byte to download
+	// index of first byte to download
 	protected Long startByte;
-	
-	//index of last byte to download
+
+	// index of last byte to download
 	protected Long endByte;
 
 	public static enum Mode {
@@ -51,8 +54,10 @@ public abstract class FileTransferBase {
 
 	protected String preferredProtocol;
 
-	public abstract void perform(StorageClient sms)throws Exception;
-	
+	public void setStorageClient(StorageClient sms) {
+		this.sms = sms;
+	}
+
 	protected Map<String,String> getExtraParameters(String protocol){
 		Map<String,String> res = new HashMap<>();
 		if(extraParameterSource!=null){
@@ -72,7 +77,7 @@ public abstract class FileTransferBase {
 		}
 		return res;
 	}
-	
+
 	protected String resolveFromBaseDir(String child, File baseDirectory) {
 		File childF = new File(child);
 		if(childF.isAbsolute()) {
@@ -80,7 +85,7 @@ public abstract class FileTransferBase {
 		}
 		return new File(baseDirectory, child).getAbsolutePath();
 	}
-	
+
 	public String getTo() {
 		return to;
 	}
@@ -140,13 +145,14 @@ public abstract class FileTransferBase {
 	public void setRecurse(boolean recurse) {
 		this.recurse = recurse;
 	}
+
 	/**
 	 * check if the given path denotes a valid remote directory
 	 * @param remotePath - the path
 	 * @param sms - the storage
 	 * @return <code>true</code> if the remote directory exists and is a directory
 	 */
-	protected boolean isValidDirectory(String remotePath, StorageClient sms){
+	protected boolean isValidDirectory(String remotePath){
 		boolean result = false;
 		if(! ("/".equals(remotePath) || ".".equals(remotePath)) ){
 			try{
@@ -155,10 +161,9 @@ public abstract class FileTransferBase {
 			}catch(Exception ex){}
 		}
 		else result=true;
-		
 		return result;
 	}
-	
+
 	public File[] resolveWildCards(File original){
 		final String name=original.getName();
 		if(!hasWildCards(original))return new File[]{original};
@@ -177,12 +182,11 @@ public abstract class FileTransferBase {
 	}
 
 	protected Pattern createPattern(String nameWithWildcards){
-		String regex=nameWithWildcards.replace("?",".").replace("*", ".*");
-		return Pattern.compile(regex);
+		return Pattern.compile(nameWithWildcards.replace("?",".").replace("*", ".*"));
 	}
-	
+
 	protected String chosenProtocol=null;
-	
+
 	public String getChosenProtocol(){
 		return chosenProtocol;
 	}
@@ -202,7 +206,7 @@ public abstract class FileTransferBase {
 	public void setEndByte(Long endByte) {
 		this.endByte = endByte;
 	}
-	
+
 	/**
 	 * checks if a byte range is defined
 	 * @return <code>true</code> iff both startByte and endByte are defined
@@ -210,7 +214,7 @@ public abstract class FileTransferBase {
 	protected boolean isRange(){
 		return startByte!=null && endByte!=null;
 	}
-	
+
 	/**
 	 * get the number of bytes in the byte range, or "-1" if the range is open-ended
 	 */
@@ -218,8 +222,8 @@ public abstract class FileTransferBase {
 		if(Long.MAX_VALUE==endByte)return -1;
 		return endByte-startByte;
 	}
-	
-	protected String determineProtocol(String preferred, StorageClient sms) {
+
+	protected String determineProtocol(String preferred) {
 		if(preferred!=null)try{
 			List<String> supported = JSONUtil.asList(sms.getProperties().getJSONArray("protocols"));
 			for(String s: supported) {
@@ -229,7 +233,7 @@ public abstract class FileTransferBase {
 		return "BFT";
 	}
 
-	protected void assertReady(StorageClient sms) throws Exception {
+	protected void assertReady() throws Exception {
 		int i=0;
 		while(i < 60) {
 			JSONObject props = sms.getProperties("resourceStatus");

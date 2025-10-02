@@ -15,30 +15,25 @@ import com.google.common.cache.CacheBuilder;
 public class ResourceCache {
 
 	private static final ResourceCache cache = new ResourceCache();
-	
-	private final Map<String,Cache<Object, Object>>caches;
-	
-	private ResourceCache(){
-		caches = new ConcurrentHashMap<>();
-	}
+
+	private final Map<String,Cache<Object, Object>>caches = new ConcurrentHashMap<>();
 
 	public static ResourceCache getInstance(){
 		return cache;
 	}
-	
+
 	public void put(String cacheID, Object key, Object value){	
 		doGetCache(cacheID).put(key,value);
 	}
-	
+
 	public Object get(String cacheID, Object key){
 		return doGetCache(cacheID).getIfPresent(key);
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public <T> T getAs(String cacheID, Object key, Class<T>target){
-		Object o=get(cacheID,key);
+		Object o = get(cacheID,key);
 		if(o==null)return null;
-		return (T)o;
+		return target.cast(o);
 	}
 
 	private synchronized Cache<Object,Object> doGetCache(String id){
@@ -54,8 +49,5 @@ public class ResourceCache {
 		}
 		return c;
 	}
-	
 
-	
-	
 }

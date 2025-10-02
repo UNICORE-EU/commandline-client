@@ -13,11 +13,9 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.help.HelpFormatter;
-import org.apache.logging.log4j.Logger;
 
 import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
-import eu.unicore.util.Log;
 
 /**
  * Base command class. Defines methods for setting up commandline options, logging, etc.
@@ -25,8 +23,6 @@ import eu.unicore.util.Log;
  * @author schuller
  */
 public abstract class Command implements Constants {
-
-	protected static final Logger logger = Log.getLogger("UCC", Command.class);
 
 	private final UCCOptions options;
 
@@ -87,9 +83,8 @@ public abstract class Command implements Constants {
 
 	// handle special case of requesting help (-h or --help option given)
 	private boolean handleHelp(String[] args){
-		String help="-"+OPT_HELP;
-		String help_long="--"+OPT_HELP_LONG;
-
+		String help = "-"+OPT_HELP;
+		String help_long = "--"+OPT_HELP_LONG;
 		for(String arg: args){
 			if(help.equals(arg) || help_long.equals(arg))return true;
 		}

@@ -291,11 +291,11 @@ public class Runner implements Runnable {
 		if(dryRun){
 			listCandidateSites();
 			msg.info("Dry-run, NOT submitting, effective JSON:");
-			msg.info(submit.toString(2));
+			msg.info("{}", submit.toString(2));
 			return;
 		}
 		findTSS();
-		msg.verbose("Submission endpoint: "+tss.getEndpoint().getUrl());
+		msg.verbose("Submission endpoint: {}", tss.getEndpoint().getUrl());
 		try{
 			if(builder.getImports().size()==0){
 				submit.put("haveClientStageIn", "false");
@@ -502,7 +502,8 @@ public class Runner implements Runnable {
 			if(imp.getChosenProtocol()==null){
 				imp.setPreferredProtocol(preferredProtocol);
 			}
-			imp.perform(jobClient.getWorkingDirectory());
+			imp.setStorageClient(jobClient.getWorkingDirectory());
+			imp.call();
 		}
 		catch(Exception ex){
 			if(imp.isFailOnError()){
@@ -539,7 +540,8 @@ public class Runner implements Runnable {
 			else{
 				sms=jobClient.getWorkingDirectory();
 			}
-			e.perform(sms);
+			e.setStorageClient(sms);
+			e.call();
 		}
 		catch(Exception ex){
 			if(e.isFailOnError()){

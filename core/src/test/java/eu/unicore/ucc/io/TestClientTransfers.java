@@ -23,17 +23,18 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		ActionBase b = (ActionBase)UCC.initCommand(args, false, null);
 		b.initConfigurationProvider();
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
-		
+
 		String url = "https://localhost:65322/rest/core/storages/WORK";
 		File testData = new File("target/data/test1.dat");
 		FileUtils.writeByteArrayToFile(testData, "test123".getBytes());
-		
+
 		StorageClient sc = new StorageClient(new Endpoint(url), 
 				ucp.getClientConfiguration(url), ucp.getRESTAuthN());
 		System.out.println(sc.getProperties().toString(2));
-		
+
 		FileDownloader fd = new FileDownloader("test1.dat", "target/data/download1.dat", FileTransferBase.Mode.NORMAL);
-		fd.perform(sc);
+		fd.setStorageClient(sc);
+		fd.call();
 		checkFilesOK(testData, new File("target/data/download1.dat"));
 	}
 
@@ -46,17 +47,18 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		ActionBase b = (ActionBase)UCC.initCommand(args, false, null);
 		b.initConfigurationProvider();
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
-		
+
 		String url = "https://localhost:65322/rest/core/storages/WORK";
 		File testData = new File("target/data/test1.dat");
 		FileUtils.writeByteArrayToFile(testData, "test123".getBytes());
-		
+
 		StorageClient sc = new StorageClient(new Endpoint(url), 
 				ucp.getClientConfiguration(url), ucp.getRESTAuthN());
 		System.out.println(sc.getProperties().toString(2));
-		
+
 		FileUploader fd = new FileUploader(new File("."), "target/data/test1.dat", "/upload1.dat", FileTransferBase.Mode.NORMAL);
-		fd.perform(sc);
+		fd.setStorageClient(sc);
+		fd.call();
 		checkFilesOK(testData, new File("target/data/upload1.dat"));
 	}
 	
@@ -69,17 +71,18 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		ActionBase b = (ActionBase)UCC.initCommand(args, false, null);
 		b.initConfigurationProvider();
 		UCCConfigurationProvider ucp = b.getConfigurationProvider();
-		
+
 		String url = "https://localhost:65322/rest/core/storages/WORK";
 		File testData = new File("target/data/test1.dat");
 		FileUtils.writeByteArrayToFile(testData, "test123".getBytes());
-		
+
 		StorageClient sc = new StorageClient(new Endpoint(url), 
 				ucp.getClientConfiguration(url), ucp.getRESTAuthN());
 		System.out.println(sc.getProperties().toString(2));
-		
+
 		FileUploader fd = new FileUploader(new File("target/data"), "test1.dat", "/upload1.dat", FileTransferBase.Mode.NORMAL);
-		fd.perform(sc);
+		fd.setStorageClient(sc);
+		fd.call();
 		checkFilesOK(testData, new File("target/data/upload1.dat"));
 	}
 }

@@ -7,9 +7,10 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
+
 import eu.unicore.client.core.FileList;
 import eu.unicore.client.core.FileList.FileListEntry;
-import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
 import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.client.data.UFTPFileTransferClient;
@@ -50,12 +51,12 @@ public class FileDownloader extends FileTransferBase {
 	}
 
 	@Override
-	public void perform(StorageClient sms)throws Exception{
-		assertReady(sms);
+	public JSONObject call()throws Exception {
+		assertReady();
 		boolean isWildcard = hasWildCards(from);
 		FileListEntry remoteSource = null;
 		if(isWildcard){
-			performWildCardExport(sms);
+			performWildCardExport();
 		}
 		else {
 			//check if source is a directory
@@ -64,15 +65,16 @@ public class FileDownloader extends FileTransferBase {
 				if(forceFileOnly){
 					throw new IOException("Source is a directory");
 				}
-				performDirectoryExport(remoteSource, new File(to), sms);
+				performDirectoryExport(remoteSource, new File(to));
 			}
 			else{
-				download(remoteSource,new File(to),sms);
+				download(remoteSource,new File(to));
 			}
-		}	
+		}
+		return new JSONObject();
 	}
 
-	private void performDirectoryExport(FileListEntry directory, File targetDirectory, StorageClient sms)
+	private void performDirectoryExport(FileListEntry directory, File targetDirectory)
 			throws Exception {
 		if(!targetDirectory.exists()|| !targetDirectory.canWrite()){
 			throw new IOException("Target directory <"+to+"> does not exist or is not writable!");
@@ -91,15 +93,15 @@ public class FileDownloader extends FileTransferBase {
 					File newTargetDirectory=new File(targetDirectory,getName(file.path));
 					boolean success=newTargetDirectory.mkdirs();
 					if(!success)throw new IOException("Can create directory: "+newTargetDirectory.getAbsolutePath());
-					performDirectoryExport(file, newTargetDirectory, sms);
+					performDirectoryExport(file, newTargetDirectory);
 					continue;
 				}
 			}
-			download(file, new File(targetDirectory,getName(file.path)), sms);
+			download(file, new File(targetDirectory,getName(file.path)));
 		}
 	}
 
-	private void performWildCardExport(StorageClient sms)throws Exception{
+	private void performWildCardExport()throws Exception{
 		String dir = getDir(from);
 		Pattern p = createPattern(getName(from));
 		if(dir==null)dir="/";
@@ -110,7 +112,7 @@ public class FileDownloader extends FileTransferBase {
 		}
 		for(FileListEntry f: files.list(0, 1000)){
 			if(p.matcher(new File(f.path).getName()).matches()){
-				download(f, targetDir, sms);
+				download(f, targetDir);
 			}
 		}
 	}
@@ -132,7 +134,7 @@ public class FileDownloader extends FileTransferBase {
 	 * @param sms
 	 * @throws Exception
 	 */
-	private void download(FileListEntry source, File localFile, StorageClient sms)throws Exception{
+	private void download(FileListEntry source, File localFile)throws Exception{
 		if(source==null || source.isDirectory){
 			throw new IllegalStateException("Source="+source); 
 		}
@@ -157,7 +159,7 @@ public class FileDownloader extends FileTransferBase {
 				}
 				os = new FileOutputStream(localFile.getAbsolutePath(), append);
 			}
-			chosenProtocol = determineProtocol(preferredProtocol, sms);
+			chosenProtocol = determineProtocol(preferredProtocol);
 			Map<String,String>extraParameters = getExtraParameters(chosenProtocol);
 			ftc = sms.createExport(path, chosenProtocol, extraParameters);
 			configure(ftc, extraParameters);

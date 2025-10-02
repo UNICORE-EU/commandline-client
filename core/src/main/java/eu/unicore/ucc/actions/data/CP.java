@@ -33,11 +33,10 @@ public class CP extends FileOperation {
 
 	private boolean recurse;
 	private boolean resume;
-	
+
 	@Override
 	protected void createOptions() {
 		super.createOptions();
-		
 		getOptions().addOption(Option.builder(OPT_MODE)
 				.longOpt(OPT_MODE_LONG)
 				.desc("(server-server only) Asynchronous mode, writes the transfer ID to a file.")
@@ -137,16 +136,17 @@ public class CP extends FileOperation {
 			url = targetDesc.getSmsEpr();
 			fd = new FileUploader(new File("."), source, to, mode);
 		}
+		StorageClient sms=new StorageClient(new Endpoint(url),
+				configurationProvider.getClientConfiguration(url),
+				configurationProvider.getRESTAuthN());
+		fd.setStorageClient(sms);
 		fd.setStartByte(startByte);
 		fd.setEndByte(endByte);
 		fd.setPreferredProtocol(selectedProtocol);
 		fd.setRecurse(recurse);
 		fd.setExtraParameters(getExtraParameters());
 		fd.setExtraParameterSource(properties);
-		StorageClient sms=new StorageClient(new Endpoint(url),
-				configurationProvider.getClientConfiguration(url),
-				configurationProvider.getRESTAuthN());
-		fd.perform(sms);
+		fd.call();
 	}
 	
 	@Override
@@ -189,12 +189,11 @@ public class CP extends FileOperation {
 
 	// for unit-testing
 	public static String lastTransferAddress;
-	
+
 	private void rawDownload(String url)throws Exception {
 		File tFile = new File(target);
 		try(OutputStream os=new FileOutputStream(tFile)){
 			runRawTransfer(url, os, new ProgressBar(tFile.getName(),-1));
 		}
 	}
-	
 }
