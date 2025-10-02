@@ -1,5 +1,7 @@
 # UNICORE Commandline Client (UCC)
 
+[![Unit tests](https://github.com/UNICORE-EU/commandline-client/actions/workflows/maven.yml/badge.svg)](https://github.com/UNICORE-EU/commandline-client/actions/workflows/maven.yml)
+
 This repository contains the source code for the
 UNICORE Commandline Client (UCC), a full featured
 client for UNICORE, written in Java.
