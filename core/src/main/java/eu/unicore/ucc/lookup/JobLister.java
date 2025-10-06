@@ -35,15 +35,14 @@ public class JobLister implements Iterable<JobClient>{
 		try{
 			final EnumerationClient ec = site.getJobsList();
 			ec.setDefaultTags(tags);
-			
 			return new Iterator<JobClient>(){
-				
+
 				Iterator<String> iter = ec.iterator();
-				
+
 				public boolean hasNext() {
 					return iter.hasNext();
 				}
-				
+
 				public JobClient next() {
 					String url = iter.next();
 					try{

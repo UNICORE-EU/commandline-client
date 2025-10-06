@@ -77,7 +77,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		console.debug("Detailed listing = {}", detailed);
 		raw = getBooleanOption(OPT_RAW_LONG, OPT_RAW);
 		if(doFilter){
-			filter=createFilter(getCommandLine().getOptionValues(OPT_FILTER));
+			filter = createFilter(getCommandLine().getOptionValues(OPT_FILTER));
 		}
 		if(getCommandLine().hasOption(OPT_TAGS)){
 			tags = getCommandLine().getOptionValues(OPT_TAGS);

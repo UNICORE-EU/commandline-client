@@ -10,9 +10,9 @@ import jnr.unixsocket.UnixSocketChannel;
 
 /**
  * Connector to the 'oidc-agent' via UNIX domain socket.
- * 
+ *
  * Modeled after the JSch ssh-agent proxy
- *  
+ *
  * @author schuller
  */
 public class OIDCAgentProxy {

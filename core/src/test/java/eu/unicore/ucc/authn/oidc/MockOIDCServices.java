@@ -7,11 +7,6 @@ import eu.unicore.services.Kernel;
 import eu.unicore.services.rest.USERestApplication;
 import jakarta.ws.rs.core.Application;
 
-/**
- * REST app for the notification receiver
- * 
- * @author schuller
- */
 public class MockOIDCServices extends Application implements USERestApplication {
 
 	@Override
@@ -27,5 +22,5 @@ public class MockOIDCServices extends Application implements USERestApplication 
 	public static boolean isEnabled(Kernel kernel){
 		return kernel.getService("oidc")!=null;
 	}
-	
+
 }
