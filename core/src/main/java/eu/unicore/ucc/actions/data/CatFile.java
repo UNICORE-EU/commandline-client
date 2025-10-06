@@ -49,7 +49,7 @@ public class CatFile extends FileOperation implements StorageConstants {
 				configurationProvider.getClientConfiguration(sourceDesc.getSmsEpr()),
 				configurationProvider.getRESTAuthN());
 		
-		FileDownloader exp=new FileDownloader(sourceDesc.getName(),"", Mode.NORMAL);
+		FileDownloader exp = new FileDownloader(sourceDesc.getName(),"", Mode.NORMAL);
 		String selectedProtocol = getEffectiveProtocol(sourceDesc);
 		exp.setPreferredProtocol(selectedProtocol);
 		exp.setExtraParameterSource(properties);
@@ -62,7 +62,7 @@ public class CatFile extends FileOperation implements StorageConstants {
 			exp.setEndByte(endByte);
 		}
 		exp.setStorageClient(sms);
-		exp.call();
+		exp.callAndCheck();
 	}
 
 	OutputStream getStdout(){

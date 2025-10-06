@@ -55,6 +55,20 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 
 	protected String preferredProtocol;
 
+	public void callAndCheck() throws Exception {
+		JSONObject res = call();
+		if(!"OK".equals(res.optString("status"))){
+			String desc = res.getString("description");
+			String err = res.getString("error");
+			if(res.getBoolean("failOnError")) {
+				throw new Exception(String.format("File transfer %s failed: %s", desc, err));
+			}
+			else {
+				UCC.console.verbose("Ignoring {}: {}", desc, err);
+			}
+		}
+	}
+
 	@Override
 	public JSONObject call()throws Exception {
 		JSONObject res = new JSONObject();
