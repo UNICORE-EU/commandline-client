@@ -1,5 +1,6 @@
 package eu.unicore.ucc.actions.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
@@ -58,7 +59,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	/**
 	 * storage type to create
 	 */
-	private String storageType;
+	private String storageType = "DEFAULT";
 
 	public static final String OPT_TYPE_LONG="type";
 	public static final String OPT_TYPE="t";
@@ -82,7 +83,6 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 				.argName("Site")
 				.hasArg()
 				.required(false)
-				.deprecated()
 				.get());
 		getOptions().addOption(Option.builder(OPT_FACTORY)
 				.longOpt(OPT_FACTORY_LONG)
@@ -94,7 +94,6 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		getOptions().addOption(Option.builder(OPT_TYPE)
 				.longOpt(OPT_TYPE_LONG)
 				.desc("Storage type")
-				.deprecated()
 				.argName("Type")
 				.hasArg()
 				.required(false)
@@ -137,8 +136,8 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		StorageFactoryClient sfc = null;
 		if(factoryURL==null){
 			siteName = getOption(OPT_SITENAME_LONG, OPT_SITENAME);
+			storageType = getOption(OPT_TYPE_LONG, OPT_TYPE);
 		}
-		storageType = getOption(OPT_TYPE_LONG, OPT_TYPE);
 		boolean infoOnly = getBooleanOption(OPT_INFO_LONG, OPT_INFO);
 		// resolve
 		boolean byFactoryURL = factoryURL!=null;
@@ -331,7 +330,11 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		private boolean checkStorageType(BaseServiceClient smf) {
 			try{
 				if(!byType)return true;
-				JSONObject desc = smf.getProperties().getJSONObject("storageDescriptions");
+				JSONObject desc = smf.getProperties().optJSONObject("storageDescriptions");
+				if(desc==null) {
+					return new File(smf.getEndpoint().getUrl()).getName().equalsIgnoreCase(storageType);
+				}
+				// u10 and older has the available types as properties
 				Iterator<String>types = desc.keys();
 				while(types.hasNext()){
 					if(storageType.equals(types.next()))return true;
@@ -342,7 +345,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 			return false;
 		}
 	}
-	
+
 	@Override
 	public Collection<Endpoint> listEndpoints(IRegistryClient registry, UCCConfigurationProvider configurationProvider) throws Exception {
 		Set<Endpoint> ep = new HashSet<>();

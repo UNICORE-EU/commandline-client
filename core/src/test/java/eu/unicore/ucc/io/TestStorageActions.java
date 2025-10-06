@@ -112,20 +112,43 @@ public class TestStorageActions extends EmbeddedTestBase {
 	}
 
 	@Test
-	public void test_Stat()throws Exception{
+	public void test_Stat_Rename()throws Exception{
 		connect();
 		String storage = createNewUspace();
-		String[] args=new String[]{"stat",
+		String[] args = new String[]{"stat",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				storage+"/files/stdout",
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		// multiple args
-		args=new String[]{"stat",
+		args = new String[]{"stat",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				storage+"/files/stdout",
 				storage+"/files/stderr",
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+
+		// non-existent file
+		args = new String[]{"stat",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				storage+"/files/new_name"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
+
+		// rename
+		args = new String[]{"rename",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				storage+"/files/stdout",
+				"new_name"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		args = new String[]{"stat",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				storage+"/files/new_name"
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
@@ -157,8 +180,8 @@ public class TestStorageActions extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
-	
 
+	
 	protected String createNewUspace(){
 		String[] args=new String[]{"run",
 				"-c", "src/test/resources/conf/userprefs.embedded",
