@@ -2,13 +2,14 @@ package eu.unicore.ucc.runner;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.JSONObject;
@@ -120,18 +121,6 @@ public class Runner implements Runnable {
 	public static final String DONE="DONE";
 	public static final String FINISHED="FINISHED";
 	public static final String EXITING="EXITING";
-
-	//error codes
-	public static final String ERR_UNKNOWN="Unkown";
-	public static final String ERR_INVALID_JOB_DEFINITION="InvalidJobDefinition";
-	public static final String ERR_UNMET_REQUIREMENTS="UnmetJobRequirements";
-	public static final String ERR_SITE_UNAVAILABLE="SiteUnavailable";
-	public static final String ERR_NO_SITE="NoSiteAvailable";
-	public static final String ERR_SUBMIT_FAILED="SubmissionFailed";
-	public static final String ERR_LOCAL_IMPORT_FAILED="LocalFileImportFailed";
-	public static final String ERR_START_FAILED="JobStartFailed";
-	public static final String ERR_GET_JOB_STATUS="GettingJobStatusFailed";
-	public static final String ERR_JOB_NOT_COMPLETED_SUCCESSFULLY="JobDidNotCompleteSuccessfully";
 
 	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider, UCCBuilder builder){
 		this(registry,configurationProvider,builder,UCC.console);
@@ -296,19 +285,16 @@ public class Runner implements Runnable {
 		}
 		findTSS();
 		msg.verbose("Submission endpoint: {}", tss.getEndpoint().getUrl());
-		try{
-			if(builder.getImports().size()==0){
-				submit.put("haveClientStageIn", "false");
-				needManualJobStart=false;
-			}
-			int lifetime=builder.getLifetime();
-			if(lifetime>0){
-				Calendar c=Calendar.getInstance();
-				c.add(Calendar.SECOND, lifetime);
-				// submit.put("", ""); // TODO
-			}
-		}catch(Exception e){
-			throw new RunnerException(ERR_INVALID_JOB_DEFINITION,"Could not setup job definition",e);
+
+		if(builder.getImports().size()==0){
+			submit.put("haveClientStageIn", "false");
+			needManualJobStart=false;
+		}
+		int lifetime=builder.getLifetime();
+		if(lifetime>0){
+			Calendar c=Calendar.getInstance();
+			c.add(Calendar.SECOND, lifetime);
+			// submit.put("", ""); // TODO
 		}
 		// honor group and uid preference from job
 		UserPreferences up = ((BaseServiceClient)tss).getUserPreferences();
@@ -320,11 +306,7 @@ public class Runner implements Runnable {
 		if(uid!=null && up.getUid()==null) {
 			up.setUid(uid);
 		}
-		try{
-			jobClient = tss.submitJob(submit);
-		}catch(Exception e){
-			throw new RunnerException(ERR_SUBMIT_FAILED,"Could not submit job",e);
-		}
+		jobClient = tss.submitJob(submit);
 		String url = jobClient.getEndpoint().getUrl();
 		builder.setProperty("_ucc_epr", url);
 		builder.setProperty("_ucc_type", "job");
@@ -351,32 +333,23 @@ public class Runner implements Runnable {
 	 * find a suitable TSS for job submission.
 	 * @throws RunnerException if no matching TSS can be found
 	 */
-	private void findTSS()throws RunnerException {
+	private void findTSS() throws Exception {
 		if(tss!=null) {
 			return;
 		}
 		if(broker==null){
 			broker = UCC.getBroker("LOCAL");
 		}
-		try{
-			Endpoint epr = broker.findTSSAddress(registry, configurationProvider, builder, selectionStrategy);
-			tss = new SiteClient(epr, 
-					configurationProvider.getClientConfiguration(epr.getUrl()),
-					configurationProvider.getRESTAuthN());
-		}
-		catch(RunnerException re){
-			throw re;
-		}
-		catch(Exception ex){
-			String errorReason=Log.createFaultMessage("Error accessing site(s)", ex);
-			throw new RunnerException(ERR_NO_SITE, errorReason, ex);
-		}
+		Endpoint epr = broker.findTSSAddress(registry, configurationProvider, builder, selectionStrategy);
+		tss = new SiteClient(epr, 
+				configurationProvider.getClientConfiguration(epr.getUrl()),
+				configurationProvider.getRESTAuthN());
 	}
 
 	/**
 	 * list suitable TSS for job submission.
 	 */
-	private void listCandidateSites()throws RunnerException {
+	private void listCandidateSites()throws Exception {
 		if(tss!=null) {
 			msg.info("Submission endpoint: {}", tss.getEndpoint().getUrl());
 			return;
@@ -384,18 +357,12 @@ public class Runner implements Runnable {
 		if(broker==null){
 			broker = UCC.getBroker("LOCAL");
 		}
-		try{
-			Collection<Endpoint> eprs=broker.listCandidates(registry, configurationProvider, builder);
-			if(eprs.size()==0){
-				msg.verbose("No matching target system available (try 'connect' or check job requirements)");
-			}
-			for(Endpoint epr: eprs){
-				msg.info("Candidate site: {}", epr.getUrl());
-			}
+		Collection<Endpoint> eprs=broker.listCandidates(registry, configurationProvider, builder);
+		if(eprs.size()==0){
+			msg.verbose("No matching target system available (try 'connect' or check job requirements)");
 		}
-		catch(Exception ex){
-			String errorReason = Log.createFaultMessage("Error accessing site(s)", ex);
-			throw new RunnerException(ERR_NO_SITE, errorReason, ex);
+		for(Endpoint epr: eprs){
+			msg.info("Candidate site: {}", epr.getUrl());
 		}
 	}
 
@@ -443,7 +410,7 @@ public class Runner implements Runnable {
 			e.setShowProgress(false);
 			e.setTargetStream(System.out);
 		}
-		doExport(e);
+		waitFor(performExportToLocal(e));
 		if(outputToConsole){
 			System.out.println();
 			System.out.println("*** End of command output.");
@@ -452,71 +419,55 @@ public class Runner implements Runnable {
 
 	private void doGetStdErr()throws Exception{
 		String stderr = builder.getProperty("Stderr", "stderr");
-		FileDownloader e=new FileDownloader(stderr, stderr, Mode.NORMAL, false);
+		FileDownloader e = new FileDownloader(stderr, stderr, Mode.NORMAL, false);
 		if(outputToConsole){
 			System.out.println("*** Error output: ");
 			System.out.println();
 			e.setShowProgress(false);
 			e.setTargetStream(System.out);
 		}
-		doExport(e);
+		waitFor(performExportToLocal(e));
 		if(outputToConsole){
 			System.out.println();
 			System.out.println("*** End of error output.");
 		}
 	}
 
-	private void doImport()throws RunnerException{
-		doImport(builder.getImports());
-	}
-
 	/**
-	 * do the imports
+	 * do all job imports
 	 */
-	private void doImport(List<FileUploader>uploads)throws RunnerException{
+	private void doImport() throws Exception{
+		List<FileUploader>uploads = builder.getImports();
+		List<Future<JSONObject>> results = new ArrayList<>();
 		for(FileUploader up: uploads){
-			performImportFromLocal(up);
+			results.add(performImportFromLocal(up));
 		}
-	}
-
-	private void doExport()throws Exception{
-		doExport(builder.getExports());
-	}
-
-	private void doExport(FileDownloader ...fd)throws Exception{
-		doExport(Arrays.asList(fd));
+		checkAll(results);
 	}
 
 	/**
-	 * do exports, including a retry using BFT in case of error
+	 * do all job exports
 	 */
-	private void doExport(List<FileDownloader>downloads)throws Exception{
+	private void doExport()throws Exception{
+		List<FileDownloader>downloads = builder.getExports();
+		List<Future<JSONObject>> results = new ArrayList<>();
 		for(FileDownloader d: downloads){
-			performExportToLocal(d);
+			results.add(performExportToLocal(d));
 		}
+		checkAll(results);
 	}
 
-	private void performImportFromLocal(FileUploader imp) throws RunnerException{
-		try{
-			imp.setExtraParameterSource(properties);
-			if(imp.getChosenProtocol()==null){
-				imp.setPreferredProtocol(preferredProtocol);
-			}
-			imp.setStorageClient(jobClient.getWorkingDirectory());
-			imp.call();
+	private Future<JSONObject> performImportFromLocal(FileUploader imp) throws Exception{
+		imp.setExtraParameterSource(properties);
+		if(imp.getChosenProtocol()==null){
+			imp.setPreferredProtocol(preferredProtocol);
 		}
-		catch(Exception ex){
-			if(imp.isFailOnError()){
-				throw new RunnerException(ERR_LOCAL_IMPORT_FAILED,"Import of local file <"+imp.getFrom()+"> failed",ex);
-			}
-			else {
-				msg.verbose("Could not perform import of local file <{}>: {}", imp.getFrom(), ex.getMessage());
-			}
-		}
+		imp.setStorageClient(jobClient.getWorkingDirectory());
+		return UCC.executor.submit(imp);
 	}
 
-	private void performExportToLocal(FileDownloader e)throws Exception{
-		File out=new File(e.getTo());
+	private Future<JSONObject> performExportToLocal(FileDownloader e)throws Exception{
+		File out = new File(e.getTo());
 		if(!out.isAbsolute()){
 			createOutfileDirectory();
 			File f=new File(output, e.getTo());
@@ -526,42 +477,48 @@ public class Runner implements Runnable {
 		if(e.getChosenProtocol()==null){
 			e.setPreferredProtocol(preferredProtocol);
 		}
-		try{
-			//resolve the "from" address
-			Location l = Resolve.resolve(e.getFrom(), registry, configurationProvider);
-			StorageClient sms=null;
-			if(!l.isLocal()){
-				String url = l.getSmsEpr();
-				sms=new StorageClient(new Endpoint(url), 
-						configurationProvider.getClientConfiguration(url),
-						configurationProvider.getRESTAuthN());
-				e.setFrom(l.getName());
-			}
-			else{
-				sms=jobClient.getWorkingDirectory();
-			}
-			e.setStorageClient(sms);
-			e.call();
+		Location l = Resolve.resolve(e.getFrom(), registry, configurationProvider);
+		StorageClient sms;
+		if(!l.isLocal()){
+			String url = l.getSmsEpr();
+			sms = new StorageClient(new Endpoint(url), 
+					configurationProvider.getClientConfiguration(url),
+					configurationProvider.getRESTAuthN());
+			e.setFrom(l.getName());
 		}
-		catch(Exception ex){
-			if(e.isFailOnError()){
-				throw ex;
-			}
-			else{
-				msg.verbose("Could not export file <{}>: {}", e.getFrom(), ex.getMessage());
+		else{
+			sms = jobClient.getWorkingDirectory();
+		}
+		e.setStorageClient(sms);
+		return UCC.executor.submit(e);
+	}
+	
+	private JSONObject waitFor(Future<JSONObject>f) throws Exception {
+		while(!f.isDone()) {
+			Thread.sleep(200);
+		}
+		return f.get();
+	}
+
+	private void checkAll(List<Future<JSONObject>>results) throws Exception {
+		for(Future<JSONObject>f: results) {
+			JSONObject r = waitFor(f);
+			if(!"OK".equals(r.optString("status"))){
+				String desc = r.getString("description");
+				String err = r.getString("error");
+				if(r.getBoolean("failOnError")) {
+					throw new Exception(String.format("File transfer %s failed: %s", desc, err));
+				}
+				else {
+					msg.verbose("Ignoring {}: {}", desc, err);
+				}
 			}
 		}
 	}
 
-	private void startJob()throws RunnerException{
-		try{
-			//jobClient.waitUntilReady(0);
-			jobClient.start();
-			msg.verbose("Job started: "+jobClient.getEndpoint().getUrl());
-		}
-		catch(Exception e){
-			throw new RunnerException(ERR_START_FAILED,"Could not start job",e);
-		}
+	private void startJob()throws Exception{
+		jobClient.start();
+		msg.verbose("Job started: {}", jobClient.getEndpoint().getUrl());
 	}
 
 	private void writeJobIDFile(){
@@ -677,7 +634,7 @@ public class Runner implements Runnable {
 		 * perform actions for this state
 		 * @return the next state
 		 */
-		public State process(Runner r)throws Exception
+		public State process(Runner r) throws Exception
 		{
 			return this;
 		}
@@ -711,7 +668,7 @@ public class Runner implements Runnable {
 		 * The next state is READY.
 		 */
 		states.put(STAGEIN, new State(STAGEIN){
-			public State process(Runner r)throws RunnerException{
+			public State process(Runner r) throws Exception {
 				r.initJobClient();
 				r.doImport();
 				r.mustSave=true;
@@ -731,7 +688,7 @@ public class Runner implements Runnable {
 		 * The next state is STARTED.
 		 */
 		states.put(READY, new State(READY){
-			public State process(Runner r)throws RunnerException{
+			public State process(Runner r) throws Exception {
 				r.initJobClient();
 				r.startJob();
 				r.mustSave=true;
@@ -747,42 +704,34 @@ public class Runner implements Runnable {
 		 * method.
 		 */
 		states.put(STARTED, new State(STARTED){
-			public State process(Runner r)throws RunnerException{
+			public State process(Runner r) throws Exception {
 				r.initJobClient();
 				if(r.asyncMode){
 					if(!r.shouldUpdate()){
 						return getState(STARTED);
 					}
-					try{
-						//check if still running
-						r.getStatus(true);
-						Status status = r.status;
-						if(!Status.SUCCESSFUL.equals(status) &&
-								!Status.FAILED.equals(status)){
-							r.builder.setProperty("_ucc_Update interval", "0");
-							return getState(STARTED);
-						}
-					}catch(Exception ex){
-						throw new RunnerException(ERR_GET_JOB_STATUS,"Error getting job status",ex);
+					// check if still running
+					r.getStatus(true);
+					Status status = r.status;
+					if(!Status.SUCCESSFUL.equals(status) &&
+							!Status.FAILED.equals(status)){
+						r.builder.setProperty("_ucc_Update interval", "0");
+						return getState(STARTED);
 					}
 				}
 				else{
-					try{
-						if(!Boolean.parseBoolean(r.builder.getProperty("_ucc_DetailedStatusDisplay", "false"))){
-							waitUntilDone(r.jobClient,0);
-						}
-						else{
-							String status="";
-							do{
-								status = waitUntilDone(r.jobClient, 1000);
-								r.getStatus(true);
-							}while(!status.equals("SUCCESSFUL") && !status.equals("FAILED"));
-						}
-					}catch(Exception e){
-						throw new RunnerException(ERR_JOB_NOT_COMPLETED_SUCCESSFULLY,"Error waiting for job to finish.",e);
+					if(!Boolean.parseBoolean(r.builder.getProperty("_ucc_DetailedStatusDisplay", "false"))){
+						waitUntilDone(r.jobClient,0);
+					}
+					else{
+						String status="";
+						do{
+							status = waitUntilDone(r.jobClient, 1000);
+							r.getStatus(true);
+						}while(!status.equals("SUCCESSFUL") && !status.equals("FAILED"));
 					}
 				}
-				r.mustSave=true;
+				r.mustSave = true;
 				return getState(STAGEOUT);
 			}
 			public boolean autoProceedToNextState(){

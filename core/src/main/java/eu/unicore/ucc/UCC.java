@@ -54,7 +54,7 @@ public class UCC{
 		return v+", https://www.unicore.eu";
 	}
 
-	public static final ExecutorService executor=new ThreadPoolExecutor(4,4,
+	public static final ExecutorService executor = new ThreadPoolExecutor(4,4,
 			100,TimeUnit.MILLISECONDS,
 			new LinkedBlockingQueue<>(),
 			new ThreadFactory(){

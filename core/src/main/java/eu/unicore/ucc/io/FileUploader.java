@@ -6,8 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import org.json.JSONObject;
-
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
 import eu.unicore.client.data.UFTPConstants;
@@ -37,7 +35,7 @@ public class FileUploader extends FileTransferBase {
 	}
 
 	@Override
-	public JSONObject call()throws Exception {
+	protected void run() throws Exception {
 		assertReady();
 		File fileSpec = new File(from);
 		boolean hasWildCards = false;
@@ -55,7 +53,7 @@ public class FileUploader extends FileTransferBase {
 				to = to+"/"+fileSpec.getName();
 			}
 			uploadFile(fileSpec, to, sms, chosenProtocol, extraParameters);
-			return new JSONObject();
+			return;
 		}
 		//handle wildcards or directory
 		if(hasWildCards){
@@ -71,7 +69,6 @@ public class FileUploader extends FileTransferBase {
 		String target=isDirectory?to+fileSpec.getName():to;
 		sms.mkdir(target);
 		uploadFiles(fileset,target,sms,chosenProtocol,extraParameters);
-		return new JSONObject();
 	}
 
 	/**

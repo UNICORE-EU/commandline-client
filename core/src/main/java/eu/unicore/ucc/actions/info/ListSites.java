@@ -66,9 +66,10 @@ public class ListSites extends ListActionBase<SiteClient> {
 	}
 
 	private void listSite(SiteClient site)throws Exception{
-		properties.put(PROP_LAST_RESOURCE_URL, site.getEndpoint().getUrl());
-		console.info("{} {} {}", site.getProperties().getString("siteName"),
-				site.getEndpoint().getUrl(), getDetails(site));
+		String url = site.getEndpoint().getUrl();
+		properties.put(PROP_LAST_RESOURCE_URL, url);
+		console.info("{} {} {}", site.getProperties().optString("siteName", "<noname>"),
+				url, getDetails(site));
 		printProperties(site);
 	}
 
@@ -77,18 +78,16 @@ public class ListSites extends ListActionBase<SiteClient> {
 	@Override
 	protected String getDetails(SiteClient tss)throws Exception{
 		if(!detailed)return "";
-		StringBuilder details=new StringBuilder();
+		StringBuilder details = new StringBuilder();
 		JSONObject props = tss.getProperties();
 		details.append(_newline).append("  Number of jobs: ").append(props.get("numberOfJobs"));
 
-		boolean first=true;
 		for(String a: JSONUtil.asList(props.getJSONArray("applications"))){
-			if(!first){
+			if(details.length()>0){
 				details.append(", ");
 			}
 			else {
 				details.append(_newline).append("  Applications: ");
-				first=false;
 			}
 			String name = a.split(appSeparator)[0];
 			String version = a.split(appSeparator)[1];

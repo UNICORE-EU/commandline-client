@@ -155,6 +155,14 @@ public abstract class ActionBase extends Command {
 	}
 
 	/**
+	 * returns true if registry access should use the credentials.
+	 * if false, anonymous access will be used to read the registry
+	 */
+	protected boolean authenticateToRegistry(){
+		return Boolean.parseBoolean(properties.getProperty("authenticate-to-registry", "false"));
+	}
+
+	/**
 	 * initialise the configuration provider
 	 * 
 	 * @throws IOException
@@ -174,7 +182,7 @@ public abstract class ActionBase extends Command {
 	 * will not be done. This may or not lead to issues later, depending on the type of command
 	 */
 	protected void initRegistryClient() throws Exception {
-		registryURL=getCommandLine().getOptionValue(OPT_REGISTRY, properties.getProperty(OPT_REGISTRY_LONG));
+		registryURL = getCommandLine().getOptionValue(OPT_REGISTRY, properties.getProperty(OPT_REGISTRY_LONG));
 		if(registryURL==null || registryURL.trim().length()==0){
 			console.debug("No registry is configured.");
 			if(requireRegistry()){
@@ -188,7 +196,7 @@ public abstract class ActionBase extends Command {
 			return;
 		}
 		//accept list of registries either comma- or space-separated
-		String[] urls=registryURL.split("[, ]");
+		String[] urls = registryURL.split("[, ]");
 		if(urls.length>1){
 			MultiRegistryClient erc = new MultiRegistryClient();
 			for(String url: urls){
@@ -196,7 +204,7 @@ public abstract class ActionBase extends Command {
 				console.debug("Registry = {}", url);
 				erc.addRegistry(makeRegistry(url));
 			}
-			registry=erc;
+			registry = erc;
 		}
 		else{
 			console.debug("Registry = {}", registryURL);
@@ -207,10 +215,11 @@ public abstract class ActionBase extends Command {
 
 	protected IRegistryClient makeRegistry(String url)throws Exception{
 		IClientConfiguration sec = configurationProvider.getClientConfiguration(url);
-		IAuthCallback auth = configurationProvider.getRESTAuthN();
+		IAuthCallback auth = authenticateToRegistry()? configurationProvider.getRESTAuthN() :
+			configurationProvider.getAnonymousRESTAuthN();
 		return new RegistryClient(url, sec, auth);
 	}
-	
+
 	protected void testRegistryConnection() throws Exception {
 		if (registry == null)
 		{

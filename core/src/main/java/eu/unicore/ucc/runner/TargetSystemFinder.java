@@ -42,13 +42,13 @@ public class TargetSystemFinder implements Broker, Constants {
 	@Override
 	public Endpoint findTSSAddress(final IRegistryClient registry, 
 			final UCCConfigurationProvider configurationProvider, UCCBuilder builder, SiteSelectionStrategy selectionStrategy)
-					throws Exception{
+					throws Exception {
 		ConsoleLogger msg=builder.getMessageWriter();
 		if(selectionStrategy==null)selectionStrategy = new RandomSelection();
 		final List<SiteClient>available = listSites(registry, configurationProvider, builder);
 		SiteClient tss=null;
 		if(available.size()==0){
-			throw new RunnerException(Runner.ERR_NO_SITE,"No matching target system available (try 'connect' or check job requirements)");
+			throw new Exception("No matching target system available (try 'connect' or check job requirements)");
 		}
 		else{
 			if(msg.isVerbose()){
@@ -108,7 +108,7 @@ public class TargetSystemFinder implements Broker, Constants {
 				try{
 					ErrorHolder err = new ErrorHolder();
 					if(!matches(tsf, requirements, err, checkResources, msg)) {
-						msg.verbose("Skipped {} {}:{}", current, err.code, err.message);
+						msg.verbose("Skipped {}: {}", current, err.message);
 					}
 					else {
 						available.add(tsf);
@@ -133,20 +133,18 @@ public class TargetSystemFinder implements Broker, Constants {
 			for(Requirement r: requirements){
 				msg.verbose("Check requirement: "+r.getDescription());
 				if(r.isFulfilled(props))continue;
-				error.code = Runner.ERR_UNMET_REQUIREMENTS;
 				error.message = "Requirement <"+r.getDescription()+"> not fulfilled on "+tssClient.getEndpoint().getUrl();
 				return false;
 			}
 			return true;
 		}catch(Exception e){
-			error.code = Runner.ERR_SITE_UNAVAILABLE;
 			error.message = Log.createFaultMessage("Can't contact target system", e);
 			return false;
 		}
 	}
 
 	static class ErrorHolder {
-		String code, message;
+		String message;
 	}
 
 }

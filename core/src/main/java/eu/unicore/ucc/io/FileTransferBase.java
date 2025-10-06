@@ -18,6 +18,7 @@ import eu.unicore.uas.FiletransferParameterProvider;
 import eu.unicore.uas.util.PropertyHelper;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.util.JSONUtil;
+import eu.unicore.util.Log;
 
 public abstract class FileTransferBase implements Callable<JSONObject>{
 
@@ -53,6 +54,26 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 	protected boolean failOnError;
 
 	protected String preferredProtocol;
+
+	@Override
+	public JSONObject call()throws Exception {
+		JSONObject res = new JSONObject();
+		res.put("description", from+"->"+to);
+		res.put("failOnError", failOnError);
+		try{
+			run();
+			res.put("status", "OK");
+		}catch(Exception ex) {
+			res.put("status", "FAILED");
+			res.put("error", Log.createFaultMessage("Error", ex));
+		}
+		return res;
+	}
+
+	/**
+	 *  perform the actual transfer
+	 */
+	protected abstract void run() throws Exception;
 
 	public void setStorageClient(StorageClient sms) {
 		this.sms = sms;

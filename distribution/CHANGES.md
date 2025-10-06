@@ -6,9 +6,14 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
-Version 10.2.1 (released MMM dd, 2025)
+Version 10.3.0 (released Oct dd, 2025)
 --------------------------------------
  - improvement: mkdir, stat, rm commands accept multiple targets
+ - improvement: parallelize data file uploads on job submission
+ - registry read access is now anonymous by default to avoid issues
+   when using API tokens for authentication
+ - improvement: less boilerplate output (=noise) in verbose mode
+ - update to 10.3.0 base libs
 
 Version 10.2.0 (released May 28, 2025)
 --------------------------------------

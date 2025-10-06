@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.json.JSONObject;
-
 import eu.unicore.client.core.FileList;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.data.FiletransferClient;
@@ -51,7 +49,7 @@ public class FileDownloader extends FileTransferBase {
 	}
 
 	@Override
-	public JSONObject call()throws Exception {
+	protected void run() throws Exception {
 		assertReady();
 		boolean isWildcard = hasWildCards(from);
 		FileListEntry remoteSource = null;
@@ -71,7 +69,6 @@ public class FileDownloader extends FileTransferBase {
 				download(remoteSource,new File(to));
 			}
 		}
-		return new JSONObject();
 	}
 
 	private void performDirectoryExport(FileListEntry directory, File targetDirectory)

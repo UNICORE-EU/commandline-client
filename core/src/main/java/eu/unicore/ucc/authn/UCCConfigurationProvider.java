@@ -14,5 +14,10 @@ public interface UCCConfigurationProvider extends ClientConfigurationProvider
 
 	public IAuthCallback getRESTAuthN();
 
+	public default IAuthCallback getAnonymousRESTAuthN() {
+		return (httpMessage)-> { /* noop_*/ };
+	}
+
 	public IClientConfiguration getClientConfiguration(String url) throws Exception;
+
 }
