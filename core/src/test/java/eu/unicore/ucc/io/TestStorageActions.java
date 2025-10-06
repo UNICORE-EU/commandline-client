@@ -23,10 +23,24 @@ public class TestStorageActions extends EmbeddedTestBase {
 	public void test_CreateStorage() {
 		UCC.main(new String[]{"create-storage",
 				"-v", "-c", "src/test/resources/conf/userprefs.embedded",
+				"-f", "https://localhost:65322/rest/core/storagefactories/DEFAULT",
+				"-i"}
+		);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+
+		UCC.main(new String[]{"create-storage",
+				"-v", "-c", "src/test/resources/conf/userprefs.embedded",
 				"-f", "https://localhost:65322/rest/core/storagefactories/default_storage_factory"}
 		);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		assertNotNull(CreateStorage.getLastStorageAddress());
+
+		UCC.main(new String[]{"create-storage",
+				"-v", "-c", "src/test/resources/conf/userprefs.embedded",
+				"-f", "https://localhost:65322/rest/core/storagefactories/DEFAULT",
+				"-i"}
+		);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
 		UCC.main(new String[]{"create-storage","-v", "-c", "src/test/resources/conf/userprefs.embedded",
 				"--lifetime", "14",

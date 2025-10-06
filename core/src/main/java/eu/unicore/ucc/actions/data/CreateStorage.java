@@ -229,29 +229,27 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	}
 
 	private String getDescription(StorageFactoryClient sfc) throws Exception {
-		boolean u11mode = true;
+		boolean u11mode = false;
 		JSONObject pr = sfc.getProperties().optJSONObject("storageDescriptions");
 		if(pr==null) {
-			u11mode = false;
+			u11mode = true;
 			pr = new JSONObject();
 			pr.put("description", sfc.getProperties().optString("description", "n/a"));
 			pr.put("parameters", sfc.getProperties().optJSONObject("parameters", new JSONObject()));
 		}
 		StringBuilder sb = new StringBuilder();
-		boolean first = true;
 		if(u11mode) {
-			sb.append(": ").append(pr.getString("description"));
+			sb.append("  Description: ").append(pr.getString("description"));
 			sb.append(_newline).append(getParameterDescription(pr));
 		}
 		else {
 			Iterator<String>types = pr.keys();
 			while(types.hasNext()){
-				if(!first)sb.append(_newline).append("  ");
+				if(sb.length()>0)sb.append(_newline).append("  ");
 				String type = types.next();
 				JSONObject desc = pr.getJSONObject(type);
 				sb.append(getBriefDescription(type, desc));
 				sb.append(_newline).append(getParameterDescription(desc));
-				first=false;
 			}
 		}
 		return sb.toString();
