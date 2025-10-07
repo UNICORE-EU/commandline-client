@@ -26,7 +26,6 @@ import eu.unicore.ucc.util.EmbeddedTestBase;
  */
 public class TestJobRelatedActions extends EmbeddedTestBase {
 
-
 	@Test
 	public void test_Run(){
 		connect();
@@ -60,7 +59,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		System.setIn(in);
 		fis.close();
 	}
-	
+
 	@Test
 	public void test_Run_JobWithUploads(){
 		connect();
@@ -81,13 +80,13 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		connect();
 		run("src/test/resources/jobs/date-with-error-in-staging.u", true);
 	}
-	
+
 	@Test
 	public void test_Run_JobWithWildcardExports(){
 		connect();
 		run("src/test/resources/jobs/date-with-wildcard-exports.u", false);
 	}
-	
+
 	@Test
 	public void test_Run_and_ListJobs(){
 		connect();
@@ -120,10 +119,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-
 		String id2=Run.getLastJobAddress();
-		
-		
 		int c=0;
 		do{
 			args=new String[]{"job-status",
@@ -147,7 +143,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-
 	}
 
 	@Test
@@ -155,7 +150,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		connect();
 		File tmp=new File("target/temp-file-for-upload");
 		FileUtils.writeStringToFile(tmp, "test123", "UTF-8");
-		
+
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/date-with-uploads-tmpfile.u",
@@ -167,9 +162,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		//remove local file, should not cause problems in get-status and get-outcome
 		boolean delete=tmp.delete();
 		if(!delete)System.out.println("Warning, did not delete file");
-		
-		String id1=Run.getLastJobAddress();
-				
+		String id1=Run.getLastJobAddress();	
 		int c=0;
 		do{
 			args=new String[]{"job-status",
@@ -186,16 +179,13 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 		}while(c<5 && !JobStatus.allSuccessful);
 
-
 		args=new String[]{"get-output", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				id1
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-
 	}
-
 
 	@Test
 	public void test_Run_and_Abort(){
@@ -208,8 +198,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-
-
 		args=new String[]{"job-abort", "-v", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				Run.getLastJobAddress(),
@@ -221,7 +209,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	@Test
 	public void test_Run_and_Restart(){
 		connect();
-
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/date.u",
@@ -240,7 +227,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	@Test
 	public void test_Run_Tags(){
 		connect();
-
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/date.u",
@@ -248,17 +234,15 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-
 		args=new String[]{"list-jobs", "-v", "--tags", "test123",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
-	
+
 	@Test
 	public void test_Run_PrintSampleJob(){
-
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-H"
@@ -290,7 +274,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
-	
+
 	@Test
 	public void test_Allocate(){
 		connect();
@@ -320,7 +304,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		String lastTSS = CreateTSS.getLastTargetSystemAddress();
 		assertNotNull(lastTSS);
 	}
-
 
 	protected String createNewUspace(){
 		String[] args=new String[]{"run",

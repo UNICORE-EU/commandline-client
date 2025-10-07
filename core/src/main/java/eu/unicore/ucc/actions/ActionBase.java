@@ -1,10 +1,12 @@
 package eu.unicore.ucc.actions;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.cli.Option;
 
+import eu.unicore.client.lookup.Blacklist;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.restclient.IAuthCallback;
@@ -30,15 +32,16 @@ public abstract class ActionBase extends Command {
 	protected IRegistryClient registry;
 
 	protected UCCConfigurationProvider configurationProvider;
-	
+
 	protected String registryURL;
 
 	protected String authNMethod;
 
 	protected boolean acceptAllIssuers = false;
-	
-	protected String[] blacklist;
-	
+
+	protected String[] blacklist = null;
+	protected Blacklist _blacklist = new Blacklist(null);
+
 	/**
 	 * creates basic options for setting keystore, etc
 	 */
@@ -69,7 +72,7 @@ public abstract class ActionBase extends Command {
 				.required(false)
 				.get()
 				,UCCOptions.GRP_SECURITY);
-		
+
 		getOptions().addOption(Option.builder(OPT_SECURITY_PREFERENCES)
 				.longOpt(OPT_SECURITY_PREFERENCES_LONG)
 				.desc("User preference regarding choice of UNIX login and " +
@@ -82,7 +85,6 @@ public abstract class ActionBase extends Command {
 						.get()
 						,UCCOptions.GRP_SECURITY);
 	}
-
 
 	/* 
 	 * general (preferences, registries, ...)
@@ -115,11 +117,17 @@ public abstract class ActionBase extends Command {
 		setOutputLocation();
 		String blacklistP = properties.getProperty("blacklist", null);
 		if(blacklistP!=null) {
-			blacklist = blacklistP.split("[ ,]+");
-		}else blacklist = new String[0];
-		if(blacklist.length>0) {
-			console.debug("Blacklist = {}", Arrays.asList(blacklist));
+			String[] tokens = blacklistP.split("[ ,]+");
+			List<String>entries = new ArrayList<>();
+			for(String t: tokens) {
+				if(t.length()>0)entries.add(t);
+			}
+			blacklist = entries.toArray(new String[entries.size()]);
+			console.debug("Blacklist = {}", entries);
+		}else {
+			blacklist = null;
 		}
+		_blacklist = new Blacklist(blacklist);
 	}
 
 	@Override
@@ -241,12 +249,7 @@ public abstract class ActionBase extends Command {
 		return Resolve.resolve(descriptor, registry, configurationProvider);
 	}
 
-	protected boolean isBlacklisted(String url) {
-		if(blacklist.length>0) {
-			for(String b: blacklist) {
-				if(url.contains(b))return true;
-			}
-		}
-		return false;
+	protected synchronized boolean isBlacklisted(String url) {
+		return !_blacklist.accept(url);
 	}
 }

@@ -19,6 +19,10 @@ public class ConsoleLogger implements UserLogger {
 		this.prefix =prefix;
 	}
 
+	public String getPrefix(){
+		return prefix;
+	}
+
 	public boolean isVerbose(){ return verbose; }
 	public void setVerbose(boolean verbose){ this.verbose=verbose; }
 	

@@ -7,45 +7,38 @@ import java.util.Map;
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.admin.AdminServiceClient;
 import eu.unicore.client.admin.AdminServiceClient.AdminCommand;
-import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.ucc.actions.info.ListActionBase;
+import eu.unicore.ucc.lookup.SiteFilter;
 
 /**
  * lists accessible admin services and shows information
  *
  * @author schuller
  */
-public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
+public class AdminServiceInfo extends ListActionBase<AdminServiceClient>{
 
 	@Override
-	public void process() throws Exception {
-		super.process();
-		List<AdminServiceClient>clients = createClients();
-		for(AdminServiceClient asc: clients){
-			try{
-				console.debug("Contacting admin service at <{}>", asc.getEndpoint().getUrl());
-			}catch(Exception ex){
-				console.error(ex, "Can't access <{}>", asc.getEndpoint().getUrl());
-				continue;
-			}
-			if(filterMatch(asc)){
-				try{
-					list(asc);
-					lastNumberOfResults++;
-				}catch(Exception ex){
-					console.error(ex, "Error showing admin service info at <{}>", asc.getEndpoint().getUrl());
-				}
-			}						
+	protected Iterable<AdminServiceClient>iterator()throws Exception {
+		List<AdminServiceClient>clients = new ArrayList<>();
+		List<Endpoint> urls = findURLs();
+		for(Endpoint u: urls){
+			AdminServiceClient asc = new AdminServiceClient(u,
+					configurationProvider.getClientConfiguration(u.getUrl()),
+					configurationProvider.getRESTAuthN());
+			clients.add(asc);
 		}
+		return clients;
 	}
 
-	private void list(AdminServiceClient asc)throws Exception{
+	@Override
+	protected void list(AdminServiceClient asc)throws Exception{
 		console.info("{} {}", asc.getEndpoint().getUrl(), getDetails(asc));
 		printProperties(asc);
 	}
 
-	private String getDetails(AdminServiceClient asc)throws Exception{
+	@Override
+	protected String getDetails(AdminServiceClient asc)throws Exception{
 		if(!detailed)return "";
 		StringBuilder details = new StringBuilder();
 		boolean first = true;
@@ -73,28 +66,16 @@ public class AdminServiceInfo extends ListActionBase<BaseServiceClient>{
 		return details.toString();
 	}
 
-	private List<AdminServiceClient> createClients()throws Exception{
-		List<AdminServiceClient>clients = new ArrayList<>();
-		List<Endpoint> urls = findURLs();
-		for(Endpoint u: urls){
-			AdminServiceClient asc = new AdminServiceClient(u,
-					configurationProvider.getClientConfiguration(u.getUrl()),
-					configurationProvider.getRESTAuthN());
-			clients.add(asc);
-		}
-		return clients;
-	}
-
 	private List<Endpoint> findURLs()throws Exception{
-		List<Endpoint>tsfs = registry.listEntries(new RegistryClient.ServiceTypeFilter("TargetSystemFactory"));
+		SiteFilter f = new SiteFilter(siteName, blacklist);
+		List<Endpoint>tsfs = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
 		List<Endpoint>result = new ArrayList<>();
-
 		for(Endpoint epr: tsfs){
+			if(!f.accept(epr))continue;
 			String tsfURL = epr.getUrl();
-			int endIndex = tsfURL.lastIndexOf("/core/factories/");
-			String adminServiceURL=tsfURL.substring(0, endIndex)+"/admin";
-			if(isBlacklisted(adminServiceURL))continue;
-			result.add( new Endpoint(adminServiceURL));
+			int endIndex = tsfURL.lastIndexOf("/core");
+			String adminServiceURL = tsfURL.substring(0, endIndex)+"/admin";
+			result.add(new Endpoint(adminServiceURL));
 		}
 		return result;
 	}

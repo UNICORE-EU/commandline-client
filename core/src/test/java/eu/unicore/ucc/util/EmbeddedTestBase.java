@@ -36,7 +36,6 @@ public abstract class EmbeddedTestBase {
 
 	public static synchronized void setUp(String config)throws Exception{
 		System.out.println("Starting embedded UNICORE/X server.");
-		//clean data directory
 		FileUtils.deleteQuietly(new File("target","data"));
 		uas=new UAS(config);
 		uas.startSynchronous();
@@ -103,11 +102,6 @@ public abstract class EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
-	protected void listStorages(){
-		UCC.main(new String[]{"list-storages","-l","-c","src/test/resources/conf/userprefs.embedded"});
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-	}
-	
 	protected void runDate(){
 		run("src/test/resources/jobs/date.u",false);
 	}

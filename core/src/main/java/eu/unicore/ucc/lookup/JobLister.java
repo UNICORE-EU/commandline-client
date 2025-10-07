@@ -1,66 +1,144 @@
 package eu.unicore.ucc.lookup;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.Logger;
-
+import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.JobClient;
+import eu.unicore.client.lookup.AddressFilter;
+import eu.unicore.client.lookup.Lister;
+import eu.unicore.client.lookup.Producer;
+import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.client.registry.RegistryClient;
+import eu.unicore.services.restclient.IAuthCallback;
+import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.util.Log;
+import eu.unicore.util.Pair;
+import eu.unicore.util.httpclient.IClientConfiguration;
 
-/**
- * Convenient access to the jobs on a given target system
- *
- * @author schuller
- */
-public class JobLister implements Iterable<JobClient>{
+public class JobLister extends Lister<JobClient>{
 
-	private static final Logger logger = Log.getLogger("UCC", JobLister.class);
+	private final IRegistryClient registry;
 
-	private final CoreClient site;
+	private final UCCConfigurationProvider configurationProvider;
 
 	private final String[] tags;
 
-	public JobLister(CoreClient site, String[] tags){
-		this.site = site;
-		this.tags = tags;
+	/**
+	 * @param executor
+	 * @param registry
+	 * @param configurationProvider
+	 * @param tags
+	 */
+	public JobLister(ExecutorService executor, IRegistryClient registry, 
+			UCCConfigurationProvider configurationProvider, String[] tags){
+		this(executor,registry,configurationProvider,new AcceptAllFilter(), tags);
 	}
 
 	/**
-	 * returns an iterator over the available jobs, providing a
-	 * pre-initialised JobClient per job
+	 * 
+	 * @param executor
+	 * @param registry
+	 * @param configurationProvider
+	 * @param addressFilter - filter for accepting/rejecting service URLs 
 	 */
-	public Iterator<JobClient> iterator(){
+	public JobLister(ExecutorService executor, IRegistryClient registry, 
+			UCCConfigurationProvider configurationProvider, AddressFilter addressFilter, 
+			String[] tags){
+		super(executor);
+		this.registry = registry;
+		this.configurationProvider = configurationProvider;
+		this.tags = tags;
+		setAddressFilter(addressFilter);
+	}
+
+	@Override
+	public Iterator<JobClient> iterator() {
 		try{
-			final EnumerationClient ec = site.getJobsList();
+			setupProducers();
+		}
+		catch(Exception ex){
+			throw new RuntimeException(ex);
+		}
+		return super.iterator();
+	}
+
+	protected void setupProducers()throws Exception {
+		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
+		for(Endpoint site: sites){
+			if(addressFilter.accept(site)){
+				var sp = new JobProducer(site, 
+						configurationProvider.getClientConfiguration(site.getUrl()),
+						configurationProvider.getRESTAuthN(), addressFilter, tags);
+				addProducer(sp);
+			}
+		}
+	}
+
+	public static class JobProducer implements Producer<JobClient>{
+
+		private final Endpoint epr;
+
+		protected final IClientConfiguration securityProperties;
+		protected final IAuthCallback auth;
+		
+		protected final List<Pair<Endpoint,String>>errors = new ArrayList<>();
+
+		private AtomicInteger runCount;
+
+		protected BlockingQueue<JobClient> target;
+
+		protected AddressFilter addressFilter;
+		
+		private final String[] tags;
+
+		public JobProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, 
+				AddressFilter addressFilter, String[] tags) {
+			this.epr = epr;
+			this.securityProperties = securityProperties;
+			this.auth = auth;
+			this.addressFilter = addressFilter;
+			this.tags = tags;
+		}
+
+		@Override
+		public void run() {
+			try{
+				handleEndpoint(epr);
+			}
+			catch(Exception ex){
+				errors.add(new Pair<>(epr,Log.createFaultMessage("", ex)));
+			}
+			finally{
+				runCount.decrementAndGet();
+			}
+		}
+
+		private void handleEndpoint(Endpoint epr) throws Exception{
+			CoreClient core = new CoreClient(epr, securityProperties, auth);
+			String storagesUrl = core.getLinkUrl("jobs");
+			EnumerationClient ec = new EnumerationClient(epr.cloneTo(storagesUrl), securityProperties, auth);
 			ec.setDefaultTags(tags);
-			return new Iterator<JobClient>(){
-
-				Iterator<String> iter = ec.iterator();
-
-				public boolean hasNext() {
-					return iter.hasNext();
-				}
-
-				public JobClient next() {
-					String url = iter.next();
-					try{
-						return new JobClient(site.getEndpoint().cloneTo(url),
-								site.getSecurityConfiguration(), 
-								site.getAuth());
-					}catch(Exception e){
-						logger.error("Can't create Job Client.",e);
-						return null;
+			for(String url: ec){
+				if(addressFilter.accept(url)){
+					JobClient c = new JobClient(epr.cloneTo(url), securityProperties, auth);
+					if(addressFilter.accept(c)) {
+						target.put(c);
 					}
 				}
+			}
+		}
 
-				public void remove() {
-					iter.remove();
-				}
-			};
-		}catch(Exception e){
-			throw new RuntimeException(e);
+		@Override
+		public void init(BlockingQueue<JobClient> target, AtomicInteger runCount) {
+			this.target = target;
+			this.runCount = runCount;
 		}
 	}
 

@@ -1,5 +1,6 @@
 	package eu.unicore.ucc.workflow;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -11,10 +12,11 @@ import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.uas.json.JSONUtil;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.info.ListActionBase;
+import eu.unicore.ucc.lookup.SiteFilter;
 import eu.unicore.util.Log;
 import eu.unicore.workflow.WorkflowClient;
-import eu.unicore.workflow.WorkflowFactoryClient;
 
 /**
  * creates a workflow listing
@@ -25,6 +27,8 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 	private boolean listFiles;
 
 	private boolean listJobs;
+
+	private boolean includeInternal;
 
 	@Override
 	public String getName() {
@@ -71,89 +75,70 @@ public class WorkflowInfo extends ListActionBase<WorkflowClient> {
 				.required(false)
 				.get());
 	}
-
 	@Override
-	public void process() throws Exception {
-		super.process();
+	protected void setupOptions() {
+		super.setupOptions();
 		listFiles=detailed && !getBooleanOption("nofiles", "N");
 		listJobs=detailed && !getBooleanOption("nojobs", "j");
 		if(detailed){
 			console.debug("Listing jobs = {}", listJobs);
 			console.debug("Listing names of files = {}", listFiles);
 		}
-		run();
+		includeInternal = !getBooleanOption("no-internal", "n");
 	}
 
-	private void run() throws Exception{
+	@Override
+	protected Iterable<WorkflowClient> iterator() throws Exception{
 		if(getCommandLine().getArgs().length>=2) {
-			for(int i=1; i<getCommandLine().getArgs().length; i++) {
-				listOne(getCommandLine().getArgs()[i]);
-			}
+			List<WorkflowClient> workflows = new ArrayList<>();
+			getCommandLine().getArgList().listIterator(1).forEachRemaining(
+					(url)-> {
+							try{
+								WorkflowClient wf = new WorkflowClient(new Endpoint(url), 
+										configurationProvider.getClientConfiguration(url),
+										configurationProvider.getRESTAuthN());
+								workflows.add(wf);
+							}catch(Exception e) {
+								UCC.console.error(e, "Cannot create client for {}", url);
+							}
+					});
+			return workflows;
 		}
 		else {
-			// list all
-			boolean includeInternal = !getBooleanOption("no-internal", "n");
-			WorkflowFactoryLister workflowFactories = new WorkflowFactoryLister(registry, configurationProvider, includeInternal);
-			for(WorkflowFactoryClient wf: workflowFactories){
-				try{
-					console.verbose("Listing workflows from {}", wf.getEndpoint().getUrl());
-					EnumerationClient jobs = wf.getWorkflowList();
-					jobs.setDefaultTags(tags);
-					Iterator<String>urls = jobs.iterator();
-					while(urls.hasNext()) {
-						String url = urls.next();
-						try {
-							listOne(url);
-						}catch(Exception e) {
-							console.error(e, "Error accessing workflow {}", url);						
-						}
-					}
-				}catch(Exception e){
-					console.error(e, "Error accessing workflows at: {}", wf.getEndpoint().getUrl());
-				}
-			}
+			WorkflowLister lister = new WorkflowLister(UCC.executor, registry, configurationProvider, tags);
+			lister.setAddressFilter(new SiteFilter(siteName, blacklist));
+			lister.setIncludeInternal(includeInternal);
+			return () -> lister.iterator(); 
 		}
-	}
-
-	private void listOne(String url) throws Exception{
-		WorkflowClient wf = new WorkflowClient(new Endpoint(url), 
-				configurationProvider.getClientConfiguration(url),
-				configurationProvider.getRESTAuthN());
-		if(!filterMatch(wf)){
-			return;
-		}
-		console.info("{}{}", url, getDetails(wf));
-		printProperties(wf);
 	}
 
 	@Override
 	protected String getDetails(WorkflowClient workflow)throws Exception{
-		if(!detailed)return "";
 		StringBuilder details=new StringBuilder();
+		details.append(workflow.getEndpoint().getUrl());
 		JSONObject props = workflow.getProperties();
-		String sep=System.getProperty("line.separator");
-		details.append(sep);
+		details.append(_newline);
 		String status = props.getString("status");
 		details.append("  Status: ").append(status);
 		if("FAILED".equals(status)){
-			details.append(sep).append("  Error(s): tbd");
+			details.append(_newline).append("  Error(s): tbd");
 		}
 		List<String> tags =  JSONUtil.toList(props.getJSONArray("tags"));
-		details.append(sep).append("  Tags: ").append(tags);
+		details.append(_newline).append("  Tags: ").append(tags);
 		listParameters(props, details);
 		if(listFiles){
 			listFiles(workflow, details);
 		}
 		if(listJobs){
 			try{
-				details.append(sep).append("  Jobs: ");
+				details.append(_newline).append("  Jobs: ");
 				EnumerationClient jobListClient = workflow.getJobList();
 				for(String u: jobListClient) {
-					details.append(sep).append("    ").append(u);
+					details.append(_newline).append("    ").append(u);
 				}
 			}catch(Exception e){
 				String msg = Log.createFaultMessage("Can't access job list.", e);
-				details.append(sep).append("  ** ERROR: ").append(msg);
+				details.append(_newline).append("  ** ERROR: ").append(msg);
 			}
 		}
 		return details.toString();

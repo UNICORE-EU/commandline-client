@@ -25,6 +25,7 @@ import eu.unicore.ucc.UCCOptions;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UsernameAuthN;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
+import eu.unicore.ucc.util.Spawner;
 
 /**
  * a UCC command that starts an interactive session
@@ -134,7 +135,7 @@ public class Shell extends ActionBase {
 				if(s==null){
 					s="exit";
 				}
-				s=s.trim();
+				s = s.trim();
 				if(s.isEmpty() || s.startsWith("#"))continue;
 
 				if("exit".equalsIgnoreCase(s) || "quit".equalsIgnoreCase(s)){
@@ -192,14 +193,7 @@ public class Shell extends ActionBase {
 					if(acceptAllIssuers) {
 						properties.put(OPT_AUTHN_ACCEPT_ALL_LONG, "true");
 					}
-					Command cmd = UCC.initCommand(args, false, properties);
-					if(cmd!=null){
-						cmd.setProperties(properties);
-						cmd.setPropertiesFile(propertiesFile);
-						UCC.console.setPrefix("[ucc "+cmd.getName()+"]");
-						cmd.process();
-						cmd.postProcess();
-					}
+					new Spawner(this, args).run();
 				}
 				catch(ParseException pex){
 					numberOfErrors++;
@@ -272,7 +266,7 @@ public class Shell extends ActionBase {
 			verbose = UCCOptions.isTrue(properties.getProperty("verbose", String.valueOf(verbose)));
 			UCC.console.setVerbose(verbose);
 			boolean debug = UCC.console.isDebug();
-			debug = UCCOptions.isTrue(properties.getProperty("UCC_DEBUG", String.valueOf(verbose)));
+			debug = UCCOptions.isTrue(properties.getProperty("UCC_DEBUG", String.valueOf(debug)));
 			UCC.console.setDebug(debug);
 		}
 	}

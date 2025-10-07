@@ -8,9 +8,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.unicore.client.Endpoint;
+import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.EnumerationClient;
-import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.lookup.AddressFilter;
 import eu.unicore.client.lookup.Lister;
 import eu.unicore.client.lookup.Producer;
@@ -22,7 +22,7 @@ import eu.unicore.util.Log;
 import eu.unicore.util.Pair;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
-public class StorageLister extends Lister<StorageClient>{
+public class TransferLister extends Lister<BaseServiceClient>{
 
 	private final IRegistryClient registry;
 
@@ -30,15 +30,13 @@ public class StorageLister extends Lister<StorageClient>{
 
 	private final String[] tags;
 
-	private boolean showAll = false;
-
 	/**
 	 * @param executor
 	 * @param registry
 	 * @param configurationProvider
 	 * @param tags
 	 */
-	public StorageLister(ExecutorService executor, IRegistryClient registry, 
+	public TransferLister(ExecutorService executor, IRegistryClient registry, 
 			UCCConfigurationProvider configurationProvider, String[] tags){
 		this(executor,registry,configurationProvider,new AcceptAllFilter(), tags);
 	}
@@ -50,7 +48,7 @@ public class StorageLister extends Lister<StorageClient>{
 	 * @param configurationProvider
 	 * @param addressFilter - filter for accepting/rejecting service URLs 
 	 */
-	public StorageLister(ExecutorService executor, IRegistryClient registry, 
+	public TransferLister(ExecutorService executor, IRegistryClient registry, 
 			UCCConfigurationProvider configurationProvider, AddressFilter addressFilter, 
 			String[] tags){
 		super(executor);
@@ -60,12 +58,8 @@ public class StorageLister extends Lister<StorageClient>{
 		setAddressFilter(addressFilter);
 	}
 
-	public void showAll(boolean showAll) {
-		this.showAll = showAll;
-	}
-
 	@Override
-	public Iterator<StorageClient> iterator() {
+	public Iterator<BaseServiceClient> iterator() {
 		try{
 			setupProducers();
 		}
@@ -79,16 +73,15 @@ public class StorageLister extends Lister<StorageClient>{
 		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
 		for(Endpoint site: sites){
 			if(addressFilter.accept(site)){
-				var sp = new StorageProducer(site, 
+				var sp = new TransferProducer(site, 
 						configurationProvider.getClientConfiguration(site.getUrl()),
 						configurationProvider.getRESTAuthN(), addressFilter, tags);
-				sp.showAll(showAll);
 				addProducer(sp);
 			}
 		}
 	}
 
-	public static class StorageProducer implements Producer<StorageClient>{
+	public static class TransferProducer implements Producer<BaseServiceClient>{
 
 		private final Endpoint epr;
 
@@ -99,15 +92,13 @@ public class StorageLister extends Lister<StorageClient>{
 
 		private AtomicInteger runCount;
 
-		protected BlockingQueue<StorageClient> target;
+		protected BlockingQueue<BaseServiceClient> target;
 
 		protected AddressFilter addressFilter;
 		
 		private final String[] tags;
-		
-		private boolean showAll = false;
 
-		public StorageProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, 
+		public TransferProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, 
 				AddressFilter addressFilter, String[] tags) {
 			this.epr = epr;
 			this.securityProperties = securityProperties;
@@ -131,15 +122,12 @@ public class StorageLister extends Lister<StorageClient>{
 
 		private void handleEndpoint(Endpoint epr) throws Exception{
 			CoreClient core = new CoreClient(epr, securityProperties, auth);
-			String storagesUrl = core.getLinkUrl("storages");
+			String storagesUrl = core.getLinkUrl("transfers");
 			EnumerationClient ec = new EnumerationClient(epr.cloneTo(storagesUrl), securityProperties, auth);
 			ec.setDefaultTags(tags);
-			if(showAll) {
-				ec.setFilter("all");
-			}
 			for(String url: ec){
 				if(addressFilter.accept(url)){
-					StorageClient c = new StorageClient(epr.cloneTo(url), securityProperties, auth);
+					BaseServiceClient c = new BaseServiceClient(epr.cloneTo(url), securityProperties, auth);
 					if(addressFilter.accept(c)) {
 						target.put(c);
 					}
@@ -148,13 +136,9 @@ public class StorageLister extends Lister<StorageClient>{
 		}
 
 		@Override
-		public void init(BlockingQueue<StorageClient> target, AtomicInteger runCount) {
-			this.target=target;
-			this.runCount=runCount;
-		}
-
-		public void showAll(boolean showAll) {
-			this.showAll = showAll;
+		public void init(BlockingQueue<BaseServiceClient> target, AtomicInteger runCount) {
+			this.target = target;
+			this.runCount = runCount;
 		}
 	}
 

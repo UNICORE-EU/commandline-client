@@ -277,6 +277,10 @@ public abstract class Command implements Constants {
 		return properties;
 	}
 
+	public File getPropertiesFile() {
+		return propertiesFile;
+	}
+
 	/**
 	 * gets a numeric option value
 	 * 
@@ -285,7 +289,7 @@ public abstract class Command implements Constants {
 	 * @param defaultValue - default value if option is not given
 	 */
 	protected int getNumericOption(String longForm, String shortForm, int defaultValue){
-		String val=getCommandLine().getOptionValue(shortForm, properties.getProperty(longForm, ""+defaultValue));
+		String val=getCommandLine().getOptionValue(shortForm, properties.getProperty(longForm, String.valueOf(defaultValue)));
 		try{
 			return Integer.parseInt(val);
 		}catch(Exception e){

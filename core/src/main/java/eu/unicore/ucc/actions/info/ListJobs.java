@@ -2,15 +2,11 @@ package eu.unicore.ucc.actions.info;
 
 import java.util.Date;
 
-import org.apache.commons.cli.Option;
-
-import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.JobClient;
-import eu.unicore.client.lookup.CoreEndpointLister;
 import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.actions.shell.URLCompleter;
 import eu.unicore.ucc.lookup.JobLister;
+import eu.unicore.ucc.lookup.SiteFilter;
 
 /**
  * creates a job listing
@@ -19,66 +15,22 @@ import eu.unicore.ucc.lookup.JobLister;
  */
 public class ListJobs extends ListActionBase<JobClient> {
 
-	private String siteName;
-
 	@Override
 	public String getName(){
 		return "list-jobs";
 	}
 
 	@Override
-	protected void createOptions() {
-		super.createOptions();
-		getOptions().addOption(Option.builder(OPT_SITENAME)
-				.longOpt(OPT_SITENAME_LONG)
-				.desc("Site Name")
-				.required(false)
-				.argName("Site")
-				.hasArg()
-				.get());
+	public void setupOptions() {
+		super.setupOptions();
+		if(detailed)printHeader();
 	}
 
 	@Override
-	public void process() throws Exception {
-		super.process();
-		siteName = getCommandLine().getOptionValue(OPT_SITENAME);
-		CoreEndpointLister siteLister = new CoreEndpointLister(registry, configurationProvider,
-				configurationProvider.getRESTAuthN(), UCC.executor);
-		if(detailed)printHeader();
-		for(CoreClient c: siteLister){
-			if(c==null){
-				if(!siteLister.isRunning()){
-					break;
-				}
-			}
-			else{
-				String siteURL = c.getEndpoint().getUrl();
-				try{
-					if(isBlacklisted(siteURL))continue;
-					URLCompleter.registerSiteURL(siteURL);
-					if(!siteNameMatches(siteName, siteURL))continue;
-					for(JobClient job: new JobLister(c, tags)){
-						if(filterMatch(job)){
-							listJob(job);
-							lastNumberOfResults++;
-						}
-					}
-				}catch(Exception ex){
-					console.verbose("Error accessing TSS at {}", siteURL);
-				}
-			}
-		}
-	}
-
-	private void listJob(JobClient job) throws Exception {
-		properties.put(PROP_LAST_RESOURCE_URL, job.getEndpoint().getUrl());
-		if(detailed) {
-			console.info("{}", getDetails(job));
-		}
-		else {
-			console.info("{}", job.getEndpoint().getUrl());
-		}
-		printProperties(job);
+	protected Iterable<JobClient>iterator()throws Exception {
+		JobLister jobLister = new JobLister(UCC.executor, registry, configurationProvider, tags);
+		jobLister.setAddressFilter(new SiteFilter(siteName, blacklist));
+		return () -> jobLister.iterator(); 
 	}
 
 	final String format = " %16s | %10s | %s";

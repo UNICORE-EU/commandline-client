@@ -97,7 +97,9 @@ public class WorkflowFactoryLister extends Lister<WorkflowFactoryClient>{
 							configurationProvider.getRESTAuthN());
 					if(checkExists)try {
 						c.getProperties();
-					}catch(Exception ex) {}
+					}catch(Exception ex) {
+						return;
+					}
 					if(addressFilter.accept(c)) {
 						target.add(c);
 					}

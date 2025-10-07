@@ -3,18 +3,15 @@ package eu.unicore.ucc.actions.info;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.actions.shell.URLCompleter;
+import eu.unicore.ucc.lookup.SiteFilter;
 import eu.unicore.ucc.lookup.SiteLister;
 import eu.unicore.ucc.util.JSONUtil;
 
 public class ListSites extends ListActionBase<SiteClient> {
-
-	private String siteName;
 
 	@Override
 	public String getName(){
@@ -22,66 +19,26 @@ public class ListSites extends ListActionBase<SiteClient> {
 	}
 
 	@Override
-	protected void createOptions() {
-		super.createOptions();
-		getOptions().addOption(Option.builder(OPT_SITENAME)
-				.longOpt(OPT_SITENAME_LONG)
-				.desc("Site Name")
-				.required(false)
-				.argName("Site")
-				.hasArg()
-				.get());
-	}
-
-	@Override
-	public void process() throws Exception {
-		super.process();
+	protected void setupOptions() {
+		super.setupOptions();
 		siteName = getCommandLine().getOptionValue(OPT_SITENAME);
-		SiteLister tssLister = new SiteLister(UCC.executor,registry,configurationProvider);
-		for(SiteClient c: tssLister){
-			try{
-				if(c==null){
-					if(!tssLister.isRunning()){
-						break;
-					}
-					else try{
-						Thread.sleep(100);
-					}catch(Exception ex) {}
-				}
-				else if(filterMatch(c)){
-					String url = c.getEndpoint().getUrl();
-					URLCompleter.registerSiteURL(url);
-					if(!siteNameMatches(siteName, url))continue;
-					listSite(c);
-					properties.put(PROP_LAST_RESOURCE_URL, url);
-					lastNumberOfResults++;
-				}
-			}catch(Exception ex){
-				if(c!=null && c.getEndpoint()!=null) {
-					console.error(ex, "Error listing site at <{}>", c.getEndpoint().getUrl());
-				}
-				else console.error(ex, "");
-			}
-		}
 	}
-
-	private void listSite(SiteClient site)throws Exception{
-		String url = site.getEndpoint().getUrl();
-		properties.put(PROP_LAST_RESOURCE_URL, url);
-		console.info("{} {} {}", site.getProperties().optString("siteName", "<noname>"),
-				url, getDetails(site));
-		printProperties(site);
+	
+	@Override
+	protected Iterable<SiteClient>iterator() throws Exception {
+		SiteLister tssLister = new SiteLister(UCC.executor,registry,configurationProvider);
+		tssLister.setAddressFilter(new SiteFilter(siteName, blacklist));
+		return ()->tssLister.iterator();
 	}
 
 	public static final String appSeparator = "---v";
 
 	@Override
 	protected String getDetails(SiteClient tss)throws Exception{
-		if(!detailed)return "";
 		StringBuilder details = new StringBuilder();
+		details.append(tss.getEndpoint().getUrl()).append(_newline);
 		JSONObject props = tss.getProperties();
-		details.append(_newline).append("  Number of jobs: ").append(props.get("numberOfJobs"));
-
+		details.append("  Number of jobs: ").append(props.get("numberOfJobs"));
 		for(String a: JSONUtil.asList(props.getJSONArray("applications"))){
 			if(details.length()>0){
 				details.append(", ");

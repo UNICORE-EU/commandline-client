@@ -1,6 +1,8 @@
 package eu.unicore.ucc.actions.info;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.json.JSONObject;
@@ -10,7 +12,7 @@ import eu.unicore.client.core.StorageClient;
 import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.actions.shell.URLCompleter;
+import eu.unicore.ucc.lookup.SiteFilter;
 import eu.unicore.ucc.lookup.StorageLister;
 
 public class ListStorages extends ListActionBase<StorageClient> {
@@ -35,72 +37,46 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	}
 
 	@Override
-	public void process() throws Exception {
-		super.process();
+	protected void setupOptions() {
+		super.setupOptions();
 		this.showAll = getCommandLine().hasOption(OPT_ALL);
 		console.debug("Listing job directories = {}", showAll);
-		// do we have a list of storages
+	}
+
+	@Override
+	protected Iterable<StorageClient>iterator()throws Exception {
+		// do we have a list?
 		if(getCommandLine().getArgList().size()>1){
+			List<StorageClient>storages = new ArrayList<>();
 			getCommandLine().getArgList().listIterator(1).forEachRemaining(
 				(url)-> {
-					try{
-						listStorage(makeClient(String.valueOf(url)));
-					}catch(Exception ex){
-						console.error(ex, "Error listing storage at {}", url);
-					}
+						try{
+							storages.add(makeClient(String.valueOf(url)));
+						}catch(Exception e) {
+							UCC.console.error(e, "Cannot create client for {}", url);
+						}
 				});
+			return storages;
 		}
-		else{
-			listAll();
+		else {
+			StorageLister storageLister = new StorageLister(UCC.executor, registry, configurationProvider, tags);
+			storageLister.showAll(showAll);
+			storageLister.setAddressFilter(new SiteFilter(null, blacklist));
+			return () -> storageLister.iterator(); 
 		}
 	}
 
 	private StorageClient makeClient(String url) throws Exception {
 		Endpoint epr = new Endpoint(url);
-		properties.put(PROP_LAST_RESOURCE_URL, url);
 		return new StorageClient(epr, 
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
 	}
 
-	private void listAll(){
-		StorageLister storageLister=new StorageLister(UCC.executor, registry, configurationProvider, tags);
-		storageLister.showAll(showAll);
-		for(StorageClient sms: storageLister){
-			try {
-				if(sms==null){
-					if(!storageLister.isRunning()){
-						break;
-					}
-				}
-				else{
-					if(filterMatch(sms)){
-						listStorage(sms);
-						lastNumberOfResults++;
-					}
-				}
-			}catch(Exception ex) {
-				console.error(ex, "Error listing storage at <{}>", sms.getEndpoint().getUrl());
-			}
-		}
-	}
-
-	private void listStorage(StorageClient storage) throws Exception {
-		String url = storage.getEndpoint().getUrl();
-		try{
-			console.info("{}{}{}", url, _newline, getDetails(storage));
-			properties.put(PROP_LAST_RESOURCE_URL, url);
-			URLCompleter.registerSiteURL(url);
-		}catch(Exception ex){
-			console.error(ex, "Error listing storage at {}", url);
-		}
-		printProperties(storage);
-	}
-
 	@Override
 	protected String getDetails(StorageClient sms) throws Exception  {
-		if(!detailed)return "";
 		StringBuilder sb = new StringBuilder();
+		sb.append(sms.getEndpoint().getUrl()).append(_newline);
 		JSONObject props = sms.getProperties();
 		sb.append("  Description: ").append(props.optString("description"));
 		long free = -1;

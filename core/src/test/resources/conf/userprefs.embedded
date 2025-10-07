@@ -15,3 +15,5 @@ output=target
 client.http.connection.timeout=2000
 client.http.socket.timeout=20000
 client.serverHostnameChecking=NONE
+
+blacklist=test123.com foobar.org

@@ -45,4 +45,14 @@ public class TestListers extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
+	@Test
+	public void test_List_Storages() throws Exception {
+		connect();
+		runDate();
+		String[] args=new String[]{"list-storages", "-v", "-l",
+					"-c", "src/test/resources/conf/userprefs.embedded",
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
 }

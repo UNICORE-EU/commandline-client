@@ -177,7 +177,7 @@ public class FileDownloader extends FileTransferBase {
 							"partial read! Please choose a different protocol!");
 				}
 				UCC.console.verbose("Byte range: {} - {}", startByte, (getRangeSize()>0?endByte:""));
-				SupportsPartialRead pReader=(SupportsPartialRead)ftc;
+				SupportsPartialRead pReader = (SupportsPartialRead)ftc;
 				long length = endByte-startByte+1;
 				if(Long.MAX_VALUE==endByte){
 					length = source.size - startByte;
@@ -185,17 +185,14 @@ public class FileDownloader extends FileTransferBase {
 				if(length>0)pReader.readPartial(startByte, length, os);
 			}
 			else{
-				if(!(ftc instanceof FiletransferOptions.Read)){
-					throw new Exception("Protocol does not support read operation! Please choose a different protocol!");
-				}
 				((FiletransferOptions.Read)ftc).readAllData(os);
 			}
 			if(p!=null){
 				p.finish();
 			}
 			if(timing){
-				long duration=System.currentTimeMillis()-startTime;
-				double rate=(double)localFile.length()/(double)duration;
+				long duration = System.currentTimeMillis()-startTime;
+				double rate = (double)localFile.length()/(double)duration;
 				UCC.console.info("Rate: {} kB/sec.", UCC.numberFormat.format(rate));
 			}
 			if(targetStream==null)copyProperties(source, localFile);
@@ -208,13 +205,6 @@ public class FileDownloader extends FileTransferBase {
 			}
 			if(ftc!=null){
 				try{
-					// try to get some more error info
-					// JSONObject props = ftc.getProperties();
-					// String description = props.optString("description");
-					// String finalStatus = props.optString("status");
-					// if("FAILED".equals(finalStatus)){
-					//	 msg.error("Filetransfer error: "+description, null);
-					// }
 					ftc.delete();
 				}catch(Exception e1){}
 			}
