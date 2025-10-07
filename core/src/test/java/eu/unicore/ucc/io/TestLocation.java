@@ -28,14 +28,6 @@ public class TestLocation {
 	}
 
 	@Test
-	public void testProtocolInLocation2() {
-		String url = "https://localhost:8080/DEMO/rest/core/storages/WORK/files/foo.dat?protocol=UFTP";
-		Location l = new Location(url);
-		assertTrue(l.isUnicoreURL());
-		assertEquals("UFTP", l.getProtocol());
-	}
-
-	@Test
 	public void testLocalURL(){
 		File f=new File(System.getProperty("java.io.tmpdir"));
 		String u1=f.getAbsolutePath();

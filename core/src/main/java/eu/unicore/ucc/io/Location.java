@@ -50,7 +50,7 @@ public class Location implements eu.unicore.uas.json.Location {
 		this(desc, "BFT");
 	}
 	
-	//pattern describing a UNICORE REST file URL: <PROTOCOL>:https://<url>/rest/core/storages/<storage_name>/<files>/path
+	//pattern describing a UNICORE REST file URL: <PROTOCOL>:https://<url>/rest/core/storages/<storage_name>/<files>/path?query
 	final protected static String u8URLRE= "(([[\\w-]]+):)?([\\w-])+://.*/rest/core/storages/(.)*(/files/)?(.)*";
 	final public static Pattern pattern = Pattern.compile(u8URLRE); 
 
