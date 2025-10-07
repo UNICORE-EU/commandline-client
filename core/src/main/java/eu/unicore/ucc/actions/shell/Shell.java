@@ -223,6 +223,7 @@ public class Shell extends ActionBase {
 	 * @param args
 	 */
 	private boolean processSpecial(String[] args) throws Exception {
+		args = Spawner.expandArgs(args, properties);
 		String cmd = args[0];
 		if("set".equalsIgnoreCase(cmd)){
 			handleSet(args);

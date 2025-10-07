@@ -91,6 +91,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	@Override
 	public void process() throws Exception {
 		super.process();
+		properties.remove(PROP_LAST_RESOURCE_URL);
 		lastNumberOfResults = 0;
 		setupOptions();
 		for(T entry: iterator()) {
@@ -199,13 +200,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	 * spawn a UCC command for the given endpoint
 	 */
 	protected void handleExec(T entry) throws Exception {
-		String[] args = new String[execArgs.length];
-		for(int i=0; i<execArgs.length; i++) {
-			if(execArgs[i].contains("{}")) {
-				args[i] = execArgs[i].replace("{}", entry.getEndpoint().getUrl());
-			}
-			else args[i] = execArgs[i];
-		}
+		String[] args = Arrays.copyOf(execArgs, execArgs.length);
 		new Spawner(this, args).run();
 	}
 

@@ -38,7 +38,7 @@ public class Spawner {
 		}
 	}
 
-	private String[] expandArgs(String[] args, Properties p) {
+	public static String[] expandArgs(String[] args, Properties p) {
 		String[]res = new String[args.length];
 		for(int i=0; i<args.length; i++) {
 			res[i] = expandVariables(args[i],p);
@@ -46,7 +46,7 @@ public class Spawner {
 		return res;
 	}
 
-	private String expandVariables(String var, Properties p){
+	public static String expandVariables(String var, Properties p){
 		for(String key: p.stringPropertyNames()) {
 			if(!var.contains(key))continue;
 			if(var.contains("${"+key+"}")){
