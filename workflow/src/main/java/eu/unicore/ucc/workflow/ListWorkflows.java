@@ -22,7 +22,7 @@ import eu.unicore.workflow.WorkflowClient;
  * creates a workflow listing
  * @author schuller
  */
-public class WorkflowInfo extends ListActionBase<WorkflowClient> {
+public class ListWorkflows extends ListActionBase<WorkflowClient> {
 
 	private boolean listFiles;
 

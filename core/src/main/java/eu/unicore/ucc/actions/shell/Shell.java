@@ -172,7 +172,7 @@ public class Shell extends ActionBase {
 					continue;
 				}
 				// it is a command
-				String[] args = parseCmdlineWithVars(s);
+				String[] args = parseCmdline(s);
 				if(UCC.console.isVerbose()) {
 					StringBuilder sb = new StringBuilder();
 					for(String a: args)sb.append(a).append(" ");
@@ -321,30 +321,6 @@ public class Shell extends ActionBase {
 	}
 
 	private static Pattern p = Pattern.compile("\"([^\"]*)\"|(\\S+)");
-
-	private String[] parseCmdlineWithVars(String cmdArgs) throws IOException {
-		String[] args = parseCmdline(cmdArgs);
-		for(int i=0; i<args.length; i++) {
-			String s = args[i];
-			if(s.contains("$")) {
-				args[i] = expandVariables(s);
-			}
-		}
-		return args;
-	}
-
-	private String expandVariables(String var){
-		for(String key: properties.stringPropertyNames()) {
-			if(!var.contains(key))continue;
-			if(var.contains("${"+key+"}")){
-				var = var.replace("${"+key+"}", String.valueOf(properties.get(key)));
-			}
-			else if(var.contains("$"+key)){
-				var = var.replace("$"+key, String.valueOf(properties.get(key)));				
-			}
-		}
-		return var;
-	}
 
 	private int numberOfErrors = 0;
 

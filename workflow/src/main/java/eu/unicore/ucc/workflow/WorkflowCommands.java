@@ -13,7 +13,7 @@ public class WorkflowCommands implements ProvidedCommands {
 		return new Command[]{
 				new SubmitWorkflow(),
 				new WorkflowControl(),
-				new WorkflowInfo(),
+				new ListWorkflows(),
 		};
 	}
 

@@ -19,7 +19,7 @@ _ucc()
   # looking for arguments matching to command
   case "${COMP_WORDS[1]}" in
     admin-info)
-    opts="$global_opts --fields --filter --long --raw --tags"
+    opts="$global_opts --execute --fields --filter --long --raw --sitename --tags"
     ;;
     admin-runcommand)
     opts="$global_opts --sitename --url"
@@ -67,25 +67,25 @@ _ucc()
     opts="$global_opts --all --long --timeout --wait-for"
     ;;
     list-jobs)
-    opts="$global_opts --fields --filter --long --raw --sitename --tags"
+    opts="$global_opts --execute --fields --filter --long --raw --sitename --tags"
     ;;
     list-sites)
-    opts="$global_opts --fields --filter --long --raw --sitename --tags"
+    opts="$global_opts --execute --fields --filter --long --raw --sitename --tags"
     ;;
     list-storages)
-    opts="$global_opts --all --fields --filter --long --raw --tags"
+    opts="$global_opts --all --execute --fields --filter --long --raw --sitename --tags"
     ;;
     list-transfers)
-    opts="$global_opts --fields --filter --long --raw --tags"
+    opts="$global_opts --execute --fields --filter --long --raw --sitename --tags"
     ;;
     list-workflows)
-    opts="$global_opts --fields --filter --long --no-files --no-internal --no-jobs --raw --tags"
+    opts="$global_opts --execute --fields --filter --long --no-files --no-internal --no-jobs --raw --sitename --tags"
     ;;
     ls)
     opts="$global_opts --human --long --recursive --show-metadata"
     ;;
     metadata)
-    opts="$global_opts --advanced-query --command --file --query --storage --wait"
+    opts="$global_opts --command --file --query --storage --wait"
     ;;
     mkdir)
     opts="$global_opts "

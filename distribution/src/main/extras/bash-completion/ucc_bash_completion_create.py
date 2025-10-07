@@ -19,7 +19,6 @@ def find_commands():
             continue
         else:
             commands.append(line.split()[0])
-
     return commands
 
 
@@ -32,9 +31,7 @@ def find_options(command):
         if not line.startswith(" -"):
             continue
         else:
-            s = line.split()[0]
-            options.append(s.split(",")[1])
-
+            options.append(line.split()[1])
     return options
 
 

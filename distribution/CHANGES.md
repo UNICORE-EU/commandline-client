@@ -8,11 +8,15 @@ Report any issues via the
 
 Version 10.3.0 (released Oct dd, 2025)
 --------------------------------------
+ - new feauture: list-* commands can execute a command for each match
+   as given by the "--execute" option
  - improvement: mkdir, stat, rm commands accept multiple targets
  - improvement: parallelize data file uploads on job submission
  - registry read access is now anonymous by default to avoid issues
    when using API tokens for authentication
  - improvement: less boilerplate output (=noise) in verbose mode
+ - improvement: unified options on list-* commands
+ - improvement: simpler syntax for filtering list-* commands
  - update to 10.3.0 base libs
 
 Version 10.2.0 (released May 28, 2025)

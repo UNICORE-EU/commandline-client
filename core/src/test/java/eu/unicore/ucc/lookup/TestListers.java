@@ -55,4 +55,16 @@ public class TestListers extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
+	
+	@Test
+	public void test_List_Jobs_Exec() throws Exception {
+		connect();
+		runDate();
+		String[] args=new String[]{"list-jobs", "-v", "-l",
+					"-c", "src/test/resources/conf/userprefs.embedded",
+					"--execute", "rest", "get", "{}?fields=status"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
 }

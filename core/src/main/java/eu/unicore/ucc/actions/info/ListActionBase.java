@@ -9,6 +9,7 @@ import eu.unicore.client.lookup.Filter;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.actions.shell.URLCompleter;
 import eu.unicore.ucc.lookup.PropertyFilter;
+import eu.unicore.ucc.util.Spawner;
 /**
  * Base class for actions creating a listing.<br/>
  * 
@@ -96,6 +97,9 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 			if(filterMatch(entry)){
 				URLCompleter.registerSiteURL(entry.getEndpoint().getUrl());
 				list(entry);
+				if(getCommandLine().hasOption(OPT_EXEC)) {
+					handleExec(entry);
+				}
 			}
 		}
 	}
@@ -188,12 +192,21 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	protected boolean filterMatch(T resource) throws Exception {
 		if(resource==null)return false;
 		if(isBlacklisted(resource.getEndpoint().getUrl()))return false;
-		if(!doFilter)return true;
-		return filter.accept(resource);
+		return !doFilter || filter.accept(resource);
 	}
 
-	protected boolean siteNameMatches(String name, String url) {
-		return name==null || (url!=null && url.contains("/"+name+"/"));
+	/**
+	 * spawn a UCC command for the given endpoint
+	 */
+	protected void handleExec(T entry) throws Exception {
+		String[] args = new String[execArgs.length];
+		for(int i=0; i<execArgs.length; i++) {
+			if(execArgs[i].contains("{}")) {
+				args[i] = execArgs[i].replace("{}", entry.getEndpoint().getUrl());
+			}
+			else args[i] = execArgs[i];
+		}
+		new Spawner(this, args).run();
 	}
 
 	//for unit testing
