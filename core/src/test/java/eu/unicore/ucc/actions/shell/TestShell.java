@@ -53,7 +53,7 @@ public class TestShell extends EmbeddedTestBase {
 	@Test
 	public void test_Shell()throws Exception{
 		connect();
-		String[]args=new String[]{"shell",
+		String[]args=new String[]{"shell", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-f", "src/test/resources/shell_input",
 		};

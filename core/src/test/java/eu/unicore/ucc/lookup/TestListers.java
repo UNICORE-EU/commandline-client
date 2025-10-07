@@ -62,7 +62,7 @@ public class TestListers extends EmbeddedTestBase {
 		runDate();
 		String[] args=new String[]{"list-jobs", "-v", "-l",
 					"-c", "src/test/resources/conf/userprefs.embedded",
-					"--execute", "rest", "get", "{}?fields=status"
+					"--execute", "rest", "get", "$_?fields=status"
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
