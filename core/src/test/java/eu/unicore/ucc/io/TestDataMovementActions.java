@@ -17,6 +17,7 @@ import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.CP;
 import eu.unicore.ucc.actions.data.LS;
+import eu.unicore.ucc.util.MockServer;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
 public class TestDataMovementActions extends EmbeddedTestBase {
@@ -208,7 +209,74 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
+	@Test
+	public void test_Upload_Resume()throws IOException{
+		String storage = createUspace();
+		String data="0123456789abcdefghijklmnopqrstuvwxyz";
+		File t=new File("target","test-upload-"+System.currentTimeMillis());
+		FileUtils.writeStringToFile(t, data, "UTF-8");
+		int endByte=3;
+		String[] args=new String[]{"cp", t.getPath(),
+				"BFT:"+storage+"/files/test",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-B", "0-"+endByte
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		// resume to upload fully
+		args=new String[]{"cp", t.getPath(),
+				"BFT:"+storage+"/files/test",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"--resume"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		// get the file
+		t=new File("target","test-get-file"+System.currentTimeMillis());
+		args=new String[]{"cp", "BFT:"+storage+"/files/test",
+				t.getPath(),
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"--with-timing"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		assertEquals(data, FileUtils.readFileToString(t, "UTF-8"));
+	}
 
+	@Test
+	public void test_Download_Resume()throws IOException{
+		String storage = createUspace();
+		String data="0123456789abcdefghijklmnopqrstuvwxyz";
+		File t = new File("target","test-upload-"+System.currentTimeMillis());
+		FileUtils.writeStringToFile(t, data, "UTF-8");
+		// upload first
+		String[] args=new String[]{"cp", t.getPath(),
+				"BFT:"+storage+"/files/test",
+				"-c", "src/test/resources/conf/userprefs.embedded"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		File t2 = new File("target","downloaded-test-"+System.currentTimeMillis());	
+		int endByte=3;
+		args=new String[]{"cp", "BFT:"+storage+"/files/test",
+				t2.getPath(),
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-B", "0-"+endByte
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		// resume to download fully
+		args = new String[]{"cp", "BFT:"+storage+"/files/test",
+				t2.getPath(),
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"--resume", "--with-timing"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		assertEquals(data, FileUtils.readFileToString(t2, "UTF-8"));
+	}
+
+	
 	@Test
 	public void test_CopyFile_and_CopyFileStatus()throws IOException{
 		String storage  = createUspace();
@@ -507,7 +575,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 	@Test
 	public void test_CP_FromHttpURL()throws IOException{
 		String storage = createUspace();
-
 		String[] args=new String[]{"cp", "https://localhost:65322/rest/core",
 				"BFT:"+storage+"/files/file1",
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -515,7 +582,26 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		
 	}
 
+	@Test
+	public void test_CP_ToHttpURL()throws IOException{
+		String storage = runDate();
+		MockServer serv = new MockServer(true);
+		try{
+			serv.start();
+			int port = serv.getServerPort();
+			String httpUrl = "http://127.0.0.1:"+port;
+			String[] args=new String[]{"cp", "BFT:"+storage+"/files/stdout",
+					httpUrl,
+					"-c", "src/test/resources/conf/userprefs.embedded",
+					"-v"
+			};
+			UCC.main(args);
+			assertEquals(Integer.valueOf(0),UCC.exitCode);
+		}
+		finally {
+			serv.shutdown();
+		}
+	}
 }

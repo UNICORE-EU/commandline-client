@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.job.Run;
-import eu.unicore.ucc.util.EchoServer;
+import eu.unicore.ucc.util.MockServer;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
 public class TestOpenTunnel extends EmbeddedTestBase {
@@ -21,7 +21,7 @@ public class TestOpenTunnel extends EmbeddedTestBase {
 		File sessions=new File("target","ucc-session-ids");
 		FileUtils.deleteQuietly(sessions);
 		connect();
-		EchoServer ec = new EchoServer();
+		MockServer ec = new MockServer(false);
 		ec.start();
 		runDate();
 
