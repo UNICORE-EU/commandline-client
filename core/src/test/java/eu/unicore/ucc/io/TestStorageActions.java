@@ -131,7 +131,7 @@ public class TestStorageActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Stat_Rename()throws Exception{
-		String storage = createUspace();
+		String storage = runDate();
 		String[] args = new String[]{"stat",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				storage+"/files/stdout",

@@ -414,7 +414,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_CatFile()throws IOException{
-		String storage = createUspace();
+		String storage = runDate();
 		String[] args=new String[]{"cat",
 				"BFT:"+storage+"/files/stdout", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",

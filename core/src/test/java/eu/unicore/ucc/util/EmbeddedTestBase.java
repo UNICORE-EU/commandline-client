@@ -84,8 +84,9 @@ public abstract class EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
-	protected static void runDate(){
+	protected static String runDate(){
 		run("src/test/resources/jobs/date.u",false);
+		return Run.getLastJobDirectory();
 	}
 
 	protected static String createUspace(){
