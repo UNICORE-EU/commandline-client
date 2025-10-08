@@ -137,7 +137,7 @@ public class FileDownloader extends FileTransferBase {
 		}
 		OutputStream os = targetStream;
 		FiletransferClient ftc=null;
-		boolean resume = false;
+		boolean resume = Mode.RESUME.equals(mode);
 		boolean append = Mode.APPEND.equals(mode) || resume;
 		try{
 			String path = source.path;
