@@ -146,6 +146,7 @@ public class CP extends FileOperation {
 		fd.setRecurse(recurse);
 		fd.setExtraParameters(getExtraParameters());
 		fd.setExtraParameterSource(properties);
+		fd.setTiming(timing);
 		fd.callAndCheck();
 	}
 	
