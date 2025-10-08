@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.CreateStorage;
 import eu.unicore.ucc.actions.data.Metadata;
-import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
 /**
@@ -23,13 +22,11 @@ public class TestMetadata extends EmbeddedTestBase {
 	@Test
 	public void test_Metadata()throws Exception{
 		connect();
-
 		String[] args=new String[]{"create-storage", "-v", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		
 		String storage = CreateStorage.getLastStorageAddress();
 		
 		// create file first
@@ -116,17 +113,6 @@ public class TestMetadata extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		assertTrue(Metadata.lastSearchResults.size()>0);
-	}
-	
-
-	protected String createNewUspace(){
-		String[] args=new String[]{"run",
-				"-c", "src/test/resources/conf/userprefs.embedded",
-				"src/test/resources/jobs/date.u",
-		};
-		UCC.main(args);
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		return Run.getLastJobDirectory();
 	}
 
 }

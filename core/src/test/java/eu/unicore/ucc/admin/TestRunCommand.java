@@ -2,6 +2,7 @@ package eu.unicore.ucc.admin;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.UCC;
@@ -9,9 +10,13 @@ import eu.unicore.ucc.util.EmbeddedTestBase;
 
 public class TestRunCommand extends EmbeddedTestBase {
 
+	@BeforeAll
+	public static void setup() {
+		connect();
+	}
+
 	@Test
 	public void testRunCommand(){
-		connect();
 		String[] args=new String[]{"admin-runcommand", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"ToggleJobSubmission"
@@ -22,7 +27,6 @@ public class TestRunCommand extends EmbeddedTestBase {
 
 	@Test
 	public void testParametrisedRunCommand(){
-		connect();
 		String[] args=new String[]{"admin-runcommand", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"mock", "key=value", "foo=spam",
@@ -33,7 +37,6 @@ public class TestRunCommand extends EmbeddedTestBase {
 	
 	@Test
 	public void testInvokeWrongAction(){
-		connect();
 		String[] args=new String[]{"admin-runcommand", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"no-such-action",

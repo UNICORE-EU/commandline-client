@@ -9,13 +9,6 @@ import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
 public class TestREST extends EmbeddedTestBase {
-	
-	@Override
-	protected void connect(){
-		UCC.main(new String[]{"connect",
-				"-c", "src/test/resources/conf/userprefs.embedded"});
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-	}
 
 	@Test
 	public void testREST() throws Exception {

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.UCC;
@@ -26,15 +27,18 @@ import eu.unicore.ucc.util.EmbeddedTestBase;
  */
 public class TestJobRelatedActions extends EmbeddedTestBase {
 
+	@BeforeAll
+	public static void setup() {
+		connect();
+	}
+
 	@Test
 	public void test_Run(){
-		connect();
 		runDate();
 	}
 
 	@Test
 	public void test_RunMulti(){
-		connect();
 		String job="src/test/resources/jobs/date.u";
 		String[] args=new String[]{"run",
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -47,29 +51,26 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Run_JobFromStdin()throws IOException{
-		connect();
 		InputStream in=System.in;
-		FileInputStream fis=new FileInputStream("src/test/resources/jobs/date.u");
-		System.setIn(fis);
-		String[] args=new String[]{"run","-v",
-				"-c", "src/test/resources/conf/userprefs.embedded",
-		};		
-		UCC.main(args);
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		System.setIn(in);
-		fis.close();
+		try(FileInputStream fis=new FileInputStream("src/test/resources/jobs/date.u")){
+			System.setIn(fis);
+			String[] args = new String[]{"run","-v",
+					"-c", "src/test/resources/conf/userprefs.embedded",
+			};		
+			UCC.main(args);
+			assertEquals(Integer.valueOf(0),UCC.exitCode);
+			System.setIn(in);
+		}
 	}
 
 	@Test
 	public void test_Run_JobWithUploads(){
-		connect();
 		run("src/test/resources/jobs/date-with-uploads.u", true);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
 	@Test
 	public void test_Run_With_UNICORE_Staging() throws Exception {
-		connect();
 		File testData = new File("target/data/file1");
 		FileUtils.writeByteArrayToFile(testData, "test123".getBytes());
 		run("src/test/resources/jobs/date-with-u6-staging.u", true);
@@ -77,19 +78,16 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Run_WithErrorInStageOut(){
-		connect();
 		run("src/test/resources/jobs/date-with-error-in-staging.u", true);
 	}
 
 	@Test
 	public void test_Run_JobWithWildcardExports(){
-		connect();
 		run("src/test/resources/jobs/date-with-wildcard-exports.u", false);
 	}
 
 	@Test
 	public void test_Run_and_ListJobs(){
-		connect();
 		runDate();
 		String[] args=new String[]{"list-jobs", "-v", "-l",
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -101,7 +99,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Run_Async(){
-		connect();
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/date.u",
@@ -111,7 +108,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
 		String id1 = Run.getLastJobAddress();
-		
+
 		args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/date.u",
@@ -147,7 +144,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Run_Async_MissingLocalFile()throws IOException{
-		connect();
 		File tmp=new File("target/temp-file-for-upload");
 		FileUtils.writeStringToFile(tmp, "test123", "UTF-8");
 
@@ -189,8 +185,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Run_and_Abort(){
-		connect();
-
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/sleep.u",
@@ -208,7 +202,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Run_and_Restart(){
-		connect();
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/date.u",
@@ -226,7 +219,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Run_Tags(){
-		connect();
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/date.u",
@@ -253,7 +245,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Exec(){
-		connect();
 		String[] args=new String[]{"exec", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"/bin/date",
@@ -264,7 +255,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Exec_with_fake_allocation(){
-		connect();
 		String[] args=new String[]{"exec", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				// this will serve as a fake allocation we can submit into
@@ -277,7 +267,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Allocate(){
-		connect();
 		String[] args=new String[]{"allocate", "-v", "--dry-run",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"Nodes=2", "Runtime=1h", "Queue=dev"
@@ -291,8 +280,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_CreateTSS() throws Exception {
-		connect();
-
 		String[] args=new String[]{"create-tss", "-v", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-l", "2",
@@ -303,16 +290,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		String lastTSS = CreateTSS.getLastTargetSystemAddress();
 		assertNotNull(lastTSS);
-	}
-
-	protected String createNewUspace(){
-		String[] args=new String[]{"run",
-				"-c", "src/test/resources/conf/userprefs.embedded",
-				"src/test/resources/jobs/date.u",
-		};
-		UCC.main(args);
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		return Run.getLastJobDirectory();
 	}
 
 }

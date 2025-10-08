@@ -72,7 +72,7 @@ public class TestGeneralActions extends EmbeddedTestBase {
 	public void test_MultiRegistry() throws Exception {
 		File sessions=new File("target","ucc-session-ids");
 		FileUtils.deleteQuietly(sessions);
-		this.prefsFile = "src/test/resources/conf/userprefs.multiregistry";
+		prefsFile = "src/test/resources/conf/userprefs.multiregistry";
 		connect();
 		IRegistryClient reg = ((Connect)UCC.lastCommand).getRegistry();
 		assertTrue(reg instanceof MultiRegistryClient);
@@ -95,7 +95,6 @@ public class TestGeneralActions extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
-
 
 	@Test
 	public void test_Share()throws Exception{

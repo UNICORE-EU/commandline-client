@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import eu.unicore.uas.UAS;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.actions.job.Run;
 
 /**
  * starts an embedded UNICORE/X server for testing
@@ -67,25 +68,6 @@ public abstract class EmbeddedTestBase {
 		}
 	}
 
-	public void verbose(String message){
-		System.out.println("[ucc testing] "+message);
-	}
-
-	public void message(String message){
-		System.out.println("[ucc testing] "+message);
-		for(String s: expected){
-			if(message.contains(s)){
-				gotExpectedOutput = true;
-				break;
-			}
-		}
-	}
-
-	public void error(String message, Throwable cause){
-		System.err.println("[ucc testing] "+message);
-		if(cause!=null)cause.printStackTrace();
-	}
-
 	protected void delete(File directory)throws IOException{
 		for(File f: directory.listFiles()){
 			if(f.isDirectory()){
@@ -95,22 +77,27 @@ public abstract class EmbeddedTestBase {
 		}
 	}
 
-	protected String prefsFile = "src/test/resources/conf/userprefs.embedded"; 
+	protected static String prefsFile = "src/test/resources/conf/userprefs.embedded"; 
 
-	protected void connect(){
-		UCC.main(new String[]{"connect","-v","-c",prefsFile});
+	protected static void connect(){
+		UCC.main(new String[]{"connect","-v","-c", prefsFile});
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
-	protected void runDate(){
+	protected static void runDate(){
 		run("src/test/resources/jobs/date.u",false);
 	}
 
-	protected void run(String jobFile, boolean verbose){
+	protected static String createUspace(){
+		run("src/test/resources/jobs/empty.u",false);
+		return Run.getLastJobDirectory();
+	}
+
+	protected static void run(String jobFile, boolean verbose){
 		run(jobFile, verbose, true);
 	}
 		
-	protected void run(String jobFile, boolean verbose, boolean ignoreFailure){
+	protected static void run(String jobFile, boolean verbose, boolean ignoreFailure){
 		String[] args=new String[]{"run",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				jobFile

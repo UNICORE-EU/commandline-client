@@ -10,18 +10,13 @@ import eu.unicore.ucc.util.EmbeddedTestBase;
 import eu.unicore.ucc.util.KeystoreAuthNWithPasswd;
 
 public class TestActionsWithoutPassword extends EmbeddedTestBase {
-	
-	@Override
-	protected void connect(){
-		UCC.main(new String[]{"connect", "-k", "X509Test", "-c","src/test/resources/conf/userprefs.nopasswd"});
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-	}
 
 	@Test
 	public void testNoPassword(){
 		KeystoreAuthNWithPasswd.QUESTIONS=0;
 		UCC.loadAuthNMethods();
-		connect();
+		UCC.main(new String[]{"connect", "-k", "X509Test", "-c","src/test/resources/conf/userprefs.nopasswd"});
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		
 		String[] args=new String[]{"run", "-k", "X509Test",
 				"-c", "src/test/resources/conf/userprefs.nopasswd",

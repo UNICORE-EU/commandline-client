@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.CreateStorage;
 import eu.unicore.ucc.actions.info.ListActionBase;
-import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
 /**
@@ -18,6 +18,11 @@ import eu.unicore.ucc.util.EmbeddedTestBase;
  * These run against an embedded UNICORE instance.
  */
 public class TestStorageActions extends EmbeddedTestBase {
+
+	@BeforeAll
+	public static void setup() {
+		connect();
+	}
 
 	@Test
 	public void test_CreateStorage() {
@@ -87,8 +92,7 @@ public class TestStorageActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Mkdir_RM(){
-		connect();
-		String storage = createNewUspace();
+		String storage = createUspace();
 		String dir1="/test1"+System.currentTimeMillis();
 		String[] args=new String[]{"mkdir", "-v", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -127,8 +131,7 @@ public class TestStorageActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Stat_Rename()throws Exception{
-		connect();
-		String storage = createNewUspace();
+		String storage = createUspace();
 		String[] args = new String[]{"stat",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				storage+"/files/stdout",
@@ -170,8 +173,7 @@ public class TestStorageActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Umask()throws Exception{
-		connect();
-		String storage=createNewUspace();
+		String storage = createUspace();
 		String[] args=new String[]{"umask",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				storage,
@@ -193,17 +195,6 @@ public class TestStorageActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-	}
-
-	
-	protected String createNewUspace(){
-		String[] args=new String[]{"run",
-				"-c", "src/test/resources/conf/userprefs.embedded",
-				"src/test/resources/jobs/date.u",
-		};
-		UCC.main(args);
-		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		return Run.getLastJobDirectory();
 	}
 
 }

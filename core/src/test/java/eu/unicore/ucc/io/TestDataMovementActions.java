@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import eu.unicore.client.core.FileList.FileListEntry;
@@ -16,16 +17,18 @@ import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.CP;
 import eu.unicore.ucc.actions.data.LS;
-import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
 public class TestDataMovementActions extends EmbeddedTestBase {
 
+	@BeforeAll
+	public static void setup() {
+		connect();
+	}
+
 	@Test
 	public void test_PutFile_GetFile_WithWildcards()throws IOException{
-		connect();
-		String storage = createStorage();
-
+		String storage = createUspace();
 		String[] args=new String[]{"cp", "src/test/resources/testfiles/file*",
 				"BFT:"+storage+"/files/",
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -61,8 +64,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Error_PutFile_GetFile()throws IOException{
-		connect();
-		String storage=createStorage();
+		String storage = createUspace();
 
 		String[] args=new String[]{"cp", "target/NOSUCHFILE",
 				"BFT:"+storage+"/files/",
@@ -93,8 +95,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_PutFile_LS_GetFile_Find()throws IOException{
-		connect();
-		String storage=createStorage();
+		String storage = createUspace();
 
 		String[] args=new String[]{"cp", "src/test/resources/jobs/date.u",
 				"BFT:"+storage+"/files/test",
@@ -128,7 +129,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_GetFile_RawHttpURL()throws IOException{
-		connect();
 		File f=new File("target","test-get-file"+System.currentTimeMillis());
 		String[] args=new String[]{"cp", "https://localhost:65322/rest/core",
 				f.getPath(),
@@ -141,8 +141,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_FileOps_ByteRange()throws IOException{
-		connect();
-		String storage=createStorage();
+		String storage = createUspace();
 		String data="0123456789abcdefghijklmnopqrstuvwxyz";
 		File t=new File("target","test-upload-"+System.currentTimeMillis());
 		FileUtils.writeStringToFile(t, data, "UTF-8");
@@ -212,9 +211,8 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_CopyFile_and_CopyFileStatus()throws IOException{
-		connect();
-		String storage=createStorage();
-		String storage2=createStorage();
+		String storage  = createUspace();
+		String storage2 = createUspace();
 
 		String[] args=new String[]{"cp", "src/test/resources/jobs/date.u",
 				"BFT:"+storage+"/files/test",
@@ -277,9 +275,8 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_ListTransfers()throws IOException{
-		connect();
-		String storage = createStorage();
-		String storage2 = createStorage();
+		String storage  = createUspace();
+		String storage2 = createUspace();
 
 		String[] args=new String[]{"cp", "src/test/resources/jobs/date.u",
 				storage+"/files/test",
@@ -297,7 +294,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-
 		//scheduled in async mode
 		Calendar startTime=Calendar.getInstance();
 		startTime.add(Calendar.DATE, 1);
@@ -310,8 +306,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-
-
 		args=new String[]{"list-transfers", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-l", 
@@ -322,9 +316,8 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Error_CopyFile()throws IOException{
-		connect();
-		String storage=createStorage();
-		String storage2=createStorage();
+		String storage  = createUspace();
+		String storage2 = createUspace();
 
 		String[] args=new String[]{"cp", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -337,8 +330,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_ExportDirectory()throws IOException{
-		connect();
-		String storage=createStorage();
+		String storage = createUspace();
 		//upload files
 		String[] args=new String[]{"cp", "src/test/resources/testfiles/*",
 				"BFT:"+storage+"/files/",
@@ -381,8 +373,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_ImportDirectory()throws IOException{
-		connect();
-		String storage=createStorage();
+		String storage = createUspace();
 		//create a directory with a few files
 		String dirname="ucctest-"+System.currentTimeMillis();
 		File tmp=new File(System.getProperty("java.io.tmpdir"), dirname);
@@ -423,7 +414,6 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_CatFile()throws IOException{
-		connect();
 		String storage = createUspace();
 		String[] args=new String[]{"cat",
 				"BFT:"+storage+"/files/stdout", "-v",
@@ -457,8 +447,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_CP()throws IOException{
-		connect();
-		String storage=createStorage();
+		String storage = createUspace();
 
 		// client to server
 
@@ -494,7 +483,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		assertTrue(new File(tmpfolder,"file2").exists());
 
 		// server to server
-		String storage2=createStorage();
+		String storage2 = createUspace();
 
 		args=new String[]{"cp", 
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -517,8 +506,7 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 	
 	@Test
 	public void test_CP_FromHttpURL()throws IOException{
-		connect();
-		String storage=createStorage();
+		String storage = createUspace();
 
 		String[] args=new String[]{"cp", "https://localhost:65322/rest/core",
 				"BFT:"+storage+"/files/file1",
@@ -530,13 +518,4 @@ public class TestDataMovementActions extends EmbeddedTestBase {
 		
 	}
 
-	protected String createStorage(){
-		run("src/test/resources/jobs/empty.u", false);
-		return Run.getLastJobDirectory();
-	}
-
-	protected String createUspace(){
-		run("src/test/resources/jobs/date.u", false);
-		return Run.getLastJobDirectory();
-	}
 }
