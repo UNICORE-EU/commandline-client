@@ -16,7 +16,7 @@ import groovy.lang.GroovyShell;
  *
  * @author schuller
  */
-public class Groovy extends ActionBase{
+public class Groovy extends ActionBase {
 
 	private String expression;
 
@@ -37,7 +37,6 @@ public class Groovy extends ActionBase{
 				.hasArg()
 				.required(false)
 				.get());
-		
 	}
 
 	@Override

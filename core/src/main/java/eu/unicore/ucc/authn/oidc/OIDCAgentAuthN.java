@@ -75,7 +75,6 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 			throw new IOException("Error received from oidc-agent: <"+error+">");
 		}
 		token = reply.getString("access_token");
-		refreshToken = reply.optString("refresh_token", null);
 	}
 
 	@Override
@@ -86,7 +85,7 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 			return;
 		}
 		lastRefresh = instant;
-		msg.verbose("Refreshing token (after <"+interval+"> seconds.");
+		msg.debug("Refreshing token (after <{}> seconds.", interval);
 		retrieveToken();
 	}
 

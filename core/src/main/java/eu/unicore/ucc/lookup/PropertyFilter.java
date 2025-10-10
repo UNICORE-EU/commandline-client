@@ -27,19 +27,6 @@ public class PropertyFilter implements Filter {
 
 	private final String value;
 
-	private static final String MOD_EQUAL="equals";
-	private static final String MOD_EQUAL_SHORT="eq";
-	private static final String MOD_NOTEQUAL="notequals";
-	private static final String MOD_NOTEQUAL_SHORT="neq";
-	private static final String MOD_GT="greaterthan";
-	private static final String MOD_GT_SHORT="gt";
-	private static final String MOD_LT="lessthan";
-	private static final String MOD_LT_SHORT="lt";
-	private static final String MOD_CONTAINS="contains";
-	private static final String MOD_CONTAINS_SHORT="c";
-	private static final String MOD_NOTCONTAINS="notcontains";
-	private static final String MOD_NOTCONTAINS_SHORT="nc";
-
 	private PropertyFilter(String property, MOD modifier, String value){
 		this.modifier = modifier;
 		this.property = property;
@@ -86,13 +73,13 @@ public class PropertyFilter implements Filter {
 	}
 
 	/**
-	 * accepts arguments: PropertyName [modifier] [value]
-	 * where [modifier] is one of: contains | lessthan | greaterthan | equals | not
+	 * accepts arguments: "Name [OPERAND] Value"
+	 * or the short version "NameOPValue", where OP is "=", "!=" etc
 	 */
 	public static PropertyFilter create(String... args) {
-		String propertyName = null;
-		MOD mod = null;
-		String val = null;
+		String propertyName;
+		MOD mod;
+		String val;
 		if(args.length==3){
 			propertyName = args[0];
 			mod = createModifier(args[1]);
@@ -104,19 +91,19 @@ public class PropertyFilter implements Filter {
 			mod = createModifier(m.group(2));
 			val = m.group(3);
 		}
+		else throw new IllegalArgumentException();
 		return new PropertyFilter(propertyName, mod, val);
 	}
 
 	static final Pattern filterPattern = Pattern.compile("(\\w+)(\\W+)(\\w+)");
 
-	
 	private static final Map<MOD, String[]> modifiers = Map.of(
-		MOD.EQUALS , new String[]{ "=", "==", MOD_EQUAL,MOD_EQUAL_SHORT },
-		MOD.NOT_EQUALS , new String[]{ "!=", MOD_NOTEQUAL, MOD_NOTEQUAL_SHORT },
-		MOD.CONTAINS, new String[]{ "~=", MOD_CONTAINS, MOD_CONTAINS_SHORT},
-		MOD.NOT_CONTAINS, new String[]{ "!~", "!~=", MOD_NOTCONTAINS, MOD_NOTCONTAINS_SHORT},
-		MOD.LESS, new String[]{ "<", MOD_LT, MOD_LT_SHORT},
-		MOD.GREATER, new String[]{ ">", MOD_GT, MOD_GT_SHORT}
+		MOD.EQUALS , new String[]{ "=", "==", "equals", "eq" },
+		MOD.NOT_EQUALS , new String[]{ "!=", "notequals", "neq" },
+		MOD.CONTAINS, new String[]{ "~=", "contains", "c"},
+		MOD.NOT_CONTAINS, new String[]{ "!~", "!~=", "notcontains", "nc"},
+		MOD.LESS, new String[]{ "<", "lessthan", "lt"},
+		MOD.GREATER, new String[]{ ">", "greaterthan", "gt"}
 	);
 
 	static MOD createModifier(String modSpec) {

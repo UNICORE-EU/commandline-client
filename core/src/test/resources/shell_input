@@ -8,6 +8,8 @@ help
 help-auth
 help job-status
 help system
+system -h
+set -h
 
 # variables
 set
@@ -15,11 +17,15 @@ set foo=bar
 set foo2=bar=x
 set ham=spam
 unset ham
+set emptyvar
+unset emptyvar
 
 # external cmd
 set mycmd=date
 system ${mycmd}
 unset mycmd
+!date
+! date
 
 # some error cases
 help no-such-command

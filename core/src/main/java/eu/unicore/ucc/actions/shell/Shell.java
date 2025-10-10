@@ -231,7 +231,7 @@ public class Shell extends ActionBase {
 		else if("unset".equalsIgnoreCase(cmd)){
 			handleUnset(args);
 		}
-		else if("system".equalsIgnoreCase(cmd) || "!".equals(cmd) ) {
+		else if("system".equalsIgnoreCase(cmd) || "!".equals(cmd) || cmd.startsWith("!") ) {
 			handleSystem(args);
 		}
 		else if("version".equalsIgnoreCase(cmd)) {
@@ -247,8 +247,8 @@ public class Shell extends ActionBase {
 		if(args.length==1){
 			// "set" alone: print properties
 			for(Object keyObj: properties.keySet()){
-				String key=String.valueOf(keyObj);
-				String val=properties.getProperty(key);
+				String key = String.valueOf(keyObj);
+				String val = properties.getProperty(key);
 				//naive, but should work rather well :-)
 				if(key.toLowerCase().contains("password")){
 					console.info("{}=*", key);
@@ -259,6 +259,14 @@ public class Shell extends ActionBase {
 			}
 		}
 		else {
+			if(UCC.isHelp(args[1])) {
+				System.err.println(" usage: set [name1=value1 [name1=value1] ... ]");
+				System.err.println("   Show variables or set variables");
+				System.err.println(); 
+				System.err.println("   use 'set @filame' to read name=value lines from a file");
+				System.err.println("   use 'set name=@filename' to read value from a file");
+				return;
+			}
 			// set property
 			String[] paramArgs = new String[args.length-1];
 			System.arraycopy(args, 1, paramArgs, 0, paramArgs.length);
@@ -273,18 +281,30 @@ public class Shell extends ActionBase {
 	}
 
 	private void handleSystem(String[] args) throws Exception {
-		if(args.length<2)return;
-		String[] paramArgs = new String[args.length-1];
-		System.arraycopy(args, 1, paramArgs, 0, paramArgs.length);
-		ProcessBuilder pb = new ProcessBuilder(Arrays.asList(paramArgs));
+		String[] systemArgs;
+		if(args[0].length()>1 && args[0].startsWith("!")) {
+			// support for '!cmd'
+			args[0]=args[0].substring(1);
+			systemArgs = new String[args.length];
+			System.arraycopy(args, 0, systemArgs, 0, systemArgs.length);
+		}
+		else {
+			systemArgs = new String[args.length-1];
+			System.arraycopy(args, 1, systemArgs, 0, systemArgs.length);
+		}
+		if(systemArgs.length>0 && UCC.isHelp(systemArgs[0])) {
+			System.err.println(" usage: system cmd [args... ] (or '! cmd [args..]'");
+			System.err.println("   Runs external command.");
+			return;
+		}
+		ProcessBuilder pb = new ProcessBuilder(Arrays.asList(systemArgs));
 		pb.inheritIO();
-		Process p = pb.start();
-		p.waitFor();
+		pb.start().waitFor();
 	}
 
 	private void handleUnset(String[] args){
-		for(int i=1; i<args.length;i++){
-			properties.remove(args[i]);
+		for(String s: args){
+			properties.remove(s);
 		}
 	}
 

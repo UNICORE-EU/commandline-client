@@ -324,7 +324,7 @@ public class UCC{
 
 	private static String[] version = {"-V","--version","-version","version"};
 
-	private static boolean isHelp(String arg) {
+	public static boolean isHelp(String arg) {
 		for(String h: help){
 			if(arg.toLowerCase().equals(h))
 				return true;

@@ -75,9 +75,7 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 
 	@Override
 	public void addAuthenticationHeaders(HttpMessage httpMessage) throws Exception {
-		if(refreshToken!=null) {
-			refreshTokenIfNecessary();
-		}
+		refreshTokenIfNecessary();
 		if(token==null) {
 			retrieveToken();
 		}

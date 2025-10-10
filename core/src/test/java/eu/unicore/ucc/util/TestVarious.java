@@ -65,7 +65,6 @@ public class TestVarious {
 		new FiletransferParameterProvider().provideParameters(params, "UFTP");
 		assertFalse("all".equals(params.get(UFTPConstants.PARAM_CLIENT_HOST)));
 	}
-	
 
 	private static String getFullyQualifiedHostName()
 	{
@@ -78,12 +77,10 @@ public class TestVarious {
 				NetworkInterface net = enet.nextElement();
 				if ( net.isLoopback() )
 					continue;
-
 				Enumeration<InetAddress> eaddr = net.getInetAddresses();
 				while ( eaddr.hasMoreElements() )
 				{
 					InetAddress inet = eaddr.nextElement();
-
 					if ( inet.getCanonicalHostName().equalsIgnoreCase( inet.getHostAddress() ) )
 						continue;
 					else
@@ -92,7 +89,6 @@ public class TestVarious {
 					}
 				}
 			}
-
 			canonical = InetAddress.getLocalHost().getCanonicalHostName();
 			if(canonical != null)
 			{
@@ -106,11 +102,9 @@ public class TestVarious {
 			{
 				return names.isEmpty() ? "localhost" : names.get(0); 
 			}
-
 		} catch (Exception e) {
 			return "localhost";
 		}
-
 	}
 	
 	@Test

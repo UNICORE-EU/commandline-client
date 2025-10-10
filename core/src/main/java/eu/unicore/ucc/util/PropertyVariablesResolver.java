@@ -75,7 +75,6 @@ public class PropertyVariablesResolver
 		for(String arg: args){
 			if(arg.startsWith("@")){
 				Properties p = new Properties();
-				
 				try(FileInputStream fis = new FileInputStream(arg.substring(1))){
 					p.load(fis);
 					for(Object k : p.keySet()){
@@ -88,7 +87,7 @@ public class PropertyVariablesResolver
 			else{
 				String[]sp=arg.split("=",2);
 				String name = sp[0];
-				String val = sp[1];
+				String val = sp.length>1? sp[1]: "";
 				if(val.startsWith("@")){
 					val=FileUtils.readFileToString(new File(val.substring(1)), "UTF-8");
 				}

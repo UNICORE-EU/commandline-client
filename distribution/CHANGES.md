@@ -6,17 +6,20 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
-Version 10.3.0 (released Oct dd, 2025)
+Version 10.3.0 (released Oct 10, 2025)
 --------------------------------------
- - new feauture: list-* commands can execute a command for each match
+ - new feature: list-* commands can execute a command for each match
    as given by the "--execute" option
+ - new feature: registry read access is now anonymous by default, to avoid issues
+   when using API tokens for authentication. Authentication can be forced by
+   setting 'authenticate-to-registry=true" in the config file
  - improvement: mkdir, stat, rm commands accept multiple targets
  - improvement: parallelize data file uploads on job submission
- - registry read access is now anonymous by default to avoid issues
-   when using API tokens for authentication
- - improvement: less boilerplate output (=noise) in verbose mode
+ - improvement: less boilerplate output in verbose mode
  - improvement: unified options on list-* commands
  - improvement: simpler syntax for filtering list-* commands
+ - fix: cp: resume mode was ignored for downloads
+ - fix: oidc-agent auth was not refreshing properly (in shell mode)
  - update to 10.3.0 base libs
 
 Version 10.2.0 (released May 28, 2025)
@@ -28,7 +31,6 @@ Version 10.2.0 (released May 28, 2025)
  - fixes in example files and Windows ucc.bat script
  - code cleanup
  - update to 10.2.0 base libs
-
 
 Version  10.1.4 (released Apr 07, 2025)
 ---------------------------------------
@@ -118,7 +120,6 @@ Version 9.1.0 (released Dec 13, 2022)
 
 Version 9.0.0 (released Oct 13, 2022)
 ------------------------------------
-
  - **Incompatible change:** the long forms of the commandline options have been harmonized 
    to all lowercase with "-" as separator, e.g. "--dryRun" is now "--dry-run"
  - update to UNICORE 9.0 base libs
@@ -248,7 +249,7 @@ Version 1.7.6 (released March 13, 2015)
 
 Version 1.7.5 (released December 19, 2014)
 ------------------------------------------
- - new feature: "exec" command (SF feature #347)
+ - new feature: "exec" command
  - new feature: can use OIDC bearer token for authentication (authenticationMethod 'unity')
  - new feature: add way to read parameters for 'create-storage' and 'create-tss' from file
    For example: 'ucc create-storage ... @s3.properties'
@@ -282,7 +283,7 @@ Version 1.7.1 (released Feb 26, 2014)
  - fix: using Unity did not work
  - fix: allow unescaped "!" characters when entering a password on the console 
  - fix: 'help-auth' did not work in shell mode
- - improvement: more readable help-auth output (SF bug #688)
+ - improvement: more readable help-auth output
  - improvement: documentation on using Unity
 
 Version 1.7.0 (released Dec 20, 2013)
@@ -318,7 +319,6 @@ Version 1.6.0 (released Mar 25, 2013)
 
 Version 1.5.1 (released Dec 3, 2012)
 ------------------------------------
-
  - fix: using resource reservation led to an error
  - improvement: "issue-delegation" does not contact registry if not necessary
  - fix: copy-file "-R" does not need an argument
@@ -390,7 +390,6 @@ Version 1.4.1 (released Jul 11, 2011)
  
 Version 1.4.0 (released Apr 16, 2011)
 -------------------------------------
-
  - Java 1.6 is mandatory
  - update to UNICORE 6.4.0 base libraries
  - fix: "registry" option consumes too many command line arguments
@@ -409,7 +408,6 @@ Version 1.4.0 (released Apr 16, 2011)
 
 Version 1.3.1 (released Jul 15, 2010)
 -------------------------------------
-
  - allow to configure extra out handlers
  - more detailed output from "system-info" command
  - workflow commands can properly deal with StorageFactory
@@ -421,7 +419,6 @@ Version 1.3.1 (released Jul 15, 2010)
 
 Version 1.3.0 (released Feb 8, 2010)
 ------------------------------------
-
  - support for new StorageFactory service
  - new "create-storage" command
  - new "connect-to-testgrid" command for gaining access to the public testgrid at http://www.unicore.eu/testgrid
@@ -439,7 +436,6 @@ Version 1.3.0 (released Feb 8, 2010)
 
 Version 1.2.2 (released Oct 13, 2009)
 -------------------------------------
-
  - depends on UNICORE 6.2.2 libraries
  - bugfix in batch mode (would finish before jobs were all processed)
  - new "list-storages" command
@@ -449,10 +445,9 @@ Version 1.2.2 (released Oct 13, 2009)
  
 Version 1.2.1 (released Aug 28, 2009)
 -------------------------------------
-
  - batch mode: flag "-X" now means: do not download stdout/err, but download exports defined in .u file
  - batch mode: always print statistics on exit
- - batch mode: in case of job, failure write job descriptor (.u file) to output directory (with prefix "FAILED_"
+ - batch mode: in case of job, failure write job descriptor (.u file) to output directory (with prefix "FAILED_")
  - consistent syntax for imports/exports and data staging
  - resolve addresses like "u6://STORAGE-NAME/..." where STORAGE-NAME is a shared SMS
  - connect command: do not print "access denied" if not in verbose mode
@@ -465,7 +460,6 @@ Version 1.2.1 (released Aug 28, 2009)
  
 Version 1.2.0 (released Mar 25, 2009)
 -------------------------------------
-
  - avoid exception printout in case a site is not accessible
  - do not test the Registry connection in the 'WSRF' command 
    (the user might not want to talk to a registry)
@@ -487,7 +481,6 @@ Version 1.2.0 (released Mar 25, 2009)
 
 Version 1.1.3 (released Oct 28, 2008)
 -------------------------------------
-
  - check more resource requirements (e.g. operating system)
  - allow to redirect stdin, stdout and stderr in jobs
  - support JSDL creation flag (overwrite/append/nooverwrite) in stage in/out
@@ -507,26 +500,22 @@ Version 1.1.3 (released Oct 28, 2008)
  
 Version 1.1.2 (released Aug 1, 2008)
 ------------------------------------
-
  - allow setting low-level options (e.g. connection timeouts)
  - fix batch mode problems (files not deleted) under Windows
  - update to unicorex 1.1.2
  
 Version 1.1.1 (released May 15, 2008)
 -------------------------------------
-
  - allow to configure separate truststore
  - add Emacs mode files in the extras/emacs-mode folder
- - batch mode accepts only ".u", ".jsdl" or ".xml" files (fix SF bug #1938686)
+ - batch mode accepts only ".u", ".jsdl" or ".xml" files
  - support JSDL files in batch mode
  - cache results of registry queries in batch mode 
  - cleanup of filetransfer resources
  - minor bugfixes
- 
- 
+
 Version 1.1 (released Mar 20, 2008)
 -----------------------------------
-
  - support for new UNICORE 6.1 features:
  	- setting the user name
  	- job progess indication (if available)
@@ -537,16 +526,12 @@ Version 1.1 (released Mar 20, 2008)
 
 Version 1.0.1
 -------------
-
-
  - resolve u6:// style URLs also for stage-out
  - bug fixes
  - add ucc.bat startfile for Windows
  - new commands: 'ls' for listing a remote storage, 'abort-job'
  - new filtering option for list-jobs and list-sites commands 
 
-
 Version 1.0 (released Aug 13, 2007)
 -----------------------------------
-
  - first release.
