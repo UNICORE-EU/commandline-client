@@ -97,6 +97,8 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		for(T entry: iterator()) {
 			if(filterMatch(entry)){
 				URLCompleter.registerSiteURL(entry.getEndpoint().getUrl());
+				properties.put(PROP_LAST_RESOURCE_URL, entry.getEndpoint().getUrl());
+				lastNumberOfResults++;
 				list(entry);
 				if(getCommandLine().hasOption(OPT_EXEC)) {
 					handleExec(entry);
@@ -141,8 +143,6 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	 * @throws Exception
 	 */
 	protected void list(T entry)throws Exception {
-		properties.put(PROP_LAST_RESOURCE_URL, entry.getEndpoint().getUrl());
-		lastNumberOfResults++;
 		if(detailed) {
 			console.info("{}", getDetails(entry));
 		}
@@ -150,9 +150,6 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 			console.info("{}", entry.getEndpoint().getUrl());
 		}
 		printProperties(entry);
-		if(execArgs!=null) {
-			// TODO spawn and run cmd
-		}
 	}
 
 	/**
@@ -201,6 +198,11 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	 */
 	protected void handleExec(T entry) throws Exception {
 		String[] args = Arrays.copyOf(execArgs, execArgs.length);
+		for(int i=0; i<args.length;i++) {
+			if(args[i].contains("{}")) {
+				args[i]=args[i].replace("{}",properties.getProperty(PROP_LAST_RESOURCE_URL));
+			}
+		}
 		new Spawner(this, args).run();
 	}
 

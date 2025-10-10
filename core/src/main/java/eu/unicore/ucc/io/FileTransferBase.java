@@ -184,7 +184,6 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 	/**
 	 * check if the given path denotes a valid remote directory
 	 * @param remotePath - the path
-	 * @param sms - the storage
 	 * @return <code>true</code> if the remote directory exists and is a directory
 	 */
 	protected boolean isValidDirectory(String remotePath){

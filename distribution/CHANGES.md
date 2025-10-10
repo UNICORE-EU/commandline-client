@@ -9,7 +9,8 @@ Report any issues via the
 Version 10.3.0 (released Oct 10, 2025)
 --------------------------------------
  - new feature: list-* commands can execute a command for each match
-   as given by the "--execute" option
+   as given by the "--execute" option. The special argument "{}" will be
+   replaced by the URL of the last match
  - new feature: registry read access is now anonymous by default, to avoid issues
    when using API tokens for authentication. Authentication can be forced by
    setting 'authenticate-to-registry=true" in the config file
