@@ -159,10 +159,10 @@ public class FileUploader extends FileTransferBase {
 					totalSkipped+=skipped;
 					toSkip-=skipped;
 				}
-				writer.writeAllData(is, endByte-startByte+1);
+				writer.write(is, endByte-startByte+1);
 
 			}else{
-				writer.writeAllData(is);
+				writer.write(is);
 			}
 			copyProperties(localFile, sms, remotePath);
 

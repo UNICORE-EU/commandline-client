@@ -182,10 +182,10 @@ public class FileDownloader extends FileTransferBase {
 				if(Long.MAX_VALUE==endByte){
 					length = source.size - startByte;
 				}
-				if(length>0)pReader.readPartial(startByte, length, os);
+				if(length>0)pReader.read(startByte, length, os);
 			}
 			else{
-				((FiletransferOptions.Read)ftc).readAllData(os);
+				((FiletransferOptions.Read)ftc).readFully(os);
 			}
 			if(p!=null){
 				p.finish();

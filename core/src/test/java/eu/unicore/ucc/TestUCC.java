@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
-import eu.unicore.ucc.authn.KeystoreAuthN;
 
 public class TestUCC {
 
@@ -15,7 +14,7 @@ public class TestUCC {
 		UCC.printUsage(false);
 		System.err.println("\n");
 		UCC.printAuthNUsage();
-		UCC.printAuthNUsage(KeystoreAuthN.X509);
+		UCC.printAuthNUsage("X509");
 	}
 
 	@Test

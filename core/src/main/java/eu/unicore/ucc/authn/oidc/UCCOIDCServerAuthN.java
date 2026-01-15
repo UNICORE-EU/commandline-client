@@ -6,6 +6,7 @@ import org.apache.hc.core5.http.HttpMessage;
 
 import eu.unicore.services.restclient.oidc.OIDCProperties;
 import eu.unicore.services.restclient.oidc.OIDCServerAuthN;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.CallbackUtils;
 
 /**
@@ -52,6 +53,7 @@ public class UCCOIDCServerAuthN extends TokenBasedAuthN {
 					super.retrieveToken();
 				}
 			};
+		this.auth.setLogger(UCC.console);
 	}
 
 	@Override

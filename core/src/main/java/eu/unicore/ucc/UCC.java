@@ -141,7 +141,7 @@ public class UCC{
 	public static void printAuthNUsage() {
 		String version = getVersion();
 		System.out.println("UCC " + version);
-		System.out.println("Select the authentication method using the '-k', '--authenticationMethod' option.");
+		System.out.println("Select the authentication method using the '-k', '--authentication-method' option.");
 		System.out.println("The following authentication methods are available:");
 		List<AuthenticationProvider>methods = new ArrayList<>(authNMethods.values());
 		Collections.sort(methods, (a,b)->{

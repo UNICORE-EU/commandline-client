@@ -35,15 +35,12 @@ public class SSHKeyAuthN extends PropertiesBasedAuthenticationProvider
 			throw new ConfigurationException("Private key file "+
 					privateKey.getParent()+" does not exist.");
 		}
-		final PasswordSupplier pf = new PasswordSupplier() {
-			@Override
-			public char[] getPassword() {
-				String password = properties.getProperty("password");
-				if(password==null) {
-					return CallbackUtils.getPasswordFromUserCmd("private key", privateKey.getPath());
-				}
-				return password.toCharArray();
+		final PasswordSupplier pf = ()-> {
+			String password = properties.getProperty("password");
+			if(password==null) {
+				return CallbackUtils.getPasswordFromUserCmd("private key", privateKey.getPath());
 			}
+			return password.toCharArray();
 		};
 		auth = new SSHKey(username, privateKey, pf);
 	}

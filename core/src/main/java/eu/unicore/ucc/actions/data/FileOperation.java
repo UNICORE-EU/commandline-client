@@ -107,10 +107,10 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 			if(startByte!=null){
 				console.debug("Byte range: {}-{}", startByte, endByte);
 				SupportsPartialRead pReader=(SupportsPartialRead)hc;
-				pReader.readPartial(startByte, endByte-startByte, out);
+				pReader.read(startByte, endByte-startByte, out);
 			}
 			else{
-				hc.readAllData(out);
+				hc.readFully(out);
 			}
 			p.finish();
 		}

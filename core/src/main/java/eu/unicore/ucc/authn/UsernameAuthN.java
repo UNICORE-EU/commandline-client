@@ -52,7 +52,7 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 	}
 
 	public static final String NAME = "username";
-	
+
 	@Override
 	public String getName() {
 		return NAME;

@@ -11,7 +11,7 @@ import eu.emi.security.authn.x509.ValidationErrorListener;
 public interface PropertiesAwareAuthn
 {
 	public void setProperties(Properties properties);
-	
+
     public void setValidationErrorListener(ValidationErrorListener properties);
 
 }
