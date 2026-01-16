@@ -19,6 +19,7 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.history.DefaultHistory;
 
 import eu.unicore.client.Endpoint;
+import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.UCCOptions;
@@ -74,9 +75,9 @@ public class Shell extends ActionBase {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		String fileName=getOption(OPT_FILE_LONG, OPT_FILE);
+		String fileName = getOption(OPT_FILE_LONG, OPT_FILE);
 		if(fileName!=null){
-			commandFile=new File(fileName);
+			commandFile = new File(fileName);
 		}
 		run();
 	}
@@ -89,6 +90,12 @@ public class Shell extends ActionBase {
 		for(Endpoint ep: registry.listEntries()) {
 			URLCompleter.registerSiteURL(ep.getUrl());
 		}
+	}
+
+	@Override
+	protected IRegistryClient makeRegistry(String url) throws Exception {
+		URLCompleter.registerSiteURL(url);
+		return super.makeRegistry(url);
 	}
 
 	private List<String> internalCommands = Arrays.asList( "set", "unset", "system", "!",
@@ -133,7 +140,7 @@ public class Shell extends ActionBase {
 					s = commandFile!=null ? is.readLine() : is.readLine("ucc>");
 				}catch(Exception uie) {}
 				if(s==null){
-					s="exit";
+					s = "exit";
 				}
 				s = s.trim();
 				if(s.isEmpty() || s.startsWith("#"))continue;
