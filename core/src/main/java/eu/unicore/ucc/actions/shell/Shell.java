@@ -83,9 +83,14 @@ public class Shell extends ActionBase {
 	}
 
 	@Override
-	protected void testRegistryConnection() throws Exception {
+	protected void initRegistryClient() throws Exception {
 		// setup linereader here, if we must query for passwords
 		setupLineReader();
+		super.initRegistryClient();
+	}
+
+	@Override
+	protected void testRegistryConnection() throws Exception {
 		super.testRegistryConnection();
 		for(Endpoint ep: registry.listEntries()) {
 			URLCompleter.registerSiteURL(ep.getUrl());

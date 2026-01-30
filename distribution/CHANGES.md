@@ -6,6 +6,17 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 11 or later!
 
+Version 1x.x.x (released MMM dd, 2026)
+--------------------------------------
+ - fix: setup shell completer also in case the registry is not
+   contacted
+
+Version 10.4.0 (released Jan 16, 2026)
+--------------------------------------
+ - add registry URL to shell completer
+ - third-party library updates
+ - update to UNICORE 10.4.0 base libs
+
 Version 10.3.0 (released Oct 10, 2025)
 --------------------------------------
  - new feature: list-* commands can execute a command for each match
