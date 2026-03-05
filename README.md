@@ -11,7 +11,7 @@ client for UNICORE, written in Java.
 Binary releases of UCC can be downloaded from
 [GitHub](https://github.com/UNICORE-EU/commandline-client/releases)
 
-Running UCC requires a Java runtime (version 11 or later).
+Running UCC requires a Java runtime (version 17 or later).
 
 ## Documentation
 
@@ -39,3 +39,4 @@ The following commands create distribution packages:
     mvn package -DskipTests -Ppackman -Dpackage.type=deb -Ddistribution=Debian
     # rpm
     mvn package -DskipTests -Ppackman -Dpackage.type=rpm -Ddistribution=RedHat
+

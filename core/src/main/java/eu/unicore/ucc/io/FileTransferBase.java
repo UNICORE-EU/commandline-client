@@ -254,7 +254,7 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 	 */
 	protected long getRangeSize(){
 		if(Long.MAX_VALUE==endByte)return -1;
-		return endByte-startByte;
+		return endByte-startByte+1;
 	}
 
 	protected String determineProtocol(String preferred) {

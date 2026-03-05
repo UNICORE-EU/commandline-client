@@ -169,13 +169,13 @@ public class UCCBuilder extends Builder {
 				boolean failOnError=true;
 				try{
 					JSONObject jObj=j.getJSONObject(i);
-					source=JSONUtil.getString(jObj,"From");
-					target=JSONUtil.getString(jObj,"To");
-					String creation=JSONUtil.getString(jObj,"Mode","NORMAL");
-					failOnError=Boolean.parseBoolean(JSONUtil.getString(jObj,"FailOnError","true"));
+					source = jObj.getString("From");
+					target = jObj.getString("To");
+					String creation = jObj.optString("Mode", "NORMAL");
+					failOnError=Boolean.parseBoolean(jObj.optString("FailOnError","true"));
 					mode=Mode.valueOf(creation);
 					// source can be null if it is an inline import
-					if(source==null && target!=null && JSONUtil.getString(jObj, "Data")==null) {
+					if(source==null && target!=null && jObj.optString("Data", null)==null) {
 						throw new IllegalArgumentException("File import specification invalid: need one of 'From' or 'Data'.");
 					}
 					if(target==null){
@@ -210,25 +210,19 @@ public class UCCBuilder extends Builder {
 		JSONArray otherExports = new JSONArray();
 		if(j!=null){
 			for (int i = 0; i < j.length(); i++) {
-				String source,target;
-				Mode mode=Mode.NORMAL;
-				boolean failOnError=true;
 				try{
-					JSONObject jObj=j.getJSONObject(i);
-					source=JSONUtil.getString(jObj,"From");
-					if(source==null)source=JSONUtil.getString(jObj,"File");//backwards compatibility
-					target=jObj.getString("To");
-					String creation=JSONUtil.getString(jObj,"Mode","NORMAL");
-					mode=Mode.valueOf(creation);
-					failOnError=Boolean.parseBoolean(JSONUtil.getString(jObj,"FailOnError","true"));
-
+					JSONObject jObj = j.getJSONObject(i);
+					String source = jObj.getString("From");
+					String target = jObj.getString("To");
+					Mode mode  = Mode.valueOf(jObj.optString("Mode", "NORMAL"));
+					boolean failOnError = jObj.optBoolean("FailOnError", true);
 					if(source==null || target==null){
 						throw new IllegalArgumentException("Local export specification invalid. Syntax: \"From: <uspacefile | remotefile>, To: <target>, Mode: overwrite|append|nooverwrite\"");
 					}
 					Location l = createLocation(target);
 					if(l.isLocal()){
 						exports.add(new FileDownloader(source, target, mode, failOnError));
-						msg.verbose("File export to client: "+source+" -> "+target);
+						msg.verbose("File export to client: {} -> {}", source, target);
 					}
 					else {
 						otherExports.put(jObj);
@@ -260,15 +254,15 @@ public class UCCBuilder extends Builder {
 	}
 
 	public String getApplicationName(){
-		return JSONUtil.getString(json, "ApplicationName");
+		return json.optString("ApplicationName", null);
 	}
 
 	public String getApplicationVersion(){
-		return JSONUtil.getString(json, "ApplicationVersion");
+		return json.optString("ApplicationVersion", null);
 	}
 
 	public String getSite(){
-		return JSONUtil.getString(json, "_ucc_Site", null);
+		return json.optString("_ucc_Site", null);
 	}
 
 	public void setSite(String site){
@@ -276,7 +270,7 @@ public class UCCBuilder extends Builder {
 	}
 
 	public String getState(){
-		return JSONUtil.getString(json, "_ucc_state", Runner.NEW);
+		return json.optString("_ucc_state", Runner.NEW);
 	}
 
 	public void setState(String state){
@@ -301,7 +295,7 @@ public class UCCBuilder extends Builder {
 	}
 
 	public int getLifetime(){
-		String lifetime =JSONUtil.getString(json,"Lifetime");
+		String lifetime = json.optString("Lifetime", null);
 		if(lifetime!=null && lifetime.length()>0){
 			return (int)UnitParser.getTimeParser(0).getDoubleValue(lifetime);
 		}

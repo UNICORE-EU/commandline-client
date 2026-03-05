@@ -6,6 +6,7 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.hc.core5.http.HttpMessage;
 
+import eu.unicore.security.AuthorisationException;
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
 import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.UCC;
@@ -75,9 +76,13 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 
 	@Override
 	public void addAuthenticationHeaders(HttpMessage httpMessage) throws Exception {
-		refreshTokenIfNecessary();
-		if(token==null) {
-			retrieveToken();
+		try {
+			refreshTokenIfNecessary();
+			if(token==null) {
+				retrieveToken();
+			}
+		}catch(Exception e) {
+			throw new AuthorisationException("Could not obtain an authentication token", e);
 		}
 		if(token!=null) {
 			String tokenType = properties.getProperty("token-type", "Bearer");

@@ -44,8 +44,8 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 				.get());
 		getOptions().addOption(Option.builder(OPT_BYTES)
 				.longOpt(OPT_BYTES_LONG)
-				.desc("Byte range")
-				.argName("ByteRange")
+				.desc("Byte range (e.g., 0-499)")
+				.argName("start_byte-end_byte")
 				.hasArg()
 				.required(false)
 				.get());
@@ -67,14 +67,16 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 		preferredProtocol = getCommandLine().getOptionValue(OPT_PROTOCOLS);
 	}
 
+	// Parse range according to HTTP Range header spec
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Range
 	protected void initRange(){
-		String bytes=getOption(OPT_BYTES_LONG, OPT_BYTES);
+		String bytes = getOption(OPT_BYTES_LONG, OPT_BYTES);
 		if(bytes==null)return;
-		String[]tokens=bytes.split("-");
+		String[]tokens = bytes.split("-");
 		try{
 			if(tokens.length>1) {
-				String start=tokens[0];
-				String end=tokens[1];
+				String start = tokens[0];
+				String end = tokens[1];
 				if(start.length()>0){
 					startByte = (long)(UnitParser.getCapacitiesParser(0).getDoubleValue(start));
 					endByte=Long.MAX_VALUE;

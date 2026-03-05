@@ -17,8 +17,8 @@ import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.CP;
 import eu.unicore.ucc.actions.data.LS;
-import eu.unicore.ucc.util.MockServer;
 import eu.unicore.ucc.util.EmbeddedTestBase;
+import eu.unicore.ucc.util.MockServer;
 
 public class TestDataMovementActions extends EmbeddedTestBase {
 

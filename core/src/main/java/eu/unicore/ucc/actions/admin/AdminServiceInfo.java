@@ -2,7 +2,6 @@ package eu.unicore.ucc.actions.admin;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.admin.AdminServiceClient;
@@ -42,17 +41,6 @@ public class AdminServiceInfo extends ListActionBase<AdminServiceClient>{
 		if(!detailed)return "";
 		StringBuilder details = new StringBuilder();
 		boolean first = true;
-		Map<String,String> allMetrics = asc.getMetrics();
-		for(String m: allMetrics.keySet()){
-			if(first){
-				details.append(_newline).append("  Metrics: ");
-				first=false;
-			}
-			details.append(_newline).append("    ");
-			details.append(m);
-			details.append(": ").append(allMetrics.get(m));
-		}
-		first=true;
 		for(AdminCommand ac: asc.getCommands()) {
 			if(first){
 				details.append(_newline).append("  Commands: ");
@@ -62,7 +50,6 @@ public class AdminServiceInfo extends ListActionBase<AdminServiceClient>{
 			details.append(ac.name);
 			details.append(" : ").append(ac.description);
 		}
-
 		return details.toString();
 	}
 

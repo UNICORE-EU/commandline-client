@@ -165,12 +165,12 @@ public class FileDownloader extends FileTransferBase {
 			if(ftc instanceof IMonitorable  && showProgress){
 				long size = source.size;
 				if(isRange()){
-					size=getRangeSize();
+					size = getRangeSize();
 				}
 				p = new ProgressBar(localFile.getName(),size);
 				((IMonitorable) ftc).setProgressListener(p);
 			}
-			long startTime=System.currentTimeMillis();
+			long startTime = System.currentTimeMillis();
 			if(isRange()){
 				if(!(ftc instanceof SupportsPartialRead)){
 					throw new Exception("Byte range is defined but protocol does not allow " +

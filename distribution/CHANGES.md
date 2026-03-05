@@ -4,10 +4,11 @@ UCC Changelog
 Report any issues via the
 [GitHub issue tracker](https://github.com/UNICORE-EU/commandline-client/issues)
 
-**JAVA VERSION NOTE** This release requires Java 11 or later!
+**JAVA VERSION NOTE** This release requires Java 17 or later!
 
-Version 1x.x.x (released MMM dd, 2026)
+Version 11.0.0 (released Mar dd, 2026)
 --------------------------------------
+ - update to UNICORE 11 base (requires Java 17)
  - fix: setup shell completer also in case the registry is not
    contacted
 
