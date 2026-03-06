@@ -24,9 +24,9 @@
     <wf.version>3.10.0</wf.version>
     <secutils.version>5.0.1</secutils.version>
     <jnr.version>0.38.24</jnr.version>
-    <groovy.version>4.0.28</groovy.version>
+    <groovy.version>5.0.4</groovy.version>
     <guava.version>33.5.0-jre</guava.version>
-    <jline.version>3.30.6</jline.version>
+    <jline.version>4.0.0</jline.version>
     <commons-cli.version>1.11.0</commons-cli.version>
     <junit.version>5.12.1</junit.version>
     <junit.p.version>1.12.1</junit.p.version>
