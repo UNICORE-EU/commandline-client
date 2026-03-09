@@ -157,6 +157,32 @@ public class TestShell extends EmbeddedTestBase {
 		cc.complete(lr, pl, candidates);
 		assertTrue(candidates.contains(new Candidate("QUEUED")));
 
+		// "job-status --wait-for ..."
+		words.clear();
+		words.add("job-status");
+		words.add("--"+Constants.OPT_WAIT_LONG);
+		words.add("");
+		wordIndex = 2;
+		wordCursor = 0;
+		line = "job-status --wait-for ";
+		cursor = line.length();
+		candidates.clear();
+		cc.complete(lr, pl, candidates);
+		assertTrue(candidates.contains(new Candidate("QUEUED")));
+
+		// "metadata --command ..."
+		words.clear();
+		words.add("metadata");
+		words.add("--command");
+		words.add("");
+		wordIndex = 2;
+		wordCursor = 0;
+		line = "metadata --commmand ";
+		cursor = line.length();
+		candidates.clear();
+		cc.complete(lr, pl, candidates);
+		assertTrue(candidates.contains(new Candidate("start-extract")));
+
 		// "rest ..."
 		words.clear();
 		words.add("rest");

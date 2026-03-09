@@ -15,11 +15,11 @@ import eu.unicore.security.OperationType;
 import eu.unicore.uas.json.JSONUtil;
 
 /**
- * Shares resources and shows resource ACLs
+ * Edit and display resource's ACLs
  *
  * @author schuller
  */
-public class Share extends ActionBase {
+public class ACL extends ActionBase {
 
 	public static final String OPT_CLEAN_LONG = "clean";
 	public static final String OPT_CLEAN = "b";
@@ -44,12 +44,12 @@ public class Share extends ActionBase {
 
 	@Override
 	public String getName() {
-		return "share";
+		return "acl";
 	}
 
 	@Override
 	public String getSynopsis() {
-		return "Shares a remote resource by modifying its ACL. By default the command will add " +
+		return "Edits access to a remote resource by modifying its ACL. By default the command will add " +
 				"the specified Access Control Entries (ACEs) to the resource's ACL. With the '"
 				+ OPT_DELETE_LONG + "' option the ACEs are removed. The ACEs specification is " +
 				"required always unless the '" + OPT_CLEAN_LONG + "' option is specified. " +
@@ -60,7 +60,7 @@ public class Share extends ActionBase {
 
 	@Override
 	public String getDescription(){
-		return "share a resource via its ACL";
+		return "edits a resource's ACL";
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class Share extends ActionBase {
 		boolean delete = getBooleanOption(OPT_DELETE_LONG, OPT_DELETE);
 		console.debug("Delete given ACL entries = {}", delete);
 
-		int length=getCommandLine().getArgs().length;
+		int length = getCommandLine().getArgs().length;
 		boolean onlyShow = !clean && length<3;
 		if(length<2)
 		{
@@ -176,6 +176,7 @@ public class Share extends ActionBase {
 			this.matchType = ofType;
 		}
 
+		@Override
 		public String toString(){
 			return accessType+":"+matchType+":"+requiredValue;
 		}
@@ -213,9 +214,5 @@ public class Share extends ActionBase {
 
 	// unit testing
 	public static int lastNumberOfPermits=0;
+
 }
-
-
-
-
-

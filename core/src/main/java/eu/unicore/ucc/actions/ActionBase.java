@@ -199,10 +199,6 @@ public abstract class ActionBase extends Command {
 			}
 			return;
 		}
-		if(skipConnectingToRegistry() && !requireRegistry()){
-			console.debug("Registry connection will be skipped.");
-			return;
-		}
 		//accept list of registries either comma- or space-separated
 		String[] urls = registryURL.split("[, ]");
 		if(urls.length>1){
@@ -217,6 +213,10 @@ public abstract class ActionBase extends Command {
 		else{
 			console.debug("Registry = {}", registryURL);
 			registry = makeRegistry(registryURL);
+		}
+		if(skipConnectingToRegistry() && !requireRegistry()){
+			console.debug("Registry connection will be skipped.");
+			return;
 		}
 		testRegistryConnection();
 	}

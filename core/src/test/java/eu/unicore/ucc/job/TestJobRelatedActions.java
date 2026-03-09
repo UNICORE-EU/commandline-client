@@ -143,6 +143,37 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	}
 
 	@Test
+	public void test_Run_Async_Check_Job_Status(){
+		String[] args = new String[]{"run", "-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"src/test/resources/jobs/date.u",
+				"-a"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		String id1 = Run.getLastJobAddress();
+
+		args = new String[]{"job-status",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"--all",
+				"--wait-for", "SUCCESSFUL",
+				"--timeout", "120",
+				id1
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+
+
+		args = new String[]{"job-status",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"--wait-for", "no-such-status",
+				id1
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
+	}
+
+	@Test
 	public void test_Run_Async_MissingLocalFile()throws IOException{
 		File tmp=new File("target/temp-file-for-upload");
 		FileUtils.writeStringToFile(tmp, "test123", "UTF-8");

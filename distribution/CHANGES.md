@@ -6,11 +6,13 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 17 or later!
 
-Version 11.0.0 (released Mar dd, 2026)
+Version 11.0.0 (released Mar 09, 2026)
 --------------------------------------
  - update to UNICORE 11 base (requires Java 17)
  - fix: setup shell completer also in case the registry is not
    contacted
+ - update to Jline 4.0 and Groovy 5.0
+ - command "share" renamed to "acl" to avoid confusion
 
 Version 10.4.0 (released Jan 16, 2026)
 --------------------------------------

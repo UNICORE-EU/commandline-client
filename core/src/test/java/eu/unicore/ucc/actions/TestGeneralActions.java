@@ -97,21 +97,21 @@ public class TestGeneralActions extends EmbeddedTestBase {
 	}
 
 	@Test
-	public void test_Share()throws Exception{
+	public void test_ACL()throws Exception{
 		connect();
 		String target = Connector._last_TSS;
 
 		// show ACL
-		String[]args=new String[]{"share", "-v",
+		String[]args=new String[]{"acl", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				target
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		assertEquals(0,Share.lastNumberOfPermits);
+		assertEquals(0,ACL.lastNumberOfPermits);
 
 		// add ACL entry
-		args=new String[]{"share",
+		args=new String[]{"acl",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"read:VO:testers","-v",
 				target
@@ -120,16 +120,16 @@ public class TestGeneralActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
 		// show ACL again
-		args=new String[]{"share",
+		args=new String[]{"acl",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				target
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		assertEquals(1,Share.lastNumberOfPermits);
+		assertEquals(1,ACL.lastNumberOfPermits);
 		
 		// clean entries
-		args=new String[]{"share",
+		args=new String[]{"acl",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-b",
 				target
@@ -138,13 +138,13 @@ public class TestGeneralActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
 		// show ACL again
-		args=new String[]{"share",
+		args=new String[]{"acl",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				target
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		assertEquals(0,Share.lastNumberOfPermits);
+		assertEquals(0,ACL.lastNumberOfPermits);
 	}
 	
 	@Test

@@ -5,7 +5,7 @@ import eu.unicore.ucc.actions.Groovy;
 import eu.unicore.ucc.actions.IssueToken;
 import eu.unicore.ucc.actions.OpenTunnel;
 import eu.unicore.ucc.actions.REST;
-import eu.unicore.ucc.actions.Share;
+import eu.unicore.ucc.actions.ACL;
 import eu.unicore.ucc.actions.admin.AdminServiceInfo;
 import eu.unicore.ucc.actions.admin.RunCommand;
 import eu.unicore.ucc.actions.data.CP;
@@ -81,7 +81,7 @@ public class CoreCommands implements ProvidedCommands {
 				new Connect(),
 				new Groovy(),
 				new Shell(),
-				new Share(),
+				new ACL(),
 				new REST(),
 				new OpenTunnel(),
 				new IssueToken(),

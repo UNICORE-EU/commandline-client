@@ -1,6 +1,5 @@
 package eu.unicore.ucc.actions.job;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -80,14 +79,10 @@ public class JobStatus extends JobOperationBase {
 		console.debug("Showing detailed job status = {}", detailed);
 		String waitForSpec = getOption(OPT_WAIT_LONG, OPT_WAIT);
 		if(waitForSpec!=null) {
-			try{
-				waitFor = Status.valueOf(waitForSpec);
-				if(waitFor==Status.FAILED || waitFor==Status.UNDEFINED) {
-					throw new Exception();
-				}
-			}catch(Exception ex) {
-				throw new IllegalArgumentException("'--wait-for' accepts one of: "+Arrays.asList(waitableJobStatuses));
+			if(!waitableJobStatuses.contains(waitForSpec)) {
+				throw new IllegalArgumentException("'--wait-for' accepts one of: "+waitableJobStatuses);
 			}
+			waitFor = Status.valueOf(waitForSpec);
 			String timeoutSpec = getCommandLine().getOptionValue(OPT_TIMEOUT);
 			if(timeoutSpec!=null) {
 				timeout = (int)UnitParser.getTimeParser(0).getDoubleValue(timeoutSpec);
