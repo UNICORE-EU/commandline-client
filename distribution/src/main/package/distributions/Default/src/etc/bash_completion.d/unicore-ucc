@@ -5,7 +5,7 @@ _ucc()
   COMPREPLY=()
   cur=`_get_cword`
   prev="${COMP_WORDS[COMP_CWORD-1]}"
-  commands="admin-info admin-runcommand allocate batch cat connect copy-file-status cp create-storage create-tss exec get-output issue-token job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir open-tunnel rename resolve rest rm run run-groovy share shell stat system-info umask workflow-control workflow-submit"
+  commands="acl admin-info admin-runcommand allocate batch cat connect copy-file-status cp create-storage create-tss exec get-output issue-token job-abort job-restart job-status list-jobs list-sites list-storages list-transfers list-workflows ls metadata mkdir open-tunnel rename resolve rest rm run run-groovy shell stat system-info umask workflow-control workflow-submit"
   global_opts="--accept-all-issuers --authentication-method --configuration --help --include --output --preference --registry --verbose --with-timing"
 
 
@@ -18,6 +18,9 @@ _ucc()
 
   # looking for arguments matching to command
   case "${COMP_WORDS[1]}" in
+    acl)
+    opts="$global_opts --clean --delete"
+    ;;
     admin-info)
     opts="$global_opts --execute --fields --filter --long --raw --sitename --tags"
     ;;
@@ -107,9 +110,6 @@ _ucc()
     ;;
     run-groovy)
     opts="$global_opts --expression --file"
-    ;;
-    share)
-    opts="$global_opts --clean --delete"
     ;;
     shell)
     opts="$global_opts --file"
