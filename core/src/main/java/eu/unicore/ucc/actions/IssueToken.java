@@ -12,6 +12,7 @@ import eu.unicore.client.lookup.CoreEndpointLister;
 import eu.unicore.client.lookup.SiteNameFilter;
 import eu.unicore.services.restclient.BaseClient;
 import eu.unicore.services.restclient.jwt.JWTUtils;
+import eu.unicore.services.restclient.utils.UnitParser;
 import eu.unicore.ucc.UCC;
 
 /**
@@ -22,7 +23,7 @@ import eu.unicore.ucc.UCC;
 public class IssueToken extends ActionBase {
 
 	// token lifetime (in seconds)
-	private int lifetime;;
+	private long lifetime = -1;
 
 	private boolean limited=false;
 
@@ -37,9 +38,9 @@ public class IssueToken extends ActionBase {
 		super.createOptions();
 		getOptions().addOption(Option.builder(OPT_LIFETIME)
 				.longOpt(OPT_LIFETIME_LONG)
-				.desc("Initial lifetime (in seconds) for token.")
-				.argName("Lifetime")
+				.desc("Initial lifetime for token.")
 				.hasArg()
+				.argName("Lifetime")
 				.required(false)
 				.get());
 		getOptions().addOption(Option.builder("L")
@@ -101,8 +102,8 @@ public class IssueToken extends ActionBase {
 		}else {
 			url = resolveSite();
 		}
-		lifetime=getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
-		if(lifetime>0){
+		if(getCommandLine().hasOption(OPT_LIFETIME)){
+			lifetime = UnitParser.getTimeParser(0).getLongValue(getOption(OPT_LIFETIME_LONG, OPT_LIFETIME));
 			console.debug("Requesting lifetime of <{}> seconds.", lifetime);
 		}else{
 			console.debug("Using site default for token lifetime.");
@@ -147,8 +148,9 @@ public class IssueToken extends ActionBase {
 		if(uid!=null) {
 			sub = sub + " (uid="+uid+")";
 		}
+		long lt = o.getLong("exp")-o.getLong("iat");
 		console.info("Subject:      {}", sub);
-		console.info("Lifetime (s): {}", o.getInt("exp")-o.getInt("iat"));
+		console.info("Lifetime (s): {} ({})", lt, UnitParser.getTimeParser(0).getHumanReadable(lt));
 		console.info("Issued by:    {}", o.getString("iss"));
 		console.info("Valid for:    {}", o.optString("aud", "<unlimited>"));
 		console.info("Renewable:    {}", o.optString("renewable", "no"));
