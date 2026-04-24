@@ -48,7 +48,8 @@ public class TargetSystemFinder implements Broker, Constants {
 		final List<SiteClient>available = listSites(registry, configurationProvider, builder);
 		SiteClient tss=null;
 		if(available.size()==0){
-			throw new Exception("No matching target system available (try 'connect' or check job requirements)");
+			UCC.console.verbose("Errors: {}", getDebugInfo());
+			throw new Exception("No suitable endpoint found - check credentials and job requirements");
 		}
 		else{
 			if(msg.isVerbose()){
@@ -104,7 +105,7 @@ public class TargetSystemFinder implements Broker, Constants {
 			}
 			else{
 				String current = tsf.getEndpoint().getUrl();
-				msg.verbose("Checking "+current);
+				msg.verbose("Checking {}", current);
 				try{
 					ErrorHolder err = new ErrorHolder();
 					if(!matches(tsf, requirements, err, checkResources, msg)) {
@@ -118,6 +119,13 @@ public class TargetSystemFinder implements Broker, Constants {
 				}
 			}
 		}
+
+		StringBuilder _debug = new StringBuilder();
+		for(var p: tsfList.getErrors()) {
+			if(_debug.length()>0)_debug.append(Constants._newline);
+			_debug.append(p.getM1()).append(": ").append(p.getM2());
+		}
+		debugInfo = _debug.toString();
 		return available;
 	}
 
@@ -145,6 +153,16 @@ public class TargetSystemFinder implements Broker, Constants {
 
 	static class ErrorHolder {
 		String message;
+	}
+
+
+	/**
+	 * summary of errors collected during checking of endpoints
+	 */
+	private String debugInfo;
+
+	public String getDebugInfo(){
+		return debugInfo;
 	}
 
 }

@@ -1,6 +1,8 @@
 package eu.unicore.ucc.lookup;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -27,6 +29,8 @@ public class SiteLister extends Lister<SiteClient>{
 	private final IRegistryClient registry;
 
 	private final UCCConfigurationProvider configurationProvider;
+
+	private final List<Pair<Endpoint,String>>errors = Collections.synchronizedList(new ArrayList<>());
 
 	public SiteLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider){
 		this(null,registry,configurationProvider,new AcceptAllFilter());
@@ -55,6 +59,10 @@ public class SiteLister extends Lister<SiteClient>{
 		this.configurationProvider = configurationProvider;
 	}
 
+	public Collection<Pair<Endpoint,String>> getErrors(){
+		return errors;
+	}
+
 	@Override
 	public Iterator<SiteClient> iterator() {
 		try{
@@ -73,7 +81,8 @@ public class SiteLister extends Lister<SiteClient>{
 				addProducer(new SiteProducer(site, 
 						configurationProvider.getClientConfiguration(site.getUrl()),
 						configurationProvider.getRESTAuthN(), 
-						addressFilter));
+						addressFilter,
+						errors));
 			}
 		}
 	}
@@ -83,17 +92,19 @@ public class SiteLister extends Lister<SiteClient>{
 		private final Endpoint epr;
 		private final IClientConfiguration securityProperties;
 		private final IAuthCallback auth;
-		private final List<Pair<Endpoint,String>>errors = new ArrayList<>();
 		private final AddressFilter addressFilter;
-
+		private final Collection<Pair<Endpoint,String>>errors;
+		
 		private AtomicInteger runCount;
 		private BlockingQueue<SiteClient> target;
 
-		public SiteProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter) {
+		public SiteProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter,
+				Collection<Pair<Endpoint,String>>errors) {
 			this.epr = epr;
 			this.securityProperties = securityProperties;
 			this.auth = auth;
 			this.addressFilter = addressFilter;
+			this.errors = errors;
 		}
 
 		@Override

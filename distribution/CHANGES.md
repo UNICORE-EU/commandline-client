@@ -6,6 +6,11 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 17 or later!
 
+Version 11.0.1 (released Apr 27, 2026)
+--------------------------------------
+ - update to UNICORE 11.0.1
+ - dependency updates
+
 Version 11.0.0 (released Mar 09, 2026)
 --------------------------------------
  - update to UNICORE 11 base (requires Java 17)

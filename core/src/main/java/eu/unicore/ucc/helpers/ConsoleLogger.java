@@ -42,22 +42,26 @@ public class ConsoleLogger implements UserLogger {
 		}
 	}
 
+	public void out(String msg) {
+		System.out.println(msg);
+	}
+
 	@Override
 	public void info(String msg, Object... params) {
-		System.out.println(new ParameterizedMessage(msg, params).getFormattedMessage());
+		out(new ParameterizedMessage(msg, params).getFormattedMessage());
 	}
 
 	@Override
 	public void verbose(String msg, Object... params) {
 		if(verbose) {
-			this.info(prefix+" "+msg, params);
+			info(prefix+" "+msg, params);
 		}
 	}
 
 	@Override
 	public void debug(String msg, Object... params) {
 		if(debug) {
-			this.info(prefix+" [DEBUG] "+msg, params);
+			info(prefix+" [DEBUG] "+msg, params);
 		}
 	}
 

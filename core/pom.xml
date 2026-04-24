@@ -26,10 +26,6 @@
       <scope>test</scope>
     </dependency> 
     <dependency>
-      <groupId>com.github.jnr</groupId>
-      <artifactId>jnr-unixsocket</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy</artifactId>
     </dependency>

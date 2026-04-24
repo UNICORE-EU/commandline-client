@@ -1,6 +1,8 @@
 package eu.unicore.ucc.lookup;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -28,6 +30,8 @@ public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 	private final IRegistryClient registry;
 
 	private final UCCConfigurationProvider configurationProvider;
+
+	private final List<Pair<Endpoint,String>>errors = Collections.synchronizedList(new ArrayList<>());
 
 	public SiteFactoryLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider, String[] tags){
 		this(UCC.executor, registry, configurationProvider, new AcceptAllFilter());
@@ -74,8 +78,12 @@ public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 		for(final Endpoint site: sites){
 			addProducer(new SiteFactoryProducer(site,
 					configurationProvider.getClientConfiguration(site.getUrl()),
-					configurationProvider.getRESTAuthN(), addressFilter));
+					configurationProvider.getRESTAuthN(), addressFilter, errors));
 		}
+	}
+
+	public Collection<Pair<Endpoint,String>> getErrors(){
+		return errors;
 	}
 
 	public static class SiteFactoryProducer implements Producer<SiteFactoryClient>{
@@ -83,17 +91,19 @@ public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 		private final Endpoint ep;
 		private final IClientConfiguration securityProperties;
 		private final IAuthCallback auth;
-		private final List<Pair<Endpoint,String>>errors = new ArrayList<>();
 		private final AddressFilter addressFilter;
+		private final Collection<Pair<Endpoint,String>>errors;
 
 		private BlockingQueue<SiteFactoryClient> target;
 		private AtomicInteger runCounter;
 
-		public SiteFactoryProducer(Endpoint ep, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter) {
+		public SiteFactoryProducer(Endpoint ep, IClientConfiguration securityProperties, IAuthCallback auth, 
+				AddressFilter addressFilter, Collection<Pair<Endpoint,String>>errors) {
 			this.ep = ep;
 			this.securityProperties = securityProperties;
 			this.auth = auth;
 			this.addressFilter = addressFilter;
+			this.errors = errors;
 		}
 
 		@Override
@@ -129,6 +139,7 @@ public class SiteFactoryLister extends Lister<SiteFactoryClient>{
 			this.target = target;
 			this.runCounter = runCount;
 		}
+
 	}
 
 }

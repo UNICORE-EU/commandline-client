@@ -1,8 +1,8 @@
 package eu.unicore.ucc.helpers;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -42,8 +42,8 @@ public class ResourceCache {
 		if(c==null){
 			c = CacheBuilder.newBuilder()
 					.maximumSize(250)
-					.expireAfterAccess(3600, TimeUnit.SECONDS)
-					.expireAfterWrite(3600, TimeUnit.SECONDS)
+					.expireAfterAccess(Duration.ofSeconds(3600))
+					.expireAfterWrite(Duration.ofSeconds(3600))
 					.build();
 			caches.put(id, c);
 		}

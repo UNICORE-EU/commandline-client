@@ -1,5 +1,7 @@
 package eu.unicore.ucc.actions.data;
 
+import java.io.IOException;
+
 import org.apache.commons.cli.Option;
 
 import eu.unicore.client.core.StorageClient;
@@ -47,7 +49,7 @@ public class RM extends SMSOperation {
 		}
 	}
 
-	private boolean confirm(String t){
+	private boolean confirm(String t) throws IOException {
 		String line = UCC.getLineReader().readLine("This will delete remote file <"+t+">, "
 				+ "are you sure? [Y]");
 		return line.length()==0  || line.startsWith("y") || line.startsWith("Y");

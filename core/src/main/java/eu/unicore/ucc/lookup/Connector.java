@@ -7,10 +7,10 @@ import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.SiteFactoryClient;
 import eu.unicore.client.lookup.Blacklist;
 import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.shell.URLCompleter;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.util.Log;
 
 /**
  * connects to the federation and creates target systems if required
@@ -23,14 +23,19 @@ public class Connector implements Runnable {
 
 	private final UCCConfigurationProvider cfgProvider;
 
-	final AtomicInteger tsfAvailable=new AtomicInteger(0);
+	final AtomicInteger tsfAvailable = new AtomicInteger(0);
 
-	final AtomicInteger tssAvailable=new AtomicInteger(0);
+	final AtomicInteger tssAvailable = new AtomicInteger(0);
 
 	/**
 	 * blacklisted sites to avoid
 	 */
 	private String[] blacklist;
+
+	/**
+	 * summary of errors collected during checking of endpoints
+	 */
+	private String debugInfo;
 
 	/**
 	 * @param registry
@@ -43,7 +48,7 @@ public class Connector implements Runnable {
 
 	@Override
 	public void run() {
-		SiteFactoryLister lister=new SiteFactoryLister(UCC.executor,registry,cfgProvider);
+		SiteFactoryLister lister=new SiteFactoryLister(UCC.executor, registry, cfgProvider);
 		if(blacklist!=null && blacklist.length>0){
 			UCC.console.debug("Using blacklist <{}>", Arrays.asList(blacklist));
 			lister.setAddressFilter(new Blacklist(blacklist));
@@ -63,6 +68,13 @@ public class Connector implements Runnable {
 				}
 			}
 		}
+
+		StringBuilder _debug = new StringBuilder();
+		for(var p: lister.getErrors()) {
+			if(_debug.length()>0)_debug.append(Constants._newline);
+			_debug.append(p.getM1()).append(": ").append(p.getM2());
+		}
+		debugInfo = _debug.toString();
 	}
 	
 	private void handleTSF(SiteFactoryClient tsf) throws Exception {
@@ -73,12 +85,7 @@ public class Connector implements Runnable {
 			URLCompleter.registerSiteURL(_last_TSS);
 			tssAvailable.incrementAndGet();
 		}catch(Exception e){
-			if(Log.getDetailMessage(e).contains("Access denied")){
-				UCC.console.verbose("Access denied on <{}>", tsf.getEndpoint().getUrl());
-			}
-			else{
-				UCC.console.error(e, "Can't create target system.");
-			}
+			UCC.console.error(e, "Can't create target system.");
 		}
 	}
 
@@ -96,6 +103,10 @@ public class Connector implements Runnable {
 
 	public int getAvailableTSF(){
 		return tsfAvailable.get();
+	}
+
+	public String getDebugInfo(){
+		return debugInfo;
 	}
 
 	public static String _last_TSS = null;

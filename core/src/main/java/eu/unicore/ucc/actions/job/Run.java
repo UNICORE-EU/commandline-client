@@ -242,10 +242,13 @@ public class Run extends ActionBase {
 			}
 		}
 		if(errors.size()>0) {
+			StringBuilder sb = new StringBuilder();
 			for(String s: errors) {
+				if(sb.length()>0)sb.append(", ");
+				sb.append(s);
 				console.verbose("{}", s);
 			}
-			throw new Exception("Job(s) failed.");
+			throw new Exception("Job(s) failed: "+sb.toString());
 		}
 	}
 
@@ -320,7 +323,7 @@ public class Run extends ActionBase {
 				}catch(Exception ex){}
 			}
 		}catch(Exception ex){
-			return new Pair<>(ERROR, Log.createFaultMessage("Error processing job", ex));
+			return new Pair<>(ERROR, Log.getDetailMessage(ex));
 		}
 		try {
 			if(Status.FAILED.equals(runner.getJob().getStatus())) {

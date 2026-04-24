@@ -59,7 +59,8 @@ public class CallbackUtils
 		};
 	}
 
-	public static char[] getPasswordFromUserCmd(String protectedArtifactType, String protectedArtifactDescription) {
+	public static char[] getPasswordFromUserCmd(String protectedArtifactType,
+			String protectedArtifactDescription) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Please enter your ").append(protectedArtifactType);
 		if(protectedArtifactDescription!=null){
@@ -82,7 +83,11 @@ public class CallbackUtils
 
 	private static String readLine(boolean hidden) {
 		if(UCC.unitTesting)return "test123";
-		return UCC.getLineReader().readLine(hidden? '*' : null).trim();
+		try {
+			return UCC.getLineReader().readLine(hidden? '*' : null).trim();
+		}catch(IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

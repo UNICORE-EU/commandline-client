@@ -38,13 +38,12 @@ public class TestTargetSystemFinder extends EmbeddedTestBase {
 		b.getMessageWriter().setVerbose(true);
 		candidates = finder.listCandidates(r, conf, b);
 		assertEquals(0, candidates.size());
-		
+
 		j = new JSONObject();
 		j.put("ApplicationName", "Date");
 		b = new UCCBuilder(j.toString(), r, conf);
 		b.getMessageWriter().setVerbose(true);
 		candidates = finder.listCandidates(r, conf, b);
 		assertEquals(1, candidates.size());
-		
 	}
 }

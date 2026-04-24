@@ -2,16 +2,13 @@ package eu.unicore.ucc.authn.oidc;
 
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.UnixDomainSocketAddress;
 import java.nio.CharBuffer;
 import java.nio.channels.Channels;
-
-import jnr.unixsocket.UnixSocketAddress;
-import jnr.unixsocket.UnixSocketChannel;
+import java.nio.channels.SocketChannel;
 
 /**
  * Connector to the 'oidc-agent' via UNIX domain socket.
- *
- * Modeled after the JSch ssh-agent proxy
  *
  * @author schuller
  */
@@ -27,7 +24,8 @@ public class OIDCAgentProxy {
 
 	public String send(String data) throws Exception {
 		String path = System.getenv(OIDC_SOCK);
-		try(UnixSocketChannel channel = UnixSocketChannel.open(new UnixSocketAddress(path));
+		UnixDomainSocketAddress unixSocketAddress = UnixDomainSocketAddress.of(path);
+		try(SocketChannel channel =  SocketChannel.open(unixSocketAddress);
 				PrintWriter w = new PrintWriter(Channels.newOutputStream(channel));
 				InputStreamReader r = new InputStreamReader(Channels.newInputStream(channel)))
 		{

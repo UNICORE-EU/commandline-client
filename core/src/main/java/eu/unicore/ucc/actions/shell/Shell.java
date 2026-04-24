@@ -17,6 +17,8 @@ import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.history.DefaultHistory;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
@@ -107,7 +109,7 @@ public class Shell extends ActionBase {
 			"help", "help-auth", "version",
 			"exit", "quit" );
 
-	private void setupLineReader() {
+	private void setupLineReader() throws IOException {
 		UCCCompleter c = null;
 		if(commandFile==null){
 			Set<String> cmds = new HashSet<>();
@@ -117,7 +119,8 @@ public class Shell extends ActionBase {
 			}
 			c = new UCCCompleter(cmds, this.configurationProvider);
 		}
-		LineReader is = LineReaderBuilder.builder().completer(c).build();
+		Terminal term = TerminalBuilder.builder().graphemeCluster(false).build();
+		LineReader is = LineReaderBuilder.builder().terminal(term).completer(c).build();
 		if(commandFile==null) {
 			history = getHistory(is);
 		}
@@ -126,8 +129,9 @@ public class Shell extends ActionBase {
 
 	private void run(){
 		Command.quitAfterPrintingUsage=false;
-		LineReader is = UCC.getLineReader();
+		LineReader is = null;
 		try{
+			is = UCC.getLineReader();
 			if(commandFile!=null){
 				is.addCommandsInBuffer(FileUtils.readLines(commandFile, "UTF-8"));
 				is.addCommandsInBuffer(Arrays.asList("exit"));
@@ -139,7 +143,7 @@ public class Shell extends ActionBase {
 			System.out.println("UCC "+UCC.getVersion());
 			System.out.println("Welcome to the UCC shell. Enter 'help' for a list of commands. Enter 'exit' to quit.");
 			while(true){
-				UCC.console.setPrefix("[ucc "+getName()+"]");
+				console.setPrefix("[ucc "+getName()+"]");
 				String s = null;
 				try {
 					s = commandFile!=null ? is.readLine() : is.readLine("ucc>");
@@ -151,7 +155,7 @@ public class Shell extends ActionBase {
 				if(s.isEmpty() || s.startsWith("#"))continue;
 
 				if("exit".equalsIgnoreCase(s) || "quit".equalsIgnoreCase(s)){
-					console.info("\nGoodbye.");
+					System.out.println("\nGoodbye.");
 					return;
 				}
 				if(s.startsWith("help-auth")){

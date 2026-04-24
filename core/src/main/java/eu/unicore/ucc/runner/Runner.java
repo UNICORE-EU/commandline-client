@@ -357,9 +357,9 @@ public class Runner implements Runnable {
 		if(broker==null){
 			broker = UCC.getBroker("LOCAL");
 		}
-		Collection<Endpoint> eprs=broker.listCandidates(registry, configurationProvider, builder);
+		Collection<Endpoint> eprs = broker.listCandidates(registry, configurationProvider, builder);
 		if(eprs.size()==0){
-			msg.verbose("No matching target system available (try 'connect' or check job requirements)");
+			msg.verbose("No suitable endpoint found - check credentials and job requirements");
 		}
 		for(Endpoint epr: eprs){
 			msg.info("Candidate site: {}", epr.getUrl());

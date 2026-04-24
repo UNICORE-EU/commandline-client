@@ -1,5 +1,6 @@
 package eu.unicore.ucc;
 
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.ucc.helpers.ConsoleLogger;
@@ -347,9 +350,10 @@ public class UCC{
 	}
 
 	private static LineReader lr;
-	public static synchronized LineReader getLineReader() {
+	public static synchronized LineReader getLineReader() throws IOException {
 		if(lr==null) {
-			lr = LineReaderBuilder.builder().build();
+			Terminal term = TerminalBuilder.builder().graphemeCluster(false).build();
+			lr = LineReaderBuilder.builder().terminal(term).build();
 		}
 		return lr;
 	}

@@ -58,13 +58,16 @@ public class Connect extends ActionBase {
 		Connector c = new Connector(registry, configurationProvider);
 		c.setBlacklist(blacklist);
 		c.run();
-		int tsfAvailable=c.getAvailableTSF();
-		if(tsfAvailable==0)console.info("There are no target system factories in the selected registry.");
-		int tssAvailable=c.getAvailableTSS();
+		int tsfAvailable = c.getAvailableTSF();
+		if(tsfAvailable==0) {
+			console.info("There are no accessible endpoints in the selected registry.");
+		}
+		int tssAvailable = c.getAvailableTSS();
 		console.info("You can access {} target system(s).", tssAvailable);
 		//it should be considered an error if no sites are available
 		if(tssAvailable==0) {
-			throw new Exception("No sites available!");
+			console.verbose("Errors: {}", c.getDebugInfo());
+			throw new Exception("No accessible sites found!");
 		}
 	}
 
