@@ -154,7 +154,7 @@ public class Shell extends ActionBase {
 				s = s.trim();
 				if(s.isEmpty() || s.startsWith("#"))continue;
 
-				if("exit".equalsIgnoreCase(s) || "quit".equalsIgnoreCase(s)){
+				if("exit".equalsIgnoreCase(s) || "quit".equalsIgnoreCase(s) || "bye".equalsIgnoreCase(s)){
 					System.out.println("\nGoodbye.");
 					return;
 				}
@@ -334,6 +334,7 @@ public class Shell extends ActionBase {
 		System.err.println(" unset <name>...     - unset a variable");
 		System.err.println(" system ...          - run a system command (also: '! ...'");
 		System.err.println(" version             - show version info");
+		System.err.println(" exit, quit, bye     - exit the UCC shell");
 	}
 
 	@Override
@@ -345,7 +346,7 @@ public class Shell extends ActionBase {
 		try{
 			String historyFile = properties.getProperty(HISTORY_FILEKEY);
 			if(historyFile == null){
-				historyFile=System.getProperty("user.home")+File.separator+".ucc"
+				historyFile = System.getProperty("user.home")+File.separator+".ucc"
 						+File.separator+HISTORY_FILEKEY;
 			}
 			lineReader.setVariable(LineReader.HISTORY_FILE, historyFile);

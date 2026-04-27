@@ -24,11 +24,13 @@ public class ConsoleLogger implements UserLogger {
 	}
 
 	public boolean isVerbose(){ return verbose; }
+
 	public void setVerbose(boolean verbose){ this.verbose=verbose; }
 	
 	public boolean isDebug(){ return debug; }
+
 	public void setDebug(boolean debug){ this.debug=debug; }
-	
+
 	@Override
 	public void error(Throwable cause, String message, Object ...params){
 		System.err.println(prefix +" "+new ParameterizedMessage(message, params).getFormattedMessage());
@@ -42,13 +44,9 @@ public class ConsoleLogger implements UserLogger {
 		}
 	}
 
-	public void out(String msg) {
-		System.out.println(msg);
-	}
-
 	@Override
 	public void info(String msg, Object... params) {
-		out(new ParameterizedMessage(msg, params).getFormattedMessage());
+		System.out.println(new ParameterizedMessage(msg, params).getFormattedMessage());
 	}
 
 	@Override
