@@ -6,10 +6,12 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 17 or later!
 
-Version 11.0.1 (released Apr 27, 2026)
+Version 11.0.1 (released Apr 28, 2026)
 --------------------------------------
+ - improvement: "issue-token": allow to specify lifetime with units
  - update to UNICORE 11.0.1
  - dependency updates
+ - code cleanup
 
 Version 11.0.0 (released Mar 09, 2026)
 --------------------------------------

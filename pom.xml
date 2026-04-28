@@ -25,7 +25,7 @@
     <secutils.version>5.0.2</secutils.version>
     <groovy.version>5.0.5</groovy.version>
     <guava.version>33.6.0-jre</guava.version>
-    <jline.version>4.0.12</jline.version>
+    <jline.version>4.0.13</jline.version>
     <commons-cli.version>1.11.0</commons-cli.version>
     <junit.version>5.12.1</junit.version>
     <junit.p.version>1.12.1</junit.p.version>
