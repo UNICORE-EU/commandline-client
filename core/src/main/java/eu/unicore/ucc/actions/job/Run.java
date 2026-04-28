@@ -53,7 +53,7 @@ public class Run extends ActionBase {
 		super.createOptions();
 		getOptions().addOption(Option.builder(OPT_MODE)
 				.longOpt(OPT_MODE_LONG)
-				.desc("Run asynchronous, writing a job ID file for use with other ucc commands")
+				.desc("Don't wait for job to finish.")
 				.required(false)
 				.get());
 		getOptions().addOption(Option.builder(OPT_SITENAME)

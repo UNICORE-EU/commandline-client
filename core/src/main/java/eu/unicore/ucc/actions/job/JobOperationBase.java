@@ -1,8 +1,6 @@
 package eu.unicore.ucc.actions.job;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +25,6 @@ public abstract class JobOperationBase extends ActionBase {
 	 */
 	protected Pair<JobClient,UCCBuilder> createJobClient(String jobDescriptor) throws Exception {
 		Pair<JobClient,UCCBuilder>res = new Pair<>();
-		
 		UCCBuilder builder = createBuilder(jobDescriptor);
 		res.setM2(builder);
 		String url = builder.getProperty("_ucc_epr");
@@ -45,25 +42,21 @@ public abstract class JobOperationBase extends ActionBase {
 	 * @param arg - denoting either a file, or a URL
 	 */
 	protected UCCBuilder createBuilder(String arg) throws Exception {
-		try{
-			UCCBuilder builder = null;
-			File job = new File(arg);
-			if(job.exists())
-			{
-				builder = new UCCBuilder(job, registry, configurationProvider);
-				builder.setCheckLocalFiles(false);
-				console.debug("Read job info from <{}>", arg);
-			}
-			else{
-				console.debug("Accessing job at <{}>", arg);
-				builder = new UCCBuilder(registry, configurationProvider);
-				builder.setCheckLocalFiles(false);
-				builder.setProperty("_ucc_epr", arg);
-			}
-			return builder;
-		}catch(Exception e){
-			throw new Exception("Can't use <"+arg+">.", e);
+		UCCBuilder builder = null;
+		File job = new File(arg);
+		if(job.exists())
+		{
+			builder = new UCCBuilder(job, registry, configurationProvider);
+			builder.setCheckLocalFiles(false);
+			console.debug("Read job info from <{}>", arg);
 		}
+		else{
+			console.debug("Accessing job at <{}>", arg);
+			builder = new UCCBuilder(registry, configurationProvider);
+			builder.setCheckLocalFiles(false);
+			builder.setProperty("_ucc_epr", arg);
+		}
+		return builder;
 	}
 
 	@Override
@@ -71,14 +64,8 @@ public abstract class JobOperationBase extends ActionBase {
 		super.process();
 		processAdditionalOptions();
 		List<String> args = new ArrayList<>();
-		if(getCommandLine().getArgs().length==1){
-			try{
-				console.info("Enter job URL:");
-				String arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
-				args.add(arg);
-			}catch(Exception e){
-				throw new Exception("Can't read job descriptor from stdin.",e);
-			}	
+		if(getCommandLine().getArgs().length<2){
+			throw new Exception("At least one job is required.");	
 		}
 		else{
 			for(int i=1; i<getCommandLine().getArgs().length;i++){

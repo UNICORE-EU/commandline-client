@@ -186,6 +186,14 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		String id1 = Run.getLastJobAddress();
 
+		// check error if job URL is missing
+		args = new String[]{"job-status",
+				"-c", "src/test/resources/conf/userprefs.embedded"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
+
+		// now really check status 
 		args = new String[]{"job-status",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"--all",
@@ -195,7 +203,6 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-
 
 		args = new String[]{"job-status",
 				"-c", "src/test/resources/conf/userprefs.embedded",
