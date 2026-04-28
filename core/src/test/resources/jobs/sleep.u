@@ -1,6 +1,6 @@
 {
 
-  Executable: "/bin/sleep", 
-  Arguments: ["30", ],
+  "Executable": "/bin/sleep", 
+  "Arguments": ["30" ]
 
 } 

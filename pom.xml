@@ -113,6 +113,7 @@
 	<groupId>org.jline</groupId>
 	<artifactId>jline</artifactId>
 	<version>${jline.version}</version>
+	<classifier>jdk11</classifier>
       </dependency>
       <dependency>
 	<groupId>eu.unicore.workflow</groupId>

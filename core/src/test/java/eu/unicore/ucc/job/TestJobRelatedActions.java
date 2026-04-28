@@ -50,6 +50,19 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	}
 
 	@Test
+	public void test_Run_MultiWithErrors(){
+		String[] args=new String[]{"run", "-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-J",
+				"src/test/resources/jobs/error-executable.u",
+				"src/test/resources/jobs/error-executable.u",
+				"src/test/resources/jobs/error-executable.u"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
+	}
+
+	@Test
 	public void test_Run_JobFromStdin()throws IOException{
 		InputStream in=System.in;
 		try(FileInputStream fis=new FileInputStream("src/test/resources/jobs/date.u")){
@@ -109,10 +122,11 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 		String id1 = Run.getLastJobAddress();
 
-		args=new String[]{"run", "-v",
+		args = new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"src/test/resources/jobs/date.u",
-				"-a"
+				"-a",
+				"--wait-for", "SUCCESSFUL"
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
@@ -140,6 +154,25 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		
+		// wait-for syntax errors
+		args = new String[]{"run", "-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"src/test/resources/jobs/date.u",
+				"-a",
+				"--wait-for", "A_BETTER_DAY"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
+
+		args = new String[]{"run", "-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"src/test/resources/jobs/date.u",
+				"-a",
+				"--wait-for", "UNDEFINED"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
 	}
 
 	@Test

@@ -191,15 +191,13 @@ public class Run extends ActionBase {
 				throw new IllegalArgumentException("Option '--"+
 						OPT_WAIT_LONG+"' requires '--"+OPT_MODE_LONG+"'");
 			}
-			try{
-				waitFor = Status.valueOf(waitForSpec);
-				if(waitFor==Status.FAILED || waitFor==Status.UNDEFINED) {
-					throw new Exception();
-				}
-			}catch(Exception ex) {
+			waitForSpec = waitForSpec.toUpperCase();
+			if(!waitableJobStatuses.contains(waitForSpec)) {
 				throw new IllegalArgumentException("'--"+OPT_WAIT_LONG
 						+"' accepts one of: "+Arrays.asList(waitableJobStatuses));
 			}
+			waitFor = Status.valueOf(waitForSpec);
+			console.debug("Will wait for job to become {}", waitFor);
 		}
 		final List<String>errors = Collections.synchronizedList(new ArrayList<>());
 		if(getCommandLine().getArgs().length>1){
@@ -311,14 +309,13 @@ public class Run extends ActionBase {
 			if(!dryRun){
 				lastJobAddress = runner.getJob().getEndpoint().getUrl();
 				if(!synchronous) {
-					lastJobFile=builder.getProperty("_ucc_jobIdFile");
 					if(waitFor!=null) {
 						console.verbose("Waiting for job to be {} ...", waitFor);
 						runner.getJob().poll(waitFor);
 					}
 				}
 				try{
-					lastJobDirectory=runner.getJob().getLinkUrl("workingDirectory");
+					lastJobDirectory = runner.getJob().getLinkUrl("workingDirectory");
 					properties.put(PROP_LAST_JOBDIR_URL, lastJobDirectory);
 				}catch(Exception ex){}
 			}
@@ -333,15 +330,13 @@ public class Run extends ActionBase {
 		return new Pair<>(0, "");
 	}
 
-	public void printSampleJob(){
+	public void printSampleJob() throws Exception {
 		try (InputStream is = getClass().getClassLoader().getResourceAsStream(
 				"META-INF/examples/basic.json")){
 			console.info("Example job:\n{}",IOUtils.toString(is, "UTF-8"));
-		}catch(Exception ex) {
-			throw new RuntimeException(ex);
+			console.info("For a full description, see:");
+			console.info("https://unicore-docs.readthedocs.io/en/latest/user-docs/rest-api/job-description/index.html");
 		}
-		console.info("For a full description, see:");
-		console.info("https://unicore-docs.readthedocs.io/en/latest/user-docs/rest-api/job-description/index.html");
 	}
 
 	/*
@@ -357,12 +352,6 @@ public class Run extends ActionBase {
 
 	public static String getLastJobDirectory() {
 		return lastJobDirectory;
-	}
-
-	private static String lastJobFile;
-
-	public static String getLastJobFile() {
-		return lastJobFile;
 	}
 
 }

@@ -163,7 +163,7 @@ public interface Constants {
 	public static final String CMD_GRP_WORKFLOW = "Workflow";
 	public static final String CMD_GRP_OTHER = "Other";
 
-	// job stati
+	// job stati that async Run can wait for
 	public static final Collection<String> waitableJobStatuses = Arrays.asList(
 			"STAGINGIN", "QUEUED", "RUNNING", "STAGINGOUT", "SUCCESSFUL");
 

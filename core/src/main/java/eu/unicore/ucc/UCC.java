@@ -288,7 +288,7 @@ public class UCC{
 		exitCode = null;
 		lastCommand = null;
 		try {
-			boolean showHelp=args.length < 1 || isHelp(args[0]);
+			boolean showHelp = args.length < 1 || isHelp(args[0]);
 			boolean showAuthNHelp = args.length > 0  && args[0].equalsIgnoreCase("help-auth");
 			boolean showVersion = args.length > 0  && isVersion(args[0]);
 			if (showHelp) {
@@ -313,7 +313,7 @@ public class UCC{
 					lastCommand = cmd;
 				}
 			}
-			exitCode=0;
+			exitCode = 0;
 		} catch (Exception e) {
 			console.error(e, "Error running UCC command '{}'", args[0]);
 			exitCode = Constants.ERROR;
@@ -350,6 +350,7 @@ public class UCC{
 	}
 
 	private static LineReader lr;
+
 	public static synchronized LineReader getLineReader() throws IOException {
 		if(lr==null) {
 			Terminal term = TerminalBuilder.builder().graphemeCluster(false).build();
@@ -357,7 +358,9 @@ public class UCC{
 		}
 		return lr;
 	}
+
 	public static void setLineReader(LineReader l) {
 		lr = l;
 	}
+
 }

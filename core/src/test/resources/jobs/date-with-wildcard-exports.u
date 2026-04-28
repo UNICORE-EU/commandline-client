@@ -1,9 +1,9 @@
 {
 
-  ApplicationName: Date, 
+  "ApplicationName": "Date", 
   
-  Exports:[
-   { From: "std*", To: "./" , },
+  "Exports":[
+   { "From": "std*", "To": "./" , },
   ],
   
 } 
