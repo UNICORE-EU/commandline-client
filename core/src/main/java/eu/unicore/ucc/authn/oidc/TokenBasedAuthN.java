@@ -9,25 +9,22 @@ import org.apache.hc.core5.http.HttpMessage;
 import eu.unicore.security.AuthorisationException;
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
 import eu.unicore.services.restclient.IAuthCallback;
-import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.PropertiesAwareAuthn;
-import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.util.httpclient.ClientProperties;
 
 /**
  * Base class for authenticating using a Bearer token.
  *
- * (it also handles the case where the token is explicitely
+ * (it also handles the case where the token is explicitly
  * given in the properties)
  *
  * @author schuller
  */
 public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider 
                              implements PropertiesAwareAuthn, IAuthCallback {
-	
+
 	protected String token = null;
 	protected String refreshToken = null;
-	protected ConsoleLogger msg = UCC.console;
 	protected long lastRefresh;
 
 	@Override
@@ -40,7 +37,7 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 	{
 		return "Authenticate with an OIDC token given via the 'token' property.";
 	}
-	
+
 	@Override
 	public String getUsage()
 	{
@@ -53,7 +50,7 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 				+ "use the usual 'truststore.*' propertierefreshTokens\n");
 		return ret.toString();
 	}
-	
+
 	@Override
 	public void setProperties(Properties properties) {
 		this.properties = properties;

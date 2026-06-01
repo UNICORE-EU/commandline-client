@@ -17,7 +17,7 @@ import eu.unicore.util.configuration.PropertyMD;
  * @author schuller
  */
 public class OIDCAgentProperties extends PropertiesHelper {
-	
+
 	private static final Logger log = Log.getLogger(Log.CONFIGURATION, OIDCAgentProperties.class);
 
 	public static final String PREFIX = "oidc-agent.";

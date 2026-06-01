@@ -112,7 +112,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 
 	@Override
 	public String getArgumentList(){
-		return "[param1=value1,...]";
+		return "[param1=value1, param2=@val-from-file, ...] or [@param-file]";
 	}
 
 	@Override

@@ -25,11 +25,11 @@ public class IssueToken extends ActionBase {
 	// token lifetime (in seconds)
 	private long lifetime = -1;
 
-	private boolean limited=false;
+	private boolean limited = false;
 
-	private boolean renewable=false;
+	private boolean renewable = false;
 
-	private boolean inspect=false;
+	private boolean inspect = false;
 
 	private String siteName;
 
@@ -147,6 +147,10 @@ public class IssueToken extends ActionBase {
 		String uid = o.optString("uid", null);
 		if(uid!=null) {
 			sub = sub + " (uid="+uid+")";
+		}
+		String scope = o.optString("preferences", null);
+		if(scope!=null) {
+			sub = sub + " ["+scope+"]";
 		}
 		long lt = o.getLong("exp")-o.getLong("iat");
 		console.info("Subject:      {}", sub);

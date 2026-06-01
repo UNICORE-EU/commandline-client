@@ -5,6 +5,8 @@ import java.util.Properties;
 
 import org.json.JSONObject;
 
+import eu.unicore.ucc.UCC;
+
 /**
  * Gets a Bearer token from 'oidc-agent'
  * https://github.com/indigo-dc/oidc-agent
@@ -85,7 +87,7 @@ public class OIDCAgentAuthN extends TokenBasedAuthN {
 			return;
 		}
 		lastRefresh = instant;
-		msg.debug("Refreshing token (after <{}> seconds.", interval);
+		UCC.console.debug("Refreshing token (after <{}> seconds.", interval);
 		retrieveToken();
 	}
 

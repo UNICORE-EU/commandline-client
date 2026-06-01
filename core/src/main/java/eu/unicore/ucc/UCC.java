@@ -40,8 +40,7 @@ public class UCC{
 
 	public static final Map<String, Class<? extends Command>> cmds = new HashMap<>();
 
-	public static final Map<String, AuthenticationProvider> authNMethods = 
-			new HashMap<>();
+	public static final Map<String, AuthenticationProvider> authNMethods = new HashMap<>();
 
 	public static Integer exitCode=null;
 

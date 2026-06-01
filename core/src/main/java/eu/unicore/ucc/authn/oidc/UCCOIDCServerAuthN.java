@@ -35,9 +35,10 @@ public class UCCOIDCServerAuthN extends TokenBasedAuthN {
 	{
 		OIDCProperties oidcProperties = new OIDCProperties(properties);	
 		super.setProperties(properties);
-		this.auth = new eu.unicore.services.restclient.oidc.OIDCServerAuthN(
+		this.auth = new OIDCServerAuthN(
 				oidcProperties,
 				super.getAnonymousClientConfiguration()){
+				@Override
 				protected void retrieveToken()throws Exception {
 					String password = oidcProperties.getValue(OIDCProperties.PASSWORD);
 					if(password==null){

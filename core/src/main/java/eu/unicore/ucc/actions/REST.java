@@ -189,7 +189,8 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			properties.put(PROP_LAST_RESOURCE_URL, l.getValue());
 		}
 		if(res.getEntity()!=null) {
-			if("application/json".equalsIgnoreCase(accept)) {
+			String type = res.getEntity().getContentType();
+			if(type!=null && type.toLowerCase().contains("application/json")) {
 				console.info("{}", bc.asJSON(res).toString(2));
 			}
 			else {
