@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.workflow.WorkflowClient;
 
@@ -62,7 +61,7 @@ public class WorkflowControl extends ActionBase {
 		}
 		workflowURL = arg;
 		console.verbose("Checking workflow at {}", workflowURL);
-		workflow=new WorkflowClient(new Endpoint(workflowURL),
+		workflow=new WorkflowClient(workflowURL,
 				configurationProvider.getClientConfiguration(workflowURL), 
 				configurationProvider.getRESTAuthN());
 		properties.put(PROP_LAST_RESOURCE_URL, workflowURL);

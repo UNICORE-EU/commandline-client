@@ -96,8 +96,8 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		setupOptions();
 		for(T entry: iterator()) {
 			if(filterMatch(entry)){
-				URLCompleter.registerSiteURL(entry.getEndpoint().getUrl());
-				properties.put(PROP_LAST_RESOURCE_URL, entry.getEndpoint().getUrl());
+				URLCompleter.registerSiteURL(entry.getEndpoint());
+				properties.put(PROP_LAST_RESOURCE_URL, entry.getEndpoint());
 				lastNumberOfResults++;
 				list(entry);
 				if(getCommandLine().hasOption(OPT_EXEC)) {
@@ -147,7 +147,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 			console.info("{}", getDetails(entry));
 		}
 		else {
-			console.info("{}", entry.getEndpoint().getUrl());
+			console.info("{}", entry.getEndpoint());
 		}
 		printProperties(entry);
 	}
@@ -189,7 +189,7 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 	 */
 	protected boolean filterMatch(T resource) throws Exception {
 		if(resource==null)return false;
-		if(isBlacklisted(resource.getEndpoint().getUrl()))return false;
+		if(isBlacklisted(resource.getEndpoint()))return false;
 		return !doFilter || filter.accept(resource);
 	}
 

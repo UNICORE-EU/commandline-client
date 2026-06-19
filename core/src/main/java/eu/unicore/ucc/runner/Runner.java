@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.IJobSubmission;
 import eu.unicore.client.core.JobClient;
@@ -184,7 +183,7 @@ public class Runner implements Runnable {
 
 	public String getJobID() throws Exception {
 		return jobClient!=null ? 
-			JSONUtil.extractResourceID(jobClient.getEndpoint().getUrl()) : null;
+			JSONUtil.extractResourceID(jobClient.getEndpoint()) : null;
 	}
 
 	public void setProperties(Properties properties) {
@@ -284,7 +283,7 @@ public class Runner implements Runnable {
 			return;
 		}
 		findTSS();
-		msg.verbose("Submission endpoint: {}", tss.getEndpoint().getUrl());
+		msg.verbose("Submission endpoint: {}", tss.getEndpoint());
 
 		if(builder.getImports().size()==0){
 			submit.put("haveClientStageIn", "false");
@@ -307,7 +306,7 @@ public class Runner implements Runnable {
 			up.setUid(uid);
 		}
 		jobClient = tss.submitJob(submit);
-		String url = jobClient.getEndpoint().getUrl();
+		String url = jobClient.getEndpoint();
 		builder.setProperty("_ucc_epr", url);
 		builder.setProperty("_ucc_type", "job");
 		msg.info(url);
@@ -321,7 +320,7 @@ public class Runner implements Runnable {
 		if(jobClient!=null)return;
 		try{
 			String url = builder.getProperty("_ucc_epr");
-			jobClient=new JobClient(new Endpoint(url),
+			jobClient=new JobClient(url,
 					configurationProvider.getClientConfiguration(url),
 					configurationProvider.getRESTAuthN());
 		}catch(Exception e){
@@ -340,9 +339,9 @@ public class Runner implements Runnable {
 		if(broker==null){
 			broker = UCC.getBroker("LOCAL");
 		}
-		Endpoint epr = broker.findTSSAddress(registry, configurationProvider, builder, selectionStrategy);
-		tss = new SiteClient(epr, 
-				configurationProvider.getClientConfiguration(epr.getUrl()),
+		String epr = broker.findTSSAddress(registry, configurationProvider, builder, selectionStrategy);
+		tss = new SiteClient(epr,
+				configurationProvider.getClientConfiguration(epr),
 				configurationProvider.getRESTAuthN());
 	}
 
@@ -351,25 +350,25 @@ public class Runner implements Runnable {
 	 */
 	private void listCandidateSites()throws Exception {
 		if(tss!=null) {
-			msg.info("Submission endpoint: {}", tss.getEndpoint().getUrl());
+			msg.info("Submission endpoint: {}", tss.getEndpoint());
 			return;
 		}
 		if(broker==null){
 			broker = UCC.getBroker("LOCAL");
 		}
-		Collection<Endpoint> eprs = broker.listCandidates(registry, configurationProvider, builder);
+		Collection<String> eprs = broker.listCandidates(registry, configurationProvider, builder);
 		if(eprs.size()==0){
 			msg.verbose("No suitable endpoint found - check credentials and job requirements");
 		}
-		for(Endpoint epr: eprs){
-			msg.info("Candidate site: {}", epr.getUrl());
+		for(String epr: eprs){
+			msg.info("Candidate site: {}", epr);
 		}
 	}
 
 	private void setOutputLocation(){
-		String outputLoc=builder.getProperty("_ucc_Output", ".");
+		String outputLoc = builder.getProperty("_ucc_Output", ".");
 		try{
-			output=new File(outputLoc);
+			output = new File(outputLoc);
 			if(!output.exists())output.mkdirs();
 			if(!output.isDirectory())throw new IllegalArgumentException("<"+outputLoc+"> is not a directory.");
 		}catch(Exception e){
@@ -481,7 +480,7 @@ public class Runner implements Runnable {
 		StorageClient sms;
 		if(!l.isLocal()){
 			String url = l.getSmsEpr();
-			sms = new StorageClient(new Endpoint(url), 
+			sms = new StorageClient(url,
 					configurationProvider.getClientConfiguration(url),
 					configurationProvider.getRESTAuthN());
 			e.setFrom(l.getName());
@@ -518,7 +517,7 @@ public class Runner implements Runnable {
 
 	private void startJob()throws Exception{
 		jobClient.start();
-		msg.verbose("Job started: {}", jobClient.getEndpoint().getUrl());
+		msg.verbose("Job started: {}", jobClient.getEndpoint());
 	}
 
 	private void writeJobIDFile(){
@@ -773,7 +772,7 @@ public class Runner implements Runnable {
 						r.initJobClient();
 						r.mustSave=true;
 						r.jobClient.delete();
-						r.msg.verbose("Deleted done job {}", r.jobClient.getEndpoint().getUrl());
+						r.msg.verbose("Deleted done job {}", r.jobClient.getEndpoint());
 					}catch(Exception e){
 						r.msg.error(e, "Could not delete job");
 					}

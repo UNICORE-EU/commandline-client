@@ -15,13 +15,13 @@ public class TestAuthN {
 
 	@Test
 	public void testLoadAuthN() throws Exception {
-		assertTrue(UCC.getAuthNMethod(new SSHKeyAuthN().getName())!=null);
-		assertTrue(UCC.getAuthNMethod(new SSHKeyAuthN().getName()) instanceof SSHKeyAuthN);
+		assertTrue(UCC.getAuthNMethod(new KeyAuthN().getName())!=null);
+		assertTrue(UCC.getAuthNMethod(new KeyAuthN().getName()) instanceof KeyAuthN);
 	}
 
 	@Test
 	public void testSSHKeyAuthN() throws Exception {
-		var a = new SSHKeyAuthN();
+		var a = new KeyAuthN();
 		var p = new Properties();
 		p.setProperty("identity", "src/test/resources/certs/test_id");
 		p.setProperty("username", "demouser");

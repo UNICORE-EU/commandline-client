@@ -7,7 +7,6 @@ import java.util.Collection;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.Connect;
@@ -29,7 +28,7 @@ public class TestTargetSystemFinder extends EmbeddedTestBase {
 		j.put("ApplicationName", "no_such_app");
 		UCCBuilder b = new UCCBuilder(j.toString(), r, conf);
 		b.getMessageWriter().setVerbose(true);
-		Collection<Endpoint>candidates = finder.listCandidates(r, conf, b);
+		Collection<String>candidates = finder.listCandidates(r, conf, b);
 		assertEquals(0, candidates.size());
 
 		j.put("ApplicationName", "Date");

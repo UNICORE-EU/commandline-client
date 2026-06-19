@@ -45,7 +45,7 @@ public class ListJobs extends ListActionBase<JobClient> {
 		try	{
 			Date sTime = UnitParser.getISO8601().parse(job.getSubmissionTime());
 			String t = UnitParser.getSimpleDateFormat().format(sTime);
-			return String.format(format, t, job.getStatus(), job.getEndpoint().getUrl());
+			return String.format(format, t, job.getStatus(), job.getEndpoint());
 		}catch(Exception ex){
 			return " ERROR: "+ex.getMessage();
 		}

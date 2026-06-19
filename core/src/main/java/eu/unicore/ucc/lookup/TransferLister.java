@@ -7,7 +7,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.EnumerationClient;
@@ -70,11 +69,11 @@ public class TransferLister extends Lister<BaseServiceClient>{
 	}
 
 	protected void setupProducers()throws Exception {
-		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
-		for(Endpoint site: sites){
+		List<String>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
+		for(String site: sites){
 			if(addressFilter.accept(site)){
 				var sp = new TransferProducer(site, 
-						configurationProvider.getClientConfiguration(site.getUrl()),
+						configurationProvider.getClientConfiguration(site),
 						configurationProvider.getRESTAuthN(), addressFilter, tags);
 				addProducer(sp);
 			}
@@ -83,12 +82,12 @@ public class TransferLister extends Lister<BaseServiceClient>{
 
 	public static class TransferProducer implements Producer<BaseServiceClient>{
 
-		private final Endpoint epr;
+		private final String epr;
 
 		protected final IClientConfiguration securityProperties;
 		protected final IAuthCallback auth;
 		
-		protected final List<Pair<Endpoint,String>>errors = new ArrayList<>();
+		protected final List<Pair<String,String>>errors = new ArrayList<>();
 
 		private AtomicInteger runCount;
 
@@ -98,7 +97,7 @@ public class TransferLister extends Lister<BaseServiceClient>{
 		
 		private final String[] tags;
 
-		public TransferProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, 
+		public TransferProducer(String epr, IClientConfiguration securityProperties, IAuthCallback auth, 
 				AddressFilter addressFilter, String[] tags) {
 			this.epr = epr;
 			this.securityProperties = securityProperties;
@@ -120,16 +119,20 @@ public class TransferLister extends Lister<BaseServiceClient>{
 			}
 		}
 
-		private void handleEndpoint(Endpoint epr) throws Exception{
-			CoreClient core = new CoreClient(epr, securityProperties, auth);
-			String storagesUrl = core.getLinkUrl("transfers");
-			EnumerationClient ec = new EnumerationClient(epr.cloneTo(storagesUrl), securityProperties, auth);
-			ec.setDefaultTags(tags);
-			for(String url: ec){
-				if(addressFilter.accept(url)){
-					BaseServiceClient c = new BaseServiceClient(epr.cloneTo(url), securityProperties, auth);
-					if(addressFilter.accept(c)) {
-						target.put(c);
+		private void handleEndpoint(String epr) throws Exception{
+			try(var core = new CoreClient(epr, securityProperties, auth))
+			{
+				String storagesUrl = core.getLinkUrl("transfers");
+				try(var ec = new EnumerationClient(storagesUrl, securityProperties, auth))
+				{
+					ec.setDefaultTags(tags);
+					for(String url: ec){
+						if(addressFilter.accept(url)){
+							BaseServiceClient c = new BaseServiceClient(url, securityProperties, auth);
+							if(addressFilter.accept(c)) {
+								target.put(c);
+							}
+						}
 					}
 				}
 			}

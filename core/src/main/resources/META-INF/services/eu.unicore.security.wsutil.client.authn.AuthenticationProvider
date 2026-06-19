@@ -4,7 +4,7 @@
 eu.unicore.ucc.authn.UsernameAuthN
 eu.unicore.ucc.authn.KeystoreAuthN
 eu.unicore.ucc.authn.NoAuthN
-eu.unicore.ucc.authn.oidc.TokenBasedAuthN
-eu.unicore.ucc.authn.oidc.UCCOIDCServerAuthN
-eu.unicore.ucc.authn.oidc.OIDCAgentAuthN
-eu.unicore.ucc.authn.sshkey.SSHKeyAuthN
+eu.unicore.ucc.authn.oidc.FixedTokenAuthN
+eu.unicore.ucc.authn.oidc.ServerAuthN
+eu.unicore.ucc.authn.oidc.AgentAuthN
+eu.unicore.ucc.authn.sshkey.KeyAuthN

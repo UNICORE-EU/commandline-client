@@ -7,7 +7,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.StorageClient;
@@ -76,11 +75,11 @@ public class StorageLister extends Lister<StorageClient>{
 	}
 
 	protected void setupProducers()throws Exception {
-		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
-		for(Endpoint site: sites){
+		List<String>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
+		for(String site: sites){
 			if(addressFilter.accept(site)){
 				var sp = new StorageProducer(site, 
-						configurationProvider.getClientConfiguration(site.getUrl()),
+						configurationProvider.getClientConfiguration(site),
 						configurationProvider.getRESTAuthN(), addressFilter, tags);
 				sp.showAll(showAll);
 				addProducer(sp);
@@ -90,12 +89,12 @@ public class StorageLister extends Lister<StorageClient>{
 
 	public static class StorageProducer implements Producer<StorageClient>{
 
-		private final Endpoint epr;
+		private final String epr;
 
 		protected final IClientConfiguration securityProperties;
 		protected final IAuthCallback auth;
 		
-		protected final List<Pair<Endpoint,String>>errors = new ArrayList<>();
+		protected final List<Pair<String,String>>errors = new ArrayList<>();
 
 		private AtomicInteger runCount;
 
@@ -107,7 +106,7 @@ public class StorageLister extends Lister<StorageClient>{
 		
 		private boolean showAll = false;
 
-		public StorageProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, 
+		public StorageProducer(String epr, IClientConfiguration securityProperties, IAuthCallback auth, 
 				AddressFilter addressFilter, String[] tags) {
 			this.epr = epr;
 			this.securityProperties = securityProperties;
@@ -129,19 +128,23 @@ public class StorageLister extends Lister<StorageClient>{
 			}
 		}
 
-		private void handleEndpoint(Endpoint epr) throws Exception{
-			CoreClient core = new CoreClient(epr, securityProperties, auth);
-			String storagesUrl = core.getLinkUrl("storages");
-			EnumerationClient ec = new EnumerationClient(epr.cloneTo(storagesUrl), securityProperties, auth);
-			ec.setDefaultTags(tags);
-			if(showAll) {
-				ec.setFilter("all");
-			}
-			for(String url: ec){
-				if(addressFilter.accept(url)){
-					StorageClient c = new StorageClient(epr.cloneTo(url), securityProperties, auth);
-					if(addressFilter.accept(c)) {
-						target.put(c);
+		private void handleEndpoint(String epr) throws Exception{
+			try(var core = new CoreClient(epr, securityProperties, auth))
+			{
+				String storagesUrl = core.getLinkUrl("storages");
+				try(var ec = new EnumerationClient(storagesUrl, securityProperties, auth))
+				{
+					ec.setDefaultTags(tags);
+					if(showAll) {
+						ec.setFilter("all");
+					}
+					for(String url: ec){
+						if(addressFilter.accept(url)){
+							StorageClient c = new StorageClient(url, securityProperties, auth);
+							if(addressFilter.accept(c)) {
+								target.put(c);
+							}
+						}
 					}
 				}
 			}

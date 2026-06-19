@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.apache.commons.cli.Option;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.admin.AdminServiceClient;
 import eu.unicore.client.admin.AdminServiceClient.AdminCommand;
 import eu.unicore.client.admin.AdminServiceClient.Result;
@@ -69,7 +68,7 @@ public class RunCommand extends ActionBase {
 			//try to guess URL from the registry URL
 			if(registryURL!=null){
 				try{
-					String regurl = ((RegistryClient)registry).getEndpoint().getUrl();
+					String regurl = ((RegistryClient)registry).getEndpoint();
 					url = regurl.replace("registries/default_registry", "admin");
 					console.debug("Will try fallback admin service URL: <{}>", url);
 				}catch(Exception ex){}
@@ -99,7 +98,10 @@ public class RunCommand extends ActionBase {
 		if(result.successful){
 			console.info("SUCCESS, service reply: {}", result.message);
 			if(result.results.size()>0){
-				console.info("{}", result.results);
+				console.info("Result(s):");
+				for(Map.Entry<String, String> e: result.results.entrySet()) {
+					console.info("  {}: {}", e.getKey(), e.getValue());
+				}
 			}
 		}else{
 			console.info("Action was NOT SUCCESSFUL, service reply: {}", result.message);
@@ -110,16 +112,14 @@ public class RunCommand extends ActionBase {
 		if(url==null){
 			findURL();
 		}
-		AdminServiceClient asc = new AdminServiceClient(new Endpoint(url),
+		return new AdminServiceClient(url,
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
-		return asc;
 	}
 
 	private void findURL()throws Exception{
-		List<Endpoint> tsfs = registry.listEntries(new RegistryClient.ServiceTypeFilter("TargetSystemFactory"));
-		for(Endpoint epr: tsfs){
-			String tsfURL = epr.getUrl();
+		List<String> tsfs = registry.listEntries(new RegistryClient.ServiceTypeFilter("TargetSystemFactory"));
+		for(String tsfURL : tsfs){
 			if(tsfURL.contains("/"+siteName+"/")){
 				int endIndex = tsfURL.lastIndexOf("/core/factories/");
 				url = tsfURL.substring(0, endIndex)+"/admin";

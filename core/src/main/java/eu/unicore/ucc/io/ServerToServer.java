@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.TransferControllerClient;
@@ -105,9 +105,9 @@ public class ServerToServer implements Constants {
 		console.debug("Synchronous transfer = {}", synchronous);
 		bothSidesUNICORE = !sourceDesc.isRaw && !targetDesc.isRaw();
 		if(bothSidesUNICORE  && sourceDesc.getSmsEpr().equalsIgnoreCase(targetDesc.getSmsEpr())) {
-			Endpoint target = new Endpoint(targetDesc.getSmsEpr());
+			String target = targetDesc.getSmsEpr();
 			StorageClient sms = new StorageClient(target,
-					configurationProvider.getClientConfiguration(target.getUrl()),
+					configurationProvider.getClientConfiguration(target),
 					configurationProvider.getRESTAuthN());
 			smsCopyFile(sms);
 		}
@@ -118,12 +118,13 @@ public class ServerToServer implements Constants {
 
 	private boolean assertSourceExists(Location remote) throws Exception {
 		if(hasWildCards(remote.getName()))return true;
-		StorageClient source = new StorageClient(new Endpoint(remote.getSmsEpr()),
+		try(var source = new StorageClient(remote.getSmsEpr(),
 				configurationProvider.getClientConfiguration(remote.getSmsEpr()),
-				configurationProvider.getRESTAuthN());
-		FileListEntry fle = source.stat(remote.getName());
-		remoteSize = fle.size;
-		return true;
+				configurationProvider.getRESTAuthN())){
+			FileListEntry fle = source.stat(remote.getName());
+			remoteSize = fle.size;
+			return true;
+		}
 	}
 
 	private boolean hasWildCards(String name){
@@ -138,29 +139,33 @@ public class ServerToServer implements Constants {
 		UNICOREReceives = sourceDesc.isRaw();
 		try {
 			if(bothSidesUNICORE || UNICOREReceives) {
-				Endpoint target = new Endpoint(targetDesc.getSmsEpr());
-				StorageClient sms = new StorageClient(target,
-						configurationProvider.getClientConfiguration(target.getUrl()),
-						configurationProvider.getRESTAuthN());
-				String protocol = bothSidesUNICORE? checkProtocols(sms):null;
-				String s = sourceDesc.isRaw()?sourceDesc.originalDescriptor:sourceDesc.getUnicoreURI();
-				console.verbose("Initiating fetch-file on storage <{}>, receiving file <{}>, writing to '{}'",
-						sms.getEndpoint().getUrl(), s, targetDesc.getName());
-				Map<String,String> params = getExtraParameters(protocol);
-				tcc = sms.fetchFile(sourceDesc.getResolvedURL(), targetDesc.getName(), params, protocol);
+				String target = targetDesc.getSmsEpr();
+				try(var sms = new StorageClient(target,
+						configurationProvider.getClientConfiguration(target),
+						configurationProvider.getRESTAuthN()))
+				{
+					String protocol = bothSidesUNICORE? checkProtocols(sms):null;
+					String s = sourceDesc.isRaw()?sourceDesc.originalDescriptor:sourceDesc.getUnicoreURI();
+					console.verbose("Initiating fetch-file on storage <{}>, receiving file <{}>, writing to '{}'",
+							sms.getEndpoint(), s, targetDesc.getName());
+					Map<String,String> params = getExtraParameters(protocol);
+					tcc = sms.fetchFile(sourceDesc.getResolvedURL(), targetDesc.getName(), params, protocol);
+				}
 			}
 			else {
 				// source sends
-				Endpoint source = new Endpoint(sourceDesc.getSmsEpr());
-				StorageClient sms = new StorageClient(source,
-						configurationProvider.getClientConfiguration(source.getUrl()),
-						configurationProvider.getRESTAuthN());
-				console.verbose("Initiating send-file on storage <{}>, sending file <{}>, writing to '{}'",
-						sms.getEndpoint().getUrl(),	sourceDesc.getName(), targetDesc.getResolvedURL());
-				Map<String,String> params = getExtraParameters(null);
-				tcc = sms.sendFile(sourceDesc.getName(), targetDesc.getResolvedURL(), params, null);
+				String source = sourceDesc.getSmsEpr();
+				try(var sms = new StorageClient(source,
+						configurationProvider.getClientConfiguration(source),
+						configurationProvider.getRESTAuthN()))
+				{
+					console.verbose("Initiating send-file on storage <{}>, sending file <{}>, writing to '{}'",
+							sms.getEndpoint(),	sourceDesc.getName(), targetDesc.getResolvedURL());
+					Map<String,String> params = getExtraParameters(null);
+					tcc = sms.sendFile(sourceDesc.getName(), targetDesc.getResolvedURL(), params, null);
+				}
 			}
-			transferAddress = tcc.getEndpoint().getUrl();
+			transferAddress = tcc.getEndpoint();
 			console.debug("Have filetransfer instance: {}", transferAddress);
 			if(synchronous) {
 				console.verbose("Waiting for transfer to complete...");
@@ -169,7 +174,10 @@ public class ServerToServer implements Constants {
 			}
 		} finally{
 			if(synchronous && tcc!=null){
-				try{ tcc.delete(); }
+				try{
+					tcc.delete();
+					IOUtils.closeQuietly(tcc);
+				}
 				catch(Exception e1){}
 			}
 		}

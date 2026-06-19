@@ -280,7 +280,7 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 			}
 		}
 		throw new Exception("Timeout waiting for Storage <"+
-				sms.getEndpoint().getUrl()+"> to become ready");
+				sms.getEndpoint()+"> to become ready");
 	}
 
 }

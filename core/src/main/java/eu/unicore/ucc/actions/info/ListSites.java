@@ -36,7 +36,7 @@ public class ListSites extends ListActionBase<SiteClient> {
 	@Override
 	protected String getDetails(SiteClient tss)throws Exception{
 		StringBuilder details = new StringBuilder();
-		details.append(tss.getEndpoint().getUrl()).append(_newline);
+		details.append(tss.getEndpoint()).append(_newline);
 		JSONObject props = tss.getProperties();
 		details.append("  Number of jobs: ").append(props.get("numberOfJobs"));
 		for(String a: JSONUtil.asList(props.getJSONArray("applications"))){

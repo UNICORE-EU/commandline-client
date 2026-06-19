@@ -10,10 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.Option;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
-import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.SiteFactoryClient;
 import eu.unicore.client.lookup.SiteNameFilter;
 import eu.unicore.ucc.IServiceInfoProvider;
@@ -23,7 +22,6 @@ import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.lookup.SiteFactoryLister;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
 import eu.unicore.util.Log;
-import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**
  * creates an TSS instance
@@ -89,7 +87,6 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 	@Override
 	public void process() throws Exception {
 		super.process();
-
 		initialLifeTime = getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(initialLifeTime>0){
 			console.debug("New TSSs will have a lifetime of <{}> days.", initialLifeTime);
@@ -112,22 +109,26 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 		}
 		else{
 			console.debug("Using factory at <{}>", siteFactoryURL);
-			tsf = new SiteFactoryClient(new Endpoint(siteFactoryURL), 
-					configurationProvider.getClientConfiguration(siteFactoryURL), 
+			tsf = new SiteFactoryClient(siteFactoryURL,
+					configurationProvider.getClientConfiguration(siteFactoryURL),
 					configurationProvider.getRESTAuthN());
 		}
 		if(tsf==null){
 			throw new Exception("No suitable target system factory available!",null);
 		}
 		else{
-			siteFactoryURL = tsf.getEndpoint().getUrl();
+			siteFactoryURL = tsf.getEndpoint();
 			console.verbose("Using factory at <{}>", siteFactoryURL);
 		}
-		SiteClient tss = tsf.createSite(getCreationParameters(), getTermTime());
-		String addr = tss.getEndpoint().getUrl();
-		console.info("{}", addr);
-		properties.put(PROP_LAST_RESOURCE_URL, addr);
-		setLastTSSAddress(addr);
+		try(var tss = tsf.createSite(getCreationParameters(), getTermTime()))
+		{
+			String addr = tss.getEndpoint();
+			console.info("{}", addr);
+			properties.put(PROP_LAST_RESOURCE_URL, addr);
+			setLastTSSAddress(addr);
+		}finally {
+			IOUtils.closeQuietly(tsf);
+		}
 	}
 
 	private Map<String,String> getCreationParameters() throws IOException {
@@ -166,10 +167,11 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 	}
 
 	@Override
-	public String getServiceDetails(Endpoint epr, UCCConfigurationProvider configurationProvider){
-		try{
-			IClientConfiguration securityProperties = configurationProvider.getClientConfiguration(epr.getUrl());
-			SiteFactoryClient tsf = new SiteFactoryClient(epr, securityProperties, configurationProvider.getRESTAuthN());
+	public String getServiceDetails(String epr, UCCConfigurationProvider configurationProvider){
+		try(var tsf = new SiteFactoryClient(epr,
+				configurationProvider.getClientConfiguration(epr),
+				configurationProvider.getRESTAuthN()))
+		{
 			return getDescription(tsf);
 		}catch(Exception ex){
 			return "N/A ["+Log.getDetailMessage(ex)+"]";

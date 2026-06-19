@@ -30,7 +30,7 @@ public class AbortJob extends JobOperationBase {
 	}
 
 	private void abort(JobClient job) {
-		console.verbose("Job id: {}", job.getEndpoint().getUrl());
+		console.verbose("Job id: {}", job.getEndpoint());
 		try{
 			job.abort();
 		}catch(Exception ex) {

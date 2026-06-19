@@ -2,9 +2,9 @@ package eu.unicore.ucc.workflow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.UCC;
 import eu.unicore.workflow.WorkflowClient;
 
@@ -39,7 +39,7 @@ public class TestWorkflowControl extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		String url = SubmitWorkflow.lastAddress;
-		WorkflowClient wf = new WorkflowClient(new Endpoint(url), uas.getKernel().getClientConfiguration(), null);
+		WorkflowClient wf = new WorkflowClient(url, uas.getKernel().getClientConfiguration(), null);
 		wf.setUpdateInterval(-1);
 		int c=0;
 		while(WorkflowClient.Status.HELD!=wf.getStatus() && c<10) {
@@ -63,5 +63,6 @@ public class TestWorkflowControl extends EmbeddedTestBase {
 		}
 		System.out.println(wf.getProperties().toString(2));
 		assertEquals("999", wf.getProperties().getJSONObject("parameters").getString("COUNTER"));
+		IOUtils.closeQuietly(wf);
 	}
 }

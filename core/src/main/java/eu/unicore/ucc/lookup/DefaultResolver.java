@@ -2,7 +2,6 @@ package eu.unicore.ucc.lookup;
 
 import java.net.URI;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.lookup.AddressFilter;
@@ -34,14 +33,13 @@ public class DefaultResolver implements IResolve {
 			String[] p = path.split("/",2);
 			final String storage_id = p[0];
 			final String file = p.length==2? p[1] : "/";
-			
 			StorageLister l = new StorageLister(UCC.executor, registry, configurationProvider, null);
 			l.setAddressFilter(new AddressFilter() {
 
 				@Override
 				public boolean accept(BaseServiceClient resource) throws Exception {
 					return resource instanceof StorageClient
-						&& resource.getEndpoint().getUrl().contains("/"+site+"/rest/core/storages/"+storage_id);
+						&& resource.getEndpoint().contains("/"+site+"/rest/core/storages/"+storage_id);
 				}
 
 				@Override
@@ -49,10 +47,6 @@ public class DefaultResolver implements IResolve {
 					return uri.contains("/"+site+"/rest/core");
 				}
 
-				@Override
-				public boolean accept(Endpoint ep) {
-					return accept(ep.getUrl());
-				}
 			});
 			StorageClient c = l.iterator().next();
 			if(c==null) {
@@ -68,7 +62,7 @@ public class DefaultResolver implements IResolve {
 					}
 				}
 			}
-			return new Location(c.getEndpoint().getUrl()+"/files/"+file, protocol);
+			return new Location(c.getEndpoint()+"/files/"+file, protocol);
 		}catch(Exception ex) {}
 		return null;
 	}

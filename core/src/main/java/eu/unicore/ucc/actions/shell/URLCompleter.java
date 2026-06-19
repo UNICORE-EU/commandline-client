@@ -16,7 +16,6 @@ import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
@@ -94,10 +93,13 @@ public class URLCompleter {
 				}
 				fileMode = true;
 			}
-			var bsc = new BaseServiceClient(new Endpoint(base),
+			var j = new JSONObject();
+			try(var bsc = new BaseServiceClient(base,
 					configurationProvider.getClientConfiguration(current),
-					configurationProvider.getRESTAuthN());
-			var j = bsc.getProperties(all);
+					configurationProvider.getRESTAuthN()))
+			{
+				j = bsc.getProperties(all);
+			}
 			var js = j.toString();
 			if(fileMode) {
 				JSONObject files = j.getJSONObject("content");

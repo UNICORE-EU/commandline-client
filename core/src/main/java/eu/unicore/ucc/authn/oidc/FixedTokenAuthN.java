@@ -1,14 +1,12 @@
 package eu.unicore.ucc.authn.oidc;
 
-import java.io.File;
 import java.util.Properties;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.hc.core5.http.HttpMessage;
 
-import eu.unicore.security.AuthorisationException;
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
 import eu.unicore.services.restclient.IAuthCallback;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.PropertiesAwareAuthn;
 import eu.unicore.util.httpclient.ClientProperties;
 
@@ -20,12 +18,10 @@ import eu.unicore.util.httpclient.ClientProperties;
  *
  * @author schuller
  */
-public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider 
+public class FixedTokenAuthN extends PropertiesBasedAuthenticationProvider 
                              implements PropertiesAwareAuthn, IAuthCallback {
 
-	protected String token = null;
-	protected String refreshToken = null;
-	protected long lastRefresh;
+	private eu.unicore.services.restclient.oidc.TokenAuthN authN;
 
 	@Override
 	public String getName() {
@@ -35,7 +31,7 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 	@Override
 	public String getDescription()
 	{
-		return "Authenticate with an OIDC token given via the 'token' property.";
+		return "Authenticate with a token given via the 'token' property.";
 	}
 
 	@Override
@@ -56,35 +52,14 @@ public class TokenBasedAuthN extends PropertiesBasedAuthenticationProvider
 		this.properties = properties;
 		properties.setProperty("client."+ClientProperties.PROP_SSL_AUTHN_ENABLED, "false");
 		properties.setProperty("client."+ClientProperties.PROP_MESSAGE_SIGNING_ENABLED, "false");
-	}
-
-	protected void retrieveToken() throws Exception {
-		token = properties.getProperty("token");
-		if(token==null)throw new IllegalArgumentException("No 'token' defined in properties!");
-		if(token.startsWith("@")) {
-			File f = new File(token.substring(1));
-			token = FileUtils.readFileToString(f, "UTF-8");
-		}
-	}
-
-	protected void refreshTokenIfNecessary() throws Exception {
-		// NOP
+		this.authN = new eu.unicore.services.restclient.oidc.TokenAuthN();
+		this.authN.setLogger(UCC.console);
+		this.authN.setProperties(properties);
 	}
 
 	@Override
 	public void addAuthenticationHeaders(HttpMessage httpMessage) throws Exception {
-		try {
-			refreshTokenIfNecessary();
-			if(token==null) {
-				retrieveToken();
-			}
-		}catch(Exception e) {
-			throw new AuthorisationException("Could not obtain an authentication token", e);
-		}
-		if(token!=null) {
-			String tokenType = properties.getProperty("token-type", "Bearer");
-			httpMessage.setHeader("Authorization", tokenType+" "+token);
-		}
+		authN.addAuthenticationHeaders(httpMessage);
 	}
 
 }

@@ -7,7 +7,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.unicore.client.Endpoint;
+import org.apache.commons.io.IOUtils;
+
 import eu.unicore.client.lookup.AddressFilter;
 import eu.unicore.client.lookup.Lister;
 import eu.unicore.client.lookup.Producer;
@@ -69,20 +70,20 @@ public class WorkflowFactoryLister extends Lister<WorkflowFactoryClient>{
 			public void run() {
 				try {
 					List<String>urls = new ArrayList<>();
-					List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("WorkflowServices"));
-					for(Endpoint site: sites){
-						if(urls.contains(site.getUrl()))continue;
-						urls.add(site.getUrl());
+					List<String>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("WorkflowServices"));
+					for(String site: sites){
+						if(urls.contains(site))continue;
+						urls.add(site);
 						checkAndAdd(site, false);
 					}
 					if(includeInternal) {
 						sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
-						for(Endpoint coreSite: sites){
-							Endpoint site = new Endpoint(coreSite.getUrl().replace("/rest/core", "/rest/workflows"));
-							if(urls.contains(site.getUrl()))continue;
-							urls.add(site.getUrl());
+						for(String coreSite: sites){
+							String site = coreSite.replace("/rest/core", "/rest/workflows");
+							if(urls.contains(site))continue;
+							urls.add(site);
 							checkAndAdd(site, true);
-						}	
+						}
 					}
 				}catch(Exception ex) {}
 				finally {
@@ -90,14 +91,15 @@ public class WorkflowFactoryLister extends Lister<WorkflowFactoryClient>{
 				}
 			}
 
-			private void checkAndAdd(Endpoint site, boolean checkExists) throws Exception {
+			private void checkAndAdd(String site, boolean checkExists) throws Exception {
 				if(addressFilter.accept(site)){
 					WorkflowFactoryClient c = new WorkflowFactoryClient(site, 
-							configurationProvider.getClientConfiguration(site.getUrl()),
+							configurationProvider.getClientConfiguration(site),
 							configurationProvider.getRESTAuthN());
 					if(checkExists)try {
 						c.getProperties();
 					}catch(Exception ex) {
+						IOUtils.closeQuietly(c);
 						return;
 					}
 					if(addressFilter.accept(c)) {

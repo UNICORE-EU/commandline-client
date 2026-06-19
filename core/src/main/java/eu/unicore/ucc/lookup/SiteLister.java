@@ -9,8 +9,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.unicore.client.Endpoint;
-import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.SiteFactoryClient;
 import eu.unicore.client.lookup.AddressFilter;
@@ -30,7 +28,7 @@ public class SiteLister extends Lister<SiteClient>{
 
 	private final UCCConfigurationProvider configurationProvider;
 
-	private final List<Pair<Endpoint,String>>errors = Collections.synchronizedList(new ArrayList<>());
+	private final List<Pair<String,String>>errors = Collections.synchronizedList(new ArrayList<>());
 
 	public SiteLister(IRegistryClient registry, UCCConfigurationProvider configurationProvider){
 		this(null,registry,configurationProvider,new AcceptAllFilter());
@@ -59,7 +57,7 @@ public class SiteLister extends Lister<SiteClient>{
 		this.configurationProvider = configurationProvider;
 	}
 
-	public Collection<Pair<Endpoint,String>> getErrors(){
+	public Collection<Pair<String,String>> getErrors(){
 		return errors;
 	}
 
@@ -75,12 +73,12 @@ public class SiteLister extends Lister<SiteClient>{
 	}
 
 	protected void setupProducers()throws Exception {
-		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
-		for(Endpoint site: sites){
+		List<String>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
+		for(String site: sites){
 			if(addressFilter.accept(site)){
-				addProducer(new SiteProducer(site, 
-						configurationProvider.getClientConfiguration(site.getUrl()),
-						configurationProvider.getRESTAuthN(), 
+				addProducer(new SiteProducer(site,
+						configurationProvider.getClientConfiguration(site),
+						configurationProvider.getRESTAuthN(),
 						addressFilter,
 						errors));
 			}
@@ -89,17 +87,17 @@ public class SiteLister extends Lister<SiteClient>{
 
 	public static class SiteProducer implements Producer<SiteClient>{
 
-		private final Endpoint epr;
+		private final String epr;
 		private final IClientConfiguration securityProperties;
 		private final IAuthCallback auth;
 		private final AddressFilter addressFilter;
-		private final Collection<Pair<Endpoint,String>>errors;
+		private final Collection<Pair<String,String>>errors;
 		
 		private AtomicInteger runCount;
 		private BlockingQueue<SiteClient> target;
 
-		public SiteProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter,
-				Collection<Pair<Endpoint,String>>errors) {
+		public SiteProducer(String epr, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter,
+				Collection<Pair<String,String>>errors) {
 			this.epr = epr;
 			this.securityProperties = securityProperties;
 			this.auth = auth;
@@ -120,14 +118,17 @@ public class SiteLister extends Lister<SiteClient>{
 			}
 		}
 
-		private void handleEndpoint(Endpoint epr) throws Exception{
-			SiteFactoryClient factory = new SiteFactoryClient(epr, securityProperties, auth);
-			EnumerationClient sites = factory.getSiteList();
-			for(String url: sites){
-				if(addressFilter.accept(url)){
-					SiteClient c = new SiteClient(epr.cloneTo(url), securityProperties, auth);
-					if(addressFilter.accept(c)) {
-						target.put(c);
+		private void handleEndpoint(String epr) throws Exception{
+			try(var factory = new SiteFactoryClient(epr, securityProperties, auth))
+			{
+				try(var sites = factory.getSiteList()){
+					for(String url: sites){
+						if(addressFilter.accept(url)){
+							SiteClient c = new SiteClient(url, securityProperties, auth);
+							if(addressFilter.accept(c)) {
+								target.put(c);
+							}
+						}
 					}
 				}
 			}

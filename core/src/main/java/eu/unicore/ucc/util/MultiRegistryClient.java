@@ -1,14 +1,11 @@
 package eu.unicore.ucc.util;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.restclient.Resources;
@@ -36,11 +33,11 @@ public class MultiRegistryClient implements IRegistryClient {
 	}
 
 	@Override
-	public List<Endpoint> listEntries(ServiceListFilter acceptFilter) throws Exception {
-		List<Endpoint>result=new ArrayList<>();
+	public List<String> listEntries(ServiceListFilter acceptFilter) throws Exception {
+		List<String>result=new ArrayList<>();
 		for(IRegistryClient c: clients){
 			try{
-				List<Endpoint>res = c.listEntries(acceptFilter);
+				List<String>res = c.listEntries(acceptFilter);
 				if(filterDuplicates){
 					addIfNotExist(result, res);
 				}else{
@@ -54,11 +51,11 @@ public class MultiRegistryClient implements IRegistryClient {
 	}
 
 	@Override
-	public List<Endpoint> listEntries() throws Exception {
-		List<Endpoint>result=new ArrayList<>();
+	public List<String> listEntries() throws Exception {
+		List<String>result = new ArrayList<>();
 		for(IRegistryClient c: clients){
 			try{
-				List<Endpoint>res = c.listEntries();
+				List<String>res = c.listEntries();
 				if(filterDuplicates){
 					addIfNotExist(result, res);
 				}else{
@@ -72,7 +69,7 @@ public class MultiRegistryClient implements IRegistryClient {
 	}
 
 	@Override
-	public List<Endpoint> listEntries(String type) throws Exception {
+	public List<String> listEntries(String type) throws Exception {
 		return listEntries(new RegistryClient.ServiceTypeFilter(type));
 	}
 
@@ -81,16 +78,10 @@ public class MultiRegistryClient implements IRegistryClient {
 		return connectionStatus;		
 	}
 
-	private void addIfNotExist(List<Endpoint>target, List<Endpoint>source){
-		Set<String>addresses=new HashSet<String>();
-		for(Endpoint epr: target){
-			addresses.add(epr.getUrl());
-		}
-		for(Endpoint e: source){
-			String address=e.getUrl();
-			if(!addresses.contains(address)){
-				addresses.add(address);
-				target.add(e);
+	private void addIfNotExist(List<String>target, List<String>source){
+		for(String address: source){
+			if(!target.contains(address)){
+				target.add(address);
 			}
 		}
 	}
@@ -152,7 +143,7 @@ public class MultiRegistryClient implements IRegistryClient {
 
 	String getAddress(IRegistryClient c){
 		if(c instanceof RegistryClient){
-			return ((RegistryClient)c).getEndpoint().getUrl();
+			return ((RegistryClient)c).getEndpoint();
 		}
 		else{
 			//some non-standard Registry impl

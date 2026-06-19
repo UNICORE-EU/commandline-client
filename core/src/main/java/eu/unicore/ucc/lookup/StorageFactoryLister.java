@@ -7,7 +7,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.StorageFactoryClient;
@@ -69,26 +68,26 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 	}
 
 	protected void setupProducers()throws Exception {
-		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
-		for(final Endpoint site: sites){
+		List<String>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
+		for(final String site: sites){
 			addProducer(new StorageFactoryProducer(site,
-					configurationProvider.getClientConfiguration(site.getUrl()),
+					configurationProvider.getClientConfiguration(site),
 					configurationProvider.getRESTAuthN(), addressFilter));
 		}
 	}
 
 	public static class StorageFactoryProducer implements Producer<StorageFactoryClient>{
 
-		private final Endpoint ep;
+		private final String ep;
 		private final IClientConfiguration securityProperties;
 		private final IAuthCallback auth;
-		private final List<Pair<Endpoint,String>>errors = new ArrayList<>();
+		private final List<Pair<String,String>>errors = new ArrayList<>();
 		private final AddressFilter addressFilter;
 
 		private BlockingQueue<StorageFactoryClient> target;
 		private AtomicInteger runCounter;
 
-		public StorageFactoryProducer(Endpoint ep, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter) {
+		public StorageFactoryProducer(String ep, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter) {
 			this.ep = ep;
 			this.securityProperties = securityProperties;
 			this.auth = auth;
@@ -109,15 +108,18 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 		}
 
 		private void handleEndpoint() throws Exception {
-			SiteClient c = new SiteClient(ep, securityProperties, auth);
-			Endpoint factoriesEp = ep.cloneTo(c.getLinkUrl("storagefactories"));
-			EnumerationClient factoriesList = new EnumerationClient(factoriesEp, securityProperties, auth);
-			for(String factoryURL: factoriesList) {
-				if(addressFilter.accept(factoryURL)) {
-					StorageFactoryClient f = new StorageFactoryClient(c.getEndpoint().cloneTo(factoryURL),
-							securityProperties, auth);
-					if(addressFilter.accept(f)) {
-						target.offer(f);
+			try(var c = new SiteClient(ep, securityProperties, auth)){
+				String factoriesEp = c.getLinkUrl("storagefactories");
+				try(var factoriesList = new EnumerationClient(factoriesEp, securityProperties, auth))
+				{
+					for(String factoryURL: factoriesList) {
+						if(addressFilter.accept(factoryURL)) {
+							StorageFactoryClient f = new StorageFactoryClient(factoryURL,
+									securityProperties, auth);
+							if(addressFilter.accept(f)) {
+								target.offer(f);
+							}
+						}
 					}
 				}
 			}

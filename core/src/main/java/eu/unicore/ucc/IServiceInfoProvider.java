@@ -2,7 +2,6 @@ package eu.unicore.ucc;
 
 import java.util.Collection;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
@@ -30,13 +29,13 @@ public interface IServiceInfoProvider {
 	 * @param epr - the endpoint of the service
 	 * @param configurationProvider - the security config provider
 	 */
-	public String getServiceDetails(Endpoint epr, UCCConfigurationProvider configurationProvider);
+	public String getServiceDetails(String epr, UCCConfigurationProvider configurationProvider);
 
 	/**
 	 * returns a list of all endpoints that this info provider can provide info on
 	 * @param registry
 	 */
-	public default Collection<Endpoint> listEndpoints(IRegistryClient registry, UCCConfigurationProvider configurationProvider) throws Exception {
+	public default Collection<String> listEndpoints(IRegistryClient registry, UCCConfigurationProvider configurationProvider) throws Exception {
 		return registry.listEntries(new RegistryClient.ServiceTypeFilter(getType()));
 	}
 }

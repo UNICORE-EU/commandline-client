@@ -115,11 +115,12 @@ public class IssueToken extends ActionBase {
 		if(lifetime>0)b.addParameter("lifetime", String.valueOf(lifetime));
 		if(renewable)b.addParameter("renewable", "true");
 		if(limited)b.addParameter("limited", "true");
-		BaseClient bc = new BaseClient(b.build().toString(),
+		console.verbose("Requesting token from {}", url);
+		try(BaseClient bc = new BaseClient(b.build().toString(),
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
-		console.verbose("Requesting token from {}", bc.getURL());
-		try(ClassicHttpResponse res = bc.get(ContentType.TEXT_PLAIN)){
+			ClassicHttpResponse res = bc.get(ContentType.TEXT_PLAIN))
+		{
 			String token = EntityUtils.toString(res.getEntity());
 			if(inspect) {
 				showDetails(token);
@@ -138,7 +139,7 @@ public class IssueToken extends ActionBase {
 		if(cc==null) {
 			throw new Exception("No site found! Please use --sitename, or give a token endpoint URL.");
 		}
-		return cc.getEndpoint().getUrl()+"/token";
+		return cc.getEndpoint()+"/token";
 	}
 
 	private void showDetails(String token) throws Exception {

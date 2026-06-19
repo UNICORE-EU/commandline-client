@@ -12,6 +12,7 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import eu.unicore.services.restclient.oidc.OIDCAgentProxy;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
@@ -19,16 +20,16 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 
 	@Test
 	public void testLoadAuthN() throws Exception {
-		assertTrue(UCC.getAuthNMethod(new UCCOIDCServerAuthN().getName())!=null);
-		assertTrue(UCC.getAuthNMethod(new UCCOIDCServerAuthN().getName()) instanceof UCCOIDCServerAuthN);
+		assertTrue(UCC.getAuthNMethod(new ServerAuthN().getName())!=null);
+		assertTrue(UCC.getAuthNMethod(new ServerAuthN().getName()) instanceof ServerAuthN);
 
-		assertTrue(UCC.getAuthNMethod(new OIDCAgentAuthN().getName())!=null);
-		assertTrue(UCC.getAuthNMethod(new OIDCAgentAuthN().getName()) instanceof OIDCAgentAuthN);
+		assertTrue(UCC.getAuthNMethod(new AgentAuthN().getName())!=null);
+		assertTrue(UCC.getAuthNMethod(new AgentAuthN().getName()) instanceof AgentAuthN);
 	}
 
 	@Test
-	public void testOIDCServerAuthN() throws Exception {
-		var a = new UCCOIDCServerAuthN();
+	public void testServerAuthN() throws Exception {
+		var a = new ServerAuthN();
 		var p = new Properties();
 		p.setProperty("oidc.clientID", "demouser");
 		p.setProperty("oidc.clientSecret", "test123");
@@ -60,7 +61,7 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 		String storedRefreshToken = rt.getJSONObject(ep).getString("refresh_token");
 		assertEquals("some_refresh_token", storedRefreshToken);
 		// force using the refresh token
-		a = new UCCOIDCServerAuthN();
+		a = new ServerAuthN();
 		a.setProperties(p);
 		a.addAuthenticationHeaders(m);
 		req = MockOIDCServer.x.remove(0);
@@ -71,7 +72,7 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 		assertNotNull(h);
 		assertEquals("Bearer some_access_token", h.getValue());
 		// check refresh token loaded from file
-		a = new UCCOIDCServerAuthN();
+		a = new ServerAuthN();
 		a.setProperties(p);
 		a.addAuthenticationHeaders(m);
 		req = MockOIDCServer.x.remove(0);
@@ -80,22 +81,17 @@ public class TestOIDCAuthN extends EmbeddedTestBase {
 	}
 
 	@Test
-	public void testOIDCProxyAuthN() throws Exception {
-		var a = new OIDCAgentAuthN();
-		a.setAgentProxy(new MockAP());
+	public void testAgentProxyAuthN() throws Exception {
+		var a = new AgentAuthN();
 		var p = new Properties();
 		p.setProperty("oidc-agent.account", "test");
 		a.setProperties(p);
+		a.setAgentProxy(new MockAP());
 		var m = new HttpGet("https://test");
 		a.addAuthenticationHeaders(m);
 		var h = m.getHeader("Authorization");
 		assertNotNull(h);
 		assertEquals("Bearer some_access_token", h.getValue());
-		a.lastRefresh = 0l;
-		a.token = null;
-		a.refreshTokenIfNecessary();
-		assertTrue(a.lastRefresh>0);
-		assertNotNull(a.token);
 	}
 
 	public static class MockAP extends OIDCAgentProxy {

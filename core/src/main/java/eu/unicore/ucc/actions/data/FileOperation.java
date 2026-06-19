@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.data.HttpFileTransferClient;
 import eu.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
 import eu.unicore.uas.util.UnitParser;
@@ -103,18 +102,20 @@ public abstract class FileOperation extends ActionBase implements StorageConstan
 		if(url.startsWith("http")){
 			JSONObject props = new JSONObject();
 			props.put("accessURL", url);
-			Endpoint ep = new Endpoint(url);
-			HttpFileTransferClient hc = new HttpFileTransferClient(ep, props, configurationProvider.getAnonymousClientConfiguration(), null);
-			hc.setProgressListener(p);
-			if(startByte!=null){
-				console.debug("Byte range: {}-{}", startByte, endByte);
-				SupportsPartialRead pReader=(SupportsPartialRead)hc;
-				pReader.read(startByte, endByte-startByte, out);
+			try(var hc = new HttpFileTransferClient(url, props,
+					configurationProvider.getAnonymousClientConfiguration(), null))
+			{
+				hc.setProgressListener(p);
+				if(startByte!=null){
+					console.debug("Byte range: {}-{}", startByte, endByte);
+					SupportsPartialRead pReader=(SupportsPartialRead)hc;
+					pReader.read(startByte, endByte-startByte, out);
+				}
+				else{
+					hc.readFully(out);
+				}
+				p.finish();
 			}
-			else{
-				hc.readFully(out);
-			}
-			p.finish();
 		}
 		else throw new Exception("No protocol handler for "+url);
 	}

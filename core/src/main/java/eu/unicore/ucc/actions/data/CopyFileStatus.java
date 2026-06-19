@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.data.TransferControllerClient;
 import eu.unicore.client.data.TransferControllerClient.Status;
 import eu.unicore.uas.util.UnitParser;
@@ -37,12 +36,14 @@ public class CopyFileStatus extends ActionBase {
 	}
 
 	private void doCheck(String url)throws Exception{
-		TransferControllerClient tcc = new TransferControllerClient(new Endpoint(url),
+		try(var tcc = new TransferControllerClient(url,
 				configurationProvider.getClientConfiguration(url),
-				configurationProvider.getRESTAuthN());
-		Long transferred = tcc.getTransferredBytes();
-		Status status = tcc.getStatus();
-		console.info("{} {}, <{}> bytes", tcc.getEndpoint().getUrl(), status, up.getHumanReadable(transferred));
+				configurationProvider.getRESTAuthN()))
+		{
+			Long transferred = tcc.getTransferredBytes();
+			Status status = tcc.getStatus();
+			console.info("{} {}, <{}> bytes", tcc.getEndpoint(), status, up.getHumanReadable(transferred));
+		}
 	}
 
 	@Override

@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.cli.Option;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 import eu.unicore.client.lookup.Blacklist;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
+import eu.unicore.services.restclient.BaseClient;
+import eu.unicore.services.restclient.BaseClient.ClientFactory;
 import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCCOptions;
@@ -18,6 +21,7 @@ import eu.unicore.ucc.authn.UCCConfigurationProviderImpl;
 import eu.unicore.ucc.authn.UsernameAuthN;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.util.MultiRegistryClient;
+import eu.unicore.util.httpclient.HttpUtils;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**
@@ -225,7 +229,17 @@ public abstract class ActionBase extends Command {
 		IClientConfiguration sec = configurationProvider.getClientConfiguration(url);
 		IAuthCallback auth = authenticateToRegistry()? configurationProvider.getRESTAuthN() :
 			configurationProvider.getAnonymousRESTAuthN();
-		return new RegistryClient(url, sec, auth);
+		return new RegistryClient(url, sec, auth) {
+			// use pooling connection manager for this to make it thread safe
+			@Override
+			protected BaseClient createTransport(String url, IClientConfiguration security, IAuthCallback auth){
+				var cm = HttpUtils.createPoolingConnectionManager(security);
+				ClientFactory  cf = ()->{
+					return (CloseableHttpClient)HttpUtils.createClient(url, security, cm, false);
+				};
+				return new BaseClient(url, security, auth, cf);
+			}
+		};
 	}
 
 	protected void testRegistryConnection() throws Exception {

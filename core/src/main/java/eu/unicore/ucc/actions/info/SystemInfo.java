@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import org.apache.commons.cli.Option;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.UCC;
@@ -73,7 +72,7 @@ public class SystemInfo extends ActionBase {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		details=getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
+		details = getBooleanOption(OPT_DETAILED_LONG, OPT_DETAILED);
 		pattern = getOption(OPT_PATTERN_LONG, OPT_PATTERN, null);
 		if(getBooleanOption(OPT_RAW_LONG, OPT_RAW)){
 			printRawContent();
@@ -96,22 +95,21 @@ public class SystemInfo extends ActionBase {
 		console.info("");
 		console.info("Checking for <{}> endpoint ...", name);
 		try{
-			Collection<Endpoint> list = info.listEndpoints(registry, configurationProvider);
+			Collection<String> list = info.listEndpoints(registry, configurationProvider);
 			int n = list.size();
 			if(n==0){
 				console.info("... no endpoints available");
 			}
 			else{
 				console.info("... OK, found {} endpoint(s)", n);
-				for(Endpoint e: list){
-					String url = e.getUrl();
+				for(String url: list){
 					if(isBlacklisted(url) || (pattern!=null && !url.matches(pattern))) {
 						continue;
 					}
 					URLCompleter.registerSiteURL(url);
 					if(details) {
 						console.info(" * {}", url);
-						String infoS=info.getServiceDetails(e,configurationProvider);
+						String infoS = info.getServiceDetails(url, configurationProvider);
 						if(infoS!=null)console.info("  {}", infoS);
 					}
 				}
@@ -123,14 +121,20 @@ public class SystemInfo extends ActionBase {
 
 	private void printRawContent() {
 		try{
-			for(Endpoint e: registry.listEntries()){
-				console.info("Entry:           {}", e.getUrl());
-				console.info("Server identity: {}", e.getServerIdentity());
-				console.info("Service type:    {}", e.getInterfaceName());
-			}
+			registry.listEntries((x)->{
+				console.info("Entry:           {}", x.get(ENDPOINT));
+				console.info("Server identity: {}", x.get(DN));
+				console.info("Service type:    {}", x.getOrDefault(TYPE, x.get(INAME)));
+				return true;
+			});
 		} catch(Exception ex){
 			console.error(ex, "... FAILED.");
 		}
 	}
+
+	static final String ENDPOINT = "href";
+	static final String TYPE = "type";
+	static final String INAME = "InterfaceName";
+	static final String DN = "ServerIdentity";
 
 }

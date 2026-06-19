@@ -20,7 +20,6 @@ import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
@@ -94,8 +93,8 @@ public class Shell extends ActionBase {
 	@Override
 	protected void testRegistryConnection() throws Exception {
 		super.testRegistryConnection();
-		for(Endpoint ep: registry.listEntries()) {
-			URLCompleter.registerSiteURL(ep.getUrl());
+		for(String url: registry.listEntries()) {
+			URLCompleter.registerSiteURL(url);
 		}
 	}
 

@@ -102,9 +102,9 @@ public class JobStatus extends JobOperationBase {
 					j.poll(waitFor, timeout);
 					getStatus(j);
 				}catch(TimeoutException te) {
-					console.verbose("Timeout polling {}", j.getEndpoint().getUrl());
+					console.verbose("Timeout polling {}", j.getEndpoint());
 				}catch(Exception ex) {
-					console.error(ex, "Error polling {}", j.getEndpoint().getUrl());
+					console.error(ex, "Error polling {}", j.getEndpoint());
 				}
 			}
 			else {
@@ -116,7 +116,7 @@ public class JobStatus extends JobOperationBase {
 	private void getStatus(JobClient job) {
 		try{
 			Status status=job.getStatus();
-			String url=job.getEndpoint().getUrl();
+			String url=job.getEndpoint();
 			StringBuilder sb=new StringBuilder();
 			sb.append(url).append(" ");
 			sb.append(status);
@@ -153,7 +153,7 @@ public class JobStatus extends JobOperationBase {
 				sb.append(" Error message: ").append(job.getStatusMessage());
 				sb.append(_newline);
 			}
-			sb.append(" Working directory: ").append(job.getWorkingDirectory().getEndpoint().getUrl());
+			sb.append(" Working directory: ").append(job.getWorkingDirectory().getEndpoint());
 			sb.append(_newline);
 			String t = job.getProperties().optString("jobType","N/A");
 			sb.append(" Job type: ").append(t);

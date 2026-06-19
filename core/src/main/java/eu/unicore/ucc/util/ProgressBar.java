@@ -114,7 +114,7 @@ public class ProgressBar implements ProgressListener<Long> {
 
 	private int getTerminalWidth(){
 		if(width==0){
-			width = Math.max(80, terminal.getWidth());
+			width = Math.max(80, terminal.getSize().getColumns());
 		}
 		return width;
 	}

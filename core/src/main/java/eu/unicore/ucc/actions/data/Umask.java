@@ -4,7 +4,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.ucc.actions.ActionBase;
 
@@ -88,14 +87,8 @@ public class Umask extends ActionBase {
 	}
 
 	private BaseServiceClient createClient(String url) throws Exception {
-		Endpoint e = new Endpoint(url);
-		return new BaseServiceClient(e, 
+		return new BaseServiceClient(url, 
 				configurationProvider.getClientConfiguration(url),	
 				configurationProvider.getRESTAuthN());
 	}
 }
-
-
-
-
-

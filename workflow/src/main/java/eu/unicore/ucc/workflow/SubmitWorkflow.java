@@ -14,7 +14,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.core.StorageFactoryClient;
 import eu.unicore.client.lookup.SiteNameFilter;
@@ -169,7 +168,7 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 		}
 		wsc = workflowFactories.iterator().next();
 		if(wsc!=null) {
-			console.verbose("Selected workflow service at {}", wsc.getEndpoint().getUrl());
+			console.verbose("Selected workflow service at {}", wsc.getEndpoint());
 		}
 		else {
 			throw new Exception("No workflow submission endpoint found!");
@@ -190,7 +189,7 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 		StorageFactoryClient sfc = null;
 		if(getCommandLine().hasOption(OPT_FACTORY)) {
 			String url = getCommandLine().getOptionValue(OPT_FACTORY);
-			sfc = new StorageFactoryClient(new Endpoint(url),
+			sfc = new StorageFactoryClient(url,
 					configurationProvider.getClientConfiguration(url), 
 					configurationProvider.getRESTAuthN());
 		}
@@ -203,8 +202,8 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 		if(sfc==null){
 			throw new Exception("No suitable storage factory available!");
 		}
-		console.verbose("Creating new storage at <{}>", sfc.getEndpoint().getUrl());
-		storageURL = sfc.createStorage().getEndpoint().getUrl();
+		console.verbose("Creating new storage at <{}>", sfc.getEndpoint());
+		storageURL = sfc.createStorage().getEndpoint();
 	}
 	private void run() throws Exception {
 		loadWorkflow();
@@ -225,7 +224,7 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 			return;
 		}
 		WorkflowClient wmc = wsc.submitWorkflow(workflow);
-		String wfURL = wmc.getEndpoint().getUrl();
+		String wfURL = wmc.getEndpoint();
 		lastAddress = wfURL;
 		console.info("{}", wfURL);
 		properties.put(PROP_LAST_RESOURCE_URL, wfURL);
@@ -253,22 +252,24 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 	private void uploadLocalData() throws Exception {
 		if(localFiles==0)return;
 		if(!baseDir.endsWith("/"))baseDir = baseDir+"/";
-		StorageClient sc = new StorageClient(new Endpoint(storageURL),
+		try(var sc = new StorageClient(storageURL,
 				configurationProvider.getClientConfiguration(storageURL),
-				configurationProvider.getRESTAuthN());
-		for(FileUploader fu: builder.getImports()) {
-			String wfFile = fu.getTo();
-			if(wfFile.startsWith("wf:")) {
-				console.verbose("Uploading <{}> as workflow file <{}> ...", fu.getFrom(), wfFile);
-				fu.setTo(StorageClient.normalize(baseDir+wfFile.substring(3)));
-				String url = storageURL+"/files"+fu.getTo();
-				inputs.put(wfFile, url);
-				if(dryRun){
-					console.verbose("Dry run, not uploading.");
-					continue;
+				configurationProvider.getRESTAuthN()))
+		{
+			for(FileUploader fu: builder.getImports()) {
+				String wfFile = fu.getTo();
+				if(wfFile.startsWith("wf:")) {
+					console.verbose("Uploading <{}> as workflow file <{}> ...", fu.getFrom(), wfFile);
+					fu.setTo(StorageClient.normalize(baseDir+wfFile.substring(3)));
+					String url = storageURL+"/files"+fu.getTo();
+					inputs.put(wfFile, url);
+					if(dryRun){
+						console.verbose("Dry run, not uploading.");
+						continue;
+					}
+					fu.setStorageClient(sc);
+					fu.call();
 				}
-				fu.setStorageClient(sc);
-				fu.call();
 			}
 		}
 	}
@@ -365,16 +366,16 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 	}
 
 	@Override
-	public String getServiceDetails(Endpoint epr, UCCConfigurationProvider configurationProvider) {
-		String url = epr.getUrl();
+	public String getServiceDetails(String url, UCCConfigurationProvider configurationProvider) {
 		StringBuilder sb = new StringBuilder();
 		try{
 			IClientConfiguration securityProperties = configurationProvider.getClientConfiguration(url);
 			IAuthCallback auth = configurationProvider.getRESTAuthN();
-			BaseClient bc = new BaseClient(url, securityProperties, auth);
-			JSONObject props = bc.getJSON();
-			serverDetails(sb, props.getJSONObject("server"));
-			clientDetails(sb, props.getJSONObject("client"));
+			try(var bc = new BaseClient(url, securityProperties, auth)){
+				JSONObject props = bc.getJSON();
+				serverDetails(sb, props.getJSONObject("server"));
+				clientDetails(sb, props.getJSONObject("client"));
+			}
 		}catch(Exception ex) {
 			console.error(ex, "Error accessing service at <{}>", url);
 		}

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.util.UCCBuilder;
@@ -31,7 +30,7 @@ public abstract class JobOperationBase extends ActionBase {
 		if(url==null){
 			throw new Exception("Job address not found! Maybe <"+jobDescriptor+"> has not been produced by ucc.");
 		}
-		res.setM1(new JobClient(new Endpoint(url),
+		res.setM1(new JobClient(url,
 					configurationProvider.getClientConfiguration(url),
 					configurationProvider.getRESTAuthN()));
 		return res;

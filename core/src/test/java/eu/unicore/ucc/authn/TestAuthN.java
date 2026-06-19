@@ -13,7 +13,7 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.junit.jupiter.api.Test;
 
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.authn.oidc.TokenBasedAuthN;
+import eu.unicore.ucc.authn.oidc.FixedTokenAuthN;
 
 public class TestAuthN {
 
@@ -31,8 +31,8 @@ public class TestAuthN {
 
 	@Test
 	public void testLoadAuthN() throws Exception {
-		assertTrue(UCC.getAuthNMethod(new TokenBasedAuthN().getName())!=null);
-		assertTrue(UCC.getAuthNMethod(new TokenBasedAuthN().getName()) instanceof TokenBasedAuthN);
+		assertTrue(UCC.getAuthNMethod(new FixedTokenAuthN().getName())!=null);
+		assertTrue(UCC.getAuthNMethod(new FixedTokenAuthN().getName()) instanceof FixedTokenAuthN);
 
 		assertTrue(UCC.getAuthNMethod(new KeystoreAuthN().getName())!=null);
 		assertTrue(UCC.getAuthNMethod(new KeystoreAuthN().getName()) instanceof KeystoreAuthN);
@@ -43,7 +43,7 @@ public class TestAuthN {
 
 	@Test
 	public void testTokenAuthN() throws Exception {
-		var a = new TokenBasedAuthN();
+		var a = new FixedTokenAuthN();
 		var p = new Properties();
 		p.setProperty("token", "test123");
 		a.setProperties(p);
@@ -55,7 +55,7 @@ public class TestAuthN {
 		// test load token from file
 		FileUtils.write(new File("target","test_access_token"), "test123", "UTF-8");
 		p.setProperty("token", "@target/test_access_token");
-		a = new TokenBasedAuthN();
+		a = new FixedTokenAuthN();
 		a.setProperties(p);
 		a.addAuthenticationHeaders(m);
 		h = m.getHeader("Authorization");

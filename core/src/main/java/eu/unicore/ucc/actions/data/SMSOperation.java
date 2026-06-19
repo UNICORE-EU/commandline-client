@@ -1,6 +1,5 @@
 package eu.unicore.ucc.actions.data;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.io.Location;
@@ -38,7 +37,7 @@ public abstract class SMSOperation extends ActionBase {
 	 * @return StorageClient for the target
 	 */
 	protected StorageClient getStorageClient(Location targetDesc) throws Exception {
-		return new StorageClient(new Endpoint(targetDesc.getSmsEpr()), 
+		return new StorageClient(targetDesc.getSmsEpr(), 
 				configurationProvider.getClientConfiguration(targetDesc.getSmsEpr()),
 				configurationProvider.getRESTAuthN());
 	}

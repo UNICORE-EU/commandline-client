@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.uas.json.JSONUtil;
@@ -94,10 +93,9 @@ public class ListWorkflows extends ListActionBase<WorkflowClient> {
 			getCommandLine().getArgList().listIterator(1).forEachRemaining(
 					(url)-> {
 							try{
-								WorkflowClient wf = new WorkflowClient(new Endpoint(url), 
+								workflows.add(new WorkflowClient(url,
 										configurationProvider.getClientConfiguration(url),
-										configurationProvider.getRESTAuthN());
-								workflows.add(wf);
+										configurationProvider.getRESTAuthN()));
 							}catch(Exception e) {
 								UCC.console.error(e, "Cannot create client for {}", url);
 							}
@@ -114,8 +112,8 @@ public class ListWorkflows extends ListActionBase<WorkflowClient> {
 
 	@Override
 	protected String getDetails(WorkflowClient workflow)throws Exception{
-		StringBuilder details=new StringBuilder();
-		details.append(workflow.getEndpoint().getUrl());
+		StringBuilder details = new StringBuilder();
+		details.append(workflow.getEndpoint());
 		JSONObject props = workflow.getProperties();
 		details.append(_newline);
 		String status = props.getString("status");

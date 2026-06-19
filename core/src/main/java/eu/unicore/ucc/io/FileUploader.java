@@ -121,7 +121,7 @@ public class FileUploader extends FileTransferBase {
 			remotePath+=localFile.getName();
 		}
 		UCC.console.verbose("Uploading local file '{}' -> '{}/files/{}'",
-				localFile.getAbsolutePath(), sms.getEndpoint().getUrl(), remotePath);
+				localFile.getAbsolutePath(), sms.getEndpoint(), remotePath);
 		FiletransferClient ftc = null;
 		try(FileInputStream is = new FileInputStream(localFile.getAbsolutePath())){
 			boolean resume = Mode.RESUME.equals(mode);
@@ -138,7 +138,7 @@ public class FileUploader extends FileTransferBase {
 					throw new Exception("Append is not supported by protocol <"+protocol+">");
 				}	
 			}
-			String url = ftc.getEndpoint().getUrl();
+			String url = ftc.getEndpoint();
 			UCC.console.verbose("File transfer URL: {}", url);
 			ProgressBar p=null;
 			if(ftc instanceof IMonitorable){

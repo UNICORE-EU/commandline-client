@@ -6,7 +6,6 @@ import java.util.ServiceLoader;
 
 import org.apache.commons.cli.Option;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
@@ -105,9 +104,9 @@ public class Resolve extends ActionBase {
 		String target = getCommandLine().getArgs()[1];;
 		targetDesc = resolve(target,registry,configurationProvider);
 		full = getBooleanOption("full", "f");
-		Endpoint e = new Endpoint(targetDesc.getSmsEpr());
-		console.verbose("SMS = {}", targetDesc.getSmsEpr());
-		String result = full? targetDesc.getUnicoreURI() : e.getUrl();
+		String url = targetDesc.getSmsEpr();
+		console.verbose("SMS = {}", url);
+		String result = full? targetDesc.getUnicoreURI() : url;
 		console.info("{}", result);
 		if(result!=null)properties.put(PROP_LAST_RESOURCE_URL, result);
 	}

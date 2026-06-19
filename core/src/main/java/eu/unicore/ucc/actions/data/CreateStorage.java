@@ -9,13 +9,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.cli.Option;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.CoreClient;
 import eu.unicore.client.core.EnumerationClient;
@@ -154,7 +152,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 			if(sfc==null){
 				throw new Exception("No suitable storage factory available!");
 			}
-			factoryURL = sfc.getEndpoint().getUrl();
+			factoryURL = sfc.getEndpoint();
 			console.verbose("Using factory at <{}>", factoryURL);
 			haveValidFactory=true;
 			if(infoOnly){
@@ -172,11 +170,11 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 
 	@SuppressWarnings("deprecation")
 	private void doCreate(StorageFactoryClient sfc) throws Exception{
-		boolean u10Mode = sfc.getEndpoint().getUrl().contains("default_storage_factory");
+		boolean u10Mode = sfc.getEndpoint().contains("default_storage_factory");
 		StorageClient sc = u10Mode ?
 				sfc.createStorage(storageType, null, getParams(), getTermTime()) :
 				sfc.createStorage(siteName, getParams(), getTermTime());
-		String addr = sc.getEndpoint().getUrl();
+		String addr = sc.getEndpoint();
 		console.info("{}", addr);
 		properties.put(PROP_LAST_RESOURCE_URL, addr);
 		setLastStorageAddress(addr);
@@ -218,10 +216,11 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 	}
 
 	@Override
-	public String getServiceDetails(Endpoint epr, UCCConfigurationProvider configurationProvider){
-		try{
-			IClientConfiguration securityProperties = configurationProvider.getClientConfiguration(epr.getUrl());
-			StorageFactoryClient smf = new StorageFactoryClient(epr, securityProperties, configurationProvider.getRESTAuthN());
+	public String getServiceDetails(String epr, UCCConfigurationProvider configurationProvider){
+		try(var smf = new StorageFactoryClient(epr,
+				configurationProvider.getClientConfiguration(epr),
+				configurationProvider.getRESTAuthN()))
+		{
 			return getDescription(smf);
 		}catch(Exception ex){
 			return "N/A ["+Log.getDetailMessage(ex)+"]";
@@ -305,11 +304,6 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 		}
 
 		@Override
-		public boolean accept(Endpoint epr) {
-			return accept(epr.getUrl());
-		}
-
-		@Override
 		public boolean accept(String address) {
 			if(byFactoryURL){
 				return address.equalsIgnoreCase(factoryURL);
@@ -330,7 +324,7 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 				if(!byType)return true;
 				JSONObject desc = smf.getProperties().optJSONObject("storageDescriptions");
 				if(desc==null) {
-					return new File(smf.getEndpoint().getUrl()).getName().equalsIgnoreCase(storageType);
+					return new File(smf.getEndpoint()).getName().equalsIgnoreCase(storageType);
 				}
 				// u10 and older has the available types as properties
 				Iterator<String>types = desc.keys();
@@ -338,37 +332,32 @@ public class CreateStorage extends ActionBase implements IServiceInfoProvider {
 					if(storageType.equals(types.next()))return true;
 				}
 			}catch(Exception ex){
-				console.error(ex, "Error checking factory at <{}>", smf.getEndpoint().getUrl());
+				console.error(ex, "Error checking factory at <{}>", smf.getEndpoint());
 			}
 			return false;
 		}
 	}
 
 	@Override
-	public Collection<Endpoint> listEndpoints(IRegistryClient registry, UCCConfigurationProvider configurationProvider) throws Exception {
-		Set<Endpoint> ep = new HashSet<>();
+	public Collection<String> listEndpoints(IRegistryClient registry, UCCConfigurationProvider configurationProvider) throws Exception {
+		Set<String> ep = new HashSet<>();
 		ep.addAll(registry.listEntries(new RegistryClient.ServiceTypeFilter(getType())));
-		List<Endpoint> coreEps = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
+		List<String> coreEps = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
 		IAuthCallback auth = configurationProvider.getRESTAuthN();
-		for(Endpoint c: coreEps) {
+		for(String c: coreEps) {
 			IClientConfiguration sec = configurationProvider.getClientConfiguration(factoryURL);
-			CoreClient cc = new CoreClient(c, sec, auth);
-			String url = cc.getLinkUrl("storagefactories");
-			EnumerationClient ec = new EnumerationClient(c.cloneTo(url), sec, auth);
-			ec.forEach((smf)->{
-				if(!contains(ep,smf))ep.add(c.cloneTo(smf));
-			});
+			try(var cc = new CoreClient(c, sec, auth))
+			{
+				String url = cc.getLinkUrl("storagefactories");
+				try(var ec = new EnumerationClient(url, sec, auth))
+				{
+					ec.forEach((smf)->{
+						ep.add(smf);
+					});
+				}
+			}
 		}
 		return ep;
 	}
 
-	private boolean contains(Collection<Endpoint>eps, String url) {
-		final AtomicBoolean found = new AtomicBoolean();
-		eps.forEach( (e)-> {
-				if(url.equals(e.getUrl())) {
-					found.set(true);
-				}
-			});
-		return found.get();
-	}
 }

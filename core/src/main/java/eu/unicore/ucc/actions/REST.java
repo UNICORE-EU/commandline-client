@@ -18,13 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.services.restclient.BaseClient;
-import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.ucc.IServiceInfoProvider;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.util.httpclient.IClientConfiguration;
 
 /**
  * low-level REST API interactions
@@ -216,13 +213,12 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	}
 
 	@Override
-	public String getServiceDetails(Endpoint epr, UCCConfigurationProvider configurationProvider){
-		String url = epr.getUrl();
+	public String getServiceDetails(String url, UCCConfigurationProvider configurationProvider){
 		StringBuilder sb = new StringBuilder();
-		try{
-			IClientConfiguration securityProperties = configurationProvider.getClientConfiguration(url);
-			IAuthCallback auth = configurationProvider.getRESTAuthN();
-			BaseClient bc = new BaseClient(url, securityProperties, auth);
+		try(BaseClient bc = new BaseClient(url,
+				configurationProvider.getClientConfiguration(url),
+				configurationProvider.getRESTAuthN()))
+		{
 			JSONObject props = bc.getJSON();
 			serverDetails(sb, props.getJSONObject("server"));
 			clientDetails(sb, props.getJSONObject("client"));

@@ -2,7 +2,6 @@ package eu.unicore.ucc.runner;
 
 import java.util.Collection;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.util.UCCBuilder;
@@ -19,7 +18,7 @@ public interface Broker {
 	 * @return the address of a matching site (never null). If no site can be found an exception will be thrown 
 	 * @throws Exception
 	 */
-	public Endpoint findTSSAddress(IRegistryClient registry, 
+	public String findTSSAddress(IRegistryClient registry, 
 			UCCConfigurationProvider secProvider, UCCBuilder builder, SiteSelectionStrategy strategy) 
 			throws Exception;
 	
@@ -32,7 +31,7 @@ public interface Broker {
 	 * @return the addresses of matching sites (never null). If no site can be found an exception will be thrown 
 	 * @throws Exception
 	 */
-	public Collection<Endpoint> listCandidates(IRegistryClient registry, 
+	public Collection<String> listCandidates(IRegistryClient registry, 
 			UCCConfigurationProvider secProvider, UCCBuilder builder) 
 			throws Exception;
 	

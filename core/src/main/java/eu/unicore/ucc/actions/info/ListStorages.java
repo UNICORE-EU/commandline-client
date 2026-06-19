@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.cli.Option;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.uas.util.UnitParser;
@@ -67,8 +66,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	}
 
 	private StorageClient makeClient(String url) throws Exception {
-		Endpoint epr = new Endpoint(url);
-		return new StorageClient(epr, 
+		return new StorageClient(url, 
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
 	}
@@ -76,7 +74,7 @@ public class ListStorages extends ListActionBase<StorageClient> {
 	@Override
 	protected String getDetails(StorageClient sms) throws Exception  {
 		StringBuilder sb = new StringBuilder();
-		sb.append(sms.getEndpoint().getUrl()).append(_newline);
+		sb.append(sms.getEndpoint()).append(_newline);
 		JSONObject props = sms.getProperties();
 		sb.append("  Description: ").append(props.optString("description"));
 		long free = -1;

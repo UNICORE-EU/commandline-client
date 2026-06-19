@@ -47,7 +47,7 @@ public class ListTransfers extends ListActionBase<BaseServiceClient> {
 	@Override
 	protected String getDetails(BaseServiceClient ftc) {
 		if(!detailed)return "";
-		String url = ftc.getEndpoint().getUrl();
+		String url = ftc.getEndpoint();
 		try{
 			JSONObject props = ftc.getProperties();
 			String size = unitParser.getHumanReadable(Long.parseLong(String.valueOf(props.get("transferredBytes"))));

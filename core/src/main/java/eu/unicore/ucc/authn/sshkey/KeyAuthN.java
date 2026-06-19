@@ -8,7 +8,7 @@ import org.apache.hc.core5.http.HttpMessage;
 import eu.emi.security.authn.x509.helpers.PasswordSupplier;
 import eu.unicore.security.wsutil.client.authn.PropertiesBasedAuthenticationProvider;
 import eu.unicore.services.restclient.IAuthCallback;
-import eu.unicore.services.restclient.sshkey.SSHKey;
+import eu.unicore.services.restclient.sshkey.SSHKeyAuthN;
 import eu.unicore.ucc.authn.CallbackUtils;
 import eu.unicore.ucc.authn.PropertiesAwareAuthn;
 import eu.unicore.util.configuration.ConfigurationException;
@@ -19,14 +19,14 @@ import eu.unicore.util.httpclient.ClientProperties;
  *
  * @author schuller
  */
-public class SSHKeyAuthN extends PropertiesBasedAuthenticationProvider
+public class KeyAuthN extends PropertiesBasedAuthenticationProvider
     implements PropertiesAwareAuthn, IAuthCallback {
 
 	private File privateKey;
 
 	private String username;
 
-	private SSHKey auth;
+	private SSHKeyAuthN auth;
 
 	private void setup() {
 		privateKey = new File(properties.getProperty("identity"));
@@ -42,7 +42,7 @@ public class SSHKeyAuthN extends PropertiesBasedAuthenticationProvider
 			}
 			return password.toCharArray();
 		};
-		auth = new SSHKey(username, privateKey, pf);
+		auth = new SSHKeyAuthN(username, privateKey, pf);
 	}
 
 	@Override

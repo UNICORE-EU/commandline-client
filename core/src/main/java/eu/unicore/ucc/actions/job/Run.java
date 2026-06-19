@@ -12,7 +12,6 @@ import java.util.List;
 import org.apache.commons.cli.Option;
 import org.apache.commons.io.IOUtils;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.AllocationClient;
 import eu.unicore.client.core.JobClient.Status;
 import eu.unicore.uas.util.UnitParser;
@@ -296,7 +295,7 @@ public class Run extends ActionBase {
 		runner.setBroker(UCC.getBroker(brokerName));
 		if(allocationJobURL!=null) {
 			try {
-				AllocationClient ac = new AllocationClient(new Endpoint(allocationJobURL),
+				AllocationClient ac = new AllocationClient(allocationJobURL,
 						configurationProvider.getClientConfiguration(allocationJobURL),
 						configurationProvider.getRESTAuthN());
 				runner.setSubmissionService(ac);
@@ -307,7 +306,7 @@ public class Run extends ActionBase {
 		try{
 			runner.run();
 			if(!dryRun){
-				lastJobAddress = runner.getJob().getEndpoint().getUrl();
+				lastJobAddress = runner.getJob().getEndpoint();
 				if(!synchronous) {
 					if(waitFor!=null) {
 						console.verbose("Waiting for job to be {} ...", waitFor);
@@ -320,6 +319,7 @@ public class Run extends ActionBase {
 				}catch(Exception ex){}
 			}
 		}catch(Exception ex){
+			ex.printStackTrace();
 			return new Pair<>(ERROR, Log.getDetailMessage(ex));
 		}
 		try {

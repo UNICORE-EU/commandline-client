@@ -150,7 +150,7 @@ public class FileDownloader extends FileTransferBase {
 					return; 
 				}
 				UCC.console.verbose("Downloading remote file '{}/files/{}' -> {}", 
-						sms.getEndpoint().getUrl(), path, localFile.getAbsolutePath());
+						sms.getEndpoint(), path, localFile.getAbsolutePath());
 				if(resume){
 					setupOffsetForResume(localFile);
 				}
@@ -160,7 +160,7 @@ public class FileDownloader extends FileTransferBase {
 			Map<String,String>extraParameters = getExtraParameters(chosenProtocol);
 			ftc = sms.createExport(path, chosenProtocol, extraParameters);
 			configure(ftc, extraParameters);
-			UCC.console.verbose("File transfer URL: {}", ftc.getEndpoint().getUrl());
+			UCC.console.verbose("File transfer URL: {}", ftc.getEndpoint());
 			ProgressBar p=null;
 			if(ftc instanceof IMonitorable  && showProgress){
 				long size = source.size;

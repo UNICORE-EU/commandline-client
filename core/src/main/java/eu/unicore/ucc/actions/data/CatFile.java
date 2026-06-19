@@ -2,7 +2,6 @@ package eu.unicore.ucc.actions.data;
 
 import java.io.OutputStream;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.StorageConstants;
 import eu.unicore.ucc.io.FileDownloader;
@@ -44,7 +43,7 @@ public class CatFile extends FileOperation implements StorageConstants {
 	}
 
 	private void runFileDownloader()throws Exception{
-		Endpoint e = new Endpoint(sourceDesc.getSmsEpr());
+		String e = sourceDesc.getSmsEpr();
 		sms = new StorageClient(e,
 				configurationProvider.getClientConfiguration(sourceDesc.getSmsEpr()),
 				configurationProvider.getRESTAuthN());

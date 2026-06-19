@@ -15,9 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
-import eu.unicore.client.utils.TaskClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.util.JSONUtil;
@@ -108,7 +106,7 @@ public class Metadata extends ActionBase {
 			path=loc.getName();
 		}
 		sms = createStorageClient(storage);
-		console.verbose("Accessing metadata for storage {}", sms.getEndpoint().getUrl());
+		console.verbose("Accessing metadata for storage {}", sms.getEndpoint());
 		String fName = getOption(OPT_FILE_LONG, OPT_FILE);
 		if (fName != null) {
 			file = new File(fName);
@@ -192,18 +190,18 @@ public class Metadata extends ActionBase {
 
 	private void doStartExtract() throws Exception {
 		path = normalize(path);
-		TaskClient tc = sms.getFileClient(path).startMetadataExtraction(10, new String[0]);
-		if(tc!=null) {
-			console.info("Extraction started, task = {}", tc.getEndpoint().getUrl());
-			properties.put(PROP_LAST_RESOURCE_URL, tc.getEndpoint().getUrl());
-		}
-		if(tc!=null && wait) {
-			console.verbose("Waiting for extraction task <{}> to finish...", tc.getEndpoint().getUrl());
-			while(!tc.isFinished())Thread.sleep(2000);
-			JSONObject taskProps = tc.getProperties();
-			JSONObject result = taskProps.optJSONObject("result", new JSONObject());
-			console.info("Status: {}", tc.getStatus());
-			console.info("Result: \n{}", result.toString(2));
+		try(var tc = sms.getFileClient(path).startMetadataExtraction(10, new String[0]))
+		{
+			console.info("Extraction started, task = {}", tc.getEndpoint());
+			properties.put(PROP_LAST_RESOURCE_URL, tc.getEndpoint());
+			if(wait) {
+				console.verbose("Waiting for extraction task <{}> to finish...", tc.getEndpoint());
+				while(!tc.isFinished())Thread.sleep(2000);
+				JSONObject taskProps = tc.getProperties();
+				JSONObject result = taskProps.optJSONObject("result", new JSONObject());
+				console.info("Status: {}", tc.getStatus());
+				console.info("Result: \n{}", result.toString(2));
+			}
 		}
 	}
 
@@ -217,7 +215,6 @@ public class Metadata extends ActionBase {
 			console.debug("Reading data from file: <{}>", file.getName());
 			json = FileUtils.readFileToString(file, "UTF-8");
 		} else {
-			//read from stdin
 			console.debug("Reading from stdin (it does not work from within the shell)");
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			String str = "";
@@ -232,17 +229,16 @@ public class Metadata extends ActionBase {
 
 			json = buffer.toString();
 		}
-		JSONObject j = new JSONObject(json);
-		return JSONUtil.asMap(j);
+		return JSONUtil.asMap(new JSONObject(json));
 	}
 
 	private StorageClient createStorageClient(String storage) throws Exception {
 		Location td = createLocation(storage);
-		Endpoint epr = new Endpoint(td.getSmsEpr());
-		StorageClient sms = new StorageClient(epr,
-				configurationProvider.getClientConfiguration(epr.getUrl()),
+		String url = td.getSmsEpr();
+		StorageClient sms = new StorageClient(url,
+				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
-		console.verbose("Storage {}", td.getSmsEpr());
+		console.verbose("Storage {}", url);
 		if (!sms.supportsMetadata()) {
 			throw new Exception("Storage does not support metadata.");
 		}

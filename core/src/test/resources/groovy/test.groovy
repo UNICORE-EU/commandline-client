@@ -23,6 +23,6 @@ assert commandLine!=null
 
 // list core service endpoints from registry
 registry.listEntries("CoreServices").each {
-    console.info("Core API endpoint at: {}", it.url)
+    console.info("Core API endpoint at: {}", it)
 }
 println "*** END of Groovy test"

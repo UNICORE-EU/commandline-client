@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.apache.commons.cli.Option;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase;
@@ -136,7 +135,7 @@ public class CP extends FileOperation {
 			url = targetDesc.getSmsEpr();
 			fd = new FileUploader(new File("."), source, to, mode);
 		}
-		StorageClient sms=new StorageClient(new Endpoint(url),
+		StorageClient sms=new StorageClient(url,
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
 		fd.setStorageClient(sms);

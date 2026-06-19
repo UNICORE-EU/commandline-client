@@ -48,7 +48,7 @@ public class Connector implements Runnable {
 
 	@Override
 	public void run() {
-		SiteFactoryLister lister=new SiteFactoryLister(UCC.executor, registry, cfgProvider);
+		SiteFactoryLister lister = new SiteFactoryLister(UCC.executor, registry, cfgProvider);
 		if(blacklist!=null && blacklist.length>0){
 			UCC.console.debug("Using blacklist <{}>", Arrays.asList(blacklist));
 			lister.setAddressFilter(new Blacklist(blacklist));
@@ -59,16 +59,15 @@ public class Connector implements Runnable {
 					break;
 			}
 			else{
-				UCC.console.verbose("Connecting to {}", tsf.getEndpoint().getUrl());
+				UCC.console.verbose("Connecting to {}", tsf.getEndpoint());
 				try{
 					handleTSF(tsf);
 					tsfAvailable.incrementAndGet();
 				}catch(Exception ex){
-					UCC.console.error(ex, "Error creating site at {}", tsf.getEndpoint().getUrl());
+					UCC.console.error(ex, "Error creating site at {}", tsf.getEndpoint());
 				}
 			}
 		}
-
 		StringBuilder _debug = new StringBuilder();
 		for(var p: lister.getErrors()) {
 			if(_debug.length()>0)_debug.append(Constants._newline);
@@ -80,8 +79,8 @@ public class Connector implements Runnable {
 	private void handleTSF(SiteFactoryClient tsf) throws Exception {
 		try {
 			SiteClient tss = tsf.getOrCreateSite();
-			UCC.console.verbose("TSS at address {}", tss.getEndpoint().getUrl());
-			_last_TSS = tss.getEndpoint().getUrl();
+			UCC.console.verbose("TSS at address {}", tss.getEndpoint());
+			_last_TSS = tss.getEndpoint();
 			URLCompleter.registerSiteURL(_last_TSS);
 			tssAvailable.incrementAndGet();
 		}catch(Exception e){

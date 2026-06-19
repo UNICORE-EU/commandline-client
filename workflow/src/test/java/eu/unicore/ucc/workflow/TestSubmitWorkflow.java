@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.ucc.UCC;
 import eu.unicore.workflow.WorkflowClient;
@@ -60,13 +60,14 @@ public class TestSubmitWorkflow extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		WorkflowFactoryClient wfc = new WorkflowFactoryClient(new Endpoint("https://localhost:65322/rest/workflows"), 
+		WorkflowFactoryClient wfc = new WorkflowFactoryClient("https://localhost:65322/rest/workflows", 
 				uas.getKernel().getClientConfiguration(), null);
 		EnumerationClient ec = wfc.getWorkflowList();
 		WorkflowClient wf = ec.createClient(ec.getUrls(0, 1).get(0), WorkflowClient.class);
 		System.out.println(wf.getProperties().toString(2));
+		IOUtils.closeQuietly(wfc, ec, wf);
 	}
-	
+
 	@Test
 	public void testLocalFiles2() throws Exception {
 		connect();

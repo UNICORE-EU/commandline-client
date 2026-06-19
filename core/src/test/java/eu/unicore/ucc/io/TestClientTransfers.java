@@ -5,7 +5,6 @@ import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.ActionBase;
@@ -28,14 +27,14 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		File testData = new File("target/data/test1.dat");
 		FileUtils.writeByteArrayToFile(testData, "test123".getBytes());
 
-		StorageClient sc = new StorageClient(new Endpoint(url), 
-				ucp.getClientConfiguration(url), ucp.getRESTAuthN());
-		System.out.println(sc.getProperties().toString(2));
-
-		FileDownloader fd = new FileDownloader("test1.dat", "target/data/download1.dat", FileTransferBase.Mode.NORMAL);
-		fd.setStorageClient(sc);
-		fd.call();
-		checkFilesOK(testData, new File("target/data/download1.dat"));
+		try(var sc = new StorageClient(url, ucp.getClientConfiguration(url), ucp.getRESTAuthN()))
+		{
+			System.out.println(sc.getProperties().toString(2));
+			FileDownloader fd = new FileDownloader("test1.dat", "target/data/download1.dat", FileTransferBase.Mode.NORMAL);
+			fd.setStorageClient(sc);
+			fd.call();
+			checkFilesOK(testData, new File("target/data/download1.dat"));
+		}
 	}
 
 	@Test
@@ -52,14 +51,14 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		File testData = new File("target/data/test1.dat");
 		FileUtils.writeByteArrayToFile(testData, "test123".getBytes());
 
-		StorageClient sc = new StorageClient(new Endpoint(url), 
-				ucp.getClientConfiguration(url), ucp.getRESTAuthN());
-		System.out.println(sc.getProperties().toString(2));
-
-		FileUploader fd = new FileUploader(new File("."), "target/data/test1.dat", "/upload1.dat", FileTransferBase.Mode.NORMAL);
-		fd.setStorageClient(sc);
-		fd.call();
-		checkFilesOK(testData, new File("target/data/upload1.dat"));
+		try(var sc = new StorageClient(url, ucp.getClientConfiguration(url), ucp.getRESTAuthN()))
+		{
+			System.out.println(sc.getProperties().toString(2));
+			FileUploader fd = new FileUploader(new File("."), "target/data/test1.dat", "/upload1.dat", FileTransferBase.Mode.NORMAL);
+			fd.setStorageClient(sc);
+			fd.call();
+			checkFilesOK(testData, new File("target/data/upload1.dat"));
+		}
 	}
 	
 	@Test
@@ -76,13 +75,13 @@ public class TestClientTransfers extends EmbeddedTestBase {
 		File testData = new File("target/data/test1.dat");
 		FileUtils.writeByteArrayToFile(testData, "test123".getBytes());
 
-		StorageClient sc = new StorageClient(new Endpoint(url), 
-				ucp.getClientConfiguration(url), ucp.getRESTAuthN());
-		System.out.println(sc.getProperties().toString(2));
-
-		FileUploader fd = new FileUploader(new File("target/data"), "test1.dat", "/upload1.dat", FileTransferBase.Mode.NORMAL);
-		fd.setStorageClient(sc);
-		fd.call();
-		checkFilesOK(testData, new File("target/data/upload1.dat"));
+		try(var sc = new StorageClient(url, ucp.getClientConfiguration(url), ucp.getRESTAuthN()))
+		{
+			System.out.println(sc.getProperties().toString(2));
+			FileUploader fd = new FileUploader(new File("target/data"), "test1.dat", "/upload1.dat", FileTransferBase.Mode.NORMAL);
+			fd.setStorageClient(sc);
+			fd.call();
+			checkFilesOK(testData, new File("target/data/upload1.dat"));
+		}
 	}
 }

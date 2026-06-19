@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.lookup.Blacklist;
 import eu.unicore.client.lookup.SiteNameFilter;
@@ -40,7 +39,7 @@ public class TargetSystemFinder implements Broker, Constants {
 	}
 
 	@Override
-	public Endpoint findTSSAddress(final IRegistryClient registry, 
+	public String findTSSAddress(final IRegistryClient registry, 
 			final UCCConfigurationProvider configurationProvider, UCCBuilder builder, SiteSelectionStrategy selectionStrategy)
 					throws Exception {
 		ConsoleLogger msg=builder.getMessageWriter();
@@ -55,21 +54,21 @@ public class TargetSystemFinder implements Broker, Constants {
 			if(msg.isVerbose()){
 				msg.verbose("Have <{}> candidate resource(s)", available.size());
 				for(SiteClient tsc: available){
-					msg.verbose("  {}", tsc.getEndpoint().getUrl());
+					msg.verbose("  {}", tsc.getEndpoint());
 				}
 			}
 			//select one
 			tss=selectionStrategy.select(available);
 		}
-		msg.verbose("Selected TSS at {}", tss.getEndpoint().getUrl());
+		msg.verbose("Selected TSS at {}", tss.getEndpoint());
 		return tss.getEndpoint();
 	}
 
 	@Override
-	public Collection<Endpoint>listCandidates(IRegistryClient registry, 
+	public Collection<String>listCandidates(IRegistryClient registry, 
 			final UCCConfigurationProvider configurationProvider, UCCBuilder builder) 
 					throws Exception{
-		List<Endpoint>result=new ArrayList<>();
+		List<String>result = new ArrayList<>();
 		List<SiteClient> sites = listSites(registry, configurationProvider, builder);
 		for(SiteClient site: sites){
 			result.add(site.getEndpoint());
@@ -104,7 +103,7 @@ public class TargetSystemFinder implements Broker, Constants {
 					break;
 			}
 			else{
-				String current = tsf.getEndpoint().getUrl();
+				String current = tsf.getEndpoint();
 				msg.verbose("Checking {}", current);
 				try{
 					ErrorHolder err = new ErrorHolder();
@@ -141,7 +140,7 @@ public class TargetSystemFinder implements Broker, Constants {
 			for(Requirement r: requirements){
 				msg.verbose("Check requirement: "+r.getDescription());
 				if(r.isFulfilled(props))continue;
-				error.message = "Requirement <"+r.getDescription()+"> not fulfilled on "+tssClient.getEndpoint().getUrl();
+				error.message = "Requirement <"+r.getDescription()+"> not fulfilled on "+tssClient.getEndpoint();
 				return false;
 			}
 			return true;

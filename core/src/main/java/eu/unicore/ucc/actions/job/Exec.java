@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.apache.commons.cli.Option;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.Job;
 import eu.unicore.client.core.AllocationClient;
 import eu.unicore.ucc.UCC;
@@ -178,7 +177,7 @@ public class Exec extends ActionBase {
 		runner.setBroker(UCC.getBroker(brokerName));
 		if(allocation!=null) {
 			try {
-				AllocationClient ac = new AllocationClient(new Endpoint(allocation),
+				AllocationClient ac = new AllocationClient(allocation,
 						configurationProvider.getClientConfiguration(allocation),
 						configurationProvider.getRESTAuthN());
 				runner.setSubmissionService(ac);

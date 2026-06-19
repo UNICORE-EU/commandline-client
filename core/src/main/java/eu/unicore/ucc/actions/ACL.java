@@ -9,7 +9,6 @@ import org.apache.commons.cli.Option;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.security.OperationType;
 import eu.unicore.uas.json.JSONUtil;
@@ -91,9 +90,8 @@ public class ACL extends ActionBase {
 		}
 		// URL is last argument
 		String url = getCommandLine().getArgs()[length-1];
-		Endpoint epr = new Endpoint(url);
 		console.debug("Modifying ACLs of: {}", url);
-		BaseServiceClient client = new BaseServiceClient(epr,
+		BaseServiceClient client = new BaseServiceClient(url,
 				configurationProvider.getClientConfiguration(url),
 				configurationProvider.getRESTAuthN());
 
@@ -147,6 +145,7 @@ public class ACL extends ActionBase {
 					console.info("<{}> ACL entries were deleted.", deleted);
 				}
 			}catch(Exception ex) {}
+			client.close();
 		}
 	}
 

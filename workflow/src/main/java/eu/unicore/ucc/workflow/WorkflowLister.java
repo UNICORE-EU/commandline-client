@@ -7,7 +7,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.unicore.client.Endpoint;
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.lookup.AddressFilter;
@@ -76,57 +75,60 @@ public class WorkflowLister extends Lister<WorkflowClient>{
 
 	protected void setupProducers()throws Exception {
 		List<String>urls = new ArrayList<>(); // for avoiding duplicates
-		List<Endpoint>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("WorkflowServices"));
-		for(Endpoint site: sites){
+		List<String>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("WorkflowServices"));
+		for(String site: sites){
 			if(addressFilter.accept(site)){
-				urls.add(site.getUrl());
+				urls.add(site);
 				var sp = new WorkflowProducer(site, 
-						configurationProvider.getClientConfiguration(site.getUrl()),
+						configurationProvider.getClientConfiguration(site),
 						configurationProvider.getRESTAuthN(), addressFilter, tags);
 				addProducer(sp);
 			}
 		}
 		if(includeInternal) {
 			sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("CoreServices"));
-			for(Endpoint coreSite: sites){
-				BaseServiceClient siteC = new BaseServiceClient(coreSite,
-						configurationProvider.getClientConfiguration(coreSite.getUrl()),
-						configurationProvider.getRESTAuthN());
-				String wfServicesURL = null;
-				boolean check = false;
-				try{
-					wfServicesURL = siteC.getLinkUrl("workflows");
-				}catch(Exception ex) {
-					wfServicesURL = coreSite.getUrl().replace("/rest/core", "/rest/workflows");
-					check = true;
+			for(String coreSite: sites){
+				try(var siteC = new BaseServiceClient(coreSite,
+						configurationProvider.getClientConfiguration(coreSite),
+						configurationProvider.getRESTAuthN()))
+				{
+					String wfServicesURL = null;
+					boolean check = false;
+					try{
+						wfServicesURL = siteC.getLinkUrl("workflows");
+					}catch(Exception ex) {
+						wfServicesURL = coreSite.replace("/rest/core", "/rest/workflows");
+						check = true;
+					}
+					if(urls.contains(wfServicesURL))continue;
+					urls.add(wfServicesURL);
+					if(check){
+						// check if this even exists
+						try(var c = new BaseServiceClient(wfServicesURL,
+								configurationProvider.getClientConfiguration(wfServicesURL),
+								configurationProvider.getRESTAuthN())){
+							c.getProperties();
+						}catch(Exception ex) {
+							continue;
+						}
+					}
+					var sp = new WorkflowProducer(wfServicesURL,
+							configurationProvider.getClientConfiguration(wfServicesURL),
+							configurationProvider.getRESTAuthN(), addressFilter, tags);
+					addProducer(sp);
 				}
-				if(urls.contains(wfServicesURL))continue;
-				urls.add(wfServicesURL);
-				Endpoint site = new Endpoint(wfServicesURL);
-				if(check)try {
-					// check if this even exists
-					new BaseServiceClient(site,
-							configurationProvider.getClientConfiguration(site.getUrl()),
-							configurationProvider.getRESTAuthN()).getProperties();
-				}catch(Exception ex) {
-					continue;
-				}
-				var sp = new WorkflowProducer(site, 
-						configurationProvider.getClientConfiguration(site.getUrl()),
-						configurationProvider.getRESTAuthN(), addressFilter, tags);
-				addProducer(sp);
-			}	
+			}
 		}
 	}
 
 	public static class WorkflowProducer implements Producer<WorkflowClient>{
 
-		private final Endpoint epr;
+		private final String epr;
 
 		protected final IClientConfiguration securityProperties;
 		protected final IAuthCallback auth;
 		
-		protected final List<Pair<Endpoint,String>>errors = new ArrayList<>();
+		protected final List<Pair<String,String>>errors = new ArrayList<>();
 
 		private AtomicInteger runCount;
 
@@ -136,7 +138,7 @@ public class WorkflowLister extends Lister<WorkflowClient>{
 		
 		private final String[] tags;
 
-		public WorkflowProducer(Endpoint epr, IClientConfiguration securityProperties, IAuthCallback auth, 
+		public WorkflowProducer(String epr, IClientConfiguration securityProperties, IAuthCallback auth, 
 				AddressFilter addressFilter, String[] tags) {
 			this.epr = epr;
 			this.securityProperties = securityProperties;
@@ -158,14 +160,16 @@ public class WorkflowLister extends Lister<WorkflowClient>{
 			}
 		}
 
-		private void handleEndpoint(Endpoint epr) throws Exception{
-			EnumerationClient ec = new EnumerationClient(epr, securityProperties, auth);
-			ec.setDefaultTags(tags);
-			for(String url: ec){
-				if(addressFilter.accept(url)){
-					WorkflowClient c = new WorkflowClient(epr.cloneTo(url), securityProperties, auth);
-					if(addressFilter.accept(c)) {
-						target.put(c);
+		private void handleEndpoint(String epr) throws Exception{
+			try(var ec = new EnumerationClient(epr, securityProperties, auth))
+			{
+				ec.setDefaultTags(tags);
+				for(String url: ec){
+					if(addressFilter.accept(url)){
+						WorkflowClient c = new WorkflowClient(url, securityProperties, auth);
+						if(addressFilter.accept(c)) {
+							target.put(c);
+						}
 					}
 				}
 			}
