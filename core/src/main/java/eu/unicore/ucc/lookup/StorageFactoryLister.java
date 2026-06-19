@@ -1,23 +1,18 @@
 package eu.unicore.ucc.lookup;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.unicore.client.core.EnumerationClient;
-import eu.unicore.client.core.SiteClient;
 import eu.unicore.client.core.StorageFactoryClient;
 import eu.unicore.client.lookup.AddressFilter;
 import eu.unicore.client.lookup.Lister;
-import eu.unicore.client.lookup.Producer;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.util.Log;
 import eu.unicore.util.Pair;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
@@ -72,63 +67,22 @@ public class StorageFactoryLister extends Lister<StorageFactoryClient>{
 		for(final String site: sites){
 			addProducer(new StorageFactoryProducer(site,
 					configurationProvider.getClientConfiguration(site),
-					configurationProvider.getRESTAuthN(), addressFilter));
+					configurationProvider.getRESTAuthN(), addressFilter,
+					new ArrayList<>(), null));
 		}
 	}
 
-	public static class StorageFactoryProducer implements Producer<StorageFactoryClient>{
+	public static class StorageFactoryProducer extends AbstractProducer<StorageFactoryClient>{
 
-		private final String ep;
-		private final IClientConfiguration securityProperties;
-		private final IAuthCallback auth;
-		private final List<Pair<String,String>>errors = new ArrayList<>();
-		private final AddressFilter addressFilter;
-
-		private BlockingQueue<StorageFactoryClient> target;
-		private AtomicInteger runCounter;
-
-		public StorageFactoryProducer(String ep, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter) {
-			this.ep = ep;
-			this.securityProperties = securityProperties;
-			this.auth = auth;
-			this.addressFilter = addressFilter;
+		public StorageFactoryProducer(String ep, IClientConfiguration securityProperties, IAuthCallback auth, 
+				AddressFilter addressFilter, Collection<Pair<String,String>>errors, String[] tags) {
+			super("storagefactories", ep, securityProperties, auth, addressFilter, errors, tags);
 		}
 
 		@Override
-		public void run() {
-			try{
-				handleEndpoint();
-			}
-			catch(Exception ex){
-				errors.add(new Pair<>(ep,Log.createFaultMessage("", ex)));
-			}
-			finally{
-				runCounter.decrementAndGet();
-			}
-		}
-
-		private void handleEndpoint() throws Exception {
-			try(var c = new SiteClient(ep, securityProperties, auth)){
-				String factoriesEp = c.getLinkUrl("storagefactories");
-				try(var factoriesList = new EnumerationClient(factoriesEp, securityProperties, auth))
-				{
-					for(String factoryURL: factoriesList) {
-						if(addressFilter.accept(factoryURL)) {
-							StorageFactoryClient f = new StorageFactoryClient(factoryURL,
-									securityProperties, auth);
-							if(addressFilter.accept(f)) {
-								target.offer(f);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		@Override
-		public void init(BlockingQueue<StorageFactoryClient> target, AtomicInteger runCount) {
-			this.target = target;
-			this.runCounter = runCount;
+		protected StorageFactoryClient createClient(String url) {
+			return new StorageFactoryClient(url, securityProperties, auth);
 		}
 	}
+
 }

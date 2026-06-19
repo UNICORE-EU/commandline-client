@@ -5,20 +5,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.unicore.client.core.SiteClient;
-import eu.unicore.client.core.SiteFactoryClient;
 import eu.unicore.client.lookup.AddressFilter;
 import eu.unicore.client.lookup.Lister;
-import eu.unicore.client.lookup.Producer;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.util.Log;
 import eu.unicore.util.Pair;
 import eu.unicore.util.httpclient.IClientConfiguration;
 
@@ -80,64 +75,22 @@ public class SiteLister extends Lister<SiteClient>{
 						configurationProvider.getClientConfiguration(site),
 						configurationProvider.getRESTAuthN(),
 						addressFilter,
-						errors));
+						errors, null));
 			}
 		}
 	}
 
-	public static class SiteProducer implements Producer<SiteClient>{
 
-		private final String epr;
-		private final IClientConfiguration securityProperties;
-		private final IAuthCallback auth;
-		private final AddressFilter addressFilter;
-		private final Collection<Pair<String,String>>errors;
-		
-		private AtomicInteger runCount;
-		private BlockingQueue<SiteClient> target;
+	public static class SiteProducer extends AbstractProducer<SiteClient>{
 
-		public SiteProducer(String epr, IClientConfiguration securityProperties, IAuthCallback auth, AddressFilter addressFilter,
-				Collection<Pair<String,String>>errors) {
-			this.epr = epr;
-			this.securityProperties = securityProperties;
-			this.auth = auth;
-			this.addressFilter = addressFilter;
-			this.errors = errors;
+		public SiteProducer(String ep, IClientConfiguration securityProperties, IAuthCallback auth, 
+				AddressFilter addressFilter, Collection<Pair<String,String>>errors, String[] tags) {
+			super("sites", ep, securityProperties, auth, addressFilter, errors, tags);
 		}
 
 		@Override
-		public void run() {
-			try{
-				handleEndpoint(epr);
-			}
-			catch(Exception ex){
-				errors.add(new Pair<>(epr,Log.createFaultMessage("", ex)));
-			}
-			finally{
-				runCount.decrementAndGet();
-			}
-		}
-
-		private void handleEndpoint(String epr) throws Exception{
-			try(var factory = new SiteFactoryClient(epr, securityProperties, auth))
-			{
-				try(var sites = factory.getSiteList()){
-					for(String url: sites){
-						if(addressFilter.accept(url)){
-							SiteClient c = new SiteClient(url, securityProperties, auth);
-							if(addressFilter.accept(c)) {
-								target.put(c);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		@Override
-		public void init(BlockingQueue<SiteClient> target, AtomicInteger runCount) {
-			this.target=target;
-			this.runCount=runCount;
+		protected SiteClient createClient(String url) {
+			return new SiteClient(url, securityProperties, auth);
 		}
 	}
 
