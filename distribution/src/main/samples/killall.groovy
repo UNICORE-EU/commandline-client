@@ -22,7 +22,7 @@ def endpoints = new CoreEndpointLister(registry, configurationProvider, auth)
 
 endpoints.each {
    it.jobsList.each {
-      def jc = new JobClient(new Endpoint(it), configurationProvider.getClientConfiguration(it), auth)
+      def jc = new JobClient(it, configurationProvider.getClientConfiguration(it), auth)
       kill(jc, JobClient.Status.SUCCESSFUL)
    }
 }
