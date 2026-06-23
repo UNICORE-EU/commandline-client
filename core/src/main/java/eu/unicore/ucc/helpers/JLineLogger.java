@@ -15,5 +15,5 @@ public class JLineLogger {
 			System.setProperty("java.util.logging.manager", LogManager.class.getName());
 		}catch(Exception e) {}
 	}
-		
+
 }

@@ -3,7 +3,6 @@ package eu.unicore.ucc.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import eu.unicore.client.registry.IRegistryClient;
@@ -34,10 +33,10 @@ public class MultiRegistryClient implements IRegistryClient {
 
 	@Override
 	public List<String> listEntries(ServiceListFilter acceptFilter) throws Exception {
-		List<String>result=new ArrayList<>();
+		List<String>result = new ArrayList<>();
 		for(IRegistryClient c: clients){
 			try{
-				List<String>res = c.listEntries(acceptFilter);
+				List<String> res = c.listEntries(acceptFilter);
 				if(filterDuplicates){
 					addIfNotExist(result, res);
 				}else{
@@ -96,8 +95,8 @@ public class MultiRegistryClient implements IRegistryClient {
 
 	private Boolean compute(Callable<Boolean>task, int timeout){
 		try{
-			Future<Boolean>f = Resources.getExecutorService().submit(task);
-			return f.get(timeout, TimeUnit.SECONDS);
+			return Resources.getExecutorService().submit(task).
+					get(timeout, TimeUnit.SECONDS);
 		}catch(Exception ex){
 			return Boolean.FALSE;
 		}
@@ -118,16 +117,14 @@ public class MultiRegistryClient implements IRegistryClient {
 	 * @param timeout - connection timeout in seconds
 	 */
 	public boolean checkConnection(int timeout){
-		final StringBuffer status=new StringBuffer();
-		boolean result=false;
+		final StringBuffer status = new StringBuffer();
+		boolean result = false;
 		for(final IRegistryClient c: clients){
-			Callable<Boolean>task=new Callable<Boolean>(){
-				public Boolean call()throws Exception{
-					return Boolean.valueOf(c.checkConnection());
-				}
+			Callable<Boolean>task = ()-> {
+				return Boolean.valueOf(c.checkConnection());
 			};
 			Boolean res = compute(task, timeout);
-			boolean currentOK=res!=null?res.booleanValue():false;
+			boolean currentOK = res!=null ? res.booleanValue() : false;
 			if(!currentOK){
 				status.append("[NOT AVAILABLE: ").append(getAddress(c));
 				status.append("] ");
@@ -135,9 +132,7 @@ public class MultiRegistryClient implements IRegistryClient {
 			result=result || currentOK;
 
 		}
-		if(result)connectionStatus="OK";
-		else connectionStatus=status.toString();
-
+		connectionStatus = result? "OK" : status.toString();
 		return result;
 	}
 

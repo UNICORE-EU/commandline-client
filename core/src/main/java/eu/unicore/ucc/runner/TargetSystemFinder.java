@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import eu.unicore.client.core.SiteClient;
@@ -46,32 +47,37 @@ public class TargetSystemFinder implements Broker, Constants {
 		if(selectionStrategy==null)selectionStrategy = new RandomSelection();
 		final List<SiteClient>available = listSites(registry, configurationProvider, builder);
 		SiteClient tss=null;
-		if(available.size()==0){
-			UCC.console.verbose("Errors: {}", getDebugInfo());
-			throw new Exception("No suitable endpoint found - check credentials and job requirements");
-		}
-		else{
-			if(msg.isVerbose()){
-				msg.verbose("Have <{}> candidate resource(s)", available.size());
-				for(SiteClient tsc: available){
-					msg.verbose("  {}", tsc.getEndpoint());
-				}
+		try {
+			if(available.size()==0){
+				UCC.console.verbose("Errors: {}", getDebugInfo());
+				throw new Exception("No suitable endpoint found - check credentials and job requirements");
 			}
-			//select one
-			tss=selectionStrategy.select(available);
+			else{
+				if(msg.isVerbose()){
+					msg.verbose("Have <{}> candidate resource(s)", available.size());
+					for(SiteClient tsc: available){
+						msg.verbose("  {}", tsc.getEndpoint());
+					}
+				}
+				//select one
+				tss = selectionStrategy.select(available);
+			}
+			msg.verbose("Selected TSS at {}", tss.getEndpoint());
+			return tss.getEndpoint();
+		}finally {
+			IOUtils.closeQuietly(available.toArray(SiteClient[]::new));
 		}
-		msg.verbose("Selected TSS at {}", tss.getEndpoint());
-		return tss.getEndpoint();
 	}
 
 	@Override
 	public Collection<String>listCandidates(IRegistryClient registry, 
 			final UCCConfigurationProvider configurationProvider, UCCBuilder builder) 
 					throws Exception{
-		List<String>result = new ArrayList<>();
+		List<String> result = new ArrayList<>();
 		List<SiteClient> sites = listSites(registry, configurationProvider, builder);
 		for(SiteClient site: sites){
 			result.add(site.getEndpoint());
+			site.close();
 		}
 		return result;
 	}
@@ -80,23 +86,19 @@ public class TargetSystemFinder implements Broker, Constants {
 			final UCCConfigurationProvider configurationProvider, UCCBuilder builder)
 					throws Exception{
 		final Collection<Requirement> requirements = builder.getRequirements();
-		final String siteName=builder.getSite();
-		final ConsoleLogger msg=builder.getMessageWriter();
-		final List<SiteClient>available=Collections.synchronizedList(new ArrayList<>());
-
+		final String siteName = builder.getSite();
+		final ConsoleLogger msg = builder.getMessageWriter();
+		final List<SiteClient>available = Collections.synchronizedList(new ArrayList<>());
 		final String blackList = builder.getProperty("blacklist"); 
 		final boolean checkResources=true;
-
 		SiteLister tsfList = new SiteLister(UCC.executor,registry,configurationProvider);
 		if(blackList!=null){
-			String[] blacklist=blackList.trim().split(" ");
+			String[] blacklist = blackList.trim().split(" ");
 			tsfList.setAddressFilter(new Blacklist(blacklist));
 		}
-
 		if(siteName!=null){
 			tsfList.setAddressFilter(new SiteNameFilter(siteName));
 		}
-
 		for(SiteClient tsf: tsfList){
 			if(tsf == null){
 				if(!tsfList.isRunning())
@@ -118,7 +120,6 @@ public class TargetSystemFinder implements Broker, Constants {
 				}
 			}
 		}
-
 		StringBuilder _debug = new StringBuilder();
 		for(var p: tsfList.getErrors()) {
 			if(_debug.length()>0)_debug.append(Constants._newline);
@@ -153,7 +154,6 @@ public class TargetSystemFinder implements Broker, Constants {
 	static class ErrorHolder {
 		String message;
 	}
-
 
 	/**
 	 * summary of errors collected during checking of endpoints

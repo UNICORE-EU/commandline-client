@@ -79,22 +79,24 @@ public class FileDownloader extends FileTransferBase {
 		if(!targetDirectory.isDirectory()){
 			throw new IOException("Target <"+to+"> is not a directory!");
 		}
-		FileList remoteFiles = sms.ls(directory.path);
-		for(FileListEntry file: remoteFiles.list(0, 1000)){
-			if(file.isDirectory){
-				if(!recurse) {
-					UCC.console.verbose("Skipping directory {}", file.path);
-					continue;
+		try(FileList remoteFiles = sms.ls(directory.path))
+		{
+			for(FileListEntry file: remoteFiles.list(0, 1000)){
+				if(file.isDirectory){
+					if(!recurse) {
+						UCC.console.verbose("Skipping directory {}", file.path);
+						continue;
+					}
+					else{
+						File newTargetDirectory=new File(targetDirectory,getName(file.path));
+						boolean success=newTargetDirectory.mkdirs();
+						if(!success)throw new IOException("Can create directory: "+newTargetDirectory.getAbsolutePath());
+						performDirectoryExport(file, newTargetDirectory);
+						continue;
+					}
 				}
-				else{
-					File newTargetDirectory=new File(targetDirectory,getName(file.path));
-					boolean success=newTargetDirectory.mkdirs();
-					if(!success)throw new IOException("Can create directory: "+newTargetDirectory.getAbsolutePath());
-					performDirectoryExport(file, newTargetDirectory);
-					continue;
-				}
+				download(file, new File(targetDirectory,getName(file.path)));
 			}
-			download(file, new File(targetDirectory,getName(file.path)));
 		}
 	}
 
@@ -102,14 +104,15 @@ public class FileDownloader extends FileTransferBase {
 		String dir = getDir(from);
 		Pattern p = createPattern(getName(from));
 		if(dir==null)dir="/";
-		FileList files = sms.ls(dir);
-		File targetDir = targetStream==null ? new File(to) : null;
-		if(targetStream==null){
-			if(!targetDir.isDirectory())throw new IOException("Target is not a directory.");
-		}
-		for(FileListEntry f: files.list(0, 1000)){
-			if(p.matcher(new File(f.path).getName()).matches()){
-				download(f, targetDir);
+		try(FileList files = sms.ls(dir)){
+			File targetDir = targetStream==null ? new File(to) : null;
+			if(targetStream==null){
+				if(!targetDir.isDirectory())throw new IOException("Target is not a directory.");
+			}
+			for(FileListEntry f: files.list(0, 1000)){
+				if(p.matcher(new File(f.path).getName()).matches()){
+					download(f, targetDir);
+				}
 			}
 		}
 	}

@@ -55,7 +55,7 @@ import eu.unicore.util.Log;
  */
 public class Runner implements Runnable {
 
-	private static final AtomicInteger counter=new AtomicInteger(0);
+	private static final AtomicInteger counter = new AtomicInteger(0);
 
 	private ConsoleLogger msg;
 
@@ -111,15 +111,14 @@ public class Runner implements Runnable {
 	private SiteSelectionStrategy selectionStrategy;
 
 	// state names
-
-	public static final String NEW="NEW";
-	public static final String STAGEIN="STAGEIN";
-	public static final String READY="READY";
-	public static final String STARTED="STARTED";
-	public static final String STAGEOUT="STAGEOUT";
-	public static final String DONE="DONE";
-	public static final String FINISHED="FINISHED";
-	public static final String EXITING="EXITING";
+	public static final String NEW      = "NEW";
+	public static final String STAGEIN  = "STAGEIN";
+	public static final String READY    = "READY";
+	public static final String STARTED  = "STARTED";
+	public static final String STAGEOUT = "STAGEOUT";
+	public static final String DONE     = "DONE";
+	public static final String FINISHED = "FINISHED";
+	public static final String EXITING  = "EXITING";
 
 	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider, UCCBuilder builder){
 		this(registry,configurationProvider,builder,UCC.console);
@@ -127,10 +126,10 @@ public class Runner implements Runnable {
 
 	public Runner(IRegistryClient registry, UCCConfigurationProvider configurationProvider,UCCBuilder builder, ConsoleLogger writer){
 		counter.incrementAndGet();
-		this.registry=registry;
-		this.builder=builder;
-		this.msg=writer;
-		this.configurationProvider=configurationProvider;
+		this.registry = registry;
+		this.builder = builder;
+		this.msg = writer;
+		this.configurationProvider = configurationProvider;
 	}
 
 	public void setQuietMode(boolean quietMode){
@@ -138,27 +137,27 @@ public class Runner implements Runnable {
 	}
 
 	public void setBroker(Broker broker){
-		this.broker=broker;
+		this.broker = broker;
 	}
 
 	public void setAsyncMode(boolean asyncMode){
-		this.asyncMode=asyncMode;
+		this.asyncMode = asyncMode;
 	}
 
 	public void setNoFetchOutCome(boolean flag){
-		this.noFetchOutcome=flag;
+		this.noFetchOutcome = flag;
 	}
 
 	public void setSiteName(String siteName){
-		this.siteName=siteName;
+		this.siteName = siteName;
 	}
 
 	public void setBriefOutfileNames(boolean flag){
-		this.briefOutputFiles=flag;
+		this.briefOutputFiles = flag;
 	}
 
 	public void setDryRun(boolean flag){
-		this.dryRun=flag;
+		this.dryRun = flag;
 	}
 
 	public void setOutputToConsole(boolean toConsole){
@@ -238,13 +237,13 @@ public class Runner implements Runnable {
 		State s = getState(state);
 		do{
 			try{
-				mustSave=false;
-				s=s.process(this);
+				mustSave = false;
+				s = s.process(this);
 				state = s.getName();
 				builder.setState(state);
 			}catch(Exception e){
-				String reason = Log.createFaultMessage("Error occurred processing state <"+s.getName()+">",e);
-				throw new RuntimeException(reason, e);
+				throw new RuntimeException(Log.createFaultMessage("Error occurred processing state <"
+						+s.getName()+">",e), e);
 			}
 		}while(s.autoProceedToNextState());
 		if(!FINISHED.equals(state))writeJobIDFile();
@@ -258,11 +257,11 @@ public class Runner implements Runnable {
 	private void runSync(){
 		String state = builder.getState();
 		do{
-			State s=getState(state);
-			msg.verbose("Job is "+state);
+			State s = getState(state);
+			msg.verbose("Job is {}", state);
 			try{
-				s=s.process(this);
-				state=s.getName();
+				s = s.process(this);
+				state = s.getName();
 				builder.setState(state);
 			}catch(Exception e){
 				throw new RuntimeException(e);
@@ -289,9 +288,9 @@ public class Runner implements Runnable {
 			submit.put("haveClientStageIn", "false");
 			needManualJobStart=false;
 		}
-		int lifetime=builder.getLifetime();
+		int lifetime = builder.getLifetime();
 		if(lifetime>0){
-			Calendar c=Calendar.getInstance();
+			Calendar c = Calendar.getInstance();
 			c.add(Calendar.SECOND, lifetime);
 			// submit.put("", ""); // TODO
 		}
@@ -381,20 +380,20 @@ public class Runner implements Runnable {
 	 * job status should be retrieved from remote
 	 */
 	private boolean shouldUpdate(){
-		String updateInterval=builder.getProperty("_ucc_Update interval","1");
-		int updateInMillis=Integer.parseInt(updateInterval)*1000;
+		String updateInterval = builder.getProperty("_ucc_Update interval","1");
+		int updateInMillis = Integer.parseInt(updateInterval)*1000;
 		if(updateInMillis<=0)return true;
-		String lastUpdate=builder.getProperty("_ucc_lastStatusUpdate");
+		String lastUpdate = builder.getProperty("_ucc_lastStatusUpdate");
 		if(lastUpdate==null){
-			lastUpdate=String.valueOf(System.currentTimeMillis());
+			lastUpdate = String.valueOf(System.currentTimeMillis());
 			builder.setProperty("_ucc_lastStatusUpdate", String.valueOf(lastUpdate));
-			mustSave=true;
+			mustSave = true;
 		}
-		long last=Long.parseLong(lastUpdate);
-		long now=System.currentTimeMillis();
+		long last = Long.parseLong(lastUpdate);
+		long now = System.currentTimeMillis();
 		if(now>last+updateInMillis){
 			builder.setProperty("_ucc_lastStatusUpdate", String.valueOf(now));
-			mustSave=true;
+			mustSave = true;
 			return true;
 		}
 		return false;
@@ -402,7 +401,7 @@ public class Runner implements Runnable {
 
 	private void doGetStdOut()throws Exception{
 		String stdout = builder.getProperty("Stdout", "stdout");
-		FileDownloader e=new FileDownloader(stdout, stdout, Mode.NORMAL, false);
+		FileDownloader e = new FileDownloader(stdout, stdout, Mode.NORMAL, false);
 		if(outputToConsole){
 			System.out.println("*** Command output: ");
 			System.out.println();
@@ -469,8 +468,7 @@ public class Runner implements Runnable {
 		File out = new File(e.getTo());
 		if(!out.isAbsolute()){
 			createOutfileDirectory();
-			File f=new File(output, e.getTo());
-			e.setTo(f.getAbsolutePath());
+			e.setTo(new File(output, e.getTo()).getAbsolutePath());
 		}
 		e.setExtraParameterSource(properties);
 		if(e.getChosenProtocol()==null){
@@ -523,18 +521,18 @@ public class Runner implements Runnable {
 	private void writeJobIDFile(){
 		if(quietMode || !mustSave)return;
 		try	{
-			String dump=builder.getProperty("_ucc_jobIdFile",null);
-			File dumpFile=null;
+			String dump = builder.getProperty("_ucc_jobIdFile",null);
+			File dumpFile = null;
 			if(dump==null){
 				String loc=builder.getProperty("_ucc_IDLocation",output.getAbsolutePath());
-				dumpFile=new File(loc,getJobID()+".job");
-				dump=dumpFile.getAbsolutePath();
+				dumpFile = new File(loc,getJobID()+".job");
+				dump = dumpFile.getAbsolutePath();
 				builder.setProperty("_ucc_jobIdFile",dumpFile.getAbsolutePath());
 			}
 			else{
-				dumpFile=new File(dump);
+				dumpFile = new File(dump);
 			}
-			try(FileWriter fw=new FileWriter(dumpFile)){
+			try(FileWriter fw = new FileWriter(dumpFile)){
 				builder.writeTo(fw);
 			}
 			msg.info(dumpFile.getAbsolutePath());
@@ -576,13 +574,13 @@ public class Runner implements Runnable {
 	}
 
 	private void getStatus(boolean printOnlyIfChanged)throws Exception{
-		boolean changed=false;
-		Status newStatus=jobClient.getStatus();
+		boolean changed = false;
+		Status newStatus = jobClient.getStatus();
 		if(!newStatus.equals(status)){
 			changed=true;
-			status=newStatus;
+			status = newStatus;
 		}
-		StringBuilder sb=new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		sb.append(newStatus);
 		if(status.equals(Status.SUCCESSFUL) || status.equals(Status.FAILED)){
 			String exit = jobClient.getProperties().optString("exitCode");
@@ -646,7 +644,7 @@ public class Runner implements Runnable {
 
 	private static final Map<String,State>states = new HashMap<>();
 
-	static{
+	static {
 
 		/**
 		 * in state NEW, the job is submitted to the TSS. 
@@ -656,7 +654,7 @@ public class Runner implements Runnable {
 		states.put(NEW, new State(NEW){
 			public State process(Runner r)throws Exception{
 				r.doSubmit();
-				r.mustSave=true;
+				r.mustSave = true;
 				return r.dryRun? getState(EXITING) : getState(STAGEIN);
 			}
 		});
@@ -670,7 +668,7 @@ public class Runner implements Runnable {
 			public State process(Runner r) throws Exception {
 				r.initJobClient();
 				r.doImport();
-				r.mustSave=true;
+				r.mustSave = true;
 				if(r.needManualJobStart){
 					return Runner.getState(READY);
 				}
@@ -690,7 +688,7 @@ public class Runner implements Runnable {
 			public State process(Runner r) throws Exception {
 				r.initJobClient();
 				r.startJob();
-				r.mustSave=true;
+				r.mustSave = true;
 				return Runner.getState(STARTED);
 			}
 		});
@@ -756,7 +754,7 @@ public class Runner implements Runnable {
 					}
 					r.doExport();
 				}
-				r.mustSave=true;
+				r.mustSave = true;
 				return getState(DONE);
 			}
 		});
@@ -770,7 +768,7 @@ public class Runner implements Runnable {
 				if(!Boolean.parseBoolean(r.builder.getProperty("_ucc_KeepFinishedJob", "false"))){
 					try{
 						r.initJobClient();
-						r.mustSave=true;
+						r.mustSave = true;
 						r.jobClient.delete();
 						r.msg.verbose("Deleted done job {}", r.jobClient.getEndpoint());
 					}catch(Exception e){

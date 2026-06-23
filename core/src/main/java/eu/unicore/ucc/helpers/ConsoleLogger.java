@@ -12,7 +12,7 @@ public class ConsoleLogger implements UserLogger {
 	private boolean verbose;
 
 	private boolean debug = UCCOptions.isTrue(Utils.getProperty("UCC_DEBUG", null));
-	
+
 	private String prefix = "[ucc]";
 
 	public void setPrefix(String prefix){
@@ -26,7 +26,7 @@ public class ConsoleLogger implements UserLogger {
 	public boolean isVerbose(){ return verbose; }
 
 	public void setVerbose(boolean verbose){ this.verbose=verbose; }
-	
+
 	public boolean isDebug(){ return debug; }
 
 	public void setDebug(boolean debug){ this.debug=debug; }

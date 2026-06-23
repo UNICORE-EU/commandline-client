@@ -1,22 +1,19 @@
 package eu.unicore.ucc.workflow;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.unicore.client.core.BaseServiceClient;
-import eu.unicore.client.core.EnumerationClient;
 import eu.unicore.client.lookup.AddressFilter;
 import eu.unicore.client.lookup.Lister;
-import eu.unicore.client.lookup.Producer;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.client.registry.RegistryClient;
 import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.util.Log;
+import eu.unicore.ucc.lookup.AbstractProducer;
 import eu.unicore.util.Pair;
 import eu.unicore.util.httpclient.IClientConfiguration;
 import eu.unicore.workflow.WorkflowClient;
@@ -30,6 +27,7 @@ public class WorkflowLister extends Lister<WorkflowClient>{
 	private final String[] tags;
 
 	private boolean includeInternal = true;
+
 	/**
 	 * @param executor
 	 * @param registry
@@ -75,14 +73,14 @@ public class WorkflowLister extends Lister<WorkflowClient>{
 
 	protected void setupProducers()throws Exception {
 		List<String>urls = new ArrayList<>(); // for avoiding duplicates
+		List<Pair<String,String>>errors = new ArrayList<>();
 		List<String>sites = registry.listEntries(new RegistryClient.ServiceTypeFilter("WorkflowServices"));
 		for(String site: sites){
 			if(addressFilter.accept(site)){
 				urls.add(site);
-				var sp = new WorkflowProducer(site, 
+				addProducer(new WorkflowProducer(site,
 						configurationProvider.getClientConfiguration(site),
-						configurationProvider.getRESTAuthN(), addressFilter, tags);
-				addProducer(sp);
+						configurationProvider.getRESTAuthN(), addressFilter, errors, tags));
 			}
 		}
 		if(includeInternal) {
@@ -112,73 +110,30 @@ public class WorkflowLister extends Lister<WorkflowClient>{
 							continue;
 						}
 					}
-					var sp = new WorkflowProducer(wfServicesURL,
+					addProducer(new WorkflowProducer(wfServicesURL,
 							configurationProvider.getClientConfiguration(wfServicesURL),
-							configurationProvider.getRESTAuthN(), addressFilter, tags);
-					addProducer(sp);
+							configurationProvider.getRESTAuthN(), addressFilter,
+							errors, tags));
 				}
 			}
 		}
 	}
 
-	public static class WorkflowProducer implements Producer<WorkflowClient>{
+	public static class WorkflowProducer extends AbstractProducer<WorkflowClient>{
 
-		private final String epr;
-
-		protected final IClientConfiguration securityProperties;
-		protected final IAuthCallback auth;
-		
-		protected final List<Pair<String,String>>errors = new ArrayList<>();
-
-		private AtomicInteger runCount;
-
-		protected BlockingQueue<WorkflowClient> target;
-
-		protected AddressFilter addressFilter;
-		
-		private final String[] tags;
-
-		public WorkflowProducer(String epr, IClientConfiguration securityProperties, IAuthCallback auth, 
-				AddressFilter addressFilter, String[] tags) {
-			this.epr = epr;
-			this.securityProperties = securityProperties;
-			this.auth = auth;
-			this.addressFilter = addressFilter;
-			this.tags = tags;
+		public WorkflowProducer(String ep, IClientConfiguration sec, IAuthCallback auth,
+				AddressFilter addressFilter, Collection<Pair<String,String>>errors, String[] tags) {
+			super("n/a", ep, sec, auth, addressFilter, errors, tags);
 		}
 
 		@Override
-		public void run() {
-			try{
-				handleEndpoint(epr);
-			}
-			catch(Exception ex){
-				errors.add(new Pair<>(epr,Log.createFaultMessage("", ex)));
-			}
-			finally{
-				runCount.decrementAndGet();
-			}
-		}
-
-		private void handleEndpoint(String epr) throws Exception{
-			try(var ec = new EnumerationClient(epr, securityProperties, auth))
-			{
-				ec.setDefaultTags(tags);
-				for(String url: ec){
-					if(addressFilter.accept(url)){
-						WorkflowClient c = new WorkflowClient(url, securityProperties, auth);
-						if(addressFilter.accept(c)) {
-							target.put(c);
-						}
-					}
-				}
-			}
+		protected String getListURL(BaseServiceClient b) throws Exception {
+			return b.getEndpoint();
 		}
 
 		@Override
-		public void init(BlockingQueue<WorkflowClient> target, AtomicInteger runCount) {
-			this.target = target;
-			this.runCount = runCount;
+		protected WorkflowClient createClient(String url) {
+			return new WorkflowClient(url, securityProperties, auth);
 		}
 	}
 

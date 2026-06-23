@@ -1,6 +1,5 @@
 package eu.unicore.ucc.authn;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,18 +56,8 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		if (ap instanceof PropertiesAwareAuthn){
 			PropertiesAwareAuthn paa = (PropertiesAwareAuthn)ap;
 			if(userProperties.getProperty("truststore.type")==null) {
-				if(acceptAllCAs) {
-					userProperties.setProperty("truststore.type", "directory");
-					userProperties.setProperty("truststore.directoryLocations.1", "___dummy___");
-				}
-				else {
-					// fallback to a default truststore
-					String path = new File(System.getProperty("user.home"), 
-							".ucc"+File.separator+"trusted-certs"+File.separator+"*.pem").getPath();
-					UCC.console.debug("Default truststore {}", path);
-					userProperties.setProperty("truststore.type", "directory");
-					userProperties.setProperty("truststore.directoryLocations.1", path);
-				}
+				UCC.console.debug("Using default Java truststore.");
+				userProperties.setProperty("truststore.type", "java_default");
 			}
 			paa.setProperties(userProperties);
 			paa.setValidationErrorListener( err -> { return queryValidity(err); });
@@ -86,7 +75,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 	private String getSessionStorageFile() {
 		return userProperties!=null? userProperties.getProperty(Constants.SESSION_ID_FILEKEY) : null;
 	}
-	
+
 	@Override
 	public IAuthCallback getRESTAuthN() {
 		if(getAuthnProvider() instanceof IAuthCallback) {
@@ -94,7 +83,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		}
 		else return null;
 	}
-	
+
 	/**
 	 * Prepares a map with security preferences, to be quickly applied when actual configuration is 
 	 * assembled on demand. 
@@ -114,7 +103,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		}
 		return securityPreferences;
 	}
-	
+
 	private void parseSecurityPreference(String pref, Map<String, String[]> securityPreferences) {
 		if (pref.startsWith(PREFERENCE_ARG_UID + ":")) {
 			String val = pref.substring(PREFERENCE_ARG_UID.length() + 1);
@@ -150,11 +139,11 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 			throw new IllegalArgumentException(msg);
 		}
 	}
-	
+
 	private static boolean acceptAll = false;
-	
+
 	private static final ArrayList<String>acceptedCAs = new ArrayList<>();
-	
+
 	private boolean queryValidity(ValidationError err) {
 		if(acceptAll)return true;
 
@@ -166,9 +155,12 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 		try{
 			LineReader cr = UCC.getLineReader();
 			String line = cr.readLine("Accept issuer <"+issuer+"> [Y/n/a]");
-			boolean accept = line.length()==0  || line.startsWith("y") || line.startsWith("Y");
 			acceptAll =  line.startsWith("a") || line.startsWith("A");
-			if(accept||acceptAll){
+			boolean accept = acceptAll ||
+					line.length()==0 ||
+					line.startsWith("y") ||
+					line.startsWith("Y");
+			if(accept){
 				acceptedCAs.add(cmp);
 			}
 			return accept;

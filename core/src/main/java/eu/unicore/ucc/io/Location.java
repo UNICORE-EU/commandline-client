@@ -1,6 +1,5 @@
 package eu.unicore.ucc.io;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -25,15 +24,15 @@ public class Location implements eu.unicore.uas.json.Location {
 
 	// the raw location as passed to the constructor
 	protected final String originalDescriptor;
-	
-	protected boolean isLocal=false;
-	protected boolean isRaw=false;
-	
+
+	protected boolean isLocal = false;
+	protected boolean isRaw = false;
+
 	protected String smsEpr;
 	protected String protocol = null;
 	protected String name;
 	protected final String defaultProtocol;
-	
+
 	/**
 	 * Constructs a new Location
 	 * 
@@ -49,23 +48,20 @@ public class Location implements eu.unicore.uas.json.Location {
 	public Location(String desc){
 		this(desc, "BFT");
 	}
-	
+
 	//pattern describing a UNICORE REST file URL: <PROTOCOL>:https://<url>/rest/core/storages/<storage_name>/<files>/path?query
 	final protected static String u8URLRE= "(([[\\w-]]+):)?([\\w-])+://.*/rest/core/storages/(.)*(/files/)?(.)*";
 	final public static Pattern pattern = Pattern.compile(u8URLRE); 
 
 	public static boolean isUNICORE_URL(String url){		
-		Matcher m=pattern.matcher(url);
-		return m.find();
+		return pattern.matcher(url).find();
 	}
 
 	final protected static String rawURLRE= "([\\w-])+:(.)*";
 	final public static Pattern rawPattern = Pattern.compile(rawURLRE); 
 
 	public static boolean isRawURL(String url){	
-		boolean isU=isUNICORE_URL(url);
-		Matcher m=rawPattern.matcher(url);
-		return !isU && m.find();
+		return !isUNICORE_URL(url) && rawPattern.matcher(url).find();
 	}
 	
 	/**
@@ -76,8 +72,7 @@ public class Location implements eu.unicore.uas.json.Location {
 	 * @return <code>true</code> if the location could be resolved
 	 */
 	protected boolean parseDesc(String desc){
-
-		//check if it is an SMS UNICORE URI
+		// check if it is an SMS UNICORE URI
 		if(isUNICORE_URL(desc)){
 			if(!desc.contains("/files/")) {
 				// user only gave a storage endpoint
@@ -92,7 +87,7 @@ public class Location implements eu.unicore.uas.json.Location {
 					smsEpr=s2[1];
 				}
 				else{
-					//no protocol, use default
+					// no protocol, use default
 					smsEpr=s1[0];
 				}
 				return true;
@@ -100,19 +95,18 @@ public class Location implements eu.unicore.uas.json.Location {
 				return false;
 			}
 		}
-		//then check if it is a "raw" URL, i.e. does *not* have the form "PROTOTOL:scheme://..."
+		// then check if it does *not* have the form "PROTOTOL:scheme://..."
 		if(isRawURL(desc)){
-			smsEpr=desc;
-			name=null;
-			isRaw=true;
+			smsEpr = desc;
+			name = null;
+			isRaw = true;
 			return true;
 		}
 
-		//finally assume it is just a file path
-		name=desc;
-		isLocal=true;
+		// must be a local file path
+		name = desc;
+		isLocal = true;
 		return true;
-
 	}
 
 	@Override
@@ -124,7 +118,7 @@ public class Location implements eu.unicore.uas.json.Location {
 	public boolean isUnicoreURL() {
 		return !isRaw && !isLocal;
 	}
-	
+
 	@Override
 	public boolean isRaw() {
 		return isRaw;
@@ -144,7 +138,7 @@ public class Location implements eu.unicore.uas.json.Location {
 	public void setProtocol(String protocol) {
 		this.protocol = protocol;
 	}
-	
+
 	/**
 	 * get the storage endpoint, e.g. https://SITE/rest/core/storages/HOME
 	 */
@@ -159,7 +153,7 @@ public class Location implements eu.unicore.uas.json.Location {
 	public String getUnicoreURI() {
 		return getUnicoreURI(protocol);
 	}
-	
+
 	/**
 	 * get this location as a resolved URI using the given protocol, i.e.
 	 * <code>protocol://SMS-URL/files/path</code> <br/>
@@ -173,16 +167,17 @@ public class Location implements eu.unicore.uas.json.Location {
 		String p = protocol!=null?protocol:defaultProtocol;
 		return p+":"+smsEpr+"/files/"+(name!=null?name:"");
 	}
-	
+
+	@Override
 	public String toString(){
 		return getClass().getName()+"["+originalDescriptor+"]";
 	}
-	
+
 	@Override
 	public String getEndpointURL() {
 		return originalDescriptor;
 	}
-	
+
 	public String getResolvedURL() {
 		if(isRaw) {
 			return originalDescriptor;
@@ -191,5 +186,5 @@ public class Location implements eu.unicore.uas.json.Location {
 			return getUnicoreURI();
 		}
 	}
-	
+
 }

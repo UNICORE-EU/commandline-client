@@ -16,20 +16,20 @@ import eu.unicore.ucc.UCC;
 public class ProgressBar implements ProgressListener<Long> {
 
 	private Terminal terminal;
-	private long size=-1;
-	private long have=0;
-	private long startedAt=0;
-	private final UnitParser rateParser=UnitParser.getCapacitiesParser(1);
+	private long size = -1;
+	private long have = 0;
+	private final long startedAt = System.currentTimeMillis();
+	private final UnitParser rateParser = UnitParser.getCapacitiesParser(1);
 	private String sizeDisplay;
 
 	//bytes per second
-	private double rate=0;
+	private double rate = 0;
 
 	private final String identifier;
 
 	//for displaying spinning thingy if size is unknown
-	private final char[] x=new char[]{'|','/','-','\\'};
-	private int index=0;
+	private final static char[] x = new char[]{'|','/','-','\\'};
+	private int index = 0;
 
 	/**
 	 * create a new progress bar
@@ -43,8 +43,7 @@ public class ProgressBar implements ProgressListener<Long> {
 	 * @param size - if this is non-positive, a "spinning" progress indicator will be displayed
 	 */
 	public ProgressBar(String identifier, long size){
-		this.identifier=identifier;
-		startedAt=System.currentTimeMillis();
+		this.identifier = identifier;
 		try {
 			terminal = TerminalBuilder.terminal();
 		} catch (Exception e) {
@@ -54,14 +53,14 @@ public class ProgressBar implements ProgressListener<Long> {
 	}
 
 	public void setSize(long size){
-		this.size=size;
-		this.sizeDisplay=rateParser.getHumanReadable(size);
+		this.size = size;
+		this.sizeDisplay = rateParser.getHumanReadable(size);
 	}
 
 	public void updateTotal(long total){
 		if(terminal==null || total<0)return;
 		updateRate();
-		have=total;
+		have = total;
 		output();
 	}
 
@@ -81,16 +80,16 @@ public class ProgressBar implements ProgressListener<Long> {
 	}
 
 	private void output(){
-		StringBuilder sb=new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		if(size>0){
-			long progress=have*100/size;
+			long progress = have*100/size;
 			sb.append(String.format("%3d%%  %s ",progress, sizeDisplay));
 		}
 		else{
 			//for unknown size, just display a 'rotating' thingy
 			sb.append(x[index]);
 			index++;
-			if(index==x.length)index=0;
+			if(index==x.length)index = 0;
 		}
 		//append rate
 		if(rate>0){
@@ -110,7 +109,7 @@ public class ProgressBar implements ProgressListener<Long> {
 		}
 	}
 
-	private int width=0;
+	private int width = 0;
 
 	private int getTerminalWidth(){
 		if(width==0){
@@ -119,19 +118,21 @@ public class ProgressBar implements ProgressListener<Long> {
 		return width;
 	}
 
+	@Override
 	public void notifyProgress(Long amount) {
 		if(amount!=null){
 			update(amount);
 		}
 	}
 
+	@Override
 	public boolean isCancelled() {
 		return false;
 	}
 
 	public void finish(){
 		if(size>0){
-			have=size;
+			have = size;
 		}
 		else{
 			setSize(have);

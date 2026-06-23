@@ -58,10 +58,14 @@ public abstract class AbstractProducer<T> implements Producer<T>{
 		}
 	}
 
+	protected String getListURL(BaseServiceClient b) throws Exception {
+		return b.getLinkUrl(targetLink);
+	}
+
 	private void handleEndpoint() throws Exception {
 		try(var c = new BaseServiceClient(ep, securityProperties, auth))
 		{
-			String factoriesEp = c.getLinkUrl(targetLink);
+			String factoriesEp = getListURL(c);
 			try(var ec = new EnumerationClient(factoriesEp, securityProperties, auth))
 			{
 				ec.setDefaultTags(tags);

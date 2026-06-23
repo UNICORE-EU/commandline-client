@@ -14,7 +14,7 @@ import eu.unicore.client.core.SiteClient;
 public interface SiteSelectionStrategy {
 
 	public SiteClient select(List<SiteClient>available);
-	
-	public Map<String,AtomicInteger>getSelectionStatistics();
-	
+
+	public Map<String,AtomicInteger> getSelectionStatistics();
+
 }

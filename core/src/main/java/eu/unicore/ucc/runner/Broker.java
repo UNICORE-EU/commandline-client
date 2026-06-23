@@ -21,7 +21,7 @@ public interface Broker {
 	public String findTSSAddress(IRegistryClient registry, 
 			UCCConfigurationProvider secProvider, UCCBuilder builder, SiteSelectionStrategy strategy) 
 			throws Exception;
-	
+
 	/**
 	 * List those sites that can run the given job
 	 * 
@@ -34,16 +34,15 @@ public interface Broker {
 	public Collection<String> listCandidates(IRegistryClient registry, 
 			UCCConfigurationProvider secProvider, UCCBuilder builder) 
 			throws Exception;
-	
-	
+
 	/**
 	 * allows to select the "best" broker
 	 */
 	public int getPriority();
-	
+
 	/**
 	 * allows user to select the broker
 	 */
 	public String getName();
-	
+
 }

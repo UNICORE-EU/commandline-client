@@ -15,6 +15,7 @@ public class RunningQueue extends RequestQueue {
 					"must be writable.");
 			}
 	}
+
 	/**
 	 * ask whether another item can be added into the queue 
 	 * @return true if there still is some space left
@@ -30,7 +31,7 @@ public class RunningQueue extends RequestQueue {
 	 */
 	public void add(String o) throws Exception {
 		super.add(o,new File(o).lastModified());
-	}	
+	}
 
 	@Override
 	public int length(){

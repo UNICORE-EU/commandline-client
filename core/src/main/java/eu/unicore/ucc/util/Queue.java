@@ -12,9 +12,9 @@ public abstract class Queue {
 
 	protected final java.util.concurrent.DelayQueue<QueueEntry<String>> elements;
 
-	protected int limit=-1;
+	protected int limit = -1;
 
-	protected int queued=0;
+	protected int queued = 0;
 
 	protected long delay;
 
@@ -26,8 +26,8 @@ public abstract class Queue {
 	}
 
 	public Queue(long delay){
-		elements=new DelayQueue<QueueEntry<String>>();
-		this.delay=delay; //ms.
+		elements = new DelayQueue<QueueEntry<String>>();
+		this.delay = delay; //ms.
 	}
 
 	public void setDelay(long delay){
@@ -40,7 +40,7 @@ public abstract class Queue {
 	 * @param lim
 	 */
 	public void setLimit(int lim){
-		limit=lim;
+		limit = lim;
 	}
 
 	/**
@@ -88,7 +88,7 @@ public abstract class Queue {
 	 */
 	public String next(){
 		update();
-		QueueEntry<String>e=elements.poll();
+		QueueEntry<String> e = elements.poll();
 		return e!=null? e.entry : null;
 	}
 
@@ -101,7 +101,7 @@ public abstract class Queue {
 	 */
 	public String next(long timeout, TimeUnit unit)throws InterruptedException{
 		update();
-		QueueEntry<String>e=elements.poll(timeout, unit);
+		QueueEntry<String> e = elements.poll(timeout, unit);
 		return e!=null? e.entry : null;
 	}
 
@@ -116,9 +116,9 @@ public abstract class Queue {
 		final T entry;
 
 		public QueueEntry(T entry, long lastAccessed, long queueDelay){
-			this.entry=entry;
-			this.lastAccessed=lastAccessed;
-			this.queueDelay=queueDelay;
+			this.entry = entry;
+			this.lastAccessed = lastAccessed;
+			this.queueDelay = queueDelay;
 		}
 
 		public long getDelay(TimeUnit unit) {

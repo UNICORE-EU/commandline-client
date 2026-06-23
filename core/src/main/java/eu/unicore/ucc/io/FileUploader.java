@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
 import eu.unicore.client.data.UFTPConstants;
@@ -152,7 +154,7 @@ public class FileUploader extends FileTransferBase {
 			FiletransferOptions.Write writer = (FiletransferOptions.Write)ftc;
 			if(isRange()){
 				UCC.console.verbose("Byte range: {} - {}", startByte, (getRangeSize()>0?endByte:""));
-				long totalSkipped=0;
+				long totalSkipped = 0;
 				long toSkip = startByte;
 				while(totalSkipped<startByte){
 					long skipped = is.skip(toSkip);
@@ -160,26 +162,24 @@ public class FileUploader extends FileTransferBase {
 					toSkip-=skipped;
 				}
 				writer.write(is, endByte-startByte+1);
-
 			}else{
 				writer.write(is);
 			}
 			copyProperties(localFile, sms, remotePath);
-
 			if(ftc instanceof IMonitorable){
 				p.finish();
 			}
-
 		}finally{
 			if(ftc!=null){
 				try{
 					ftc.delete();
 				}catch(Exception e1){}
+				IOUtils.closeQuietly(ftc);
 			}
 		}
 		if(timing){
-			long duration=System.currentTimeMillis()-startTime;
-			double rate=(double)localFile.length()/(double)duration;
+			long duration = System.currentTimeMillis()-startTime;
+			double rate = (double)localFile.length()/(double)duration;
 			UCC.console.info("Rate: {} kB/sec.", UCC.numberFormat.format(rate));
 		}
 	}

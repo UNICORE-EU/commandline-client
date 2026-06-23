@@ -19,9 +19,9 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 		implements PropertiesAwareAuthn, IAuthCallback {
 
 	private final PasswordCallback callback;
-	
+
 	private String username, password;
-	
+
 	public UsernameAuthN()
 	{
 		 callback = CallbackUtils.getPasswordCallback();
@@ -42,7 +42,6 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 		}
 		new UsernamePassword(username,password).addAuthenticationHeaders(httpMessage);
 	}
-	
 
 	@Override
 	public void setProperties(Properties properties) {

@@ -79,8 +79,8 @@ public class ServerToServer implements Constants {
 	private Map<String,String> getExtraParameters(String protocol){
 		Map<String,String> res = new HashMap<>();
 		if(protocol!=null && extraParameterSource!=null){
-			String p=String.valueOf(protocol);
-			PropertyHelper ph=new PropertyHelper(extraParameterSource, new String[]{p,p.toLowerCase()});
+			String p = String.valueOf(protocol);
+			PropertyHelper ph = new PropertyHelper(extraParameterSource, new String[]{p,p.toLowerCase()});
 			res.putAll(ph.getFilteredMap());
 		}
 		ServiceLoader<FiletransferParameterProvider> ppLoader = ServiceLoader.load(FiletransferParameterProvider.class);
@@ -106,10 +106,11 @@ public class ServerToServer implements Constants {
 		bothSidesUNICORE = !sourceDesc.isRaw && !targetDesc.isRaw();
 		if(bothSidesUNICORE  && sourceDesc.getSmsEpr().equalsIgnoreCase(targetDesc.getSmsEpr())) {
 			String target = targetDesc.getSmsEpr();
-			StorageClient sms = new StorageClient(target,
+			try(var sms = new StorageClient(target,
 					configurationProvider.getClientConfiguration(target),
-					configurationProvider.getRESTAuthN());
-			smsCopyFile(sms);
+					configurationProvider.getRESTAuthN())){
+				smsCopyFile(sms);
+			}
 		}
 		else {
 			copyFile();
@@ -176,9 +177,9 @@ public class ServerToServer implements Constants {
 			if(synchronous && tcc!=null){
 				try{
 					tcc.delete();
-					IOUtils.closeQuietly(tcc);
 				}
 				catch(Exception e1){}
+				IOUtils.closeQuietly(tcc);
 			}
 		}
 	}
@@ -188,8 +189,8 @@ public class ServerToServer implements Constants {
 	 * @throws Exception
 	 */
 	private void waitForCompletion()throws Exception{
-		long transferred=-1;
-		ProgressBar p=new ProgressBar(sourceDesc.getName(),remoteSize);
+		long transferred = -1;
+		ProgressBar p = new ProgressBar(sourceDesc.getName(),remoteSize);
 		tcc.setUpdateInterval(-1);
 		String status = "UNDEFINED";
 		do{

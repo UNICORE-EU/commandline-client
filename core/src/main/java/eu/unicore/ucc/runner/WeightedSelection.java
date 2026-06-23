@@ -24,7 +24,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 
 	private final File weightsFile;
 
-	private long lastAccess=0;
+	private long lastAccess = 0;
 
 	private final Map<String, Integer>weights = new HashMap<>();
 
@@ -37,11 +37,11 @@ public class WeightedSelection implements SiteSelectionStrategy {
 	}
 
 	public SiteClient select(List<SiteClient> available) {
-		List<String>names=new ArrayList<>();
-		Map<String, SiteClient>map=new HashMap<>();
+		List<String> names = new ArrayList<>();
+		Map<String, SiteClient> map = new HashMap<>();
 		for(SiteClient tss: available){
 			try{
-				String name=tss.getProperties().getString("siteName");
+				String name = tss.getProperties().getString("siteName");
 				names.add(name);
 				map.put(name,tss);
 			}catch(Exception e){
@@ -53,21 +53,21 @@ public class WeightedSelection implements SiteSelectionStrategy {
 
 	public String select(Set<String>available){
 		checkUpdate();
-		String selectedTSS=null;
-		float worstRatio=-1;
+		String selectedTSS = null;
+		float worstRatio = -1;
 		//for each tss available, check its current ration of submitted jobs to weight.
 		//select the one with the worst ratio
 		for(String name: available){
 			try{
-				if(selectedTSS==null)selectedTSS=name;
-				float ratio=getRatio(name);
+				if(selectedTSS==null)selectedTSS = name;
+				float ratio = getRatio(name);
 				if(ratio<0){
 					selected.put(name, new AtomicInteger());
 					continue;
 				}
 				if(ratio<worstRatio || worstRatio<0){
-					worstRatio=ratio;
-					selectedTSS=name;
+					worstRatio = ratio;
+					selectedTSS = name;
 				}
 			}catch(Exception e){
 				UCC.console.error(e, "");
@@ -83,9 +83,9 @@ public class WeightedSelection implements SiteSelectionStrategy {
 	 * @return the ratio or <code>-1</code> if no jobs should be submitted to this site
 	 */
 	private float getRatio(String name){
-		Integer w=weights.get(name);
+		Integer w = weights.get(name);
 		if(w==null){
-			w=weights.get(DEFAULT_WEIGHT);
+			w = weights.get(DEFAULT_WEIGHT);
 		}
 		if(w==0){
 			return -1;
@@ -96,7 +96,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 	private synchronized AtomicInteger get(String key) {
 		AtomicInteger s = selected.get(key);
 		if(s==null) {
-			s=new AtomicInteger();
+			s = new AtomicInteger();
 			selected.put(key,s);
 		}
 		return s;
@@ -112,7 +112,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 		ConsoleLogger msg = UCC.console;
 		if(lastAccess<weightsFile.lastModified()){
 			lastAccess=weightsFile.lastModified();
-			Properties p=new Properties();
+			Properties p = new Properties();
 			try(FileInputStream fis = new FileInputStream(weightsFile)){
 				p.load(fis);
 			}catch(Exception e){

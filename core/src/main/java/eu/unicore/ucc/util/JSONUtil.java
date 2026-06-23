@@ -46,4 +46,5 @@ public class JSONUtil {
 	public static String extractResourceID(String url) throws IOException {
 		return new File(new URL(url).getPath()).getName();
 	}
+
 }

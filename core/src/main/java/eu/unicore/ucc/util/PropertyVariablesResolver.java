@@ -55,7 +55,7 @@ public class PropertyVariablesResolver
 			properties.setProperty((String) entry.getKey(), sb.toString());
 		}
 	}
-	
+
 	/**
 	 * helper to handle parameter list of the form
 	 * 
@@ -97,5 +97,4 @@ public class PropertyVariablesResolver
 		return params;
 	}
 
-	
 }
