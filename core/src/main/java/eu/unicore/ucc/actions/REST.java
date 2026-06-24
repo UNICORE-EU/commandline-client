@@ -3,6 +3,7 @@ package eu.unicore.ucc.actions;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Formatter;
 import java.util.List;
 
@@ -91,15 +92,22 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 		return CMD_GRP_UTILITY;
 	}
 
+	@Override
 	protected boolean requireRegistry(){
 		return false;
 	}
 
+	@Override
 	protected boolean skipConnectingToRegistry() {
 		return true;
 	}
 
-	public static List<String> cmds = Arrays.asList("GET", "POST", "PUT", "DELETE");
+	private static final List<String> cmds = Arrays.asList("GET", "POST", "PUT", "DELETE");
+
+	@Override
+	public Collection<String> getArgumentOptions(){
+		return cmds;
+	}
 	
 	@Override
 	public void process() throws Exception {

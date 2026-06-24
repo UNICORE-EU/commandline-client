@@ -1,7 +1,9 @@
 package eu.unicore.ucc.actions.admin;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import eu.unicore.client.admin.AdminServiceClient;
 import eu.unicore.client.admin.AdminServiceClient.AdminCommand;
@@ -37,19 +39,18 @@ public class AdminServiceInfo extends ListActionBase<AdminServiceClient>{
 
 	@Override
 	protected String getDetails(AdminServiceClient asc)throws Exception{
-		if(!detailed)return "";
 		StringBuilder details = new StringBuilder();
-		boolean first = true;
 		for(AdminCommand ac: asc.getCommands()) {
-			if(first){
+			if(details.length()==0){
 				details.append(_newline).append("  Commands: ");
-				first=false;
 			}
 			details.append(_newline).append("    ");
 			details.append(ac.name);
+			// store for shell completer
+			commands.add(ac.name);
 			details.append(" : ").append(ac.description);
 		}
-		return details.toString();
+		return detailed? details.toString() : "";
 	}
 
 	private List<String> findURLs()throws Exception{
@@ -83,5 +84,7 @@ public class AdminServiceInfo extends ListActionBase<AdminServiceClient>{
 	public String getCommandGroup() {
 		return CMD_GRP_ADMIN;
 	}
+
+	static Set<String> commands = new HashSet<>();
 
 }

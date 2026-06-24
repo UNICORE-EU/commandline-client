@@ -1,5 +1,6 @@
 package eu.unicore.ucc.actions.admin;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,6 +136,11 @@ public class RunCommand extends ActionBase {
 	@Override
 	public String getArgumentList() {
 		return "<command> [key1=value1 key2=value2 ...]";
+	}
+
+	@Override
+	public Collection<String> getArgumentOptions(){
+		return AdminServiceInfo.commands;
 	}
 
 	@Override

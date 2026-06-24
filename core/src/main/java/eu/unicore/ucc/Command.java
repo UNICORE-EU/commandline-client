@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -91,7 +92,11 @@ public abstract class Command implements Constants {
 		return false;
 	}
 
-	public abstract String getName();
+    public abstract String getName();
+
+	public Collection<String> getArgumentOptions(){
+		return Collections.emptyList();
+	}
 
 	public String getArgumentList(){
 		return "";

@@ -3,6 +3,7 @@ package eu.unicore.ucc.actions.info;
 import java.util.Arrays;
 
 import org.apache.commons.cli.Option;
+import org.apache.commons.io.IOUtils;
 
 import eu.unicore.client.core.BaseServiceClient;
 import eu.unicore.client.lookup.Filter;
@@ -95,14 +96,18 @@ public abstract class ListActionBase<T extends BaseServiceClient> extends Action
 		lastNumberOfResults = 0;
 		setupOptions();
 		for(T entry: iterator()) {
-			if(filterMatch(entry)){
-				URLCompleter.registerSiteURL(entry.getEndpoint());
-				properties.put(PROP_LAST_RESOURCE_URL, entry.getEndpoint());
-				lastNumberOfResults++;
-				list(entry);
-				if(getCommandLine().hasOption(OPT_EXEC)) {
-					handleExec(entry);
+			try {
+				if(filterMatch(entry)){
+					URLCompleter.registerSiteURL(entry.getEndpoint());
+					properties.put(PROP_LAST_RESOURCE_URL, entry.getEndpoint());
+					lastNumberOfResults++;
+					list(entry);
+					if(getCommandLine().hasOption(OPT_EXEC)) {
+						handleExec(entry);
+					}
 				}
+			}finally {
+				IOUtils.closeQuietly(entry);
 			}
 		}
 	}

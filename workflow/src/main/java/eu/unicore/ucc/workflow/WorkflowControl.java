@@ -2,7 +2,10 @@ package eu.unicore.ucc.workflow;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import eu.unicore.ucc.actions.ActionBase;
@@ -43,6 +46,12 @@ public class WorkflowControl extends ActionBase {
 		return "offers workflow control functions";
 	}
 
+	private static final List<String> cmds = Arrays.asList("abort", "resume");
+
+	@Override
+	public Collection<String> getArgumentOptions(){
+		return cmds;
+	}
 	@Override
 	public void process() throws Exception {
 		super.process();

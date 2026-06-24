@@ -16,7 +16,6 @@ import org.jline.reader.impl.completer.StringsCompleter;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.actions.REST;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 
 /**
@@ -58,7 +57,6 @@ public class UCCCompleter implements Completer, Constants {
 
 	protected boolean commandComplete(Command command, LineReader reader, final ParsedLine line, final List<Candidate> candidates) {
 		try{
-			String cmdName = command.getName();
 			String lastToken = line.word();
 			int oldSize = candidates.size();
 			if(lastToken.startsWith("-")){
@@ -79,14 +77,11 @@ public class UCCCompleter implements Completer, Constants {
 				}
 				return candidates.size()>oldSize;
 			}
-			else if ("rest".equals(cmdName) && line.wordIndex()==1) {
-				for(String x: REST.cmds)candidates.add(new Candidate(x));
-				return true;
-			}
-			else if ("workflow-control".equals(cmdName) && line.wordIndex()==1) {
-				for(String x: new String[] {"abort","resume"})
+			else if(command.getArgumentOptions().size()>0) {
+				for(String x: command.getArgumentOptions()) {
 					candidates.add(new Candidate(x));
-				return true;
+				}
+				return true;	
 			}
 			if(line.wordIndex()>1 && line.words().get(line.wordIndex()-1).startsWith("-")) {
 				String option = line.words().get(line.wordIndex()-1);
