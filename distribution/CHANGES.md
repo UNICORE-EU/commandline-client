@@ -6,6 +6,14 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 17 or later!
 
+Version 11.1.0 (released Jun 24, 2026)
+--------------------------------------
+ - fix handling of unknown CAs
+ - set truststore type to "java_default", if not defined
+ - update to UNICORE 11.1.0
+ - dependency updates
+ - code cleanup
+
 Version 11.0.1 (released Apr 28, 2026)
 --------------------------------------
  - improvement: "issue-token": allow to specify lifetime with units

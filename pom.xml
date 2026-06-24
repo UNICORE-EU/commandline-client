@@ -7,7 +7,7 @@
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
   <url>https://www.unicore.eu</url>
-  <version>3.1.0</version>
+  <version>3.1.1</version>
   <name>UNICORE Commandline Client (UCC)</name>
 
   <parent>
@@ -18,7 +18,7 @@
 
   <properties>
     <!-- goes into .jar manifests -->
-    <specification.version>11.1.0</specification.version>
+    <specification.version>11.1.1</specification.version>
 
     <uas.version>3.1.0</uas.version>
     <wf.version>3.10.3</wf.version>
