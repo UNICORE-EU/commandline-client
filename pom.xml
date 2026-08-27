@@ -18,18 +18,17 @@
 
   <properties>
     <!-- goes into .jar manifests -->
-    <specification.version>11.1.1</specification.version>
+    <specification.version>11.2.0</specification.version>
 
-    <uas.version>3.1.0</uas.version>
-    <wf.version>3.10.3</wf.version>
-    <seclib.version>8.2.0</seclib.version>
-    <secutils.version>5.0.3</secutils.version>
+    <uas.version>3.1.1</uas.version>
+    <wf.version>3.10.4</wf.version>
+    <seclib.version>8.2.1</seclib.version>
+    <secutils.version>5.0.4</secutils.version>
     <groovy.version>5.0.5</groovy.version>
-    <guava.version>33.6.0-jre</guava.version>
-    <jline.version>4.2.1</jline.version>
+    <guava.version>33.7.1-jre</guava.version>
+    <jline.version>4.4.0</jline.version>
     <commons-cli.version>1.11.0</commons-cli.version>
-    <junit.version>5.12.1</junit.version>
-    <junit.p.version>1.12.1</junit.p.version>
+    <junit.version>6.1.3</junit.version>
     <compiler.fork>true</compiler.fork>
   </properties>
   
@@ -89,7 +88,7 @@
       <dependency>
 	<groupId>eu.unicore</groupId>
 	<artifactId>uas-client</artifactId>
-	<version>${uas.version}-1</version>
+	<version>${uas.version}</version>
 	<exclusions>
 	  <exclusion>
 	    <groupId>com.sun.xml.ws</groupId>
@@ -151,7 +150,7 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-launcher</artifactId>
-      <version>${junit.p.version}</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

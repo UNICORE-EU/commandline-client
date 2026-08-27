@@ -13,6 +13,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -21,6 +25,8 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.client.registry.RegistryClient;
+import eu.unicore.services.restclient.BaseClient;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.UCCOptions;
@@ -105,7 +111,7 @@ public class Shell extends ActionBase {
 	}
 
 	private List<String> internalCommands = Arrays.asList( "set", "unset", "system", "!",
-			"help", "help-auth", "version",
+			"help", "help-auth", "version", "update-password",
 			"exit", "quit" );
 
 	private void setupLineReader() throws IOException {
@@ -252,6 +258,9 @@ public class Shell extends ActionBase {
 		else if("version".equalsIgnoreCase(cmd)) {
 			handleVersion();
 		}
+		else if("update-password".equalsIgnoreCase(cmd)) {
+			handleUpdatePassword(args);
+		}
 		else {
 			return false;
 		}
@@ -323,6 +332,53 @@ public class Shell extends ActionBase {
 		}
 	}
 
+	private void handleUpdatePassword(String[] args) throws Exception {
+		if(!UsernameAuthN.NAME.equalsIgnoreCase(authNMethod)) {
+			console.info("Can only update password if username/password authentication is used");
+			return;
+		}
+		console.info("Enter new password:");
+		var p1 = UCC.getLineReader().readLine('*').trim();
+		console.info("Confirm new password:");
+		var p2 = UCC.getLineReader().readLine('*').trim();
+		if(!p1.equals(p2)) {
+			console.info("Error - passwords must match.");
+			return;
+		}
+		var endpoints = registry.listEntries((epData)-> {
+			var type = epData.get(RegistryClient.TYPE);
+			if(type==null)type = epData.get(RegistryClient.INTERFACE_NAME);
+			for(String t: _settable)if(t.equals(type))return true;
+			return false;
+		});
+		var params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("password", p1));
+		var content = new UrlEncodedFormEntity(params);
+		boolean changed = false;
+		for(String ep: endpoints) {
+			console.verbose("Attempting to update password on {}", ep);
+			try(var bc = new BaseClient(ep+"/setPassword",
+					configurationProvider.getClientConfiguration(ep),
+					configurationProvider.getRESTAuthN());
+					var response = bc.post(content, ContentType.APPLICATION_FORM_URLENCODED))
+			{
+				if(200==response.getCode()) {
+					console.info("Password updated successfully for {}", ep);
+					changed = true;
+				}
+			}
+			catch(Exception ex) {
+				console.error(ex, "Could not update password!");
+			}
+			if(changed) {
+				properties.setProperty("password", p1);
+				((UsernameAuthN)configurationProvider.getAuthnProvider()).updatePassword(p1);
+			}
+		}
+	}
+
+	private static String[] _settable = new String[] { "CoreServices" };
+
 	private void handleVersion(){
 		UCC.printVersion();
 	}
@@ -332,6 +388,7 @@ public class Shell extends ActionBase {
 		System.err.println(" set [name=value]... - show variables / set a variable");
 		System.err.println(" unset <name>...     - unset a variable");
 		System.err.println(" system ...          - run a system command (also: '! ...'");
+		System.err.println(" update-password     - update the server-side password (if applicable)");
 		System.err.println(" version             - show version info");
 		System.err.println(" exit, quit, bye     - exit the UCC shell");
 	}

@@ -79,7 +79,7 @@ public class Connect extends ActionBase {
 	static String getLastReqistryURL(){
 		return lastRegistryURL;
 	}
-	
+
 	public IRegistryClient getRegistry(){
 		return registry;
 	}

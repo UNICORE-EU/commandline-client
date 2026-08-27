@@ -1,5 +1,8 @@
 package eu.unicore.ucc.authn;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Properties;
 
 import org.apache.hc.core5.http.HttpMessage;
@@ -30,11 +33,9 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 	@Override
 	public void addAuthenticationHeaders(HttpMessage httpMessage) throws Exception {
 		synchronized (this) {
-			if(username==null)username = properties.getProperty("username");
 			if(username==null) {
 				username = CallbackUtils.getUsernameFromUser("REST API");
 			}
-			if(password==null)password = properties.getProperty("password");
 			if(password==null) {
 				char[]pw = callback.getPassword("REST API", "configured server-side");
 				password = new String(pw);
@@ -48,6 +49,8 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 		this.properties = properties;
 		properties.setProperty("client."+ClientProperties.PROP_SSL_AUTHN_ENABLED, "false");
 		properties.setProperty("client."+ClientProperties.PROP_MESSAGE_SIGNING_ENABLED, "false");
+		username = properties.getProperty("username");
+		password = properties.getProperty("password");
 	}
 
 	public static final String NAME = "username";
@@ -72,6 +75,23 @@ public class UsernameAuthN extends PropertiesBasedAuthenticationProvider
 		ret.append("\nFor configuring your trusted CAs and certificates, ");
 		ret.append("use the usual 'truststore.*' properties\n");
 		return ret.toString();
+	}
+
+	@Override
+	public String getSessionKey() {
+		if(username==null)return toString();
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA1");
+			md.update(username.getBytes());
+			if(password!=null)md.update(password.getBytes());
+			return Base64.getEncoder().encodeToString(md.digest());
+		}catch(NoSuchAlgorithmException nse) {
+			return toString();
+		}
+	}
+
+	public void updatePassword(String pwd) {
+		password = pwd;
 	}
 
 }
