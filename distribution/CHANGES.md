@@ -6,6 +6,13 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 17 or later!
 
+Version 11.2.0 (released Aug 28, 2026)
+--------------------------------------
+ - new feature:  add internal 'update-password' command in 'shell' for
+   using the new UNICORE 11.2.0 password update endpoint
+ - update to UNICORE 11.2.0
+ - dependency updates
+
 Version 11.1.0 (released Jun 24, 2026)
 --------------------------------------
  - fix handling of unknown CAs
