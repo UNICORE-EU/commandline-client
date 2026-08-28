@@ -24,7 +24,7 @@
     <wf.version>3.10.4</wf.version>
     <seclib.version>8.2.1</seclib.version>
     <secutils.version>5.0.4</secutils.version>
-    <groovy.version>5.0.5</groovy.version>
+    <groovy.version>5.1.1</groovy.version>
     <guava.version>33.7.1-jre</guava.version>
     <jline.version>4.4.0</jline.version>
     <commons-cli.version>1.11.0</commons-cli.version>

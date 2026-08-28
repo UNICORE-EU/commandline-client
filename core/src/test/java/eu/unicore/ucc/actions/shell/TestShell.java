@@ -30,7 +30,6 @@ import eu.unicore.ucc.util.EmbeddedTestBase;
  */
 public class TestShell extends EmbeddedTestBase {
 
-	
 	@Test
 	public void testShellArgsParsing() throws Exception {
 		String cmd = "this is a test";
@@ -83,19 +82,13 @@ public class TestShell extends EmbeddedTestBase {
 		var candidates = new ArrayList<Candidate>();
 		var words = new ArrayList<String>();
 		var pl = new ParsedLine() {
-			
 			public List<String> words() {
 				return words;
 			}
-			
 			public int wordIndex() { return wordIndex; }
-			
 			public int wordCursor() { return wordCursor; }
-			
 			public String word() { return words.get(wordIndex); }
-			
 			public String line() { return line; }
-
 			public int cursor() { return cursor; }
 		};
 
@@ -207,7 +200,7 @@ public class TestShell extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		Shell shell = (Shell)UCC.lastCommand;
 		UCCConfigurationProvider configProvider = shell.getConfigurationProvider();
-		
+
 		wordIndex = 0;
 		wordCursor = 0;
 		cursor = 0;
@@ -218,19 +211,13 @@ public class TestShell extends EmbeddedTestBase {
 		var candidates = new ArrayList<Candidate>();
 		var words = new ArrayList<String>();
 		var pl = new ParsedLine() {
-			
 			public List<String> words() {
 				return words;
 			}
-			
 			public int wordIndex() { return wordIndex; }
-			
 			public int wordCursor() { return wordCursor; }
-			
 			public String word() { return words.get(wordIndex); }
-			
 			public String line() { return line; }
-
 			public int cursor() { return cursor; }
 		};
 		URLCompleter.registerSiteURL("https://localhost:65322/rest/");
@@ -240,7 +227,7 @@ public class TestShell extends EmbeddedTestBase {
 		words.add("rest");
 		words.add("get");
 		words.add(url);
-		
+
 		wordIndex = 2;
 		wordCursor = url.length();
 		line = "rest get "+url;
@@ -257,7 +244,7 @@ public class TestShell extends EmbeddedTestBase {
 		words.add("rest");
 		words.add("get");
 		words.add(url);
-		
+
 		wordIndex = 2;
 		wordCursor = url.length();
 		line = "rest get "+url;
@@ -267,7 +254,6 @@ public class TestShell extends EmbeddedTestBase {
 		assertEquals(uc.endpoints.size(), candidates.size());
 		assertTrue(candidates.contains(new Candidate(url+"core/")));
 
-		
 		// ".../rest/registries/..."
 		url = "https://localhost:65322/rest/registries/";
 		words.clear();
@@ -282,7 +268,7 @@ public class TestShell extends EmbeddedTestBase {
 		assertTrue(uc.completeURLs(lr, pl, candidates));
 		assertEquals(2, candidates.size());
 		assertTrue(candidates.contains(new Candidate(url+"default_registry/")));
-		
+
 		// ".../rest/core/..."
 		url = "https://localhost:65322/rest/core/";
 		words.clear();
@@ -297,7 +283,7 @@ public class TestShell extends EmbeddedTestBase {
 		assertTrue(uc.completeURLs(lr, pl, candidates));
 		assertEquals(uc.services.size(), candidates.size());
 		assertTrue(candidates.contains(new Candidate(url+"jobs/")));
-		
+
 		// ".../rest/core/storages/..."
 		url = "https://localhost:65322/rest/core/storages/";
 		words.clear();
@@ -311,7 +297,7 @@ public class TestShell extends EmbeddedTestBase {
 		candidates.clear();
 		assertTrue(uc.completeURLs(lr, pl, candidates));
 		assertTrue(candidates.contains(new Candidate(url+"WORK/")));
-		
+
 		// ".../rest/core/storages/WO..."
 		url = "https://localhost:65322/rest/core/storages/WO";
 		words.clear();
@@ -325,7 +311,7 @@ public class TestShell extends EmbeddedTestBase {
 		candidates.clear();
 		assertTrue(uc.completeURLs(lr, pl, candidates));
 		assertTrue(candidates.contains(new Candidate(url+"RK/")));
-		
+
 		// ".../rest/core/storages/WORK/files/..."
 		url = "https://localhost:65322/rest/core/storages/WORK/files/";
 		words.clear();
@@ -339,7 +325,6 @@ public class TestShell extends EmbeddedTestBase {
 		candidates.clear();
 		assertTrue(uc.completeURLs(lr, pl, candidates));
 		assertTrue(candidates.size()>1);
-		
 		// ".../rest/core/storages/WORK/files/Task.mv..."
 		url = "https://localhost:65322/rest/core/storages/WORK/files/Task.mv";
 		words.clear();
@@ -353,11 +338,9 @@ public class TestShell extends EmbeddedTestBase {
 		candidates.clear();
 		assertTrue(uc.completeURLs(lr, pl, candidates));
 		assertEquals(1, candidates.size());
-
 		File tDir = new File("target/data", "test123");
 		FileUtils.forceMkdir(tDir);
 		FileUtils.write(new File(tDir, "test.dat"), "testdata", "UTF-8");
-		
 		// ".../rest/core/storages/WORK/files/test123/..."
 		url = "https://localhost:65322/rest/core/storages/WORK/files/test123/";
 		words.clear();
