@@ -7,8 +7,6 @@ import java.util.Properties;
 
 import org.jline.reader.LineReader;
 
-import eu.emi.security.authn.x509.ValidationError;
-import eu.emi.security.authn.x509.impl.X500NameUtils;
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.security.wsutil.client.authn.ClientConfigurationProvider;
 import eu.unicore.security.wsutil.client.authn.ClientConfigurationProviderImpl;
@@ -17,6 +15,8 @@ import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
+import io.imunity.tanl.x509.ValidationError;
+import io.imunity.tanl.x509.impl.X500NameUtils;
 
 /**
  * UCC specific extension of {@link ClientConfigurationProvider}.
@@ -60,7 +60,7 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 				userProperties.setProperty("truststore.type", "java_default");
 			}
 			paa.setProperties(userProperties);
-			paa.setValidationErrorListener( err -> { return queryValidity(err); });
+			paa.setValidationErrorListener(err -> {  queryValidity(err); });
 		}
 		setAuthnProvider(ap);
 		setBasicConfiguration(ap.getBaseClientConfiguration());
@@ -144,13 +144,11 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 
 	private static final ArrayList<String>acceptedCAs = new ArrayList<>();
 
-	private boolean queryValidity(ValidationError err) {
-		if(acceptAll)return true;
-
+	private void queryValidity(ValidationError err) {
+		if(acceptAll)return;
 		String issuer = err.getChain()[0].getIssuerX500Principal().getName();
 		String cmp = X500NameUtils.getComparableForm(issuer);
-		if(acceptedCAs.contains(cmp))return true;
-
+		if(acceptedCAs.contains(cmp))return;
 		System.err.println("VALIDATION ERROR : "+err.getMessage());
 		try{
 			LineReader cr = UCC.getLineReader();
@@ -162,11 +160,12 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 					line.startsWith("Y");
 			if(accept){
 				acceptedCAs.add(cmp);
+				return;
 			}
-			return accept;
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
+		throw new RuntimeException(err.getMessage(), err.getCause());
 	}
 
 }

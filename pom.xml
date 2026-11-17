@@ -7,26 +7,26 @@
   <description>UNICORE Commandline Client</description>
   <inceptionYear>2007</inceptionYear>
   <url>https://www.unicore.eu</url>
-  <version>3.1.2</version>
+  <version>3.2.0</version>
   <name>UNICORE Commandline Client (UCC)</name>
 
   <parent>
     <groupId>eu.unicore</groupId>
     <artifactId>unicore-parent</artifactId>
-    <version>4.1.0</version>
+    <version>4.2.0</version>
   </parent>
 
   <properties>
     <!-- goes into .jar manifests -->
-    <specification.version>11.2.0</specification.version>
+    <specification.version>11.3.0</specification.version>
 
-    <uas.version>3.1.1</uas.version>
-    <wf.version>3.10.4</wf.version>
-    <seclib.version>8.2.1</seclib.version>
-    <secutils.version>5.0.4</secutils.version>
+    <uas.version>3.2.0</uas.version>
+    <wf.version>3.11.0</wf.version>
+    <seclib.version>8.3.0</seclib.version>
+    <secutils.version>5.1.0</secutils.version>
     <groovy.version>5.1.1</groovy.version>
-    <guava.version>33.7.1-jre</guava.version>
-    <jline.version>4.4.0</jline.version>
+    <guava.version>33.8.0-jre</guava.version>
+    <jline.version>4.7.0</jline.version>
     <commons-cli.version>1.11.0</commons-cli.version>
     <junit.version>6.1.3</junit.version>
     <compiler.fork>true</compiler.fork>
@@ -156,7 +156,7 @@
     <dependency>
       <groupId>org.apache.xmlbeans</groupId>
       <artifactId>xmlbeans</artifactId>
-      <version>5.3.0</version>
+      <version>5.4.1</version>
       <scope>test</scope>
       <exclusions>
 	<exclusion>

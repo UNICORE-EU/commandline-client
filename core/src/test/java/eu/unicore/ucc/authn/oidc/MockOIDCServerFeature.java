@@ -12,7 +12,7 @@ import eu.unicore.services.utils.deployment.FeatureImpl;
 public class MockOIDCServerFeature extends FeatureImpl {
 
 	public MockOIDCServerFeature() {
-		this.name = "OIDCServer";
+		super("OIDCServer");
 	}
 
 	public void setKernel(Kernel kernel) {

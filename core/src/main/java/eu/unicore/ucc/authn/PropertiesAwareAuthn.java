@@ -2,7 +2,8 @@ package eu.unicore.ucc.authn;
 
 import java.util.Properties;
 
-import eu.emi.security.authn.x509.ValidationErrorListener;
+import io.imunity.tanl.x509.ValidationErrorListener;
+
 
 /**
  * Impls will have their properties set

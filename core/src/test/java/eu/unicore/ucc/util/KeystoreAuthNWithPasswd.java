@@ -2,7 +2,6 @@ package eu.unicore.ucc.util;
 
 import java.util.Properties;
 
-import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.unicore.security.canl.CachingPasswordCallback;
 import eu.unicore.security.canl.CredentialProperties;
 import eu.unicore.security.canl.PasswordCallback;
@@ -11,6 +10,7 @@ import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
 import eu.unicore.ucc.authn.PropertiesAwareAuthn;
 import eu.unicore.util.httpclient.ClientProperties;
 import eu.unicore.util.httpclient.DefaultClientConfiguration;
+import io.imunity.tanl.x509.ValidationErrorListener;
 
 public class KeystoreAuthNWithPasswd implements AuthenticationProvider, PropertiesAwareAuthn {
 
