@@ -152,7 +152,7 @@ public abstract class Command implements Constants {
 	}
 
 	/**
-	 * for use by the completor: returns possible values for
+	 * for use by the shell completer: returns possible values for
 	 * the given option
 	 * @param option - short option
 	 */
@@ -176,6 +176,17 @@ public abstract class Command implements Constants {
 		return true;
 	}
 
+	/**
+	 * check if number of args is at least "min"
+	 * @param min
+	 * @param errorMessage
+	 */
+	protected void assertArgsLength(int min, String errorMessage) {
+		if(line.getArgs().length<min) {
+			throw new IllegalArgumentException(errorMessage);
+		}
+	}
+	
 	public void printUsage() throws IOException {
 		HelpFormatter.Builder b = HelpFormatter.builder();
 		b.setShowSince(false);

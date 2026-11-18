@@ -17,6 +17,11 @@ public class TestLocation {
 		Location l = new Location(url);
 		assertTrue(l.isUnicoreURL());
 		assertFalse(l.isRaw());
+
+		url = "https://localhost:8080/DEMO/rest/core/storages/WORK/";
+		l = new Location(url);
+		assertTrue(l.isUnicoreURL());
+		assertTrue(l.getSmsEpr().endsWith("/WORK"));
 	}
 	
 	@Test

@@ -76,6 +76,7 @@ public class Location implements eu.unicore.uas.json.Location {
 		if(isUNICORE_URL(desc)){
 			if(!desc.contains("/files/")) {
 				// user only gave a storage endpoint
+				while(desc.endsWith("/"))desc=desc.substring(0, desc.length()-1);
 				desc = desc+"/files/";
 			}
 			String[] s1=desc.split("/files/",2);
@@ -175,10 +176,6 @@ public class Location implements eu.unicore.uas.json.Location {
 
 	@Override
 	public String getEndpointURL() {
-		return originalDescriptor;
-	}
-
-	public String getResolvedURL() {
 		if(isRaw) {
 			return originalDescriptor;
 		}

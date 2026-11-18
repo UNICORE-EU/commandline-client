@@ -22,23 +22,19 @@ public class CatFile extends FileOperation implements StorageConstants {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		if(getCommandLine().getArgs().length>1){
-			for(int i=1; i<getCommandLine().getArgs().length;i++){
-				String source=getCommandLine().getArgs()[i];
-				sourceDesc = createLocation(source);
-				if(sourceDesc.isRaw()){
-					console.debug("Source file URL {}", sourceDesc.getSmsEpr());
-					runRawTransfer(sourceDesc.getSmsEpr(), getStdout(), null);
-				}
-				else{
-					console.debug("Source file URL {}", sourceDesc.getUnicoreURI());
-					runFileDownloader();
-				}
-				System.out.println();
+		assertArgsLength(2, "Please specify a remote file!");
+		for(int i=1; i<getCommandLine().getArgs().length;i++){
+			String source=getCommandLine().getArgs()[i];
+			sourceDesc = createLocation(source);
+			if(sourceDesc.isRaw()){
+				console.debug("Source file URL {}", sourceDesc.getSmsEpr());
+				runRawTransfer(sourceDesc.getSmsEpr(), getStdout(), null);
 			}
-		}
-		else{
-			throw new IllegalArgumentException("Please specify a remote file!");
+			else{
+				console.debug("Source file URL {}", sourceDesc.getUnicoreURI());
+				runFileDownloader();
+			}
+			System.out.println();
 		}
 	}
 

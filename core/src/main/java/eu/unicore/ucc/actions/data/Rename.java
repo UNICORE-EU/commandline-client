@@ -17,8 +17,8 @@ public class Rename extends SMSOperation {
 	@Override
 	public void process() throws Exception {
 		super.process();
+		assertArgsLength(3, "Must have source and target arguments!");
 		String[]args = getCommandLine().getArgs();
-		if(args.length<3)throw new IllegalArgumentException("Must have source and target arguments!");
 		source = args[args.length-2];
 		target = args[args.length-1];
 		StorageClient sms = getStorageClient(source);

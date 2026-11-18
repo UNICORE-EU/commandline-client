@@ -68,8 +68,8 @@ public class CP extends FileOperation {
 	@Override
 	public void process() throws Exception {
 		super.process();
+		assertArgsLength(3, "Must have source and target arguments!");		
 		String[]args = getCommandLine().getArgs();
-		if(args.length<3)throw new IllegalArgumentException("Must have source and target arguments!");
 		target = args[args.length-1];
 		for(int i=1; i<args.length-1; i++){
 			sources.add(args[i]);

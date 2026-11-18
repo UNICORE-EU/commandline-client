@@ -64,9 +64,7 @@ public class GetFileProperties extends SMSOperation {
 		if (showMetadata)
 			console.debug("Showing metadata.");
 		CommandLine cmdLine = getCommandLine(); 
-		if (cmdLine.getArgs().length < 2) {
-			throw new IllegalArgumentException("Wrong number of arguments");
-		}
+		assertArgsLength(2, "Wrong number of arguments");
 		for(int i=1; i<getCommandLine().getArgs().length;i++){
 			String target = cmdLine.getArgs()[i];	
 			console.debug("Getting file properties of <{}>", target);

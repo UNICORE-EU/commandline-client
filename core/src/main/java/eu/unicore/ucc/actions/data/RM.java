@@ -31,9 +31,7 @@ public class RM extends SMSOperation {
 	public void process() throws Exception {
 		super.process();
 		boolean quiet = getBooleanOption(OPT_QUIET_LONG, OPT_QUIET);
-		if (getCommandLine().getArgs().length < 2) {
-			throw new IllegalArgumentException("Wrong number of arguments");
-		}
+		assertArgsLength(2, "Wrong number of arguments");
 		for(int i=1; i<getCommandLine().getArgs().length;i++){
 			String target = getCommandLine().getArgs()[i];
 			StorageClient sms = getStorageClient(target);

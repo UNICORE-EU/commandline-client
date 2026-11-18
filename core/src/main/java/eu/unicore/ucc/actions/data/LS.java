@@ -75,9 +75,7 @@ public class LS extends SMSOperation {
 	}
 
 	protected void doProcess() throws Exception {
-		if(getCommandLine().getArgs().length<2){
-			throw new IllegalArgumentException("Please provide a storage address!");
-		}
+		assertArgsLength(2, "Please provide a storage address!");
 		String address = getCommandLine().getArgs()[1];
 		sms = getStorageClient(address);
 		String path = getPathAtStorage(address);

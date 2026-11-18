@@ -15,15 +15,11 @@ public class Mkdir extends SMSOperation {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		if(getCommandLine().getArgs().length>1){
-			for(int i=1; i<getCommandLine().getArgs().length;i++){
-				String target = getCommandLine().getArgs()[i];
-				StorageClient sms = getStorageClient(target);
-				sms.mkdir(getPathAtStorage(target));
-			}
-		}
-		else{
-			throw new IllegalArgumentException("Please specify remote directory!");
+		assertArgsLength(2, "Please specify remote directory!");
+		for(int i=1; i<getCommandLine().getArgs().length;i++){
+			String target = getCommandLine().getArgs()[i];
+			StorageClient sms = getStorageClient(target);
+			sms.mkdir(getPathAtStorage(target));
 		}
 	}
 

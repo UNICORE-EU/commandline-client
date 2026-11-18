@@ -146,11 +146,11 @@ public class ServerToServer implements Constants {
 						configurationProvider.getRESTAuthN()))
 				{
 					String protocol = bothSidesUNICORE? checkProtocols(sms):null;
-					String s = sourceDesc.isRaw()?sourceDesc.originalDescriptor:sourceDesc.getUnicoreURI();
+					String sourceEP = sourceDesc.getEndpointURL();
 					console.verbose("Initiating fetch-file on storage <{}>, receiving file <{}>, writing to '{}'",
-							sms.getEndpoint(), s, targetDesc.getName());
+							sms.getEndpoint(), sourceEP, targetDesc.getName());
 					Map<String,String> params = getExtraParameters(protocol);
-					tcc = sms.fetchFile(sourceDesc.getResolvedURL(), targetDesc.getName(), params, protocol);
+					tcc = sms.fetchFile(sourceEP, targetDesc.getName(), params, protocol);
 				}
 			}
 			else {
@@ -160,10 +160,11 @@ public class ServerToServer implements Constants {
 						configurationProvider.getClientConfiguration(source),
 						configurationProvider.getRESTAuthN()))
 				{
+					String targetEP = targetDesc.getEndpointURL();
 					console.verbose("Initiating send-file on storage <{}>, sending file <{}>, writing to '{}'",
-							sms.getEndpoint(),	sourceDesc.getName(), targetDesc.getResolvedURL());
+							sms.getEndpoint(),	sourceDesc.getName(), targetEP);
 					Map<String,String> params = getExtraParameters(null);
-					tcc = sms.sendFile(sourceDesc.getName(), targetDesc.getResolvedURL(), params, null);
+					tcc = sms.sendFile(sourceDesc.getName(), targetEP, params, null);
 				}
 			}
 			transferAddress = tcc.getEndpoint();

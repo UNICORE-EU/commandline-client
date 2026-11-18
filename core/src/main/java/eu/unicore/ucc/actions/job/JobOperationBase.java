@@ -62,14 +62,10 @@ public abstract class JobOperationBase extends ActionBase {
 	public void process() throws Exception {
 		super.process();
 		processAdditionalOptions();
+		assertArgsLength(2, "At least one job is required.");
 		List<String> args = new ArrayList<>();
-		if(getCommandLine().getArgs().length<2){
-			throw new Exception("At least one job is required.");	
-		}
-		else{
-			for(int i=1; i<getCommandLine().getArgs().length;i++){
-				args.add(getCommandLine().getArgs()[i]);
-			}
+		for(int i=1; i<getCommandLine().getArgs().length;i++){
+			args.add(getCommandLine().getArgs()[i]);
 		}
 		List<Pair<JobClient,UCCBuilder>>jobClients = new ArrayList<>();
 		for(String arg: args){

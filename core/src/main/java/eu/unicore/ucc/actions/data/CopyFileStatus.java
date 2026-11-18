@@ -22,7 +22,7 @@ public class CopyFileStatus extends ActionBase {
 		super.process();
 		List<String> urls = new ArrayList<>();
 		if(getCommandLine().getArgs().length==1){
-			String arg=new BufferedReader(new InputStreamReader(System.in)).readLine();
+			String arg = new BufferedReader(new InputStreamReader(System.in)).readLine();
 			urls.add(arg);
 		}
 		else{

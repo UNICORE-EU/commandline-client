@@ -46,13 +46,10 @@ public class RunCommand extends ActionBase {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		int length = getCommandLine().getArgs().length;
-		if(length<2){
-			throw new IllegalArgumentException("You must provide at least a command name as argument.");
-		}
+		assertArgsLength(2, "You must provide at least a command name as argument.");
 		params.clear();
 		cmd = getCommandLine().getArgs()[1];
-		for(int i=2; i<length; i++){
+		for(int i=2; i<getCommandLine().getArgs().length; i++){
 			String p = getCommandLine().getArgs()[i];
 			String[]split = p.split("=", 2);
 			if(split.length<2) {

@@ -85,6 +85,7 @@ public class Resolve extends ActionBase {
 	@Override
 	public void process() throws Exception {
 		super.process();
+		assertArgsLength(2, "Please provide a remote address!");
 		if(getCommandLine().hasOption("l")) {
 			doList();
 		}
@@ -101,7 +102,7 @@ public class Resolve extends ActionBase {
 	}
 
 	private void doResolve() throws Exception {
-		String target = getCommandLine().getArgs()[1];;
+		String target = getCommandLine().getArgs()[1];
 		targetDesc = resolve(target,registry,configurationProvider);
 		full = getBooleanOption("full", "f");
 		String url = targetDesc.getSmsEpr();
