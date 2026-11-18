@@ -45,15 +45,9 @@ public class CallbackUtils
 			@Override
 			public String getUsername()
 			{
-				if (username != null)
-					return username;
-				try
-				{
+				if (username == null) try {
 					username = getUsernameFromUser();
-				} catch (IOException e)
-				{
-					return null;
-				}
+				} catch (IOException e) {}
 				return username;
 			}
 		};
@@ -82,8 +76,7 @@ public class CallbackUtils
 	}
 
 	private static String readLine(boolean hidden) {
-		if(UCC.unitTesting)return "test123";
-		try {
+		try{
 			return UCC.getLineReader().readLine(hidden? '*' : null).trim();
 		}catch(IOException e) {
 			throw new RuntimeException(e);
