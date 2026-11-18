@@ -4,6 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.jline.reader.LineReader;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.junit5.JUnit5Mockery;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -127,6 +131,31 @@ public class TestStorageActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
+
+	@Test
+	public void test_RM2(){
+		String storage = createUspace();
+		String[] args=new String[]{"cp", "-v", 
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"pom.xml", storage
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		Mockery context = new JUnit5Mockery();
+		LineReader lr = context.mock(LineReader.class);
+		context.checking(new Expectations() {{
+			oneOf(lr).readLine(with(any(String.class)));will(returnValue("y"));
+		}});
+		UCC.setLineReader(lr);
+		args = new String[]{"rm", "-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				storage+"/files/pom.xml"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		context.assertIsSatisfied();
+		UCC.setLineReader(null);
 	}
 
 	@Test

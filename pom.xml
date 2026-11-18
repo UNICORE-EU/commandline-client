@@ -29,6 +29,7 @@
     <jline.version>4.7.0</jline.version>
     <commons-cli.version>1.11.0</commons-cli.version>
     <junit.version>6.1.3</junit.version>
+    <jmock.version>2.13.1</jmock.version>
     <compiler.fork>true</compiler.fork>
   </properties>
   
@@ -164,6 +165,12 @@
 	  <artifactId>log4j-api</artifactId>
 	</exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit5</artifactId>
+      <version>${jmock.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
