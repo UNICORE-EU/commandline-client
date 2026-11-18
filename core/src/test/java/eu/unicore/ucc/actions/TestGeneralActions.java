@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -154,18 +155,21 @@ public class TestGeneralActions extends EmbeddedTestBase {
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-v",
 				"--lifetime", "1h",
-				"--limited",
 				"--renewable",
 				"--inspect",
+				"--output-file", "target/ucc-auth-token.json",
 				"https://localhost:65322/rest/core/token",
 		};
 		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
 		String token = IssueToken.lastToken;
 		JSONObject o = JWTUtils.getPayload(token);
 		System.out.println(o.toString(2));
 		assertEquals(lifetime, o.getInt("exp")-o.getInt("iat"));
 		assertEquals(o.optString("aud"), o.optString("iss"));
 		assertEquals("true", o.optString("renewable"));
+		String t = FileUtils.readFileToString(new File("target/ucc-auth-token.json"), "UTF-8");
+		assertEquals(token, t);
 	}
 
 }

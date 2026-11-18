@@ -1,6 +1,10 @@
 package eu.unicore.ucc.authn;
 
+import java.security.cert.CertPath;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -15,7 +19,15 @@ import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.Command;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
+import eu.unicore.util.httpclient.DefaultClientConfiguration;
+import eu.unicore.util.httpclient.IClientConfiguration;
+import io.imunity.tanl.x509.RevocationParameters;
+import io.imunity.tanl.x509.StoreUpdateListener;
 import io.imunity.tanl.x509.ValidationError;
+import io.imunity.tanl.x509.ValidationErrorListener;
+import io.imunity.tanl.x509.ValidationResult;
+import io.imunity.tanl.x509.X509CertChainValidatorExt;
+import io.imunity.tanl.x509.helpers.BinaryCertChainValidator;
 import io.imunity.tanl.x509.impl.X500NameUtils;
 
 /**
@@ -60,12 +72,10 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 				userProperties.setProperty("truststore.type", "java_default");
 			}
 			paa.setProperties(userProperties);
-			paa.setValidationErrorListener(err -> {  queryValidity(err); });
 		}
 		setAuthnProvider(ap);
-		setBasicConfiguration(ap.getBaseClientConfiguration());
-		setAnonymousConfiguration(ap.getAnonymousClientConfiguration());
-	
+		setBasicConfiguration(configure(ap.getBaseClientConfiguration()));
+		setAnonymousConfiguration(configure((DefaultClientConfiguration)ap.getAnonymousClientConfiguration()));
 		setSessionsPersistence(new JsonSecuritySessionPersistence(
 				getBasicClientConfiguration().useSecuritySessions(), getSessionStorageFile()));
 		getSessionsPersistence().readSessionIDs(getBasicClientConfiguration().getSessionIDProvider());
@@ -144,28 +154,110 @@ public class UCCConfigurationProviderImpl extends ClientConfigurationProviderImp
 
 	private static final ArrayList<String>acceptedCAs = new ArrayList<>();
 
-	private void queryValidity(ValidationError err) {
-		if(acceptAll)return;
-		String issuer = err.getChain()[0].getIssuerX500Principal().getName();
-		String cmp = X500NameUtils.getComparableForm(issuer);
-		if(acceptedCAs.contains(cmp))return;
-		System.err.println("VALIDATION ERROR : "+err.getMessage());
-		try{
-			LineReader cr = UCC.getLineReader();
-			String line = cr.readLine("Accept issuer <"+issuer+"> [Y/n/a]");
-			acceptAll =  line.startsWith("a") || line.startsWith("A");
-			boolean accept = acceptAll ||
-					line.length()==0 ||
-					line.startsWith("y") ||
-					line.startsWith("Y");
-			if(accept){
-				acceptedCAs.add(cmp);
-				return;
-			}
-		}catch(Exception e){
-			throw new RuntimeException(e);
-		}
-		throw new RuntimeException(err.getMessage(), err.getCause());
+	@Override
+	public IClientConfiguration getClientConfiguration(String url) throws Exception {
+		return configure((DefaultClientConfiguration)super.getClientConfiguration(url));
 	}
 
+	public DefaultClientConfiguration configure(DefaultClientConfiguration config) {
+		if(acceptAll){
+			config.setValidator(new BinaryCertChainValidator(true)); 
+		}
+		else {
+			config.setValidator(new DelegateValidator(config.getValidator()));
+		}
+		return config;
+	}
+
+	// TODO functionality to handle unknown CAs should be available via secutils 
+	public static class DelegateValidator implements X509CertChainValidatorExt {
+
+		final X509CertChainValidatorExt validator;
+
+		public DelegateValidator(X509CertChainValidatorExt validator) {
+			this.validator = validator;
+		}
+
+		@Override
+		public ValidationResult validate(CertPath certPath) {
+			X509Certificate[] chain = new X509Certificate[certPath.getCertificates().size()];
+			int i = 0;
+			for(Certificate c: certPath.getCertificates()) {
+				chain[i]=(X509Certificate)c;
+				i++;
+			}
+			return validate(chain);
+		}
+
+		@Override
+		public ValidationResult validate(X509Certificate[] certChain) {
+			ValidationResult res = validator.validate(certChain);
+			if(!res.isValid()) {
+				boolean ok = queryValidity(res.getPrimaryError());
+				if(ok) {
+					res = ValidationResult.valid(certChain!=null?Arrays.asList(certChain):null);
+				}
+			}
+			return res;
+		}
+
+		private boolean queryValidity(ValidationError err) {
+			String issuer = err.getChain()[0].getIssuerX500Principal().getName();
+			String cmp = X500NameUtils.getComparableForm(issuer);
+			if(!acceptedCAs.contains(cmp))
+			{
+				System.err.println("VALIDATION ERROR : "+err.getMessage());
+				try{
+					LineReader cr = UCC.getLineReader();
+					String line = cr.readLine("Accept issuer <"+issuer+"> [Y/n/a]");
+					acceptAll =  line.startsWith("a") || line.startsWith("A");
+					boolean accept = acceptAll ||
+							line.length()==0 ||
+							line.startsWith("y") ||
+							line.startsWith("Y");
+					if(accept){
+						acceptedCAs.add(cmp);
+						return true;
+					}
+				}catch(Exception e){}
+			}
+			return false;
+		}
+
+		@Override
+		public X509Certificate[] getTrustedIssuers() {
+			return validator.getTrustedIssuers();
+		}
+
+		@Override
+		public void addValidationListener(ValidationErrorListener listener) {
+			validator.addValidationListener(listener);
+		}
+
+		@Override
+		public void removeValidationListener(ValidationErrorListener listener) {
+			validator.removeValidationListener(listener);
+		}
+
+		@Override
+		public void addUpdateListener(StoreUpdateListener listener) {
+			validator.addUpdateListener(listener);
+		}
+
+		@Override
+		public void removeUpdateListener(StoreUpdateListener listener) {
+			validator.removeUpdateListener(listener);
+		}
+
+		@Override
+		public RevocationParameters getRevocationCheckingMode() {
+			return validator.getRevocationCheckingMode();
+		}
+
+		@Override
+		public void dispose() {
+			validator.dispose();
+		}
+
+	}
 }

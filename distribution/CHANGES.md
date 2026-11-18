@@ -8,6 +8,7 @@ Report any issues via the
 
 Version 11.3.0 (released Nov dd, 2026)
 --------------------------------------
+ - improvement: issue-token: new --output-file option to write token to file
  - update to UNICORE 11.3.0
  - dependency updates
 

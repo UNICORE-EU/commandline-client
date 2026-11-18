@@ -1,6 +1,9 @@
 package eu.unicore.ucc.actions;
 
+import java.io.File;
+
 import org.apache.commons.cli.Option;
+import org.apache.commons.io.FileUtils;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -25,13 +28,13 @@ public class IssueToken extends ActionBase {
 	// token lifetime (in seconds)
 	private long lifetime = -1;
 
-	private boolean limited = false;
-
 	private boolean renewable = false;
 
 	private boolean inspect = false;
 
 	private String siteName;
+
+	private String output;
 
 	@Override
 	protected void createOptions() {
@@ -41,11 +44,6 @@ public class IssueToken extends ActionBase {
 				.desc("Initial lifetime for token.")
 				.hasArg()
 				.argName("Lifetime")
-				.required(false)
-				.get());
-		getOptions().addOption(Option.builder("L")
-				.longOpt("limited")
-				.desc("Token should be limited to the issuing server")
 				.required(false)
 				.get());
 		getOptions().addOption(Option.builder("R")
@@ -63,6 +61,13 @@ public class IssueToken extends ActionBase {
 				.desc("Site name")
 				.required(false)
 				.argName("Site")
+				.hasArg()
+				.get());
+		getOptions().addOption(Option.builder("O")
+				.longOpt("output-file")
+				.desc("File to write the token to")
+				.required(false)
+				.argName("OutputFile")
 				.hasArg()
 				.get());
 	}
@@ -100,7 +105,7 @@ public class IssueToken extends ActionBase {
 			}
 			url = getCommandLine().getArgs()[1];
 		}else {
-			url = resolveSite();
+			url = getTokenEndpoinnt();
 		}
 		if(getCommandLine().hasOption(OPT_LIFETIME)){
 			lifetime = UnitParser.getTimeParser(0).getLongValue(getOption(OPT_LIFETIME_LONG, OPT_LIFETIME));
@@ -108,13 +113,12 @@ public class IssueToken extends ActionBase {
 		}else{
 			console.debug("Using site default for token lifetime.");
 		}
-		limited = getBooleanOption("limited", "L");
 		renewable = getBooleanOption("renewable", "R");
 		inspect = getBooleanOption("inspect", "I");
+		output = getOption("output-file", "O");
 		URIBuilder b = new URIBuilder(url);
 		if(lifetime>0)b.addParameter("lifetime", String.valueOf(lifetime));
 		if(renewable)b.addParameter("renewable", "true");
-		if(limited)b.addParameter("limited", "true");
 		console.verbose("Requesting token from {}", url);
 		try(BaseClient bc = new BaseClient(b.build().toString(),
 				configurationProvider.getClientConfiguration(url),
@@ -126,11 +130,16 @@ public class IssueToken extends ActionBase {
 				showDetails(token);
 			}
 			console.info("{}", token);
+			if(output!=null) {
+				console.verbose("Writing token to <{}>", output);
+				FileUtils.write(new File(output), token, "UTF-8");
+			}
 			lastToken = token;
 		}
 	}
 
-	private String resolveSite() throws Exception {
+	private String getTokenEndpoinnt() throws Exception {
+		String tokenURL = null;
 		CoreEndpointLister cl = new CoreEndpointLister(registry,
 				configurationProvider, configurationProvider.getRESTAuthN(),
 				UCC.executor);
@@ -139,19 +148,26 @@ public class IssueToken extends ActionBase {
 		if(cc==null) {
 			throw new Exception("No site found! Please use --sitename, or give a token endpoint URL.");
 		}
-		return cc.getEndpoint()+"/token";
+		else {
+			tokenURL = cc.getEndpoint()+"/token";
+		}
+		return tokenURL;
 	}
 
 	private void showDetails(String token) throws Exception {
 		JSONObject o = JWTUtils.getPayload(token);
+		String jti = o.optString("jti", null);
+		if(jti!=null) {
+			console.info("Token ID:     {}", jti);
+		}
 		String sub = o.getString("sub");
 		String uid = o.optString("uid", null);
 		if(uid!=null) {
 			sub = sub + " (uid="+uid+")";
 		}
-		String scope = o.optString("preferences", null);
-		if(scope!=null) {
-			sub = sub + " ["+scope+"]";
+		String prefs = o.optString("preferences", null);
+		if(prefs!=null) {
+			sub = sub + " ["+prefs+"]";
 		}
 		long lt = o.getLong("exp")-o.getLong("iat");
 		console.info("Subject:      {}", sub);
