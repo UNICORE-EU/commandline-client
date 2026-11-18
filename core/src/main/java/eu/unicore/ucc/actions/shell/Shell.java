@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
@@ -193,7 +191,7 @@ public class Shell extends ActionBase {
 					continue;
 				}
 				// it is a command
-				String[] args = parseCmdline(s);
+				String[] args = tokenizeCmdline(s);
 				if(UCC.console.isVerbose()) {
 					StringBuilder sb = new StringBuilder();
 					for(String a: args)sb.append(a).append(" ");
@@ -414,28 +412,48 @@ public class Shell extends ActionBase {
 		}
 	}
 
-	private static Pattern p = Pattern.compile("\"([^\"]*)\"|(\\S+)");
-
 	private int numberOfErrors = 0;
 
 	public int getNumberOfErrors(){
 		return numberOfErrors;
 	}
 
-	static String[] parseCmdline(String cmdArgs) throws IOException {
-		List<String>result = new ArrayList<>();
-		Matcher m = p.matcher(cmdArgs);
-		while (m.find()) {
-			String val;
-			if (m.group(1) != null) {
-				val = m.group(1);
+	// based on https://gist.github.com/raymyers/8077031
+	static String[] tokenizeCmdline(String cmdLine) throws IOException {
+		List<String> tokens = new ArrayList<String>();
+		boolean escaping = false;
+		char quoteChar = ' ';
+		boolean quoting = false;
+		int lastCloseQuoteIndex = Integer.MIN_VALUE;
+		StringBuilder current = new StringBuilder();
+		for (int i = 0; i<cmdLine.length(); i++) {
+			char c = cmdLine.charAt(i);
+			if (escaping) {
+				current.append(c);
+				escaping = false;
+			} else if (c == '\\' && !(quoting && quoteChar == '\'')) {
+				escaping = true;
+			} else if (quoting && c == quoteChar) {
+				quoting = false;
+				lastCloseQuoteIndex = i;
+			} else if (!quoting && (c == '\'' || c == '"')) {
+				quoting = true;
+				quoteChar = c;
+			} else if (!quoting && Character.isWhitespace(c)) {
+				if (current.length() > 0 || lastCloseQuoteIndex == (i - 1)) {
+					tokens.add(current.toString());
+					current = new StringBuilder();
+				}
 			} else {
-				val = m.group(2);
+				current.append(c);
 			}
-			result.add(val);
 		}
-		return result.toArray(new String[result.size()]);
+		if (current.length() > 0 || lastCloseQuoteIndex == (cmdLine.length() - 1)) {
+			tokens.add(current.toString());
+		}
+		return tokens.toArray(new String[tokens.size()]);
 	}
+
 
 	private String getHeader() {
 		String s = _newline

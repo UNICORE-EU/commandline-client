@@ -197,4 +197,22 @@ public class TestStorageActions extends EmbeddedTestBase {
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
+	@Test
+	public void test_LS()throws Exception {
+		UCC.main(new String[]{"create-storage","-v", "-c", "src/test/resources/conf/userprefs.embedded",
+				"-f", "https://localhost:65322/rest/core/storagefactories/default_storage_factory"
+		});
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		assertNotNull(CreateStorage.getLastStorageAddress());
+		UCC.main(new String[]{"cp","-v", "-c", "src/test/resources/conf/userprefs.embedded",
+				"pom.xml", CreateStorage.getLastStorageAddress()+"/files/pom.xml"
+		});
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		UCC.main(new String[]{"ls","-v", "-c", "src/test/resources/conf/userprefs.embedded",
+				"-H", "-m",
+				CreateStorage.getLastStorageAddress()+"/files/pom.xml"
+		});
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		
+	}
 }

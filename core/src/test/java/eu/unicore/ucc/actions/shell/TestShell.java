@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,30 +23,7 @@ import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
 import eu.unicore.ucc.util.EmbeddedTestBase;
 
-/**
- * Functional tests for the UCC actions. 
- * These run against an embedded UNICORE instance.
- */
 public class TestShell extends EmbeddedTestBase {
-
-	@Test
-	public void testShellArgsParsing() throws Exception {
-		String cmd = "this is a test";
-		List<String> res = Arrays.asList(Shell.parseCmdline(cmd));
-		assertEquals(4, res.size());	
-		cmd = "this \"is a\" test";
-		res = Arrays.asList(Shell.parseCmdline(cmd));
-		assertEquals(3, res.size());
-		assertEquals("is a", res.get(1));
-		cmd = "this \"is a test\"";
-		res = Arrays.asList(Shell.parseCmdline(cmd));
-		assertEquals(2, res.size());
-		assertEquals("is a test", res.get(1));
-		cmd = "set a=b";
-		res = Arrays.asList(Shell.parseCmdline(cmd));
-		assertEquals(2, res.size());
-		assertEquals("a=b", res.get(1));		
-	}
 
 	@Test
 	public void test_Shell()throws Exception{

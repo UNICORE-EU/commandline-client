@@ -81,7 +81,7 @@ public class UCCCompleter implements Completer, Constants {
 				for(String x: command.getArgumentOptions()) {
 					candidates.add(new Candidate(x));
 				}
-				return true;	
+				return line.wordIndex()<2;
 			}
 			if(line.wordIndex()>1 && line.words().get(line.wordIndex()-1).startsWith("-")) {
 				String option = line.words().get(line.wordIndex()-1);

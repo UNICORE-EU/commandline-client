@@ -8,7 +8,9 @@ Report any issues via the
 
 Version 11.3.0 (released Nov dd, 2026)
 --------------------------------------
- - improvement: issue-token: new --output-file option to write token to file
+ - improvement: 'issue-token': new --output-file option to write token to a file
+ - fix: 'shell': URL completion was not active in some cases
+ - fix: 'shell': parse command line properly for escaped/quoted strings
  - update to UNICORE 11.3.0
  - dependency updates
 

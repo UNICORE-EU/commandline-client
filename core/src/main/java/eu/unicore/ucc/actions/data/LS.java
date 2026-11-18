@@ -70,7 +70,7 @@ public class LS extends SMSOperation {
 		human = getBooleanOption(OPT_HUMAN_LONG, OPT_HUMAN);
 		if(human)console.debug("Human friendly number format.");
 		showMetadata = getBooleanOption(OPT_SHOW_META_LONG, OPT_SHOW_META);
-		if(showMetadata)console.debug("Showing metadata.");
+		if(showMetadata)console.debug("Showing metadata (if present).");
 		doProcess();
 	}
 
@@ -78,7 +78,7 @@ public class LS extends SMSOperation {
 		if(getCommandLine().getArgs().length<2){
 			throw new IllegalArgumentException("Please provide a storage address!");
 		}
-		String address=getCommandLine().getArgs()[1];
+		String address = getCommandLine().getArgs()[1];
 		sms = getStorageClient(address);
 		String path = getPathAtStorage(address);
 		if(path==null){
@@ -111,7 +111,7 @@ public class LS extends SMSOperation {
 	}
 
 	private void listSingleFile(FileListEntry file) throws Exception {
-		lastLS=file;
+		lastLS = file;
 		console.info("{}", detailed? detailedListing(file):normalListing(file));
 		if(!file.isDirectory && showMetadata){
 			printMetadata(file);
@@ -122,8 +122,6 @@ public class LS extends SMSOperation {
 		JSONObject metadata = sms.getFileClient(meta.path).getProperties().optJSONObject("metadata");
 		if(metadata!=null) {
 			console.info("{}", metadata.toString(2));
-		}else {
-			console.info("(no metadata)");	
 		}
 	}
 

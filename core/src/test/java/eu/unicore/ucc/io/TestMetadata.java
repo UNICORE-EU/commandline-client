@@ -38,7 +38,6 @@ public class TestMetadata extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 
-		
 		File metaFile=new File("target", "testmetadata.json");
 		FileUtils.writeStringToFile(metaFile, "{foo: bar}", "UTF-8");
 
