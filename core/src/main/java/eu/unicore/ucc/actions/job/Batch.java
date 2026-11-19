@@ -238,14 +238,8 @@ public class Batch extends ActionBase {
 
 		String siteWeightFile = getCommandLine().getOptionValue(OPT_WEIGHTS);
 		if(siteWeightFile!=null){
-			File swf = new File(siteWeightFile);
-			if(! (swf.exists() && swf.canRead()) ){
-				console.error(null, "Can't read {}", swf.getAbsolutePath());
-			}
-			else{
-				siteSelectionStragegy = new WeightedSelection(swf);
-				console.debug("Using site selection weights from {}", swf.getAbsolutePath());
-			}
+			siteSelectionStragegy = new WeightedSelection(new File(siteWeightFile));
+			console.debug("Using site selection weights from <{}>",siteWeightFile);
 		}
 		executor = new ThreadPoolExecutor(numThreads, numThreads,
 				5L, TimeUnit.SECONDS,

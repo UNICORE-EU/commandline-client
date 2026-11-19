@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.unicore.client.core.SiteClient;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.helpers.ConsoleLogger;
 
 /**
  * this strategy tries to balance job submissions over the available sites,
@@ -24,7 +23,7 @@ public class WeightedSelection implements SiteSelectionStrategy {
 
 	private final File weightsFile;
 
-	private long lastAccess = 0;
+	private long lastAccess = -1L;
 
 	private final Map<String, Integer>weights = new HashMap<>();
 
@@ -32,18 +31,22 @@ public class WeightedSelection implements SiteSelectionStrategy {
 
 	public static final String DEFAULT_WEIGHT="UCC_DEFAULT_SITE_WEIGHT";
 
-	public WeightedSelection(File weightsFile){
-		this.weightsFile=weightsFile;
+	public WeightedSelection(File weightsFile) throws Exception {
+		this.weightsFile = weightsFile;
+		checkUpdate();
 	}
 
+	@Override
 	public SiteClient select(List<SiteClient> available) {
 		List<String> names = new ArrayList<>();
 		Map<String, SiteClient> map = new HashMap<>();
 		for(SiteClient tss: available){
 			try{
-				String name = tss.getProperties().getString("siteName");
-				names.add(name);
-				map.put(name,tss);
+				String name = tss.getProperties().optString("siteName", null);
+				if(name!=null) {
+					names.add(name);
+					map.put(name,tss);
+				}
 			}catch(Exception e){
 				UCC.console.error(e, "");
 			}
@@ -52,7 +55,11 @@ public class WeightedSelection implements SiteSelectionStrategy {
 	}
 
 	public String select(Set<String>available){
-		checkUpdate();
+		try{
+			checkUpdate();
+		}catch(Exception e) {
+			UCC.console.error(e, "");
+		}
 		String selectedTSS = null;
 		float worstRatio = -1;
 		//for each tss available, check its current ration of submitted jobs to weight.
@@ -108,46 +115,35 @@ public class WeightedSelection implements SiteSelectionStrategy {
 	}
 
 	//check if file was modified, and read the weights if it was
-	private void checkUpdate(){
-		ConsoleLogger msg = UCC.console;
+	private void checkUpdate() throws Exception {
 		if(lastAccess<weightsFile.lastModified()){
-			lastAccess=weightsFile.lastModified();
+			lastAccess = weightsFile.lastModified();
 			Properties p = new Properties();
 			try(FileInputStream fis = new FileInputStream(weightsFile)){
 				p.load(fis);
-			}catch(Exception e){
-				msg.error(e, "Problem reading from site weights file");
-				return;
 			}
 			for(Object oKey: p.keySet()){
-				Integer i=1;
-				String key=String.valueOf(oKey);
-				try{
-					i=Integer.parseInt(p.getProperty(key));
-				}catch(Exception e){
-					msg.error(e, "Syntax error in weights file (Format: Site name = <integer weight>");
-				}
-				weights.put(key,i);
+				Integer i = 1;
+				String key = String.valueOf(oKey);
+				i = Integer.parseInt(p.getProperty(key));
+				weights.put(key, i);
 				if(DEFAULT_WEIGHT.equalsIgnoreCase(key)){
-					msg.verbose("Default site weight <{}>", i);
+					UCC.console.verbose("Default site weight <{}>", i);
 				}
 				else{
-					msg.verbose("Site <{}> weight <{}>", key, i);
+					UCC.console.verbose("Site <{}> weight <{}>", key, i);
 				}
 				if(weights.get(DEFAULT_WEIGHT)==null){
 					weights.put(DEFAULT_WEIGHT, Integer.valueOf(1));
-					msg.verbose("Default site weight is <1> (can be changed using {})", DEFAULT_WEIGHT);
+					UCC.console.verbose("Default site weight is <1> (can be changed using {})", DEFAULT_WEIGHT);
 				}
 			}
 		}
 	}
 
+	@Override
 	public Map<String,AtomicInteger>getSelectionStatistics(){
 		return selected;
-	}
-
-	public File getWeightsFile() {
-		return weightsFile;
 	}
 
 }

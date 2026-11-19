@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 */
 public abstract class Queue {
 
-	protected final java.util.concurrent.DelayQueue<QueueEntry<String>> elements;
+	protected final DelayQueue<QueueEntry<String>> elements;
 
 	protected int limit = -1;
 
@@ -26,7 +26,7 @@ public abstract class Queue {
 	}
 
 	public Queue(long delay){
-		elements = new DelayQueue<QueueEntry<String>>();
+		elements = new DelayQueue<>();
 		this.delay = delay; //ms.
 	}
 
@@ -43,10 +43,6 @@ public abstract class Queue {
 		limit = lim;
 	}
 
-	/**
-	 * ask whether another item can be added into the queue 
-	 * @return true if there still is some space left
-	 */
 	protected void checkLimit()throws Exception{
 		if(limit!=-1 && getSize()>=limit) throw new Exception("Queue limit reached");
 	}
@@ -116,10 +112,12 @@ public abstract class Queue {
 			this.queueDelay = queueDelay;
 		}
 
+		@Override
 		public long getDelay(TimeUnit unit) {
 			return unit.convert(queueDelay-System.currentTimeMillis()+lastAccessed, TimeUnit.MILLISECONDS);
 		}
 
+		@Override
 		public int compareTo(Delayed o) {
 			return (int)(lastAccessed-((QueueEntry<?>)o).lastAccessed);
 		}

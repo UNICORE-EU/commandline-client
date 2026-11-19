@@ -32,8 +32,8 @@ public class KeyAuthN extends PropertiesBasedAuthenticationProvider
 		privateKey = new File(properties.getProperty("identity"));
 		username = properties.getProperty("username");
 		if(!privateKey.exists()){
-			throw new ConfigurationException("Private key file "+
-					privateKey.getParent()+" does not exist.");
+			throw new ConfigurationException("Private key file <"+
+					privateKey.getPath()+"> does not exist.");
 		}
 		final PasswordSupplier pf = ()-> {
 			String password = properties.getProperty("password");

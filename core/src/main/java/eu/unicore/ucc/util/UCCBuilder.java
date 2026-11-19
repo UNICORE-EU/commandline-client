@@ -226,10 +226,6 @@ public class UCCBuilder extends Builder {
 		return otherExports;
 	}
 
-	public File getBaseDirectory() {
-		return baseDirectory;
-	}
-
 	public List<FileDownloader> getExports() {
 		build();
 		return exports;
@@ -242,14 +238,6 @@ public class UCCBuilder extends Builder {
 
 	public void setCheckLocalFiles(boolean checkLocalFiles){
 		this.checkLocalFiles=checkLocalFiles;
-	}
-
-	public String getApplicationName(){
-		return json.optString("ApplicationName", null);
-	}
-
-	public String getApplicationVersion(){
-		return json.optString("ApplicationVersion", null);
 	}
 
 	public String getSite(){
@@ -266,18 +254,6 @@ public class UCCBuilder extends Builder {
 
 	public void setState(String state){
 		json.put("_ucc_state", state);
-	}
-
-	/**
-	 * get the preferred file transfer protocols (if defined)
-	 */
-	public String getPreferredProtocol(){
-		return preferredProtocol;
-	}
-
-	public void setPreferredProtocol(String protocol){
-		JSONUtil.putQuietly(json, "Preferred protocol", protocol.toString());
-		this.preferredProtocol = protocol;
 	}
 
 	public Set<Requirement>getRequirements(){
@@ -313,11 +289,6 @@ public class UCCBuilder extends Builder {
 
 	public boolean isSweepJob(){
 		return isSweepJob;
-	}
-
-	static void writeLine(String line,StringBuilder sb){
-		sb.append(line);
-		sb.append(Constants._newline);
 	}
 
 	public void writeTo(Writer writer)throws IOException{

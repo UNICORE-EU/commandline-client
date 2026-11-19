@@ -15,6 +15,7 @@ public class RunningQueue extends RequestQueue {
 	 * this will add a "running" request (in the form of a filename of a
 	 * job id file)
 	 */
+	@Override
 	public void add(String o) throws Exception {
 		super.add(o,new File(o).lastModified());
 	}

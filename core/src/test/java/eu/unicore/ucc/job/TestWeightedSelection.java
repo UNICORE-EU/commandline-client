@@ -1,8 +1,10 @@
 package eu.unicore.ucc.job;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,7 +15,12 @@ import eu.unicore.ucc.runner.WeightedSelection;
 public class TestWeightedSelection {
 
 	@Test
-	public void test_basic_weights(){
+	public void test_setup() throws Exception{
+		assertThrows(FileNotFoundException.class, ()->new WeightedSelection(new File("nosuchfile")));
+	}
+
+	@Test
+	public void test_basic_weights() throws Exception{
 		WeightedSelection ws = new WeightedSelection(new File("src/test/resources/conf/testweights.properties"));
 		Set<String> sites=new HashSet<String>();
 		sites.add("SITE1");
@@ -24,9 +31,9 @@ public class TestWeightedSelection {
 		assertEquals(100,ws.getSelectionStatistics().get("SITE2").get());
 		assertEquals(10,ws.getSelectionStatistics().get("SITE1").get());
 	}
-
+	
 	@Test
-	public void test_set_zero_weight(){
+	public void test_set_zero_weight()throws Exception{
 		WeightedSelection ws = new WeightedSelection(new File("src/test/resources/conf/testweights.properties"));
 		Set<String> sites=new HashSet<String>();
 		sites.add("SITE1");
@@ -41,7 +48,7 @@ public class TestWeightedSelection {
 	}
 
 	@Test
-	public void test_setting_default_weight(){
+	public void test_setting_default_weight()throws Exception{
 		WeightedSelection ws = new WeightedSelection(new File("src/test/resources/conf/testweights.properties"));
 		Set<String> sites=new HashSet<String>();
 		sites.add("SITE1");

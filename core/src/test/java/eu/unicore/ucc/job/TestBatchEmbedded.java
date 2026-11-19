@@ -5,15 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
+import eu.unicore.client.core.SiteClient;
+import eu.unicore.services.restclient.UsernamePassword;
 import eu.unicore.ucc.UCC;
+import eu.unicore.ucc.lookup.Connector;
+import eu.unicore.ucc.runner.WeightedSelection;
 import eu.unicore.ucc.util.EmbeddedTestBase;
+import eu.unicore.util.httpclient.IClientConfiguration;
 
 public class TestBatchEmbedded extends EmbeddedTestBase {
-
 
 	@Test
 	public void testBatch()throws Exception{
@@ -43,4 +48,18 @@ public class TestBatchEmbedded extends EmbeddedTestBase {
 			}
 		}
 	}
+
+	@Test
+	public void testWeightedSelection() throws Exception{
+		connect();
+		String url = Connector._last_TSS;
+		IClientConfiguration sec = uas.getKernel().getClientConfiguration();
+		SiteClient sc = new SiteClient(url, sec, new UsernamePassword("demouser", "test123"));
+		WeightedSelection ws = new WeightedSelection(new File("src/test/resources/conf/testweights.properties"));
+		var sites=new ArrayList<SiteClient>();
+		sites.add(sc);
+		var selected = ws.select(sites);
+		assertEquals(sc, selected);
+	}
+
 }

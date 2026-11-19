@@ -23,9 +23,7 @@ public class MultiRegistryClient implements IRegistryClient {
 
 	private final List<IRegistryClient>clients = new ArrayList<>();
 
-	private boolean filterDuplicates=true;
-
-	private String connectionStatus=null;
+	private String connectionStatus = null;
 
 	public void addRegistry(IRegistryClient registry){
 		clients.add(registry);
@@ -37,11 +35,7 @@ public class MultiRegistryClient implements IRegistryClient {
 		for(IRegistryClient c: clients){
 			try{
 				List<String> res = c.listEntries(acceptFilter);
-				if(filterDuplicates){
-					addIfNotExist(result, res);
-				}else{
-					result.addAll(res);
-				}
+				addIfNotExist(result, res);
 			}catch(Exception ex){
 				UCC.console.verbose("Registry at {} is not available: {}", getAddress(c), ex.getMessage());
 			}
@@ -55,11 +49,7 @@ public class MultiRegistryClient implements IRegistryClient {
 		for(IRegistryClient c: clients){
 			try{
 				List<String>res = c.listEntries();
-				if(filterDuplicates){
-					addIfNotExist(result, res);
-				}else{
-					result.addAll(res);
-				}
+				addIfNotExist(result, res);
 			}catch(Exception ex){
 				UCC.console.verbose("Registry at {} is not available: {}", getAddress(c), ex.getMessage());
 			}
@@ -83,14 +73,6 @@ public class MultiRegistryClient implements IRegistryClient {
 				target.add(address);
 			}
 		}
-	}
-
-	public boolean isFilterDuplicates() {
-		return filterDuplicates;
-	}
-
-	public void setFilterDuplicates(boolean filterDuplicates) {
-		this.filterDuplicates = filterDuplicates;
 	}
 
 	private Boolean compute(Callable<Boolean>task, int timeout){

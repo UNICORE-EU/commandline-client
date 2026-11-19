@@ -16,8 +16,6 @@ public class Connect extends ActionBase {
 	// the initial lifetime (in days) for newly created TSSs
 	private int initialLifeTime;
 
-	private static String lastRegistryURL;
-
 	@Override
 	protected void createOptions() {
 		super.createOptions();
@@ -48,7 +46,6 @@ public class Connect extends ActionBase {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		lastRegistryURL = registryURL;
 		initialLifeTime = getNumericOption(OPT_LIFETIME_LONG, OPT_LIFETIME, -1);
 		if(initialLifeTime>0){
 			console.debug("New TSSs will have a lifetime of <{}> days.", initialLifeTime);
@@ -74,10 +71,6 @@ public class Connect extends ActionBase {
 	@Override
 	public String getCommandGroup(){
 		return CMD_GRP_JOBS;
-	}
-
-	static String getLastReqistryURL(){
-		return lastRegistryURL;
 	}
 
 	public IRegistryClient getRegistry(){
