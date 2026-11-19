@@ -8,21 +8,7 @@ import java.io.IOException;
 public class RunningQueue extends RequestQueue {
 
 	public RunningQueue(String requestDirname) throws IOException{	
-		super(requestDirname,true);
-		if(!getRequestDir().canWrite()) 
-			{
-				throw new IOException("Directory "+requestDirname+
-					"must be writable.");
-			}
-	}
-
-	/**
-	 * ask whether another item can be added into the queue 
-	 * @return true if there still is some space left
-	 */
-	public boolean canAdd(){
-		if(limit!=-1 && length()>=limit) return false;
-		else return true;
+		super(requestDirname, true);
 	}
 
 	/** 

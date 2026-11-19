@@ -1,6 +1,8 @@
 package eu.unicore.ucc.runner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 
@@ -26,23 +28,23 @@ public class TestTargetSystemFinder extends EmbeddedTestBase {
 		JSONObject j = new JSONObject();
 
 		j.put("ApplicationName", "no_such_app");
-		UCCBuilder b = new UCCBuilder(j.toString(), r, conf);
-		b.getMessageWriter().setVerbose(true);
+		final UCCBuilder b = new UCCBuilder(j.toString(), r, conf);
 		Collection<String>candidates = finder.listCandidates(r, conf, b);
 		assertEquals(0, candidates.size());
+		var ex = assertThrows(Exception.class,
+				()->finder.findTSSAddress(r, conf, b, new RandomSelection()));
+		assertTrue(ex.getMessage().contains("No suitable endpoint"));
 
 		j.put("ApplicationName", "Date");
 		j.put("blacklist", "localhost");
-		b = new UCCBuilder(j.toString(), r, conf);
-		b.getMessageWriter().setVerbose(true);
-		candidates = finder.listCandidates(r, conf, b);
+		UCCBuilder b2 = new UCCBuilder(j.toString(), r, conf);
+		candidates = finder.listCandidates(r, conf, b2);
 		assertEquals(0, candidates.size());
 
 		j = new JSONObject();
 		j.put("ApplicationName", "Date");
-		b = new UCCBuilder(j.toString(), r, conf);
-		b.getMessageWriter().setVerbose(true);
-		candidates = finder.listCandidates(r, conf, b);
+		b2 = new UCCBuilder(j.toString(), r, conf);
+		candidates = finder.listCandidates(r, conf, b2);
 		assertEquals(1, candidates.size());
 	}
 }

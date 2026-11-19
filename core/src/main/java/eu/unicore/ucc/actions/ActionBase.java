@@ -126,7 +126,7 @@ public abstract class ActionBase extends Command {
 			for(String t: tokens) {
 				if(t.length()>0)entries.add(t);
 			}
-			blacklist = entries.toArray(new String[entries.size()]);
+			blacklist = entries.toArray(String[]::new);
 			console.debug("Blacklist = {}", entries);
 		}else {
 			blacklist = null;

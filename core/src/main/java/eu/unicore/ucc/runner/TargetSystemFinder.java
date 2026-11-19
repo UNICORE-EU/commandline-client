@@ -16,7 +16,6 @@ import eu.unicore.uas.json.Requirement;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.lookup.SiteLister;
 import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Log;
@@ -43,7 +42,6 @@ public class TargetSystemFinder implements Broker, Constants {
 	public String findTSSAddress(final IRegistryClient registry, 
 			final UCCConfigurationProvider configurationProvider, UCCBuilder builder, SiteSelectionStrategy selectionStrategy)
 					throws Exception {
-		ConsoleLogger msg=builder.getMessageWriter();
 		if(selectionStrategy==null)selectionStrategy = new RandomSelection();
 		final List<SiteClient>available = listSites(registry, configurationProvider, builder);
 		SiteClient tss=null;
@@ -53,16 +51,13 @@ public class TargetSystemFinder implements Broker, Constants {
 				throw new Exception("No suitable endpoint found - check credentials and job requirements");
 			}
 			else{
-				if(msg.isVerbose()){
-					msg.verbose("Have <{}> candidate resource(s)", available.size());
-					for(SiteClient tsc: available){
-						msg.verbose("  {}", tsc.getEndpoint());
-					}
+				UCC.console.verbose("Have <{}> candidate resource(s)", available.size());
+				for(SiteClient tsc: available){
+					UCC.console.verbose("  {}", tsc.getEndpoint());
 				}
-				//select one
 				tss = selectionStrategy.select(available);
 			}
-			msg.verbose("Selected TSS at {}", tss.getEndpoint());
+			UCC.console.verbose("Selected TSS at {}", tss.getEndpoint());
 			return tss.getEndpoint();
 		}finally {
 			IOUtils.closeQuietly(available.toArray(SiteClient[]::new));
@@ -87,7 +82,6 @@ public class TargetSystemFinder implements Broker, Constants {
 					throws Exception{
 		final Collection<Requirement> requirements = builder.getRequirements();
 		final String siteName = builder.getSite();
-		final ConsoleLogger msg = builder.getMessageWriter();
 		final List<SiteClient>available = Collections.synchronizedList(new ArrayList<>());
 		final String blackList = builder.getProperty("blacklist"); 
 		final boolean checkResources=true;
@@ -106,17 +100,17 @@ public class TargetSystemFinder implements Broker, Constants {
 			}
 			else{
 				String current = tsf.getEndpoint();
-				msg.verbose("Checking {}", current);
+				UCC.console.verbose("Checking {}", current);
 				try{
 					ErrorHolder err = new ErrorHolder();
-					if(!matches(tsf, requirements, err, checkResources, msg)) {
-						msg.verbose("Skipped {}: {}", current, err.message);
+					if(!matches(tsf, requirements, err, checkResources)) {
+						UCC.console.verbose("Skipped {}: {}", current, err.message);
 					}
 					else {
 						available.add(tsf);
 					}
 				} catch(Exception ex) {
-					msg.error(ex, "Error on TSF {}", current);
+					UCC.console.error(ex, "Error on TSF {}", current);
 				}
 			}
 		}
@@ -132,14 +126,14 @@ public class TargetSystemFinder implements Broker, Constants {
 	/**
 	 * check resource requirements
 	 */
-	private boolean matches(SiteClient tssClient, Collection<Requirement> requirements, ErrorHolder error, boolean checkResources, ConsoleLogger msg){
+	private boolean matches(SiteClient tssClient, Collection<Requirement> requirements, ErrorHolder error, boolean checkResources){
 		try{
 			if(!checkResources || requirements==null || requirements.size()==0){
 				return true;
 			}
 			JSONObject props = tssClient.getProperties();
 			for(Requirement r: requirements){
-				msg.verbose("Check requirement: "+r.getDescription());
+				UCC.console.verbose("Check requirement: {}", r.getDescription());
 				if(r.isFulfilled(props))continue;
 				error.message = "Requirement <"+r.getDescription()+"> not fulfilled on "+tssClient.getEndpoint();
 				return false;
@@ -150,7 +144,7 @@ public class TargetSystemFinder implements Broker, Constants {
 			return false;
 		}
 	}
-
+	
 	static class ErrorHolder {
 		String message;
 	}

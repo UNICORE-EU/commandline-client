@@ -104,10 +104,10 @@ public abstract class EmbeddedTestBase {
 				jobFile
 		};
 		if(verbose){
-			List<String>a=new ArrayList<>();
+			List<String>a = new ArrayList<>();
 			a.addAll(Arrays.asList(args));
 			a.add("-v");
-			args=a.toArray(new String[a.size()]);
+			args=a.toArray(String[]::new);
 		}
 		UCC.main(args);
 		if(!ignoreFailure)assertEquals(Integer.valueOf(0),UCC.exitCode);
@@ -124,7 +124,7 @@ public abstract class EmbeddedTestBase {
 			List<String>a=new ArrayList<String>();
 			a.addAll(Arrays.asList(args));
 			a.add("-v");
-			args=a.toArray(new String[a.size()]);
+			args=a.toArray(String[]::new);
 		}
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);

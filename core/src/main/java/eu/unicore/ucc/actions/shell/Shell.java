@@ -451,7 +451,7 @@ public class Shell extends ActionBase {
 		if (current.length() > 0 || lastCloseQuoteIndex == (cmdLine.length() - 1)) {
 			tokens.add(current.toString());
 		}
-		return tokens.toArray(new String[tokens.size()]);
+		return tokens.toArray(String[]::new);
 	}
 
 

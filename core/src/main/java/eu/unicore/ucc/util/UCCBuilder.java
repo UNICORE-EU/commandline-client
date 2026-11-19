@@ -19,14 +19,14 @@ import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.uas.json.Requirement;
 import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.Constants;
+import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.Resolve;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase.Mode;
-import eu.unicore.ucc.runner.Runner;
 import eu.unicore.ucc.io.FileUploader;
 import eu.unicore.ucc.io.Location;
+import eu.unicore.ucc.runner.Runner;
 
 /**
  * in addition to the basic Builder class, this 
@@ -39,7 +39,6 @@ public class UCCBuilder extends Builder {
 	private final List<FileUploader> imports;
 	private final List<FileDownloader> exports;
 
-	private ConsoleLogger msg = new ConsoleLogger();
 	private final UCCConfigurationProvider configurationProvider;
 	private final IRegistryClient registry;
 	private boolean checkLocalFiles = true;
@@ -79,14 +78,6 @@ public class UCCBuilder extends Builder {
 	 */
 	public UCCBuilder(IRegistryClient registry, UCCConfigurationProvider configurationProvider) {
 		this("{}", registry, configurationProvider);
-	}
-
-	public void setMessageWriter(ConsoleLogger msg){
-		this.msg=msg;
-	}
-
-	public ConsoleLogger getMessageWriter(){
-		return msg;
 	}
 
 	static String[] _remove = {"blacklist", "Blacklist", "User", "Group"};
@@ -137,7 +128,7 @@ public class UCCBuilder extends Builder {
 			resolveLocations(json.optJSONArray("Imports"), "From");
 			resolveLocations(json.optJSONArray("Exports"), "To");
 		}catch(Exception ex){
-			msg.error(ex, "Error building imports/exports for job");
+			UCC.console.error(ex, "Error building imports/exports for job");
 			throw new RuntimeException(ex);
 		}
 	}
@@ -188,7 +179,7 @@ public class UCCBuilder extends Builder {
 					if(l!=null && l.isLocal()){
 						failOnError=failOnError & checkLocalFiles;
 						imports.add(new FileUploader(baseDirectory, source, target, mode, failOnError));
-						msg.verbose("Local file import: "+source+" -> "+target);
+						UCC.console.verbose("Local file import: {} -> {}", source, target);
 					}
 					else {
 						otherImports.put(jObj);
@@ -222,7 +213,7 @@ public class UCCBuilder extends Builder {
 					Location l = createLocation(target);
 					if(l.isLocal()){
 						exports.add(new FileDownloader(source, target, mode, failOnError));
-						msg.verbose("File export to client: {} -> {}", source, target);
+						UCC.console.verbose("File export to client: {} -> {}", source, target);
 					}
 					else {
 						otherExports.put(jObj);

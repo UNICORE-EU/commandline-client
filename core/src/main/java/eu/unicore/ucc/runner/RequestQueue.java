@@ -12,14 +12,14 @@ import eu.unicore.ucc.util.Queue;
  */
 public class RequestQueue extends Queue {
 
-	protected File requestDir;	
+	protected final File requestDir;	
 
 	/**
 	 * constructs a new RequestQueue 
 	 */
 	public RequestQueue(String requestDirname, boolean follow) throws IOException{
 		super();
-		requestDir=new File(requestDirname);
+		requestDir = new File(requestDirname);
 		if(!requestDir.exists()){
 			requestDir.mkdir();
 		}

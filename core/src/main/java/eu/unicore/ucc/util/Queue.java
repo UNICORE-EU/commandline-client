@@ -47,9 +47,8 @@ public abstract class Queue {
 	 * ask whether another item can be added into the queue 
 	 * @return true if there still is some space left
 	 */
-	protected boolean canAdd(){
-		if(limit!=-1 && getSize()>=limit) return false;
-		else return true;
+	protected void checkLimit()throws Exception{
+		if(limit!=-1 && getSize()>=limit) throw new Exception("Queue limit reached");
 	}
 
 	/**
@@ -68,16 +67,12 @@ public abstract class Queue {
 	 * add an element
 	 */ 
 	public void add(String o) throws Exception{
-		if(limit!=-1 && getSize()>=limit){
-			throw (new Exception("Queue limit reached!"));
-		}
+		checkLimit();
 		elements.add(new QueueEntry<String>(o,System.currentTimeMillis(),delay));
 	}
 
 	public void add(String o, long lastAccessed) throws Exception{
-		if(limit!=-1 && getSize()>=limit){
-			throw (new Exception("Queue limit reached!"));
-		}
+		checkLimit();
 		elements.add(new QueueEntry<String>(o,lastAccessed,delay));
 	}
 

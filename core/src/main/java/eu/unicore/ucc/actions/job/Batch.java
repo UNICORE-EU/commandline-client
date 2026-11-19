@@ -54,9 +54,9 @@ public class Batch extends ActionBase {
 	private SiteSelectionStrategy siteSelectionStragegy = new RandomSelection();
 
 	/**
-	 * default update interval
+	 * default update interval (seconds)
 	 */
-	private static final int DEFAULT_UPDATE=1000;
+	private static final int DEFAULT_UPDATE = 5;
 
 	/**
 	 * default limit on number of running jobs
@@ -73,7 +73,7 @@ public class Batch extends ActionBase {
 	 */
 	private static final int DEFAULT_THREADS=4;
 
-	//update interval for checking running jobs (in milliseconds)
+	//update interval for checking running jobs (in seconds)
 	private int updateInterval;
 
 	private int runningJobLimit;
@@ -114,7 +114,7 @@ public class Batch extends ActionBase {
 				.get());
 		getOptions().addOption(Option.builder(OPT_UPDATEINTERVAL)
 				.longOpt(OPT_UPDATEINTERVAL_LONG)
-				.desc("Minimum update interval (millis)")
+				.desc("Minimum update interval (sec)")
 				.required(false)
 				.argName("UpdateInterval")
 				.hasArg()
@@ -195,16 +195,12 @@ public class Batch extends ActionBase {
 
 	@Override
 	public void process() throws Exception {
-		//register exit hook
-		Runtime.getRuntime().addShutdownHook(new Thread(){
-			public void run(){
-				doShutdown();
-			}
-		});
+		Runtime.getRuntime().addShutdownHook(new Thread(
+			()-> doShutdown()
+		));
 		super.process();
-
-		String inDir=getCommandLine().getOptionValue(OPT_INPUTDIR, properties.getProperty(OPT_INPUTDIR_LONG));
-		inputDir=new File(inDir);
+		String inDir = getCommandLine().getOptionValue(OPT_INPUTDIR, properties.getProperty(OPT_INPUTDIR_LONG));
+		inputDir = new File(inDir);
 		if(!inputDir.exists() || !inputDir.isFile()){
 			inputDir.mkdirs();
 			console.verbose("Created request directory <{}>", inDir);
@@ -223,7 +219,7 @@ public class Batch extends ActionBase {
 		console.debug("Limit on number of new job submissions = {}", requestLimit);
 
 		updateInterval = getNumericOption(OPT_UPDATEINTERVAL_LONG, OPT_UPDATEINTERVAL, DEFAULT_UPDATE);
-		console.debug("Update interval = {} ms.", updateInterval);
+		console.debug("Update interval = {} sec.", updateInterval);
 
 		numThreads = getNumericOption(OPT_NUMTHREADS_LONG, OPT_NUMTHREADS, DEFAULT_THREADS);
 		console.debug("Number of executor threads = {}", numThreads);
@@ -240,9 +236,9 @@ public class Batch extends ActionBase {
 		siteName = getCommandLine().getOptionValue(OPT_SITENAME);
 		if(siteName!=null)console.debug("Using site = {}", siteName);
 
-		String siteWeightFile=getCommandLine().getOptionValue(OPT_WEIGHTS);
+		String siteWeightFile = getCommandLine().getOptionValue(OPT_WEIGHTS);
 		if(siteWeightFile!=null){
-			File swf=new File(siteWeightFile);
+			File swf = new File(siteWeightFile);
 			if(! (swf.exists() && swf.canRead()) ){
 				console.error(null, "Can't read {}", swf.getAbsolutePath());
 			}
@@ -251,8 +247,8 @@ public class Batch extends ActionBase {
 				console.debug("Using site selection weights from {}", swf.getAbsolutePath());
 			}
 		}
-		executor=new ThreadPoolExecutor(numThreads, numThreads,
-				500L, TimeUnit.MILLISECONDS,
+		executor = new ThreadPoolExecutor(numThreads, numThreads,
+				5L, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>());
 		try{
 			doBatch();
@@ -279,7 +275,7 @@ public class Batch extends ActionBase {
 		requests = new RequestQueue(inputDir.getAbsolutePath(),follow);
 		running = new RunningQueue(inputDir.getAbsolutePath()+File.separator+"RUNNING_JOBS");
 		running.setLimit(runningJobLimit);
-		running.setDelay(updateInterval);
+		running.setDelay(1000*updateInterval);
 		activeJobs.set(running.length());
 		console.verbose("Starting batch processing...");
 		do{
@@ -297,8 +293,8 @@ public class Batch extends ActionBase {
 				}
 			}
 			if(!submitOnly){
-				//now process the running jobs 
-				String nextRunning=(String)running.next(100,TimeUnit.MILLISECONDS);
+				// now process the running jobs 
+				String nextRunning = running.next(100,TimeUnit.MILLISECONDS);
 				if(nextRunning!=null){
 					handleRunningJob(nextRunning);
 				}
@@ -315,7 +311,7 @@ public class Batch extends ActionBase {
 	private void createRequest(String nextReq){
 		try{
 			final UCCBuilder builder;
-			File f=new File(nextReq);
+			File f = new File(nextReq);
 			builder = new UCCBuilder(f, registry, configurationProvider);
 			builder.setProperty("_ucc_source", nextReq);
 			String requestName=f.getName();

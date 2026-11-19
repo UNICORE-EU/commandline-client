@@ -23,9 +23,7 @@ public class TestBatchEmbedded extends EmbeddedTestBase {
 		dir=new File("target/test/batchtest/in");
 		dir.mkdirs();
 		createInFiles();
-		
 		connect();
-		
 		String[]args=new String[]{"batch",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-i", "target/test/batchtest/in",
@@ -40,9 +38,9 @@ public class TestBatchEmbedded extends EmbeddedTestBase {
 	private void createInFiles()throws IOException{
 		String job="{ApplicationName: Date}";
 		for(int i=0;i<n;i++){
-			FileOutputStream fos=new FileOutputStream("target/test/batchtest/in/job"+i+".u");
-			fos.write(job.getBytes());
-			fos.close();
+			try(var fos = new FileOutputStream("target/test/batchtest/in/job"+i+".u")){
+				fos.write(job.getBytes());
+			}
 		}
 	}
 }
