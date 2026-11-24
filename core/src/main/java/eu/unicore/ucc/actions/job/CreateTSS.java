@@ -113,13 +113,9 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 					configurationProvider.getClientConfiguration(siteFactoryURL),
 					configurationProvider.getRESTAuthN());
 		}
-		if(tsf==null){
-			throw new Exception("No suitable target system factory available!",null);
-		}
-		else{
-			siteFactoryURL = tsf.getEndpoint();
-			console.verbose("Using factory at <{}>", siteFactoryURL);
-		}
+		siteFactoryURL = tsf.getEndpoint();
+		console.verbose("Using factory at <{}>", siteFactoryURL);
+
 		try(var tss = tsf.createSite(getCreationParameters(), getTermTime()))
 		{
 			String addr = tss.getEndpoint();
@@ -145,7 +141,6 @@ public class CreateTSS extends ActionBase implements IServiceInfoProvider {
 
 	private Calendar getTermTime(){
 		if(initialLifeTime<=0)return null;
-
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DATE, initialLifeTime);
 		return c;

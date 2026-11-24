@@ -111,11 +111,40 @@ public class TestSubmitWorkflow extends EmbeddedTestBase {
 	}
 
 	@Test
+	public void testDryRun() throws Exception {
+		connect();
+		var args = new String[]{"workflow-submit","-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-S", "https://localhost:65322/rest/core/storages/WORK",
+				"-u", "src/test/resources/workflows/inputs.u",
+				"--dry-run",
+				"src/test/resources/workflows/date1.json"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		args = new String[]{"list-workflows", "-v", "--long",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				SubmitWorkflow.lastAddress
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
+
+	@Test
 	public void testTemplate() throws Exception {
-		File sessions=new File("target","ucc-session-ids");
+		File sessions = new File("target","ucc-session-ids");
 		FileUtils.deleteQuietly(sessions);
 		connect();
-		String[] args=new String[]{"workflow-submit","-v",
+		// missing parameter definition
+		var args = new String[]{"workflow-submit","-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-u", "src/test/resources/workflows/empty.u",
+				"src/test/resources/workflows/template1.json"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(1),UCC.exitCode);
+
+		args = new String[]{"workflow-submit","-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"-u", "src/test/resources/workflows/template1.u",
 				"--wait",

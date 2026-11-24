@@ -18,7 +18,7 @@ public class TestOpenTunnel extends EmbeddedTestBase {
 
 	@Test
 	public void test_OpenTunnel() throws Exception {
-		File sessions=new File("target","ucc-session-ids");
+		File sessions = new File("target","ucc-session-ids");
 		FileUtils.deleteQuietly(sessions);
 		connect();
 		MockServer ec = new MockServer(false);
@@ -26,21 +26,24 @@ public class TestOpenTunnel extends EmbeddedTestBase {
 		runDate();
 
 		final int applicationPort = ec.getServerPort();
-		final int localPort = applicationPort + 1;
 		final String endpoint = Run.getLastJobAddress()+"/forward-port?port="+applicationPort;
 		boolean stop = false;
 		Thread forwarder = new Thread(()->{
 			String[] args=new String[]{"open-tunnel","-v",
 					"-c", "src/test/resources/conf/userprefs.embedded",
-					"-L", String.valueOf(localPort),
+					"-L", "0",
 					endpoint
 			};
 			UCC.main(args);
 		});
 		forwarder.start();
 		int attempts = 0;
+		int localPort = 0;
 		while(!stop && attempts < 5) {
-			Thread.sleep(1000);
+			do{
+				Thread.sleep(1000);
+				localPort = OpenTunnel._localPort;
+			}while(localPort==0);
 			try(Socket s = new Socket("127.0.0.1", localPort);
 				PrintWriter pw = new PrintWriter(s.getOutputStream());
 				BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream())))

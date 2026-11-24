@@ -12,8 +12,9 @@ import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
-import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.core.StorageClient;
+import eu.unicore.client.data.FiletransferClient;
+import eu.unicore.client.utils.Configurable;
 import eu.unicore.uas.FiletransferParameterProvider;
 import eu.unicore.uas.util.PropertyHelper;
 import eu.unicore.ucc.UCC;
@@ -28,9 +29,9 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 
 	protected final Map<String,String>extraParameters = new HashMap<>();
 
-	protected boolean timing=false;
+	protected boolean timing = false;
 
-	protected boolean recurse=false;
+	protected boolean recurse = false;
 
 	protected String from;
 
@@ -43,7 +44,7 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 	protected Long endByte;
 
 	public static enum Mode {
-			NORMAL, APPEND, RESUME, NO_OVERWRITE
+		NORMAL, APPEND, RESUME, NO_OVERWRITE
 	};
 
 	protected Mode mode;
@@ -96,7 +97,7 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 	protected Map<String,String> getExtraParameters(String protocol){
 		Map<String,String> res = new HashMap<>();
 		if(extraParameterSource!=null){
-			String p=String.valueOf(protocol);
+			String p = String.valueOf(protocol);
 			PropertyHelper ph=new PropertyHelper(extraParameterSource, new String[]{p,p.toLowerCase()});
 			res.putAll(ph.getFilteredMap());
 		}
@@ -107,9 +108,7 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 			pp.provideParameters(res, protocol);
 		}
 		res.putAll(extraParameters);
-		if(res.size()>0){
-			UCC.console.debug("Have {} extra parameters for protocol {}", extraParameters.size(), protocol);
-		}
+		UCC.console.debug("Have {} extra parameters for protocol {}", extraParameters.size(), protocol);
 		return res;
 	}
 
@@ -137,32 +136,8 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 		this.from = from;
 	}
 
-	public Mode getMode() {
-		return mode;
-	}
-
-	public void setMode(Mode mode) {
-		this.mode = mode;
-	}
-
-	public boolean isFailOnError() {
-		return failOnError;
-	}
-
-	public boolean isTiming() {
-		return timing;
-	}
-
 	public void setTiming(boolean timing) {
 		this.timing = timing;
-	}
-
-	public void setFailOnError(boolean failOnError) {
-		this.failOnError = failOnError;
-	}
-
-	public String getPreferredProtocol() {
-		return preferredProtocol;
 	}
 
 	public void setPreferredProtocol(String preferredProtocol) {
@@ -186,15 +161,15 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 	 * @param remotePath - the path
 	 * @return <code>true</code> if the remote directory exists and is a directory
 	 */
-	protected boolean isValidDirectory(String remotePath){
-		boolean result = false;
+	protected boolean isValidDirectory(String remotePath) {
+		boolean result = true;
 		if(! ("/".equals(remotePath) || ".".equals(remotePath)) ){
 			try{
-				FileListEntry gft = sms.stat(remotePath);
-				result = gft.isDirectory;
-			}catch(Exception ex){}
+				result = sms.stat(remotePath).isDirectory;
+			}catch(Exception ex) {
+				result = false;
+			}
 		}
-		else result=true;
 		return result;
 	}
 
@@ -225,16 +200,8 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 		return chosenProtocol;
 	}
 
-	public Long getStartByte() {
-		return startByte;
-	}
-
 	public void setStartByte(Long startByte) {
 		this.startByte = startByte;
-	}
-
-	public Long getEndByte() {
-		return endByte;
 	}
 
 	public void setEndByte(Long endByte) {
@@ -283,4 +250,10 @@ public abstract class FileTransferBase implements Callable<JSONObject>{
 				sms.getEndpoint()+"> to become ready");
 	}
 
+	protected void configure(FiletransferClient ftc, Map<String,String>params){
+		if(ftc instanceof Configurable){
+			Configurable u = (Configurable)ftc;
+			u.configure(params);
+		}
+	}
 }

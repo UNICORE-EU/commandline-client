@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
 import eu.unicore.client.core.FileList;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.data.FiletransferClient;
-import eu.unicore.client.data.UFTPConstants;
-import eu.unicore.client.data.UFTPFileTransferClient;
 import eu.unicore.uas.fts.FiletransferOptions;
 import eu.unicore.uas.fts.FiletransferOptions.IMonitorable;
 import eu.unicore.uas.fts.FiletransferOptions.SupportsPartialRead;
@@ -139,14 +137,14 @@ public class FileDownloader extends FileTransferBase {
 			throw new IllegalStateException("Source="+source); 
 		}
 		OutputStream os = targetStream;
-		FiletransferClient ftc=null;
+		FiletransferClient ftc = null;
 		boolean resume = Mode.RESUME.equals(mode);
 		boolean append = Mode.APPEND.equals(mode) || resume;
 		try{
 			String path = source.path;
 			if(os==null){
 				if(localFile.isDirectory()){
-					localFile=new File(localFile,getName(path));
+					localFile = new File(localFile,getName(path));
 				}
 				if(mode.equals(Mode.NO_OVERWRITE) && localFile.exists()){
 					UCC.console.verbose("File exists and creation mode was set to 'nooverwrite'.");
@@ -225,14 +223,6 @@ public class FileDownloader extends FileTransferBase {
 		}
 		catch(Exception ex){
 			UCC.console.error(ex, "Can't set 'executable' flag for {}", localFile.getName());
-		}
-	}
-
-	private void configure(FiletransferClient ftc, Map<String,String>params){
-		if(ftc instanceof UFTPFileTransferClient){
-			UFTPFileTransferClient u=(UFTPFileTransferClient)ftc;
-			String secret=params.get(UFTPConstants.PARAM_SECRET);
-			u.setSecret(secret);
 		}
 	}
 

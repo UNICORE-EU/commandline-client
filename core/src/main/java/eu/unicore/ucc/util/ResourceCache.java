@@ -1,4 +1,4 @@
-package eu.unicore.ucc.helpers;
+package eu.unicore.ucc.util;
 
 import java.time.Duration;
 import java.util.Map;

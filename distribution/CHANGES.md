@@ -6,7 +6,7 @@ Report any issues via the
 
 **JAVA VERSION NOTE** This release requires Java 17 or later!
 
-Version 11.3.0 (released Nov dd, 2026)
+Version 11.3.0 (released Nov 24, 2026)
 --------------------------------------
  - improvement: 'issue-token': new --output-file option to write token to a file
  - fix: 'shell': URL completion was not active in some cases

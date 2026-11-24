@@ -58,7 +58,7 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 
 	private JSONObject workflow;
 
-	private WorkflowClient.Status status;
+	private WorkflowClient.Status status = Status.UNDEFINED;
 
 	private String workflowFileName;
 
@@ -131,11 +131,8 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 		dryRun = getBooleanOption(OPT_DRYRUN_LONG, OPT_DRYRUN);
 		console.debug("Dry run = {}", dryRun);
 		wait =  getCommandLine().hasOption(OPT_WAIT);
-		if (getCommandLine().getArgs().length < 2) {
-			throw new IllegalArgumentException("Please supply the name of the workflow file.");
-		} else {
-			workflowFileName = getCommandLine().getArgs()[1];
-		}
+		assertArgsLength(2, "Please supply the name of the workflow file.");
+		workflowFileName = getCommandLine().getArgs()[1];
 		tags = getCommandLine().getOptionValues(OPT_TAGS);
 		if(tags!=null) {
 			console.debug("Workflow tags = {}", Arrays.deepToString(tags));
@@ -238,11 +235,7 @@ public class SubmitWorkflow extends ActionBase implements IServiceInfoProvider {
 		do {
 			Thread.sleep(2000);
 			Status newStatus = wmc.getStatus();
-			if (newStatus == null) {
-				console.error(null, "Can't get workflow status.");
-				break;
-			}
-			if (!newStatus.equals(status)) {
+			if (!status.equals(newStatus)) {
 				status = newStatus;
 				console.verbose("{}", status);
 			}

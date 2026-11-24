@@ -10,8 +10,6 @@ import org.apache.commons.io.IOUtils;
 
 import eu.unicore.client.core.StorageClient;
 import eu.unicore.client.data.FiletransferClient;
-import eu.unicore.client.data.UFTPConstants;
-import eu.unicore.client.data.UFTPFileTransferClient;
 import eu.unicore.uas.fts.FiletransferOptions;
 import eu.unicore.uas.fts.FiletransferOptions.IMonitorable;
 import eu.unicore.ucc.UCC;
@@ -189,7 +187,7 @@ public class FileUploader extends FileTransferBase {
 	 * @param sourceFile - local file
 	 * @throws Exception
 	 */
-	private void copyProperties(File sourceFile, StorageClient sms, String target)throws Exception{
+	private void copyProperties(File sourceFile, StorageClient sms, String target){
 		try{
 			StringBuilder perms = new StringBuilder("r--r--");
 			if(sourceFile.canExecute()){
@@ -202,7 +200,7 @@ public class FileUploader extends FileTransferBase {
 			}
 			sms.chmod(target, perms.toString());
 		}catch(Exception ex){
-			UCC.console.error(ex, "Can't set permissions on remote file.");
+			UCC.console.info("Can't set permissions on remote file <{}>: ", target, ex.getMessage());
 		}
 	}
 
@@ -210,24 +208,16 @@ public class FileUploader extends FileTransferBase {
 		if(!failOnError){
 			return;
 		}
-		File orig=new File(from);
+		File orig = new File(from);
 		if(!orig.isAbsolute()){
-			orig=new File(System.getProperty("user.dir"),from);
+			orig = new File(System.getProperty("user.dir"),from);
 		}
-		File[] files=resolveWildCards(orig);
+		File[] files = resolveWildCards(orig);
 		if(files==null){
 			throw new FileNotFoundException("Local import '"+from+"' does not exist.");
 		}
 		for(File f: files){
 			if(!f.exists())throw new FileNotFoundException("Local import '"+from+"' does not exist.");
-		}
-	}
-
-	private void configure(FiletransferClient ftc, Map<String,String>params){
-		if(ftc instanceof UFTPFileTransferClient){
-			UFTPFileTransferClient u=(UFTPFileTransferClient)ftc;
-			String secret=params.get(UFTPConstants.PARAM_SECRET);
-			u.setSecret(secret);
 		}
 	}
 

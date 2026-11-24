@@ -1,7 +1,7 @@
 {
   "Template parameters":
   {
-     "UC_SIZE": {},
+     "UC_SIZE": {"default": "normal"},
      "UC_INPUT": {}
   },   
   

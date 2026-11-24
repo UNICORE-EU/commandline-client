@@ -9,9 +9,7 @@ import org.apache.commons.cli.Option;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.client.core.JobClient.Status;
 import eu.unicore.uas.util.UnitParser;
-import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Log;
-import eu.unicore.util.Pair;
 
 public class JobStatus extends JobOperationBase {
 
@@ -93,10 +91,9 @@ public class JobStatus extends JobOperationBase {
 	}
 
 	@Override
-	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
+	protected void performCommand(List<JobClient>jobs){
 		allSuccessful = true;
-		jobs.forEach( x -> {
-			JobClient j = x.getM1();
+		jobs.forEach( j -> {
 			if(waitFor!=null) {
 				try{
 					j.poll(waitFor, timeout);

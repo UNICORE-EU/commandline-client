@@ -18,7 +18,6 @@ import eu.unicore.uas.json.Builder;
 import eu.unicore.uas.json.JSONUtil;
 import eu.unicore.uas.json.Requirement;
 import eu.unicore.uas.util.UnitParser;
-import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.actions.data.Resolve;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;

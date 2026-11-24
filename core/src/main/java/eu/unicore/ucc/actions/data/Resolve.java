@@ -9,9 +9,9 @@ import org.apache.commons.cli.Option;
 import eu.unicore.client.registry.IRegistryClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.ucc.helpers.ResourceCache;
 import eu.unicore.ucc.io.Location;
 import eu.unicore.ucc.lookup.IResolve;
+import eu.unicore.ucc.util.ResourceCache;
 
 /**
  * resolves a remote SMS location given via some "abstract" form or that require lookup

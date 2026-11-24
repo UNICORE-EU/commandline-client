@@ -19,15 +19,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.logging.log4j.jul.LogManager;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import eu.unicore.security.wsutil.client.authn.AuthenticationProvider;
-import eu.unicore.ucc.helpers.ConsoleLogger;
-import eu.unicore.ucc.helpers.JLineLogger;
 import eu.unicore.ucc.runner.Broker;
+import eu.unicore.ucc.util.ConsoleLogger;
 
 /**
  * UCC main class and entry point
@@ -166,18 +166,13 @@ public class UCC{
 		authN = authN.toLowerCase();
 		String version = getVersion();
 		System.out.println("UCC " + version);
-		AuthenticationProvider entry = authNMethods.get(authN);
-		if(entry == null){
-			System.out.println("No such authentication method: "+authN);
-		}
-		else{
-			System.out.println();
-			System.out.printf(" %-20s - %s", entry.getName(), entry.getDescription());
-			System.out.println();
-			System.out.println();
-			System.out.println(entry.getUsage());
-			System.out.println();
-		}
+		AuthenticationProvider entry = getAuthNMethod(authN);
+		System.out.println();
+		System.out.printf(" %-20s - %s", entry.getName(), entry.getDescription());
+		System.out.println();
+		System.out.println();
+		System.out.println(entry.getUsage());
+		System.out.println();
 	}
 
 	/**
@@ -282,7 +277,9 @@ public class UCC{
 	 * Parses commandline args, initiates and runs action
 	 */
 	public static void main(String[] args) {
-		JLineLogger.init();
+		try{
+			System.setProperty("java.util.logging.manager", LogManager.class.getName());
+		}catch(Exception e) {}
 		Command cmd = null;
 		exitCode = null;
 		lastCommand = null;

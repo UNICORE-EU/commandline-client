@@ -37,11 +37,38 @@ public class TestBatchEmbedded extends EmbeddedTestBase {
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
-	
-	int n=4;
-	
+
 	private void createInFiles()throws IOException{
 		String job="{ApplicationName: Date}";
+		int n=4;
+		for(int i=0;i<n;i++){
+			try(var fos = new FileOutputStream("target/test/batchtest/in/job"+i+".u")){
+				fos.write(job.getBytes());
+			}
+		}
+	}
+
+	@Test
+	public void testBatch_slow()throws Exception{
+		FileUtils.deleteQuietly(new File("target/test/batchtest"));
+		File dir=new File("target/test/batchtest/out");
+		dir.mkdirs();
+		dir=new File("target/test/batchtest/in");
+		dir.mkdirs();
+		createInFiles1();
+		connect();
+		String[]args=new String[]{"batch",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-i", "target/test/batchtest/in",
+				"-o", "target/test/batchtest/out",
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
+	
+	private void createInFiles1()throws IOException{
+		String job = "{Executable: '/bin/sleep', Arguments:['2']}";
+		int n=4;
 		for(int i=0;i<n;i++){
 			try(var fos = new FileOutputStream("target/test/batchtest/in/job"+i+".u")){
 				fos.write(job.getBytes());

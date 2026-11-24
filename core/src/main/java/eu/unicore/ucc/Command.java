@@ -15,7 +15,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.help.HelpFormatter;
 
-import eu.unicore.ucc.helpers.ConsoleLogger;
+import eu.unicore.ucc.util.ConsoleLogger;
 import eu.unicore.ucc.util.PropertyVariablesResolver;
 
 /**

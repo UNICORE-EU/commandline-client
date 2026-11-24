@@ -1,15 +1,22 @@
 package eu.unicore.ucc.actions;
 
 import java.io.File;
+import java.util.Properties;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
+import eu.unicore.client.registry.IRegistryClient;
+import eu.unicore.services.restclient.IAuthCallback;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.helpers.Base;
+import eu.unicore.ucc.authn.UCCConfigurationProvider;
+import eu.unicore.ucc.util.ConsoleLogger;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import groovy.lang.Script;
 
 /**
  * run a Groovy script in a ucc context
@@ -99,4 +106,22 @@ public class Groovy extends ActionBase {
 	public String getCommandGroup(){
 		return CMD_GRP_UTILITY;
 	}
+	
+	/**
+	 * Base class for groovy scripts
+	 *
+	 * @author schuller
+	 */
+	public static abstract class Base extends Script {
+
+		IRegistryClient registry;
+		UCCConfigurationProvider configurationProvider;
+		IAuthCallback auth;
+	  	String registryURL;
+	  	Properties properties;
+		Options options;
+		CommandLine commandLine;
+		ConsoleLogger console;
+	}
+
 }

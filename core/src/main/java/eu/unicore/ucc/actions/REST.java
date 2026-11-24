@@ -112,10 +112,7 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		int length=getCommandLine().getArgs().length;
-		if(length<2){
-			throw new IllegalArgumentException("You must provide at least a command (GET, PUT, POST, DELETE) as argument.");
-		}
+		assertArgsLength(3, "Not enough arguments! Needs at least a command "+cmds.toString()+" and a URL");
 		String cmdSpec = getCommandLine().getArgs()[1].toUpperCase();
 		String cmd = null;
 		for(String c: cmds) {
@@ -125,17 +122,15 @@ public class REST extends ActionBase implements IServiceInfoProvider {
 			}
 		}
 		if(cmd==null) {
-			throw new IllegalArgumentException("Operation <"+getCommandLine().getArgs()[1]+
-					"> not implemented / not understood!");
-		}
-		if(length<3){
-			throw new IllegalArgumentException("You must provide at least a URL as argument to this command.");
+			throw new IllegalArgumentException("No such REST operation <"+getCommandLine().getArgs()[1]+
+					">, must be one of "+cmds.toString());
 		}
 		accept = getCommandLine().getOptionValue(OPT_ACCEPT, "application/json");
 		contentType = getCommandLine().getOptionValue(OPT_CONTENT, "application/json");
 		includeHeaders = getCommandLine().hasOption(OPT_INCLUDE);
 		int startIndex = 2;
 		JSONObject content = new JSONObject(); 
+		int length = getCommandLine().getArgs().length;
 		if(length>3){
 			String ref = getCommandLine().getArgs()[2];
 			if(ref.startsWith("@")){

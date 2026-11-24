@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.ucc.UCC;
-import eu.unicore.ucc.helpers.ConsoleLogger;
+import eu.unicore.ucc.util.ConsoleLogger;
 
 public class FiletransferParameterProvider implements
 eu.unicore.uas.FiletransferParameterProvider {

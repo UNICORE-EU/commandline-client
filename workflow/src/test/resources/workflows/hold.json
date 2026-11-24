@@ -4,13 +4,13 @@
 	    "id": "decl1",
 	    "name": "COUNTER",
 	    "type": "INTEGER",
-	    "initial_value": "123",
-	  },
+	    "initial_value": "123"
+	  }
     ],
 
     "activities" : {
 	  "hold1": {
-	    "type": "HOLD",
+	    "type": "HOLD"
 	  }
 	 }
 

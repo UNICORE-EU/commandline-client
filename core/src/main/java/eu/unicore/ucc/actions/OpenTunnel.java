@@ -86,10 +86,7 @@ public class OpenTunnel extends ActionBase {
 	@Override
 	public void process() throws Exception {
 		super.process();
-		int length=getCommandLine().getArgs().length;
-		if(length<2){
-			throw new IllegalArgumentException("You must provide a URL as argument to this command.");
-		}
+		assertArgsLength(2, "You must provide a URL as argument to this command.");
 		String[] localAddress = getOption(OPT_LOCAL_ADDRESS_LONG, OPT_LOCAL_ADDRESS).split(":",2);
 		localPort = Integer.valueOf(localAddress[localAddress.length-1]);
 		localInterface = localAddress.length>1? localAddress[0] : "localhost";
@@ -125,6 +122,7 @@ public class OpenTunnel extends ActionBase {
 			});
 			if(localPort==0) {
 				localPort = ((InetSocketAddress)sc.getLocalAddress()).getPort();
+				_localPort = localPort;
 				console.info("Listening on <{}:{}>", localInterface, localPort);
 			}
 			fh.run();
@@ -141,4 +139,7 @@ public class OpenTunnel extends ActionBase {
 	public String getCommandGroup(){
 		return CMD_GRP_UTILITY;
 	}
+
+	// unit testing
+	static int _localPort = 0;
 }

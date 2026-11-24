@@ -330,7 +330,10 @@ public class Batch extends ActionBase {
 			Runner r = new Runner(registry, configurationProvider, builder);
 			r.setAsyncMode(true);
 			r.setQuietMode(false);
-			// TODO r.setCheckResources(!noResourceCheck);
+			// TODO
+			//r.setCheckResources(!noResourceCheck);
+			//r.setBroker(UCC.getBroker("LOCAL"));
+
 			r.setNoFetchOutCome(noFetchOutcome);
 			r.setSiteSelectionStrategy(siteSelectionStragegy);
 			r.setProperties(properties);
@@ -370,7 +373,10 @@ public class Batch extends ActionBase {
 		try{
 			Runner r = new Runner(registry, configurationProvider, b);
 			r.setAsyncMode(true);
-			//TODO r.setCheckResources(!noResourceCheck);
+			//TODO
+			//r.setCheckResources(!noResourceCheck);
+			//r.setBroker(UCC.getBroker("LOCAL"));
+
 			r.setNoFetchOutCome(noFetchOutcome);
 			r.setProperties(properties);
 			r.run();

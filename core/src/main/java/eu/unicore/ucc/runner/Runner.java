@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import org.json.JSONObject;
 
@@ -29,11 +31,11 @@ import eu.unicore.ucc.actions.job.Batch;
 import eu.unicore.ucc.actions.job.GetOutcome;
 import eu.unicore.ucc.actions.job.Run;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.ucc.helpers.ConsoleLogger;
 import eu.unicore.ucc.io.FileDownloader;
 import eu.unicore.ucc.io.FileTransferBase.Mode;
 import eu.unicore.ucc.io.FileUploader;
 import eu.unicore.ucc.io.Location;
+import eu.unicore.ucc.util.ConsoleLogger;
 import eu.unicore.ucc.util.JSONUtil;
 import eu.unicore.ucc.util.UCCBuilder;
 import eu.unicore.util.Log;
@@ -73,7 +75,7 @@ public class Runner implements Runnable {
 
 	private UCCConfigurationProvider configurationProvider;
 
-	private Broker broker;
+	private Broker broker = UCC.getBroker("LOCAL");
 
 	private boolean quietMode = false;
 
@@ -182,7 +184,7 @@ public class Runner implements Runnable {
 
 	public String getJobID() throws Exception {
 		return jobClient!=null ? 
-			JSONUtil.extractResourceID(jobClient.getEndpoint()) : null;
+				JSONUtil.extractResourceID(jobClient.getEndpoint()) : null;
 	}
 
 	public void setProperties(Properties properties) {
@@ -199,7 +201,7 @@ public class Runner implements Runnable {
 	/**
 	 * Convenience method that waits until a job has finished
 	 * and returns the final status (SUCCESSFUL or FAILED)
-	 * @param timeout in milliseconds (null for no timeout)
+	 * @param timeout in seconds (null for no timeout)
 	 * @return status string
 	 */
 	public static String waitUntilDone(JobClient job, int timeout) throws Exception{
@@ -239,13 +241,13 @@ public class Runner implements Runnable {
 			try{
 				mustSave = false;
 				s = s.process(this);
-				state = s.getName();
+				state = s.name;
 				builder.setState(state);
 			}catch(Exception e){
 				throw new RuntimeException(Log.createFaultMessage("Error occurred processing state <"
-						+s.getName()+">",e), e);
+						+state+">",e), e);
 			}
-		}while(s.autoProceedToNextState());
+		}while(s.autoproceed);
 		if(!FINISHED.equals(state))writeJobIDFile();
 	}
 
@@ -261,7 +263,7 @@ public class Runner implements Runnable {
 			msg.verbose("Job is {}", state);
 			try{
 				s = s.process(this);
-				state = s.getName();
+				state = s.name;
 				builder.setState(state);
 			}catch(Exception e){
 				throw new RuntimeException(e);
@@ -332,12 +334,6 @@ public class Runner implements Runnable {
 	 * @throws RunnerException if no matching TSS can be found
 	 */
 	private void findTSS() throws Exception {
-		if(tss!=null) {
-			return;
-		}
-		if(broker==null){
-			broker = UCC.getBroker("LOCAL");
-		}
 		String epr = broker.findTSSAddress(registry, configurationProvider, builder, selectionStrategy);
 		tss = new SiteClient(epr,
 				configurationProvider.getClientConfiguration(epr),
@@ -348,13 +344,6 @@ public class Runner implements Runnable {
 	 * list suitable TSS for job submission.
 	 */
 	private void listCandidateSites()throws Exception {
-		if(tss!=null) {
-			msg.info("Submission endpoint: {}", tss.getEndpoint());
-			return;
-		}
-		if(broker==null){
-			broker = UCC.getBroker("LOCAL");
-		}
 		Collection<String> eprs = broker.listCandidates(registry, configurationProvider, builder);
 		if(eprs.size()==0){
 			msg.verbose("No suitable endpoint found - check credentials and job requirements");
@@ -366,13 +355,9 @@ public class Runner implements Runnable {
 
 	private void setOutputLocation(){
 		String outputLoc = builder.getProperty("_ucc_Output", ".");
-		try{
-			output = new File(outputLoc);
-			if(!output.exists())output.mkdirs();
-			if(!output.isDirectory())throw new IllegalArgumentException("<"+outputLoc+"> is not a directory.");
-		}catch(Exception e){
-			msg.error(e, "Problem with <{}>", outputLoc);
-		}
+		output = new File(outputLoc);
+		if(!output.exists())output.mkdirs();
+		if(!output.isDirectory())throw new IllegalArgumentException("<"+outputLoc+"> is not a directory.");
 	}
 
 	/**
@@ -567,13 +552,13 @@ public class Runner implements Runnable {
 	}
 
 	private void initPreferredProtocols(){
-//		for(ProtocolType.Enum p : builder.getPreferredProtocols()){
-//			preferredProtocols.add(p);
-//		}
+		//		for(ProtocolType.Enum p : builder.getPreferredProtocols()){
+		//			preferredProtocols.add(p);
+		//		}
 		preferredProtocol = "BFT";
 	}
 
-	private void getStatus(boolean printOnlyIfChanged)throws Exception{
+	private void getStatus(boolean printOnlyIfChanged)throws Exception {
 		boolean changed = false;
 		Status newStatus = jobClient.getStatus();
 		if(!newStatus.equals(status)){
@@ -613,36 +598,31 @@ public class Runner implements Runnable {
 		else if(changed)msg.info(sb.toString());
 	}
 
+
 	// Runner states
 
-	public static abstract class State {
+	public static class State {
 
-		private final String name;
+		final String name;
+		final Boolean autoproceed;
+		final Function<Runner, State>next;
 
-		public State(String name) {
+		public State(String name, boolean autoproceed, Function<Runner, State>next) {
 			this.name = name;
+			this.autoproceed = autoproceed;
+			this.next = next;
 		}
 
-		public final String getName() {
-			return name;
-		}
-
-		/**
-		 * perform actions for this state
-		 * @return the next state
-		 */
-		public State process(Runner r) throws Exception
-		{
-			return this;
-		}
-
-		/** whether to proceed to the next state (in async mode) **/
-		public boolean autoProceedToNextState() {
-			return true;
+		public State process(Runner r) throws Exception {
+			return next.apply(r);
 		}
 	}
 
 	private static final Map<String,State>states = new HashMap<>();
+
+	public static State getState(String state){
+		return states.get(state);
+	}
 
 	static {
 
@@ -651,32 +631,36 @@ public class Runner implements Runnable {
 		 * The next state is STAGEIN. In dryRun mode, the next state
 		 * is EXITING
 		 */
-		states.put(NEW, new State(NEW){
-			public State process(Runner r)throws Exception{
+		states.put(NEW, new State(NEW, true, (r)->{
+			try{
 				r.doSubmit();
-				r.mustSave = true;
-				return r.dryRun? getState(EXITING) : getState(STAGEIN);
+			}catch(Exception ex) {
+				throw new RuntimeException(ex);
 			}
-		});
+			r.mustSave = true;
+			return r.dryRun? getState(EXITING) : getState(STAGEIN);
+		}));
 
 		/**
 		 * in state STAGEIN, the required local files are 
 		 * uploaded to the job working directory. 
 		 * The next state is READY.
 		 */
-		states.put(STAGEIN, new State(STAGEIN){
-			public State process(Runner r) throws Exception {
-				r.initJobClient();
+		states.put(STAGEIN, new State(STAGEIN, true, (r)->{
+			r.initJobClient();
+			try{
 				r.doImport();
-				r.mustSave = true;
-				if(r.needManualJobStart){
-					return Runner.getState(READY);
-				}
-				else{
-					return Runner.getState(STARTED);
-				}
+			}catch(Exception ex) {
+				throw new RuntimeException(ex);
 			}
-		});
+			r.mustSave = true;
+			if(r.needManualJobStart){
+				return Runner.getState(READY);
+			}
+			else{
+				return Runner.getState(STARTED);
+			}
+		}));
 
 		/**
 		 * in state READY, the job is started. 
@@ -684,14 +668,16 @@ public class Runner implements Runnable {
 		 * no data uploads, and the server supports the autostart feature.
 		 * The next state is STARTED.
 		 */
-		states.put(READY, new State(READY){
-			public State process(Runner r) throws Exception {
-				r.initJobClient();
+		states.put(READY, new State(READY, true, (r)->{
+			r.initJobClient();
+			try{
 				r.startJob();
-				r.mustSave = true;
-				return Runner.getState(STARTED);
+			}catch(Exception ex) {
+				throw new RuntimeException(ex);
 			}
-		});
+			r.mustSave = true;
+			return Runner.getState(STARTED);
+		}));
 
 		/**
 		 * in state STARTED, it is checked whether the job has finished execution.
@@ -700,8 +686,8 @@ public class Runner implements Runnable {
 		 * If the job has failed, a RuntimeException is thrown from the process() 
 		 * method.
 		 */
-		states.put(STARTED, new State(STARTED){
-			public State process(Runner r) throws Exception {
+		states.put(STARTED, new State(STARTED, false, (r)->{
+			try{
 				r.initJobClient();
 				if(r.asyncMode){
 					if(!r.shouldUpdate()){
@@ -709,91 +695,76 @@ public class Runner implements Runnable {
 					}
 					// check if still running
 					r.getStatus(true);
-					Status status = r.status;
-					if(!Status.SUCCESSFUL.equals(status) &&
-							!Status.FAILED.equals(status)){
+					if(!r.jobClient.isFinished()){
 						r.builder.setProperty("_ucc_Update interval", "0");
 						return getState(STARTED);
 					}
 				}
 				else{
 					if(!Boolean.parseBoolean(r.builder.getProperty("_ucc_DetailedStatusDisplay", "false"))){
-						waitUntilDone(r.jobClient,0);
+						r.jobClient.poll(null);
 					}
 					else{
-						String status="";
 						do{
-							status = waitUntilDone(r.jobClient, 1000);
+							try{
+								r.jobClient.poll(null, 1);
+							}catch(TimeoutException te) {}
 							r.getStatus(true);
-						}while(!status.equals("SUCCESSFUL") && !status.equals("FAILED"));
+						}while(!r.jobClient.isFinished());
 					}
 				}
-				r.mustSave = true;
-				return getState(STAGEOUT);
+			}catch(Exception ex) {
+				throw new RuntimeException(ex);
 			}
-			public boolean autoProceedToNextState(){
-				return false;
-			}
-		});
+			r.mustSave = true;
+			return getState(STAGEOUT);
+		}));
 
 		/**
 		 * in state STAGEOUT, the declared export files are retrieved and written to
 		 * the local machine. The next state is DONE. 
 		 */
-		states.put(STAGEOUT, new State(STAGEOUT){
-			public State process(Runner r)throws Exception{
-				r.initJobClient();
-				if(r.getBuilder().isSweepJob()){
-					// TODO what would be the best behaviour here?
-					r.msg.verbose("Sweep job, not downloading any output.");
-				}
-				else{
+		states.put(STAGEOUT, new State(STAGEOUT, true, (r)->{
+			r.initJobClient();
+			if(r.getBuilder().isSweepJob()){
+				// TODO what would be the best behaviour here?
+				r.msg.verbose("Sweep job, not downloading any output.");
+			}
+			else{
+				try {
 					if(!r.noFetchOutcome){
 						r.doGetStdOut();
 						r.doGetStdErr();
 					}
 					r.doExport();
+				}catch(Exception ex) {
+					throw new RuntimeException(ex);
 				}
-				r.mustSave = true;
-				return getState(DONE);
 			}
-		});
+			r.mustSave = true;
+			return getState(DONE);
+		}));
 
 		/**
 		 * in state DONE, any cleanup is performed.
 		 * The next and final state is FINISHED.
 		 */
-		states.put(DONE, new State(DONE){
-			public State process(Runner r){
-				if(!Boolean.parseBoolean(r.builder.getProperty("_ucc_KeepFinishedJob", "false"))){
-					try{
-						r.initJobClient();
-						r.mustSave = true;
-						r.jobClient.delete();
-						r.msg.verbose("Deleted done job {}", r.jobClient.getEndpoint());
-					}catch(Exception e){
-						r.msg.error(e, "Could not delete job");
-					}
-				}		
-				return getState(FINISHED);
-			}
-		});
+		states.put(DONE, new State(DONE, true, (r)->{
+			if(!Boolean.parseBoolean(r.builder.getProperty("_ucc_KeepFinishedJob", "false"))){
+				try{
+					r.initJobClient();
+					r.mustSave = true;
+					r.jobClient.delete();
+					r.msg.verbose("Deleted done job {}", r.jobClient.getEndpoint());
+				}catch(Exception e){
+					r.msg.error(e, "Could not delete job");
+				}
+			}		
+			return getState(FINISHED);
+		}));
 
-		states.put(FINISHED, new State(FINISHED){
-			public boolean autoProceedToNextState(){
-				return false;
-			}
-		});
+		states.put(FINISHED, new State(FINISHED, false, null));
 
-		states.put(EXITING, new State(EXITING){
-			public boolean autoProceedToNextState(){
-				return false;
-			}
-		});
+		states.put(EXITING, new State(EXITING, false, null));
 	}
-
-	public static State getState(String state){
-		return states.get(state);
-	}
-
 }

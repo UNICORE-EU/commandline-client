@@ -52,7 +52,7 @@ public class Run extends ActionBase {
 		super.createOptions();
 		getOptions().addOption(Option.builder(OPT_MODE)
 				.longOpt(OPT_MODE_LONG)
-				.desc("Don't wait for job to finish.")
+				.desc("Submit only, don't wait for job to finish.")
 				.required(false)
 				.get());
 		getOptions().addOption(Option.builder(OPT_SITENAME)
@@ -288,22 +288,15 @@ public class Run extends ActionBase {
 		runner.setBriefOutfileNames(brief);
 		runner.setDryRun(dryRun);
 		runner.setProperties(properties);
-		String brokerName = getOption(OPT_BROKER_LONG, OPT_BROKER);
-		if(siteName!=null){
-			brokerName = "LOCAL";
-		}
+		String brokerName = getOption(OPT_BROKER_LONG, OPT_BROKER, "LOCAL");
 		runner.setBroker(UCC.getBroker(brokerName));
-		if(allocationJobURL!=null) {
-			try {
+		try{
+			if(allocationJobURL!=null) {
 				AllocationClient ac = new AllocationClient(allocationJobURL,
 						configurationProvider.getClientConfiguration(allocationJobURL),
 						configurationProvider.getRESTAuthN());
 				runner.setSubmissionService(ac);
-			}catch(Exception ex) {
-				throw new RuntimeException(ex);
 			}
-		}
-		try{
 			runner.run();
 			if(!dryRun){
 				lastJobAddress = runner.getJob().getEndpoint();
@@ -319,7 +312,6 @@ public class Run extends ActionBase {
 				}catch(Exception ex){}
 			}
 		}catch(Exception ex){
-			ex.printStackTrace();
 			return new Pair<>(ERROR, Log.getDetailMessage(ex));
 		}
 		try {

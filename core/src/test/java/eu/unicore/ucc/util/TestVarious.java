@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import eu.unicore.client.core.FileList.FileListEntry;
 import eu.unicore.client.data.UFTPConstants;
 import eu.unicore.ucc.actions.data.LS;
-import eu.unicore.ucc.helpers.JLineLogger;
 import eu.unicore.ucc.io.FiletransferParameterProvider;
 import eu.unicore.xnjs.util.IOUtils;
 
@@ -106,12 +105,6 @@ public class TestVarious {
 			return "localhost";
 		}
 	}
-	
-	@Test
-	public void testJLineLogging() throws Exception {
-		JLineLogger.init();
-		org.jline.utils.Log.info("test123");
-	}
 
 	@Test
 	public void testArgParsing() throws Exception {
@@ -134,5 +127,23 @@ public class TestVarious {
 				"META-INF/examples/basic.json")){
 			new JSONObject(IOUtils.toString(is, 8192));
 		}
+	}
+
+	@Test
+	public void testConsoleLogger(){
+		ConsoleLogger msg = new ConsoleLogger();
+		assertFalse(msg.isVerbose());
+		assertFalse(msg.isDebug());
+		msg.info("test");
+		msg.error(new Exception("Some error for testing"), "test");
+		msg.error(null, "test with null exception");
+	}
+
+	@Test
+	public void testResourceCache() throws Exception {
+		ResourceCache c = ResourceCache.getInstance();
+		c.put("foo", "ham", "spam");
+		String e = (String)c.get("foo", "ham");
+		assertEquals("spam", e);
 	}
 }

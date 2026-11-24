@@ -19,7 +19,7 @@ import eu.unicore.uas.util.UnitParser;
 import eu.unicore.ucc.Constants;
 import eu.unicore.ucc.UCC;
 import eu.unicore.ucc.authn.UCCConfigurationProvider;
-import eu.unicore.ucc.helpers.ConsoleLogger;
+import eu.unicore.ucc.util.ConsoleLogger;
 import eu.unicore.ucc.util.JSONUtil;
 import eu.unicore.ucc.util.ProgressBar;
 

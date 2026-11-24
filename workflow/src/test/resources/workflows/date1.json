@@ -3,7 +3,7 @@
 "variables": {
 	 "COUNTER": {
 	    "type": "INTEGER",
-	    "initial_value": "123",
+	    "initial_value": "123"
 	  }
 },
 
@@ -11,13 +11,13 @@
    "date1": {
       "type": "JOB",
       "job": {
-         "ApplicationName": "Date",
+         "ApplicationName": "Date"
       },
       "options": {
        "IGNORE_FAILURE" : true,
-       "MAX_RESUBMITS": 10,
+       "MAX_RESUBMITS": 10
       }
     }
- },
+ }
 
 }

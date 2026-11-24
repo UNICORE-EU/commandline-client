@@ -1,13 +1,11 @@
 package eu.unicore.ucc.actions.job;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import eu.unicore.client.core.JobClient;
 import eu.unicore.ucc.actions.ActionBase;
 import eu.unicore.ucc.util.UCCBuilder;
-import eu.unicore.util.Pair;
 
 /**
  * base class for job operations
@@ -17,44 +15,26 @@ import eu.unicore.util.Pair;
 public abstract class JobOperationBase extends ActionBase {
 
 	/**
-	 * get job client and job info for the given job file or job URL
+	 * get job client and job info for the given job URL
 	 *
-	 * @param jobDescriptor 
+	 * @param jobURL
 	 * @return pair containing {@link JobClient} and {@link UCCBuilder}
 	 */
-	protected Pair<JobClient,UCCBuilder> createJobClient(String jobDescriptor) throws Exception {
-		Pair<JobClient,UCCBuilder>res = new Pair<>();
-		UCCBuilder builder = createBuilder(jobDescriptor);
-		res.setM2(builder);
-		String url = builder.getProperty("_ucc_epr");
-		if(url==null){
-			throw new Exception("Job address not found! Maybe <"+jobDescriptor+"> has not been produced by ucc.");
-		}
-		res.setM1(new JobClient(url,
-					configurationProvider.getClientConfiguration(url),
-					configurationProvider.getRESTAuthN()));
-		return res;
+	protected JobClient createJobClient(String jobURL) throws Exception {
+		return new JobClient(jobURL,
+					configurationProvider.getClientConfiguration(jobURL),
+					configurationProvider.getRESTAuthN());
 	}
 
 	/**
 	 * create a {@link UCCBuilder} instance
-	 * @param arg - denoting either a file, or a URL
+	 * @param url- job URL
 	 */
-	protected UCCBuilder createBuilder(String arg) throws Exception {
-		UCCBuilder builder = null;
-		File job = new File(arg);
-		if(job.exists())
-		{
-			builder = new UCCBuilder(job, registry, configurationProvider);
-			builder.setCheckLocalFiles(false);
-			console.debug("Read job info from <{}>", arg);
-		}
-		else{
-			console.debug("Accessing job at <{}>", arg);
-			builder = new UCCBuilder(registry, configurationProvider);
-			builder.setCheckLocalFiles(false);
-			builder.setProperty("_ucc_epr", arg);
-		}
+	protected UCCBuilder createBuilder(JobClient job) throws Exception {
+		UCCBuilder builder = new UCCBuilder(registry, configurationProvider);
+		builder.setCheckLocalFiles(false);
+		builder.setProperty("_ucc_epr", job.getEndpoint());
+		console.debug("Accessing job at <{}>", job.getEndpoint());
 		return builder;
 	}
 
@@ -67,7 +47,7 @@ public abstract class JobOperationBase extends ActionBase {
 		for(int i=1; i<getCommandLine().getArgs().length;i++){
 			args.add(getCommandLine().getArgs()[i]);
 		}
-		List<Pair<JobClient,UCCBuilder>>jobClients = new ArrayList<>();
+		List<JobClient>jobClients = new ArrayList<>();
 		for(String arg: args){
 			jobClients.add(createJobClient(arg));
 		}
@@ -92,6 +72,6 @@ public abstract class JobOperationBase extends ActionBase {
 				"by the 'run' command or as URLs.";
 	}
 
-	protected abstract void performCommand(List<Pair<JobClient,UCCBuilder>>jobClients);
+	protected abstract void performCommand(List<JobClient>jobClients);
 
 }

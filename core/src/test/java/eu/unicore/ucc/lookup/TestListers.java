@@ -55,6 +55,17 @@ public class TestListers extends EmbeddedTestBase {
 	}
 
 	@Test
+	public void test_Resolve_2() throws Exception {
+		String[] args=new String[]{"resolve", "-v",
+					"unicore://TEST/HOME/foo.txt",
+					"-c", "src/test/resources/conf/userprefs.embedded",
+					"-l"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
+
+	@Test
 	public void test_List_Storages() throws Exception {
 		String[] args=new String[]{"list-storages", "-v", "-l",
 					"-c", "src/test/resources/conf/userprefs.embedded",

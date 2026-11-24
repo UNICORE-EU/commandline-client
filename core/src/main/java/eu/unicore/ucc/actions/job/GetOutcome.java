@@ -7,7 +7,6 @@ import org.apache.commons.cli.Option;
 import eu.unicore.client.core.JobClient;
 import eu.unicore.ucc.runner.Runner;
 import eu.unicore.ucc.util.UCCBuilder;
-import eu.unicore.util.Pair;
 
 public class GetOutcome extends JobOperationBase {
 
@@ -58,16 +57,17 @@ public class GetOutcome extends JobOperationBase {
 	}
 
 	@Override
-	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs){
-		jobs.forEach( x -> getOutput(x.getM2()));
+	protected void performCommand(List<JobClient>jobs){
+		jobs.forEach( x -> getOutput(x));
 	}
 
-	private void getOutput(UCCBuilder builder){
+	private void getOutput(JobClient job){
 		try{
-			builder.setState(Runner.STARTED);
-			builder.setProperty("_ucc_Output",output.getAbsolutePath());
-			builder.setProperty("_ucc_KeepFinishedJob","true");
-			Runner runner = new Runner(registry,configurationProvider,builder);
+			UCCBuilder b = createBuilder(job);
+			b.setState(Runner.STARTED);
+			b.setProperty("_ucc_Output",output.getAbsolutePath());
+			b.setProperty("_ucc_KeepFinishedJob","true");
+			Runner runner = new Runner(registry,configurationProvider, b);
 			runner.setBriefOutfileNames(brief);
 			runner.setQuietMode(quiet);
 			runner.setProperties(properties);

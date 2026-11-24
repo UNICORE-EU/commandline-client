@@ -1,0 +1,22 @@
+{
+  "ApplicationName": "Bash shell", 
+  "Arguments": [ "app.sh" ],
+  
+  "Imports": [
+    { "To": "app.sh",
+      "From": "inline://x",
+      "Data":[
+        "sleep 1",
+        "echo '0.1' > .UNICORE_PROGRESS_INDICATION",        
+        "sleep 4",
+        "echo '0.5' > .UNICORE_PROGRESS_INDICATION",
+        "sleep 5",
+        "echo '1.0' > .UNICORE_PROGRESS_INDICATION"
+      ]
+    },
+    { "To": ".UNICORE_PROGRESS_INDICATION",
+      "From": "inline://x",
+      "Data":[ "0.1" ]
+    }
+   ]
+}

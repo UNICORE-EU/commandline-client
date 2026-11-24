@@ -1,4 +1,4 @@
-package eu.unicore.ucc.helpers;
+package eu.unicore.ucc.util;
 
 import org.apache.logging.log4j.message.ParameterizedMessage;
 

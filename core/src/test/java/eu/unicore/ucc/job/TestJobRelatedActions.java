@@ -154,7 +154,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		
+
 		// wait-for syntax errors
 		args = new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -305,6 +305,16 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 	}
 
 	@Test
+	public void test_Run_WithProgress()throws IOException{
+		var args = new String[]{"run","-v",
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"src/test/resources/jobs/progress.u"
+		};		
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+	}
+
+	@Test
 	public void test_Run_PrintSampleJob(){
 		String[] args=new String[]{"run", "-v",
 				"-c", "src/test/resources/conf/userprefs.embedded",
@@ -338,7 +348,7 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 
 	@Test
 	public void test_Allocate(){
-		String[] args=new String[]{"allocate", "-v", "--dry-run",
+		var args=new String[]{"allocate", "-v", "--dry-run",
 				"-c", "src/test/resources/conf/userprefs.embedded",
 				"Nodes=2", "Runtime=1h", "Queue=dev"
 		};
@@ -347,6 +357,21 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		assertEquals("2", Allocate.lastParams.get("Nodes"));
 		assertEquals("1h", Allocate.lastParams.get("Runtime"));
 		assertEquals("dev", Allocate.lastParams.get("Queue"));
+
+		// fake submission into allocation
+		args = new String[]{"create-tss", "-v", 
+				"-c", "src/test/resources/conf/userprefs.embedded"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		String allocationURL = CreateTSS.getLastTargetSystemAddress();
+		args = new String[]{"run", "-v", 
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"--allocation", allocationURL,
+				"src/test/resources/jobs/empty.u"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
 	}
 
 	@Test
@@ -359,8 +384,17 @@ public class TestJobRelatedActions extends EmbeddedTestBase {
 		};
 		UCC.main(args);
 		assertEquals(Integer.valueOf(0),UCC.exitCode);
-		String lastTSS = CreateTSS.getLastTargetSystemAddress();
-		assertNotNull(lastTSS);
+		assertNotNull(CreateTSS.getLastTargetSystemAddress());
 	}
 
+	@Test
+	public void test_CreateTSS_2() throws Exception {
+		String[] args=new String[]{"create-tss", "-v", 
+				"-c", "src/test/resources/conf/userprefs.embedded",
+				"-f", "https://localhost:65322/rest/core/factories/default_target_system_factory"
+		};
+		UCC.main(args);
+		assertEquals(Integer.valueOf(0),UCC.exitCode);
+		assertNotNull(CreateTSS.getLastTargetSystemAddress());
+	}
 }

@@ -3,8 +3,6 @@ package eu.unicore.ucc.actions.job;
 import java.util.List;
 
 import eu.unicore.client.core.JobClient;
-import eu.unicore.ucc.util.UCCBuilder;
-import eu.unicore.util.Pair;
 
 public class AbortJob extends JobOperationBase {
 
@@ -25,8 +23,8 @@ public class AbortJob extends JobOperationBase {
 	}
 
 	@Override
-	protected void performCommand(List<Pair<JobClient,UCCBuilder>>jobs) {
-		jobs.forEach( x -> abort(x.getM1()));
+	protected void performCommand(List<JobClient>jobs) {
+		jobs.forEach( x -> abort(x));
 	}
 
 	private void abort(JobClient job) {
