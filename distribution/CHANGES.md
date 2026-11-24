@@ -8,10 +8,14 @@ Report any issues via the
 
 Version 11.3.0 (released Nov 24, 2026)
 --------------------------------------
- - improvement: 'issue-token': new --output-file option to write token to a file
+ - improvement: 'issue-token': new --output-file option to write token to
+   a file. Removed option "--limited". Show token ID in "--inspect" mode.
  - fix: 'shell': URL completion was not active in some cases
  - fix: 'shell': parse command line properly for escaped/quoted strings
+ - remove query for unknown CAs - "--accept-all" option can be used
+   if necessary
  - update to UNICORE 11.3.0
+ - code cleanup
  - dependency updates
 
 Version 11.2.0 (released Aug 28, 2026)

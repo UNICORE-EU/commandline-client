@@ -58,7 +58,7 @@ _ucc()
     opts="$global_opts --brief --quiet"
     ;;
     issue-token)
-    opts="$global_opts --inspect --lifetime --limited --renewable --sitename"
+    opts="$global_opts --inspect --lifetime --output-file --renewable --sitename"
     ;;
     job-abort)
     opts="$global_opts "
